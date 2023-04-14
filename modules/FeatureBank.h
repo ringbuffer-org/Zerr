@@ -32,10 +32,13 @@ struct feature {
 
 class featurebank {
 public:
+    // general information
+    std::string algorithm_folder='../algorithm';
+
     // all supported features
     feature centroid;
-    feature flatness;
-    feature flux;
+    // feature flatness;
+    // feature flux;
     feature zero_crossing;
     feature level_diff;
 
@@ -47,6 +50,11 @@ public:
     * Print the name of all supported features
     */
     void print_features();
+    /**
+    * Check the algorithm folder if there exists the algorithm source file
+    * Raise warning when feature in the bank not finded in the folder
+    */
+    int consistency_check();
 }
 
 

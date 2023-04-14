@@ -17,13 +17,14 @@ class FeatureExtractor {
         * output_mode: FLOATING_POINTS, CATEGORY_INDEX, TRIGGER_BANG
         * (Or use simple float to represent all modes)
         */
-        std::string get_feature_name(); 
-        std::string get_processing_mode(); 
+        std::string get_feature_name(){return name;}
+        std::string get_processing_mode(){return processing_mode;}
+        std::string get_output_mode(){return output_mode;}
 
-        int get_input_channel();
-        int get_sample_rate();
-        int get_frame_size();
-        int get_step_length();
+        int get_input_channel(){return input_channel;}
+        int get_sample_rate(){return sample_rate;}
+        int get_frame_size(){return frame_size;}
+        int get_step_length(){return step_length;}
 
         /**
         * Virtual constructor functions that setup basic configs for feature extractor
@@ -38,7 +39,7 @@ class FeatureExtractor {
         */
         virtual void extract() = 0;
         /**
-        * fetch samples from audio stream. return 
+        * fetch samples from audio stream and load to the input buffer
         */
         virtual void fetch() = 0;
         /**

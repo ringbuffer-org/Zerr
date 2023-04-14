@@ -7,7 +7,6 @@
 * an error will raise if conflict exists
 */
 
-
 /**
 * Spectral Centroid
 */
