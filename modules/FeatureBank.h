@@ -24,18 +24,19 @@ struct feature {
     std::string processing_mode;
     std::string output_mode;
 
-    int input_channel;
     int sample_rate; 
-    int frame_size; 
-    int step_length;
+    int input_channel;
+    int input_size; 
+    int output_channel;
+    int output_size;
 };
 
 class featurebank {
 public:
     // general information
-    std::string algorithm_folder='../algorithm';
+    std::string algorithm_folder="../algorithm";
 
-    // all supported features
+    // information of supported features 
     feature centroid;
     // feature flatness;
     // feature flux;
@@ -56,7 +57,6 @@ public:
     */
     int consistency_check();
 }
-
 
 } //namespace zerr
 

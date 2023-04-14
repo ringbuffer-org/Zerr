@@ -24,7 +24,7 @@ class FeatureExtractor {
         int get_input_channel(){return input_channel;}
         int get_sample_rate(){return sample_rate;}
         int get_frame_size(){return frame_size;}
-        int get_step_length(){return step_length;}
+        // int get_step_length(){return step_length;}
 
         /**
         * Virtual constructor functions that setup basic configs for feature extractor
@@ -40,6 +40,7 @@ class FeatureExtractor {
         virtual void extract() = 0;
         /**
         * fetch samples from audio stream and load to the input buffer
+        * #Note: This should be take cared by audio client rather the extractor itself.
         */
         virtual void fetch() = 0;
         /**
