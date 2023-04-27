@@ -31,7 +31,7 @@ struct feature {
     int output_size;
 };
 
-class featurebank {
+class FeatureBank {
 public:
     // general information
     std::string algorithm_folder="../algorithm";

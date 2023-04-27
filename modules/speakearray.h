@@ -22,13 +22,7 @@ typedef struct Speaker {
 */
 class SpeakerArray {
 public:
-    // params
-    std::vector<Speaker> speakers;
-    int n_speaker;
-    std::vector<int> speaker_indexs; //map between vector index and speaker index
-    std::map<int, std::vector<int>> contiguous;
-
-    // methods
+    int get_n_speaker();
     // SpeakeArray();
     /**
     * setup speaker array via the YAML config file
@@ -61,13 +55,19 @@ public:
     // ~SpeakeArray();
 
 private:
+    // params
+    std::vector<Speaker> speakers;
+    int n_speaker;
+    std::vector<int> speaker_indexs; //map between vector index and speaker index
+    std::map<int, std::vector<int>> contiguous;
+
     YAML::Node speaker_config;
     /**
     * Load the YAML speaker config file
     */
-    void _read_config(std::string config_path);
-    void _init_contiguous_matrix();
-    void _init_speaker_indexs_map();
+    void read_config(std::string config_path);
+    void init_contiguous_matrix();
+    void init_speaker_indexs_map();
 }; 
 
 } //namespace zerr
