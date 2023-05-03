@@ -32,13 +32,9 @@ int main(int argc, char const *argv[])
     std::cout<<"---------------------------"<<std::endl;
     std::cout<<testArray.get_n_speakers()<<" speakers in this setup."<<std::endl;
     std::cout<<"---------------------------"<<std::endl;
-    // int index = testArray.get_random_one_speaker();
-    // Speaker s = testArray.get_speaker_by_index(index);
-    // s.print();
-    // index = testArray.get_random_one_speaker();
-    // s = testArray.get_speaker_by_index(index);
-    // s.print();
-
+    Speaker s = testArray.get_speaker_by_index(2);
+    s.print();
+    std::cout<<"---------------------------"<<std::endl;
     std::vector<int> idxs = testArray.get_random_speakers(4,1);
     std::cout << "Random Speaker indexs:\n"; 
     for (int i : idxs)
