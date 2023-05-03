@@ -1,10 +1,4 @@
 speakers:
-  0:
-    x: 2.8
-    y: 6.7
-    z: 2.6
-    directness: 1.0
-    connected: []
   1:
     x: 6.3
     y: 6.7
@@ -69,5 +63,11 @@ speakers:
     x: 5.0
     y: 7.4
     z: 2.3
+    directness: 1.0
+    connected: []
+  12:
+    x: 2.8
+    y: 6.7
+    z: 2.6
     directness: 1.0
     connected: []

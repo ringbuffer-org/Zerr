@@ -31,23 +31,23 @@ void SpeakerArray::initialize(std::string config_path){
     int cnt = 0;
     for (auto it = speakerNodes.begin(); it != speakerNodes.end(); ++it){
 
-    YAML::Node key   = it->first;
-    YAML::Node value = it->second;
+        YAML::Node key   = it->first;
+        YAML::Node value = it->second;
 
-    int index = key.as<int>();
-    float x = value['x'].as<double>();
-    float y = value['y'].as<double>();
-    float z = value['z'].as<double>();
-    float directness = value["directness"].as<double>();
-    std::vector<int> contiguous = value["connected"].as<std::vector<int>>();
+        int index = key.as<int>();
+        float x = value['x'].as<double>();
+        float y = value['y'].as<double>();
+        float z = value['z'].as<double>();
+        float directness = value["directness"].as<double>();
+        std::vector<int> contiguous = value["connected"].as<std::vector<int>>();
 
-    // Setup Speaker structure
-    Speaker s(index, x, y, z, directness, contiguous);
-    s.print();
-    indexs.push_back(index);
-    speakers.insert({index, s});
-    //update counter
-    cnt++;
+        // Setup Speaker structure
+        Speaker s(index, x, y, z, directness, contiguous);
+        s.print();
+        indexs.push_back(index);
+        speakers.insert({index, s});
+        //update counter
+        cnt++;
     }
 
     n_speakers = cnt;
@@ -67,26 +67,72 @@ Speaker SpeakerArray::get_speaker_by_index(int spkr_idx){
 
 }
 
-int SpeakerArray::get_random_one_speaker(){
+std::vector<int> SpeakerArray::get_random_indexs(int l, int n){
+    //TODO: remove duplicate
+    assert(l >= n); 
+    int idx;
+    std::vector<int> random_indexs;
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, indexs.size() - 1);
-    int i = dis(gen);
-    
-    return indexs[i];
+    std::uniform_int_distribution<> dis(0, l - 1);
+
+    for (int i = 0; i < n; ++i) {
+        idx = dis(gen);
+        random_indexs.push_back(idx);
+    }
+
+    return random_indexs;
 }
 
-// std::vector<int> SpeakerArray::get_random_speakers(int n){
+std::vector<int> SpeakerArray::get_random_speakers(int spkr_idx, int num){
+    // get from all speakers, 0 is the virtual point that connects every speaker
+    std::vector<int> chosn_idxs;
+    if (spkr_idx == 0){ 
+        int len = get_n_speakers();
+        std::vector<int> arry_idxs = get_random_indexs(len, num);
 
-// }
+        for (int i : arry_idxs){
+            chosn_idxs.push_back(indexs[i]);
+        }
+    }
+    else{
+        std::vector<int> cntg_idxs = get_contiguous_speakers(spkr_idx);
+        int len = cntg_idxs.size();
+        std::vector<int> arry_idxs = get_random_indexs(len, num);
 
-// int SpeakerArray::get_next_one_speaker(int spkr_idx, std::string mode){
+        for (int i : arry_idxs){
+            chosn_idxs.push_back(cntg_idxs[i]);
+        }
+    }
+    return chosn_idxs;
+}
 
-// }
+std::vector<int> SpeakerArray::get_contiguous_speakers(int spkr_idx){
+    Speaker s = get_speaker_by_index(spkr_idx);
+    return s.get_contiguous();
+}
 
-// std::vector<int> SpeakerArray::get_connected_speakers(int spkr_idx){
-
-// }
+int SpeakerArray::get_next_one_speaker(int spkr_idx, int mode){
+    int nxt_spker_idx = 0; // return the virtual point index
+    std::vector<int> tmp;
+    switch(mode) {
+        case 0: //"RANDOM"
+            tmp = get_random_speakers(spkr_idx, 1); //TODO: return int when only one speaker requested
+            nxt_spker_idx = tmp[0];
+            break;
+        case 1: //"MONO"
+            tmp = get_contiguous_speakers(spkr_idx);
+            assert(tmp.size()==1);
+            nxt_spker_idx = tmp[0];
+        case 2: //"NEAREST"
+            nxt_spker_idx = 1; //TODO
+            break;
+        default:
+            throw std::invalid_argument( "unknow speaker selecting mode.");
+    }
+    return nxt_spker_idx;
+}
 
 void SpeakerArray::read_config(std::string config_path){
     std::cout << "Reading speaker config!" << std::endl;
@@ -94,13 +140,4 @@ void SpeakerArray::read_config(std::string config_path){
     // clear existing data
     speakers.clear();
     speaker_config = YAML::LoadFile(config_path);
-
 }
-
-
-
-
-
-
-// void SpeakerArray::init_contiguous_matrix(){
-    // }

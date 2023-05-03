@@ -13,6 +13,7 @@
 #include "yaml-cpp/yaml.h"
 
 namespace Zerr {
+    // std::string MODE = "DEBUG"; //TODO: switch between BEBUG & RELEASE
 }
 
 #endif //ZERR_H
