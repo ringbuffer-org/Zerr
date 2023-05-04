@@ -23,12 +23,12 @@ public:
     int get_input_channel(){return input_channel;}
     int get_sample_rate(){return sample_rate;}
     int get_frame_size(){return frame_size;}
-    // int get_step_length(){return step_length;}
+    int get_step_length(){return step_length;}
 
     /**
     * Virtual constructor functions that setup basic configs for feature extractor
     */
-    virtual FeatureExtractor(){};
+    // virtual FeatureExtractor(){};
     /**
     * initialize the feature extraction algorithm 
     */

@@ -1,64 +1,57 @@
-/*
-This is a collection of possible features:
-Single   Source :
-
-Mutual   Sources:
-    (This is adised by ChatGPT)
-    1. inter-channel level difference
-    2. inter-channel phase difference
-    3. inter-channel coherence
-    4. cross-correlation
-    5. mutual information
-Multiple Sources:
-
-*/
-
 #ifndef FEATUREBANK_H
 #define FEATUREBANK_H
+
+#include "zerr.h"
+#include "featureextractor.h"
+
 namespace zerr {
-/**
-* a structure template to store basic information of algorithms
+/*
+The class to organize and setup feature extractors in zerr
 */
-struct feature {
-    std::string name; 
-    std::string processing_mode;
-    std::string output_mode;
-
-    int sample_rate; 
-    int input_channel;
-    int input_size; 
-    int output_channel;
-    int output_size;
-};
-
 class FeatureBank {
-public:
-    // general information
-    std::string algorithm_folder="../algorithm";
-
-    // information of supported features 
-    feature centroid;
-    // feature flatness;
-    // feature flux;
-    feature zero_crossing;
-    feature level_diff;
-
+public:   
     /**
-    * Print all parameters of input featur
+    * a structure template to store basic information of features
+    * TODO: move this to types.h file in the future
     */
-    void print_info(feature ft);
+    struct featureInfo {
+        std::string name; 
+        std::string description; 
+        std::string category;
+    };
+    /**
+    * Construction function: set algorithm path
+    */
+    FeatureBank(std::string path);
+    /**
+    * setup the feature selected by name 
+    */
+    void setup(std::string name);
+    /**
+    * desconstructe the used feature
+    */
+    void shutdown(std::string name);
+    /**
+    * Print all info of the selected feature
+    * Only basic info for inactive feature
+    * detail info for active feature
+    */
+    void print_info(std::string name);
     /**
     * Print the name of all supported features
     */
-    void print_features();
+    void print_all_features();
     /**
-    * Check the algorithm folder if there exists the algorithm source file
-    * Raise warning when feature in the bank not finded in the folder
+    * Print the name of active features
     */
-    int consistency_check();
-}
+    void print_active_features();
+private:
+    // general information
+    std::string path; // the relative path to the algorithm folder
+    std::vector<featureInfo> all_features; 
+    std::vector<FeatureExtractor> active_features;
+};
 
 } //namespace zerr
-
 #endif // FEATUREBANK_H
 
