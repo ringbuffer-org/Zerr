@@ -2,6 +2,7 @@
 #define FEATUREBANK_H
 
 #include "zerr.h"
+#include "features.h"
 #include "featureextractor.h"
 
 namespace zerr {
@@ -47,7 +48,7 @@ public:
     void print_active_features();
 private:
     // general information
-    std::string path; // the relative path to the algorithm folder
+    std::string features_path; // the relative path to the algorithm folder
     std::vector<featureInfo> all_features; 
     std::vector<FeatureExtractor> active_features;
 };

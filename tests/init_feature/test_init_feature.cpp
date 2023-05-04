@@ -1,6 +1,7 @@
 #include <iostream>
-#include "featurebank.h"
-
+#include "features.h"
+#include "featureextractor.h"
+// #include "centroid.h"
 using namespace zerr;
 
 /**
@@ -15,14 +16,14 @@ using namespace zerr;
 // }
 
 void print_unit_test_info(){
-    std::cout << "--------------------------------" << std::endl;
-    std::cout << "Start testing feature bank class" << std::endl;
-    std::cout << "--------------------------------" << std::endl;
+    std::cout << "---------------------------------" << std::endl;
+    std::cout << " Start testing feature extractor " << std::endl;
+    std::cout << "---------------------------------" << std::endl;
 }
 
 int main(int argc, char const *argv[]){
     print_unit_test_info();
-    std::string path = "/Users/yangzeyu/Downloads/Zerr/features";
-    FeatureBank fb(path);
+    Centroid c1;
+    std::cout<<"c1 name: "<<c1.get_name()<<std::endl;
     return 0;
 }
