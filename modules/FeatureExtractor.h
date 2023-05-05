@@ -53,7 +53,7 @@ public:
     /**
     * Run algorithm on the signal in the input buffer and update the output buffer
     */
-    virtual void extract() = 0;
+    // virtual void extract() = 0;
     /**
     * fetch samples from audio stream and load to the input buffer
     * #Note: This should be take cared by audio client rather the extractor itself.

@@ -17,36 +17,27 @@ int main(int argc, char const *argv[]){
     typedef std::unique_ptr<FeatureExtractor> Ptr;
 
     std::vector<Ptr> vec;
-    
-    std::string n = "centroid123";
-    std::string d = "The spectral centroid is a measure used in digital signal processing to characterise a spectrum.";
-    std::string c = "spectrum";
 
-    vec.push_back(Ptr(new Centroid(n,d,c)));
-    // vec.push_back(Ptr(new Flux()));
-    // vec.push_back(Ptr(new Onset()));
+    std::string name1 = "Centroid";
+    std::string description1 = "The spectral centroid is a measure used in digital signal processing to characterise a spectrum.";
+    std::string category1 = "spectrum";
+
+    std::string name2 = "Flux";
+    std::string description2 = "The ure used in digital signal processing to characterise a spectrum.";
+    std::string category2 = "specrum";
+
+    std::string name3 = "Onset";
+    std::string description3 = "The spectr measure used in digital signal processing to characterise a spectrum.";
+    std::string category3 = "specm";
+
+    vec.push_back(Ptr(new Centroid(name1,description1,category1)));
+    vec.push_back(Ptr(new Flux(name2,description2,category2)));
+    vec.push_back(Ptr(new Onset(name3,description3,category3)));
 
     for (const auto& f : vec){
         std::cout<<"name: "<<f->get_name()<<std::endl;
         f->initialize();
     }
-
-    // Centroid c1;
-    // std::cout<<"Centroid name: "<<c1.get_name()<<std::endl;
-    // Flux f1;
-    // std::cout<<"Flux name: "<<f1.get_name()<<std::endl;
-    // Onset o1;
-    // std::cout<<"Onset name: "<<o1.get_name()<<std::endl;
-
-    // get all the classes in the same namespace
-    // auto classes = FeatureExtractor::get_all();
-
-    // print the names of the classes to the console
-    // std::cout << cls->get_name() << "\n";
-    // for (const auto& cls : classes) {
-    //     std::cout << cls->get_name() << "\n";
-    // }
-    // std::cout << std::endl;
 
     return 0;
 }

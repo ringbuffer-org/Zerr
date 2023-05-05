@@ -9,10 +9,9 @@ namespace zerr {
 */
 class Onset : public FeatureExtractor {
 public:
-    // Centroid();
-    std::string get_name();
+    Onset(std::string name, std::string description, std::string category);
+    void initialize();
 private:
-    std::string name="onset";
 //     std::vector <double> x;
 //     std::vector <double> y;
 };

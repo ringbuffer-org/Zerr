@@ -1,8 +1,11 @@
 #include "flux.h"
-
+#include "zerr.h"
 using namespace zerr;
 
+Flux::Flux(std::string name, std::string description, std::string category): FeatureExtractor(name) {
+    
+}
 
-std::string Flux::get_name(){
-    return name;
+void Flux::initialize(){
+    std::cout<<"Flux:initialize"<<std::endl;
 }
