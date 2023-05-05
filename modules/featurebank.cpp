@@ -1,8 +1,6 @@
 #include "featurebank.h"
 using namespace zerr;
 
-std::vector<FeatureExtractor*> FeatureExtractor::registry_;
-
 FeatureBank::FeatureBank(std::string path){
     features_path = path;
     std::cout<<"The Path of feature algorithms:\n"<<features_path<<std::endl;

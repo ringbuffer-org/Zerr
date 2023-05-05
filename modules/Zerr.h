@@ -9,6 +9,7 @@
 #include<unistd.h>
 #include <limits>
 #include <random>
+#include <memory>
 
 #include "yaml-cpp/yaml.h"
 

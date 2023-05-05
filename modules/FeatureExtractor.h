@@ -2,7 +2,6 @@
 #define FEATUREEXTRACTOR_H
 
 #include "zerr.h"
-// #include "featurebank.h"
 /*
 Virtual Class of feature algoirthms
 */
@@ -14,7 +13,7 @@ public:
     /**
     * add this object to the static registry
     */
-    FeatureExtractor();
+    FeatureExtractor(std::string n);
     /**
     * Virtual desctructor for dealing with virtual methods
     */
@@ -22,13 +21,13 @@ public:
     /**
     * static member function to get all the classes in the same namespace
     */
-    static std::vector<FeatureExtractor*> get_all() {
-        return registry_;
-    }
+    // static std::vector<FeatureExtractor*> get_all() {
+    //     return registry_;
+    // }
 
     std::string get_name(){return name;} 
-    // std::string get_description(){return description;} 
-    // std::string get_category(){return category;}
+    std::string get_description(){return description;} 
+    std::string get_category(){return category;}
     /**
     * processing_mode: SAMPLE, BLOCK, FRAME
     * output_mode: FLOATING_POINTS, CATEGORY_INDEX, TRIGGER_BANG
@@ -50,25 +49,23 @@ public:
     /**
     * initialize the feature extraction algorithm 
     */
-    // virtual void initialize() = 0;
+    virtual void initialize() = 0;
     /**
     * Run algorithm on the signal in the input buffer and update the output buffer
     */
-    // virtual void extract() = 0;
+    virtual void extract() = 0;
     /**
     * fetch samples from audio stream and load to the input buffer
     * #Note: This should be take cared by audio client rather the extractor itself.
     */
     // virtual void fetch() = 0;
-
+    // static std::vector<FeatureExtractor*> registry_;
 
 private:
 
-    static std::vector<FeatureExtractor*> registry_;
-
     std::string name; 
-    // std::string description; 
-    // std::string category;
+    std::string description; 
+    std::string category;
 
     // struct featureInfo {
     //     std::string name; 
