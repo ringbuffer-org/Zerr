@@ -5,6 +5,12 @@
 #include "features.h"
 #include "featureextractor.h"
 
+
+// private:
+//     typedef std::unique_ptr<FeatureExtractor> Fptr;
+//     static std::vector<Fptr> vec;
+
+
 namespace zerr {
 /*
 The class to organize and setup feature extractors in zerr
@@ -12,18 +18,9 @@ The class to organize and setup feature extractors in zerr
 class FeatureBank {
 public:   
     /**
-    * a structure template to store basic information of features
-    * TODO: move this to types.h file in the future
+    * Construction function
     */
-    struct featureInfo {
-        std::string name; 
-        std::string description; 
-        std::string category;
-    };
-    /**
-    * Construction function: set algorithm path
-    */
-    FeatureBank(std::string path);
+    FeatureBank();
     /**
     * setup the feature selected by name 
     */
@@ -48,9 +45,10 @@ public:
     void print_active_features();
 private:
     // general information
-    std::string features_path; // the relative path to the algorithm folder
-    std::vector<featureInfo> all_features; 
-    std::vector<FeatureExtractor> active_features;
+    static const std::map<std::string, FeatureInfo> bank; 
+
+    typedef std::unique_ptr<FeatureExtractor> fptr;
+    static std::vector<fptr> activated;
 };
 
 } //namespace zerr

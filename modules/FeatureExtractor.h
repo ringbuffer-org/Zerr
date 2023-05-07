@@ -7,6 +7,28 @@ Virtual Class of feature algoirthms
 */
 
 namespace zerr {
+template <typename T>
+class FeatureInfo{
+public:
+    std::string name;
+    std::string category;
+    std::string description;
+
+    typedef T* (*Creator)();
+    Creator create;
+    }
+};
+
+// template <typename BaseAlgorithm>
+// class ESSENTIA_API AlgorithmInfo {
+//  public:
+//   typedef BaseAlgorithm* (*AlgorithmCreator)();
+
+//   AlgorithmCreator create;
+//   std::string name;
+//   std::string description;
+//   std::string category;
+// };
 
 class FeatureExtractor {
 public: 
@@ -53,7 +75,7 @@ public:
     /**
     * Run algorithm on the signal in the input buffer and update the output buffer
     */
-    // virtual void extract() = 0;
+    virtual void extract() = 0;
     /**
     * fetch samples from audio stream and load to the input buffer
     * #Note: This should be take cared by audio client rather the extractor itself.
@@ -63,9 +85,11 @@ public:
 
 private:
 
-    std::string name; 
-    std::string description; 
-    std::string category;
+    const std::string name; 
+    const std::string description; 
+    const std::string category;
+
+    bool mInitialized;
 
     // struct featureInfo {
     //     std::string name; 
