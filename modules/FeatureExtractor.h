@@ -18,20 +18,6 @@ public:
     void print();
 };
 
-
-// class MyClass {
-// public:
-//     MyClass(int x, int y, int (*func)(int, int)) : x_(x), y_(y), func_(func) {}
-//     int calculate() const {
-//         return func_(x_, y_);
-//     }
-// private:
-//     int x_;
-//     int y_;
-//     int (*func_)(int, int);
-// };
-
-
 class FeatureExtractor {
     /**
     * processing_mode: SAMPLE, BLOCK, FRAME
@@ -48,11 +34,12 @@ public:
     virtual ~FeatureExtractor(){};
     /**
     * get function to access the private members
+    * basic info(name, category, description) can be accessed before 
     */
     virtual std::string get_name() = 0;
     virtual std::string get_category() = 0;
     virtual std::string get_description() = 0;
-    
+
     // int get_input_channel(){return input_channel;}
     // int get_sample_rate(){return sample_rate;}
     // int get_frame_size(){return frame_size;}
@@ -60,11 +47,6 @@ public:
     // std::string get_feature_name(){return name;}
     // std::string get_processing_mode(){return processing_mode;}
     // std::string get_output_mode(){return output_mode;}
-    /**
-    * Check if this feature extractor is initialized
-    */
-    bool is_initialized(){return initialized;}
-    void set_initialize_statue(bool s){initialized=s;}
     /**
     * initialize the feature extraction algorithm 
     */
@@ -77,8 +59,13 @@ public:
     * fetch samples from audio stream and load to the input buffer
     * #Note: This should be take cared by audio client rather the extractor itself.
     */
-    // virtual void fetch() = 0;
-    // static std::vector<FeatureExtractor*> registry_;
+    virtual void fetch(BaseInput*) = 0;
+    virtual BaseOutput* send() = 0;
+    /**
+    * Check if this feature extractor is initialized
+    */
+    bool is_initialized(){return initialized;}
+    void set_initialize_statue(bool s){initialized=s;}
 
 private:
 
