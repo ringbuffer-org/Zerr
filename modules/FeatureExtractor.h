@@ -2,22 +2,36 @@
 #define FEATUREEXTRACTOR_H
 
 #include "zerr.h"
-/*
-Virtual Class of feature algoirthms
-*/
+
 
 namespace zerr {
+// template<typename InputType>
+// class BaseInput{
+// public:
+//     BaseInput();
+//     /**
+//     * get the size of input vector 
+//     */
+//     int get_length(){return length;}
+//     /**
+//     * initialize the feature extraction algorithm 
+//     */
+    
+//     InputType fetch(); 
+//     /**
+//     * initialize the feature extraction algorithm 
+//     */
+//     void set(); 
+// private:
+//     int length;
+//     InputType in; //constant size
+// }
 
-// template <typename T>
-class FeatureInfo{
-public:
-    FeatureInfo(std::string, std::string, std::string);
-    std::string name;
-    std::string category;
-    std::string description;
-    void print();
-};
-
+/**
+* Virtual Class of all feature extractors
+* Use this to unifiy the feature extractor behaviour and 
+*/
+// template<typename InputType, typename OutputType>
 class FeatureExtractor {
     /**
     * processing_mode: SAMPLE, BLOCK, FRAME
@@ -56,11 +70,15 @@ public:
     */
     virtual void extract() = 0;
     /**
+    * Run algorithm on the signal in the input buffer and update the output buffer
+    */
+    virtual void reset() = 0;
+    /**
     * fetch samples from audio stream and load to the input buffer
     * #Note: This should be take cared by audio client rather the extractor itself.
     */
-    virtual void fetch(BaseInput*) = 0;
-    virtual BaseOutput* send() = 0;
+    virtual void fetch(std::vector<double> x) = 0;
+    virtual float send() = 0;
     /**
     * Check if this feature extractor is initialized
     */
@@ -68,10 +86,8 @@ public:
     void set_initialize_statue(bool s){initialized=s;}
 
 private:
-
-    // const std::string name; 
-    // const std::string category;
-    // const std::string description; 
+    // std::vector<double> x;
+    // float               y;
 
     bool initialized=false; // 
 
@@ -84,22 +100,25 @@ private:
     // int frame_size; 
     // int step_length;
 
-    /**
-    * This function will be called internal in the init method
-    * check if the feature algorithm config has conflict with the audio client config
-    * e.g frame_size, sample_rate, input_channel etc.
-    */
-    // virtual void conflict_check() = 0;
-
-    /**
-    * size varied according to the type of algorithm: 
-    * sample:1 --> block:64 --> frame:1024 --> concated frames:1024*2
-    */
-    // std::vector <double> x;
-    // std::vector <double> y;
-
 }; // Class FeatureExtractor
+
+
+// template <typename T>
+// class FeatureInfo{
+// public:
+//     FeatureInfo(std::string, std::string, std::string);
+//     std::string name;
+//     std::string category;
+//     std::string description;
+//     void print();
+// };
+
+
 
 } // Namespace zerr 
 
 #endif // FEATUREEXTRACTOR_H
+
+
+
+
