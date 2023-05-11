@@ -5,33 +5,11 @@
 
 
 namespace zerr {
-// template<typename InputType>
-// class BaseInput{
-// public:
-//     BaseInput();
-//     /**
-//     * get the size of input vector 
-//     */
-//     int get_length(){return length;}
-//     /**
-//     * initialize the feature extraction algorithm 
-//     */
-    
-//     InputType fetch(); 
-//     /**
-//     * initialize the feature extraction algorithm 
-//     */
-//     void set(); 
-// private:
-//     int length;
-//     InputType in; //constant size
-// }
-
 /**
 * Virtual Class of all feature extractors
-* Use this to unifiy the feature extractor behaviour and 
+* Use this to unifiy the feature extractor behaviour
+* TODO: wrap input and output to class
 */
-// template<typename InputType, typename OutputType>
 class FeatureExtractor {
     /**
     * processing_mode: SAMPLE, BLOCK, FRAME
@@ -53,14 +31,6 @@ public:
     virtual std::string get_name() = 0;
     virtual std::string get_category() = 0;
     virtual std::string get_description() = 0;
-
-    // int get_input_channel(){return input_channel;}
-    // int get_sample_rate(){return sample_rate;}
-    // int get_frame_size(){return frame_size;}
-    // int get_step_length(){return step_length;}
-    // std::string get_feature_name(){return name;}
-    // std::string get_processing_mode(){return processing_mode;}
-    // std::string get_output_mode(){return output_mode;}
     /**
     * initialize the feature extraction algorithm 
     */
@@ -86,21 +56,23 @@ public:
     void set_initialize_statue(bool s){initialized=s;}
 
 private:
-    // std::vector<double> x;
-    // float               y;
 
     bool initialized=false; // 
 
-    // std::string name; 
-    // std::string processing_mode;
-    // std::string output_mode;
+    // int x_size;
+    // int y_size;
+    // std::vector<double> x;
+    // std::vector<double> y;
+
+}; // Class FeatureExtractor
+} // Namespace zerr 
+
+#endif // FEATUREEXTRACTOR_H
 
     // int input_channel;
     // int sample_rate; 
     // int frame_size; 
     // int step_length;
-
-}; // Class FeatureExtractor
 
 
 // template <typename T>
@@ -112,12 +84,35 @@ private:
 //     std::string description;
 //     void print();
 // };
+    // int get_input_channel(){return input_channel;}
+    // int get_sample_rate(){return sample_rate;}
+    // int get_frame_size(){return frame_size;}
+    // int get_step_length(){return step_length;}
+    // std::string get_feature_name(){return name;}
+    // std::string get_processing_mode(){return processing_mode;}
+    // std::string get_output_mode(){return output_mode;}
 
-
-
-} // Namespace zerr 
-
-#endif // FEATUREEXTRACTOR_H
+// template<typename InputType>
+// class BaseInput{
+// public:
+//     BaseInput();
+//     /**
+//     * get the size of input vector 
+//     */
+//     int get_length(){return length;}
+//     /**
+//     * initialize the feature extraction algorithm 
+//     */
+    
+//     InputType fetch(); 
+//     /**
+//     * initialize the feature extraction algorithm 
+//     */
+//     void set(); 
+// private:
+//     int length;
+//     InputType in; //constant size
+// }
 
 
 

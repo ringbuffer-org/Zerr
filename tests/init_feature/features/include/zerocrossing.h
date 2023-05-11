@@ -1,15 +1,16 @@
-#ifndef ONSET_H
-#define ONSET_H
+#ifndef ZEROCROSSING_H
+#define ZEROCROSSING_H
 
 #include "featureextractor.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Amplitude-based simple onset detection
+* Spectrum Centroid algorithm
 */
-class Onset : public FeatureExtractor {
+class ZeroCrossing : public FeatureExtractor { 
 public:
+
     static const std::string name; 
     static const std::string category;
     static const std::string description; 
@@ -25,11 +26,19 @@ public:
     float send();
 
 private:
-    //TODO wrap the input and output
-    std::vector <double> x; //input
-    float y; //output g
+    //TODO wrap the input and output type into uniform class
+    std::vector<double> x; //input
+    float    y; //output
+
+    // params
+    void _reset_param();
+    double new_x;
+    double pre_x;
+    float sign1;
+    float sign2;
+    
 };
 
 } //namespace feature
 } //namespace zerr
-#endif // ONSET_H
+#endif // ZEROCROSSING_H

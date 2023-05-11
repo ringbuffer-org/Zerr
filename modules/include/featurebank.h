@@ -5,15 +5,9 @@
 #include "features.h"
 #include "featureextractor.h"
 
-
-// private:
-//     typedef std::unique_ptr<FeatureExtractor> Fptr;
-//     static std::vector<Fptr> vec;
-
-
 namespace zerr {
-/*
-The class to organize and setup feature extractors in zerr
+/**
+* Organize and setup feature extractors
 */
 class FeatureBank {
 public:   
