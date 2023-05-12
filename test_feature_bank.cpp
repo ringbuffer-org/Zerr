@@ -25,23 +25,26 @@ void print_unit_test_info(){
 
 int main(int argc, char const *argv[]){
     print_unit_test_info();
+    FeatureBank::regist_all(); 
+    
     FeatureBank bank;
 
-    typedef std::unique_ptr<FeatureExtractor> fe_ptr;
-    typedef std::vector<std::string> str_vec;
-    typedef std::vector<fe_ptr> fe_ptr_vec;
+
+
+    // typedef std::unique_ptr<FeatureExtractor> fe_ptr;
+    // typedef std::vector<std::string> str_vec;
+    // typedef std::vector<fe_ptr> fe_ptr_vec;
 
     bank.setup("Centroid");
-    bank.shutdown("ZeroCrossing");
-    bank.print_info("Onset");
+    // bank.shutdown("ZeroCrossing");
+    // bank.print_info("Onset");
 
-
-    bank.regist("Centroid", []() {
-        return fe_ptr(new Centroid());
-    });
-    bank.regist("ZeroCrossing", []() {
-        return fe_ptr(new ZeroCrossing());
-    });
+    // bank.regist("Centroid", []() {
+    //     return fe_ptr(new Centroid());
+    // });
+    // bank.regist("ZeroCrossing", []() {
+    //     return fe_ptr(new ZeroCrossing());
+    // });
 
     // std::string className1 = "Centroid";
     // fe_ptr object1 = bank.create(className1);

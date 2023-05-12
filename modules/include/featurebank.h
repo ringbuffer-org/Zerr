@@ -22,10 +22,13 @@ public:
     /**
     * Register a feature extractor with the bank
     */
-    void regist(const std::string& className, CreateFunc createFunc) {
-        classRegistry_[className] = createFunc;
-    }
-
+    /**
+    * static function that register all features
+    */
+    static void regist_all();
+    /**
+    * call the constructor of a feature based on the feature name
+    */
     std::unique_ptr<FeatureExtractor> create(const std::string& className) {
         auto it = classRegistry_.find(className);
         if (it != classRegistry_.end()) {
@@ -36,16 +39,19 @@ public:
     /**
     * setup the feature selected by name 
     */
+    // template<typename T>
     void setup(std::string name);
     /**
     * desconstructe the used feature
     */
+    // template<typename T>
     void shutdown(std::string name);
     /**
     * Print all info of the selected feature
     * Only basic info for inactive feature
     * detail info for active feature
     */
+    // template<typename T>
     void print_info(std::string name);
     /**
     * Print the name of all supported features
@@ -56,12 +62,17 @@ public:
     */
     // void print_active_features();
 private:
-    std::map<std::string, CreateFunc> classRegistry_;
-    // general information
-    // static const std::map<std::string, FeatureInfo> bank; 
+    //TODO: Should all this be static?
+    static std::map<std::string, CreateFunc> classRegistry_;
 
-    // typedef std::unique_ptr<FeatureExtractor> fptr;
-    // static std::vector<fptr> activated;
+    //TODO: move the typedef to type.h
+    typedef std::unique_ptr<FeatureExtractor> fe_ptr;
+    typedef std::vector<fe_ptr> fe_ptr_vec;
+    fe_ptr_vec active_features;
+
+    static void regist(const std::string& className, CreateFunc createFunc) {
+        classRegistry_[className] = createFunc;
+    }
 };
 
 } //namespace zerr

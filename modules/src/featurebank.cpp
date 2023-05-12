@@ -4,7 +4,7 @@ using namespace zerr;
 
 
 void FeatureBank::setup(std::string name){
-    std::cout<<"setup:\n"<<name<<std::endl;
+    active_features.push_back(create(name));
 }
 
 void FeatureBank::shutdown(std::string name){
@@ -14,4 +14,16 @@ void FeatureBank::shutdown(std::string name){
 void FeatureBank::print_info(std::string name){
     std::cout<<"shutdown:\n"<<name<<std::endl;
 }
+
+static void FeatureBank::regist_all(){
+    regist("Centroid", []() {
+        return fe_ptr(new Centroid());
+    });
+    regist("ZeroCrossing", []() {
+        return fe_ptr(new ZeroCrossing());
+    });
+}
+
+
+
 
