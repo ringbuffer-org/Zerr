@@ -39,7 +39,7 @@ public:
     void print_active_features();
 private:
     // general information
-    static const std::map<std::string, FeatureInfo> bank; 
+    // static const std::map<std::string, FeatureInfo> bank; 
 
     typedef std::unique_ptr<FeatureExtractor> fptr;
     static std::vector<fptr> activated;

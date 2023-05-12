@@ -3,7 +3,6 @@
 
 #include "zerr.h"
 
-
 namespace zerr {
 /**
 * Virtual Class of all feature extractors
@@ -19,7 +18,7 @@ public:
     /**
     * add this object to the static registry
     */
-    FeatureExtractor();
+    // FeatureExtractor();
     /**
     * Virtual desctructor for dealing with virtual methods
     */

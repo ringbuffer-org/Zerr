@@ -1,19 +1,20 @@
 #include <iostream>
 #include <memory>
 
-//test data generator dependencies
+// //test data generator dependencies
 #include <cstdlib>
 #include <ctime>
 
 #include "features.h"
 #include "featureextractor.h"
+
 using namespace zerr;
 using namespace feature;
 
 void print_unit_test_info(){
-    std::cout << "---------------------------------" << std::endl;
-    std::cout << " Start testing feature extractor " << std::endl;
-    std::cout << "---------------------------------" << std::endl;
+    std::cout << "--------------------------------" << std::endl;
+    std::cout << "   Start testing feature bank   " << std::endl;
+    std::cout << "--------------------------------" << std::endl;
 }
 
 std::vector<double> randomVector(int size, double min, double max) {
@@ -36,7 +37,6 @@ int main(int argc, char const *argv[]){
     typedef std::unique_ptr<FeatureExtractor> Ptr;
 
     std::vector<Ptr> vec;
-
     vec.push_back(Ptr(new Centroid));
     vec.push_back(Ptr(new Onset));
     vec.push_back(Ptr(new ZeroCrossing));
