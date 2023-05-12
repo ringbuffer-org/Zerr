@@ -2,9 +2,6 @@
 using namespace zerr;
 
 
-FeatureBank::FeatureBank(){
-
-}
 
 void FeatureBank::setup(std::string name){
     std::cout<<"setup:\n"<<name<<std::endl;

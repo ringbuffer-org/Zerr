@@ -6,7 +6,7 @@
 #include <ctime>
 
 #include "features.h"
-#include "featureextractor.h"
+#include "featurebank.h"
 
 using namespace zerr;
 using namespace feature;
@@ -17,56 +17,57 @@ void print_unit_test_info(){
     std::cout << "--------------------------------" << std::endl;
 }
 
-std::vector<double> randomVector(int size, double min, double max) {
-    std::vector<double> result(size);
+// std::vector<double> randomVector(int size, double min, double max) {
+//     std::vector<double> result(size);
 
-    srand(time(NULL)); // seed the random number generator
+//     srand(time(NULL)); // seed the random number generator
 
-    for (int i = 0; i < size; i++) {
-        double random = (double) rand() / RAND_MAX; // generate random number between 0 and 1
-        result[i] = min + random * (max - min); // scale the number to the desired range
-    }
+//     for (int i = 0; i < size; i++) {
+//         double random = (double) rand() / RAND_MAX; // generate random number between 0 and 1
+//         result[i] = min + random * (max - min); // scale the number to the desired range
+//     }
 
-    return result;
-}
+//     return result;
+// }
 
 
 
 int main(int argc, char const *argv[]){
     print_unit_test_info();
-    typedef std::unique_ptr<FeatureExtractor> Ptr;
+    FeatureBank bank;
 
-    std::vector<Ptr> vec;
-    vec.push_back(Ptr(new Centroid));
-    vec.push_back(Ptr(new Onset));
-    vec.push_back(Ptr(new ZeroCrossing));
+    typedef std::unique_ptr<FeatureExtractor> fe_ptr;
 
+    bank.setup("Centroid");
+    bank.shutdown("ZeroCrossing");
+    bank.print_info("Onset");
 
-    std::vector<double> test_frame = randomVector(1024, -1.0, 1.0);
-    // std::vector<double> test_samples = randomVector(1, -1.0, 1.0);
+    // Register the classes with the bank
+    // bank.regist("Centroid", []() -> fe_ptr {
+    //     return std::make_unique<Centroid>();
+    // });
+    bank.regist("Centroid", []() {
+        return fe_ptr(new Centroid());
+    });
 
-    for (const auto& f : vec){
-        std::cout<<"feature name:   "<<f->get_name()<<std::endl;
-        std::cout<<"is_initialized: "<<f->is_initialized()<<std::endl;
-        f->initialize();
-        std::cout<<"is_initialized: "<<f->is_initialized()<<std::endl;
-        std::cout<<"---------------------------------"<<std::endl;
+    // bank.regist("ZeroCrossing", []() -> fe_ptr {
+    //     return std::make_unique<ZeroCrossing>();
+    // });
+
+    bank.regist("ZeroCrossing", []() {
+        return fe_ptr(new ZeroCrossing());
+    });
+
+    std::string className1 = "Centroid";
+    fe_ptr object1 = bank.create(className1);
+    if (object1) {
+        std::cout<<"feature name:   "<<object1->get_name()<<std::endl;
     }
-    // test centroid
-    vec[0]->fetch(test_frame);
-    vec[0]->extract();
-    float res = vec[0]->send();
-    std::cout<<"Result: "<<res<<std::endl;
-    // test zero crossing
-    std::vector<double> test_samples= {0.1, 2, -1.0, -2.0, 0.3};
-    std::vector<double> tmp;
-    for (const auto& s : test_samples){   
-        tmp.clear();
-        tmp.push_back(s);
-        vec[2]->fetch(tmp);
-        vec[2]->extract();
-        res = vec[2]->send();
-        std::cout<<"Result: "<<res<<std::endl;
+
+    std::string className2 = "ZeroCrossing";
+    fe_ptr object2 = bank.create(className2);
+    if (object2) {
+        std::cout<<"feature name:   "<<object2->get_name()<<std::endl;
     }
 
     return 0;
