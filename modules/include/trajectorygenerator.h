@@ -14,22 +14,22 @@ public:
     /**
     * initialize the feature extraction algorithms 
     */
-    virtual void initialize() = 0;
+    void initialize();
     /**
     * update the input control signal buffer
     */
-    virtual void update() = 0;
+    void update();
     /**
     * apply the transformation to merge incoming control signals into mono control signal
     */
-    virtual void merge() = 0;
+    void merge();
 
 private:
-    std::vector<unique_ptr<FeatureExtractor>> extractors;
+    // std::vector<unique_ptr<FeatureExtractor>> extractors;
     /**
     * vector of name the feature extraction algorithms' uesed to generate this control trajectory
     */
-    std::vector<std::string> names;
+    // std::vector<std::string> names;
     /**
     * input control signal buffer
     */
@@ -38,7 +38,7 @@ private:
     /**
     * all features should run on the same processing mode for real-time processing consistance
     */
-    void check_processing_mode();
+    // void check_processing_mode();
     /**
     * build blocks of feature to trajectory transformation
     * @params chnl: apply this function on which channel
