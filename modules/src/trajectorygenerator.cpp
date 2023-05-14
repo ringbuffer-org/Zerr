@@ -10,11 +10,18 @@ void TrajectoryGenerator::fetch(std::vector<float> in){
     //tmp
     xs.clear();
     xs = in;
-    std::cout<<"updated!"<<std::endl;
+
+    std::cout<<"new input: ";
+    for (auto x:xs){
+        std::cout<<x<<"  ";
+    }
+    std::cout<<std::endl;
 }
 
-void TrajectoryGenerator::merge(){
-    // messy temparary merge function
+void TrajectoryGenerator::process(){
+    // messy temparary process function
+    // two input channels are weighted and added then compared with a constant threshold
+    // the output 
     float tmp;
     std::vector<float> weights = {0.5, 0.1};
     tmp = weight_add(xs, weights);

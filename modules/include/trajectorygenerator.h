@@ -23,7 +23,7 @@ public:
     /**
     * apply the transformation to merge incoming control signals into mono control signal
     */
-    void merge();
+    void process();
     float send();
     void reset();
 

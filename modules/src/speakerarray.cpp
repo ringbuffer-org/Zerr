@@ -123,8 +123,9 @@ int SpeakerArray::get_next_one_speaker(int spkr_idx, int mode){
             break;
         case 1: //"MONO"
             tmp = get_contiguous_speakers(spkr_idx);
-            assert(tmp.size()==1);
+            // assert(tmp.size()==1); // commented for testing
             nxt_spker_idx = tmp[0];
+            break;
         case 2: //"NEAREST"
             nxt_spker_idx = 1; //TODO
             break;

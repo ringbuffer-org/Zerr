@@ -22,17 +22,17 @@ int main(int argc, char const *argv[]){
     gen.initialize();
 
     print_splite_line();
-    
+
     std::vector<float> test_vec1 = {0.9, 0.6};
     gen.fetch(test_vec1);
-    gen.merge();
+    gen.process();
     std::cout<<"result: "<<gen.send()<<std::endl;
 
     print_splite_line();
 
     std::vector<float> test_vec2 = {0.3, 0.6};
     gen.fetch(test_vec2);
-    gen.merge();
+    gen.process();
     std::cout<<"result: "<<gen.send()<<std::endl;
 
     return 0;
