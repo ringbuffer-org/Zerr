@@ -1,9 +1,9 @@
-project('test_audiorouter', 'cpp')
+project('test_mapper', 'cpp')
 
 build_machine.system()
 meson.get_compiler('cpp')
 
-test_src = ['test_audiorouter.cpp']
+test_src = ['test_mapper.cpp']
 
 subdir('modules')
 subdir('features')
