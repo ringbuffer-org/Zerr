@@ -14,11 +14,15 @@ public:
     static const std::string category;
     static const std::string description; 
 
-    void initialize();
-    void extract();
     std::string get_name(){return name;}
     std::string get_category(){return category;}
     std::string get_description(){return description;}
+
+    void initialize();
+    void extract();
+    void reset();
+    void fetch(std::vector<double> in);
+    float send();
 
 private:
     //TODO wrap the input and output

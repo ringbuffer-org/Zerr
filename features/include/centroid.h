@@ -10,7 +10,6 @@ namespace feature{
 */
 class Centroid : public FeatureExtractor { 
 public:
-
     static const std::string name; 
     static const std::string category;
     static const std::string description; 
