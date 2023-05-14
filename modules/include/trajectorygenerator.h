@@ -13,16 +13,19 @@ class TrajectoryGenerator {
 public:
     /**
     * initialize the feature extraction algorithms 
+    * set up the input vec size
     */
     void initialize();
     /**
     * update the input control signal buffer
     */
-    void update();
+    void fetch(std::vector<float> in);
     /**
     * apply the transformation to merge incoming control signals into mono control signal
     */
     void merge();
+    float send();
+    void reset();
 
 private:
     // std::vector<unique_ptr<FeatureExtractor>> extractors;
@@ -33,8 +36,9 @@ private:
     /**
     * input control signal buffer
     */
-    std::vector<float> values;
-    std::string output_mode;
+    std::vector<float> xs;
+    float y;
+    // std::string output_mode;
     /**
     * all features should run on the same processing mode for real-time processing consistance
     */
@@ -48,7 +52,7 @@ private:
     float below_threshold(float x, float thres);
     float max(std::vector<float> xs);
     float min(std::vector<float> xs);
-    float weight_add(std::vector<float> xs, std::vector weights);
+    float weight_add(std::vector<float> xs, std::vector<float> weights);
     float scale(float xmin, float xmax, float ymin, float ymax);
     float sample(float x, float impulse);
     float quantitative(float x, float minx, float step);

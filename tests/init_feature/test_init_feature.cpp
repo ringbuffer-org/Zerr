@@ -29,8 +29,6 @@ std::vector<double> randomVector(int size, double min, double max) {
     return result;
 }
 
-
-
 int main(int argc, char const *argv[]){
     print_unit_test_info();
     typedef std::unique_ptr<FeatureExtractor> Ptr;

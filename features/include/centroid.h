@@ -34,7 +34,6 @@ private:
     double k     = 0;
     double denum = 0.0000;
     double num   = 0.00001; // use a tiny offset to avoid NaNs
-    
 };
 
 } //namespace feature
