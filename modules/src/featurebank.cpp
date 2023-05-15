@@ -42,3 +42,31 @@ void FeatureBank::regist_all(){
     //     return fe_ptr(new Flux());
     // });
 }
+
+void FeatureBank::initialize(){
+    n_features = activated_features.size();
+    for (int i = 0; i < n_features; ++i){
+        activated_features[i]->initialize();
+    }
+    std::cout<<"activated_features.size(): "<<activated_features.size()<<std::endl;
+    ys.resize(activated_features.size());
+}
+
+void FeatureBank::fetch(std::vector<double> in){
+    x.clear();
+    x = in;
+}
+
+void FeatureBank::process(){
+    for (int i = 0; i < activated_features.size(); ++i){
+        activated_features[i]->fetch(x);
+        activated_features[i]->extract();
+        // std::cout<<"process send: "<<activated_features[i]->send()<<std::endl;
+        ys[i] = activated_features[i]->send();
+        // std::cout<<"process ys: "<<ys[i]<<std::endl;
+    }
+}
+
+std::vector<float> FeatureBank::send(){
+    return ys;
+}

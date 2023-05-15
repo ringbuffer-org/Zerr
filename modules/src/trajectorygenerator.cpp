@@ -23,7 +23,7 @@ void TrajectoryGenerator::process(){
     // two input channels are weighted and added then compared with a constant threshold
     // the output 
     float tmp;
-    std::vector<float> weights = {0.5, 0.1};
+    std::vector<float> weights = {0.5, 0.5};
     tmp = weight_add(xs, weights);
     y = (tmp > 0.5);
     std::cout<<"merged!: "<<tmp<<std::endl;

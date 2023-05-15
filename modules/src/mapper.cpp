@@ -12,6 +12,10 @@ void Mapper::initialize(std::string config_path){
     _update_mapping();
 }
 
+int Mapper::get_n_speaker(){
+    return speaker_array.get_n_speakers();
+}
+
 void Mapper::_init_mapping(int n){
     mapping.clear(); //clean up the mapping if not empty
     mapping.push_back(1); // index 0: virtual point to store the overall vol
