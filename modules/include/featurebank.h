@@ -61,9 +61,20 @@ public:
     * Print the name of active features
     */
     void print_active_features();
+
+    void initialize();
+    void fetch(std::vector<double> in);
+    void process();
+    std::vector<float> send();
 private:
     std::map<std::string, CreateFunc> registed_features;
     std::vector<fe_ptr> activated_features;
+
+    std::vector<double> x;
+    std::vector<float> ys;
+
+    int n_features;
+
 };
 
 } //namespace zerr

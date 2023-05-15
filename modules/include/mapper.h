@@ -17,6 +17,8 @@ public:
     std::vector<float> send();
     void reset();
 
+    int get_n_speaker();
+
 private:
     /**
     * The 
