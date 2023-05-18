@@ -1,7 +1,7 @@
 #ifndef TRAJECTORYGENERATOR_H
 #define TRAJECTORYGENERATOR_H
 
-#include "zerr.h"
+#include "utils.h"
 #include "featurebank.h"
 #include "featureextractor.h"
 

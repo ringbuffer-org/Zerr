@@ -1,63 +1,8 @@
 #include "zerr.h"
-#include "audiorouter.h"
-#include "featurebank.h"
-#include "mapper.h"
-#include "trajectorygenerator.h"
-
 using namespace zerr;
 
-void print_unit_test_info(){
-    std::cout << "-------------------------------" << std::endl;
-    std::cout << "Start connecting modules       " << std::endl;
-    std::cout << "-------------------------------" << std::endl;
-}
-
-void print_splite_line(){
-    std::cout << "----------------------------------" << std::endl;
-}
-
-void print_mat(std::vector<std::vector<double>> mat){
-    for (std::vector<double> chnl:mat){
-        for (double sample:chnl){
-            std::cout<<sample<<" ";
-        }
-        std::cout<<std::endl;
-    }
-    std::cout<<std::endl;
-}
-
-void print_vec(std::vector<float> vec){
-    for (double sample:vec){
-        std::cout<<sample<<" ";
-    }
-    std::cout<<std::endl;
-}
-
-std::vector<double> randomVector(int size, double min, double max) {
-    std::vector<double> result(size);
-
-    srand(time(NULL)); // seed the random number generator
-
-    for (int i = 0; i < size; i++) {
-        double random = (double) rand() / RAND_MAX; // generate random number between 0 and 1
-        result[i] = min + random * (max - min); // scale the number to the desired range
-    }
-
-    return result;
-}
-
-template<typename T>
-std::vector<T> slice(std::vector<T> const &v, int m, int n)
-{
-    auto first = v.cbegin() + m;
-    auto last = v.cbegin() + n + 1;
- 
-    std::vector<T> vec(first, last);
-    return vec;
-}
-
 int main(int argc, char const *argv[]){
-    print_unit_test_info();
+    print_unit_test_info("main test");
     typedef std::vector<std::vector<double>> audio_mat;
     typedef std::vector<std::string> str_vec;
 
@@ -71,8 +16,9 @@ int main(int argc, char const *argv[]){
         test_audio.push_back(sub);
     }
     std::cout<<"Test audio size: "<<test_audio.size()<<"*"<<test_audio[0].size()<<std::endl;
+    print_line(32);
     print_mat(test_audio);
-    print_splite_line();
+    print_line(32);
 
     /**
     *  start setup
@@ -103,7 +49,7 @@ int main(int argc, char const *argv[]){
     /**
     *  start processing
     */
-    print_splite_line();
+    print_line(64);
     for (auto frame: test_audio){
         bank.fetch(frame);
         bank.process();

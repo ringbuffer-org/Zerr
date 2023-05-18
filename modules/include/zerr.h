@@ -1,20 +1,12 @@
 #ifndef ZERR_H
 #define ZERR_H
 
-#include<stdlib.h>
-#include<vector>
-#include<algorithm>
-#include<math.h>
-#include<iostream>
-#include<unistd.h>
-#include <limits>
-#include <random>
-#include <memory>
+// dependencies
+#include "utils.h"
 
-#include "yaml-cpp/yaml.h"
-
-namespace Zerr {
-    // std::string MODE = "DEBUG"; //TODO: switch between BEBUG & RELEASE
-}
+#include "audiorouter.h"
+#include "featurebank.h"
+#include "mapper.h"
+#include "trajectorygenerator.h"
 
 #endif //ZERR_H

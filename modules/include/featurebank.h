@@ -1,7 +1,7 @@
 #ifndef FEATUREBANK_H
 #define FEATUREBANK_H
 
-#include "zerr.h"
+#include "utils.h"
 #include "features.h"
 #include "featureextractor.h"
 

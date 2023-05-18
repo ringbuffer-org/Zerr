@@ -1,7 +1,7 @@
 #ifndef FEATUREEXTRACTOR_H
 #define FEATUREEXTRACTOR_H
 
-#include "zerr.h"
+#include "utils.h"
 
 namespace zerr {
 /**

@@ -1,7 +1,7 @@
 #ifndef SPEAKERARRAY_H
 #define SPEAKERARRAY_H
 
-#include "zerr.h"
+#include "utils.h"
 
 namespace zerr {
 /**
