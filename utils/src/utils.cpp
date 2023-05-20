@@ -31,10 +31,9 @@ void print_mat(std::vector<std::vector<double>> mat){
 }
 
 // template <typename T>
-void print_vec(std::vector<double> vec){
-    // static_assert(IsNumberType<T>::value, "Invalid data type");
+void print_vec(std::vector<float> vec){
 
-    for (double sample:vec){
+    for (float sample:vec){
         std::cout<<sample<<" ";
     }
     std::cout<<std::endl;
@@ -55,6 +54,19 @@ std::vector<double> randomVector(int size, double min, double max) {
 
     return result;
 }
+
+audio_mat gen_test_frames(int size, int num){
+    audio_mat test_audio;
+    std::vector<double> tmp = randomVector(size*num, -1.0, 1.0);
+    for (int i = 0; i < num; ++i){
+        std::vector<double> sub = slice(tmp, i*size, (i+1)*size-1);
+        test_audio.push_back(sub);
+    }
+    std::cout<<"Test audio size: "<<test_audio.size()<<"*"<<test_audio[0].size()<<std::endl;
+
+    return test_audio;
+}
+
 
 } // namespace zerr
 

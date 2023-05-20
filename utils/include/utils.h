@@ -1,6 +1,5 @@
 #ifndef UTILS_H
 #define UTILS_H
-#pragma once
 
 // standard libaries
 #include<stdlib.h>
@@ -12,8 +11,15 @@
 #include <limits>
 #include <random>
 #include <memory>
+#include <chrono>
+#include <thread>
+
+// 
+#include "types.h"
+
 // dependencies
 #include "yaml-cpp/yaml.h"
+#include<jack/jack.h>
 
 namespace zerr{
 /**
@@ -37,7 +43,7 @@ void print_mat(std::vector<std::vector<double>> mat);
 * Print a vector of any type
 */
 // template <typename T>
-void print_vec(std::vector<double> vec);
+void print_vec(std::vector<float> vec);
 
 /**
 * Generate a random vector with choosen length and minimum\maximum value
@@ -58,6 +64,10 @@ std::vector<T> slice(std::vector<T> const &v, int m, int n)
     return vec;
 }
 
+/**
+* generate fake audio frames for testing
+*/
+audio_mat gen_test_frames(int size, int num);
 
 } //namespace zerr
 #endif //UTILS_H

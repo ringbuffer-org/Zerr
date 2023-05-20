@@ -1,4 +1,5 @@
 modules_src = [
+  'modules/src/zerr.cpp',
   'modules/src/mapper.cpp',
   'modules/src/audiorouter.cpp',
   'modules/src/featurebank.cpp',

@@ -4,40 +4,39 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string ZeroCrossing::name        = "Zero Crossing";
-const std::string ZeroCrossing::category    = "Time-Domain";
-const std::string ZeroCrossing::description = "This detects whether the sign of incoming sample changed. Output 1 when change detected";
+const std::string ZeroCrossingRate::name        = "Zero Crossing Rate";
+const std::string ZeroCrossingRate::category    = "Time-Domain";
+const std::string ZeroCrossingRate::description = "The zero crossing rate (ZCR) is a measure of how frequently a signal changes its sign. It represents the rate at which the signal crosses the zero amplitude level over a given time period.";
 
-void ZeroCrossing::initialize(){
-    pre_x     = 0;
+void ZeroCrossingRate::initialize(){
+    zero_crossings     = 0;
     if (is_initialized()==false){
         set_initialize_statue(true);
     }
 }
 
-void ZeroCrossing::extract(){
-    new_x = x[0];
+void ZeroCrossingRate::extract(){
+    assert(is_initialized());
+    zero_crossings = 0;
+    for (int i = 1; i < x.size(); ++i) {
+        if ((x[i] >= 0 && x[i - 1] < 0) || (x[i] < 0 && x[i - 1] >= 0)) {
+            ++zero_crossings;
+        }
+    }
 
-    // std::cout<<"new_x: "<<new_x<<" | pre_x: "<<pre_x<<std::endl;
-
-    sign1 =   (new_x > 0) - (new_x < 0);
-    sign2 =   (pre_x > 0) - (pre_x < 0);
-
-    pre_x = new_x;
-    y = ((sign1 * sign2) < 0);
+    y = static_cast<float>(zero_crossings) / (x.size() - 1);
 }
 
-void ZeroCrossing::reset(){
-    pre_x     = 0;
-    std::cout<<"ZeroCrossing::reset"<<std::endl;
+void ZeroCrossingRate::reset(){
+    std::cout<<"ZeroCrossingRate::reset"<<std::endl;
 }
 
-void ZeroCrossing::fetch(std::vector <double> in){
+void ZeroCrossingRate::fetch(std::vector <double> in){
     x.clear();
     x = in;
 }
 
-float ZeroCrossing::send(){
+float ZeroCrossingRate::send(){
     return static_cast<float>(y);
 }
 

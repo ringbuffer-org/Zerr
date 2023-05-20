@@ -6,9 +6,9 @@
 namespace zerr {
 namespace feature{
 /**
-* Spectrum Centroid algorithm
+* Zero Crossing rate algorithm
 */
-class ZeroCrossing : public FeatureExtractor { 
+class ZeroCrossingRate : public FeatureExtractor { 
 public:
 
     static const std::string name; 
@@ -26,17 +26,11 @@ public:
     float send();
 
 private:
-    //TODO wrap the input and output type into uniform class
     std::vector<double> x; //input
     float    y; //output
 
     // params
-    void _reset_param();
-    double new_x;
-    double pre_x;
-    float sign1;
-    float sign2;
-    
+    int zero_crossings;
 };
 
 } //namespace feature

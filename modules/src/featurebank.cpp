@@ -21,26 +21,7 @@ void FeatureBank::print_active_features(){
     std::cout<<"All activated features: "<<std::endl;
     for (int i = 0; i < activated_features.size(); ++i){
         std::cout<<"  -Name: "<<activated_features[i]->get_name()<<std::endl;
-
-        // std::cout<<"  -Category:    "<<acticated_features[i]->get_category()<<std::endl;
-        // std::cout<<"  -Description: "<<acticated_features[i]->get_description()<<std::endl;
     }
-}
-
-// void FeatureBank::print_info(std::string name){
-
-// }
-
-void FeatureBank::regist_all(){
-    regist("Centroid", []() {
-        return fe_ptr(new Centroid());
-    });
-    regist("ZeroCrossing", []() {
-        return fe_ptr(new ZeroCrossing());
-    }); 
-    // regist("Flux", []() {
-    //     return fe_ptr(new Flux());
-    // });
 }
 
 void FeatureBank::initialize(){
@@ -61,12 +42,19 @@ void FeatureBank::process(){
     for (int i = 0; i < activated_features.size(); ++i){
         activated_features[i]->fetch(x);
         activated_features[i]->extract();
-        // std::cout<<"process send: "<<activated_features[i]->send()<<std::endl;
         ys[i] = activated_features[i]->send();
-        // std::cout<<"process ys: "<<ys[i]<<std::endl;
     }
 }
 
 std::vector<float> FeatureBank::send(){
     return ys;
+}
+
+void FeatureBank::regist_all(){
+    regist("Centroid", []() {
+        return fe_ptr(new Centroid());
+    });
+    regist("ZeroCrossingRate", []() {
+        return fe_ptr(new ZeroCrossingRate());
+    }); 
 }
