@@ -11,6 +11,8 @@
 #include "mapper.h"
 #include "trajectorygenerator.h"
 
+#include<jack/jack.h>
+
 namespace zerr{
 
 class Zerr{
@@ -24,14 +26,19 @@ public:
     */
     void initialize();
     /**
-    * 
+    * activate the audioclient and zerr callback
+    * run it forever till user interrupted
     */
     void run();
 
 private:
     //basic config
-    int sr = 48000;
+    // int sr = 48000;
     int frame_size = 1024; //tmp
+    // std::vector<std::vector<double>> output_buffer(8,256);
+    // std::vector<std::vector<double>> input_buffer(1,256);
+    // double **input_buffer, **output_buffer;
+    std::vector<std::vector<double>> output_buffer;
 
     // config path
     std::string zerr_cfg;
@@ -42,6 +49,17 @@ private:
     TrajectoryGenerator gen;
     Mapper mapper;
     AudioRouter router;
+
+    //jackclient
+    int nInputs = 1;
+    int nOutputs = 8;
+    jack_client_t   *client;
+    jack_status_t   status;
+    jack_port_t     **input_port;
+    jack_port_t     **output_port;
+    jack_default_audio_sample_t **in, **out;
+    static int callback_process(jack_nframes_t x, void* object);
+    int process (jack_nframes_t nframes);
 
     /**
     * seperarate the initialization of zerr modules and audio client
