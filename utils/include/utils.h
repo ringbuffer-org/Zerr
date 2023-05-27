@@ -19,7 +19,6 @@
 
 // dependencies
 #include "yaml-cpp/yaml.h"
-#include<jack/jack.h>
 
 namespace zerr{
 /**
