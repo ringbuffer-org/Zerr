@@ -22,7 +22,7 @@ public:
     */
     Zerr(std::string zerrCfgFile, std::string spkrCfgFile);
     /**
-    * initialize all zerr components and the audio clients
+    * initialize all zerr modules and the audio clients
     */
     void initialize();
     /**
@@ -35,9 +35,6 @@ private:
     //basic config
     // int sr = 48000;
     int frame_size = 1024; //tmp
-    // std::vector<std::vector<double>> output_buffer(8,256);
-    // std::vector<std::vector<double>> input_buffer(1,256);
-    // double **input_buffer, **output_buffer;
     std::vector<std::vector<double>> output_buffer;
 
     // config path

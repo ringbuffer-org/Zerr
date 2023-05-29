@@ -12,19 +12,6 @@ void Zerr::initialize(){
 }
 
 void Zerr::run(){
-    // bank.fetch(frame);
-    // bank.process();
-    // gen.fetch(bank.send());
-    // gen.process();
-
-    // mapper.fetch(gen.send());
-    // mapper.process();
-
-    // router.fetch(frame, mapper.send());
-
-    // router.process();
-    // print_mat(router.send());
-
     jack_activate(this->client);
     jack_connect (client, "system:capture_1", jack_port_name(input_port[0]));
 
@@ -63,8 +50,8 @@ void Zerr::_initialize_zerr(){
         bank.setup(name);
     }
 
-    bank.print_all_features();
-    bank.print_active_features();
+    // bank.print_all_features();
+    // bank.print_active_features();
 
     bank.initialize();
     gen.initialize();
@@ -76,7 +63,6 @@ void Zerr::_initialize_zerr(){
 void Zerr::_initialize_audioclient(){
     std::cout<<"_initialize_audioclient..."<<std::endl;
     client = jack_client_open("zerr", JackNullOption, &status, NULL);
-
 
     jack_set_process_callback(this->client, this->callback_process, this);
 
@@ -145,12 +131,6 @@ int Zerr::process(jack_nframes_t nframes){
     // }
     // std::cout<<"nframes: "<<nframes<<std::endl;
 
-    // for(int chanCNT=0; chanCNT<nInputs; chanCNT++){
-    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++){
-    //         // std::cout<<in[chanCNT][sampCNT]<<std::endl;
-    //     }
-    // }
-    // print_mat(input_buffer);
     std::vector<double> targetData(in[0], in[0] + 256);
 
     bank.fetch(targetData);
@@ -177,57 +157,3 @@ int Zerr::process(jack_nframes_t nframes){
 
     return 0;
 }
-
-
-
-    // test data
-    // int frame_size = 11; // 1024 4
-    // int num_frame = 4;  // 16 8
-    // audio_mat test_audio = gen_test_frames(frame_size, num_frame);
-    // print_mat(test_audio);
-    // print_line(32);
-
-
-    // Featurebank setup
-    // FeatureBank bank;
-    // bank.regist_all();
-    // str_vec feature_names = {"Centroid", "ZeroCrossingRate"};
-    // for (auto name : feature_names) {
-    //     bank.setup(name);
-    // }
-    // bank.print_all_features();
-    // bank.print_active_features();
-    // bank.initialize();
-
-    // TrajectoryGenerator setup
-    // TrajectoryGenerator gen;
-    // gen.initialize();
-
-    // Mapper setup
-    // std::string config_path = "/Users/yangzeyu/Downloads/Zerr/configs/speakerarray/circulation_8.yaml"; //circulation_8
-    // Mapper mapper;
-    // mapper.initialize(config_path);
-
-    // AudioRouter setup
-    // AudioRouter router;
-    // router.initialize(frame_size, mapper.get_n_speaker() + 1); 
-
-    /**
-    *  start processing
-    */
-    // print_line(64);
-    // for (auto frame: test_audio){
-    //     bank.fetch(frame);
-    //     bank.process();
-    //     gen.fetch(bank.send());
-    //     gen.process();
-
-    //     mapper.fetch(gen.send());
-    //     mapper.process();
-
-    //     router.fetch(frame, mapper.send());
-
-    //     router.process();
-    //     print_mat(router.send());
-    // }
-
