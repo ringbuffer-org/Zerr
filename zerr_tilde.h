@@ -1,7 +1,7 @@
 /**
  * @file zerr_tilde.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Zerr Pure Data External
+ * @brief zerr~ Pure Data External
  * @version 0.3
  * @date 2023-05-28
  * 
@@ -14,10 +14,16 @@
 
 #include "zerr.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// #ifdef CPLUSPLUS
+// extern "C" {
+// #endif
 
+
+typedef struct zerrout
+{
+    t_atomtype u_type;
+    t_outlet *u_outlet;
+} t_zerrout;
 /**
  * @struct zerr_tilde
  * @brief main pure data external
@@ -26,12 +32,16 @@ extern "C" {
  */
 typedef struct {
     t_object x_obj; /**< parent Pure Data object */
-    t_float *f; /**< fallback field for the main signal inlet */
+    t_float *f;     /**< fallback field for the main signal inlet */
 
-    t_outlet *sigout; /**< main signal outlet */
-    t_outlet *dataout; /**< main data outlet */
+    t_int x_n;
+    t_zerrout *x_vec;
 
-    zerr *z_ptr; /**< pointer to the goat object */
+    // t_outlet *sigout1;  /**< signal outlet 1 */
+    // t_outlet *sigout2;  /**< signal outlet 2 */
+    // t_outlet *sigout3;  /**< signal outlet 3 */
+
+    zerr *z; /**< pointer to the zerr object */
 
 } zerr_tilde;
 
@@ -50,7 +60,22 @@ void *zerr_tilde_new(void);
  * 
  * @param x the zerr object to be freed. Must not be `NULL`
  */
-void goat_tilde_free(zerr_tilde *x);
+void zerr_tilde_free(zerr_tilde *x);
+
+/**
+ * @memberof zerr_tilde
+ * @brief sets up the dsp tree for a given zerr_tilde object
+ * 
+ * @param x the zerr object
+ * @param sp the signal pointer provided by pure data
+ */
+void zerr_tilde_dsp(zerr_tilde *x, t_signal **sp);
+
+/**
+ * @related zerr_tilde
+ * @brief sets up the zerr~ external
+ */
+void zerr_tilde_setup(void);
 
 /**
  * @memberof zerr_tilde
@@ -59,7 +84,7 @@ void goat_tilde_free(zerr_tilde *x);
  * @param x the zerr object
  * @param paramname the name of the parameter to get. If `NULL` or empty, all parameters are returned
  */
-void goat_tilde_param_get(zerr_tilde *x, t_symbol *paramname);
+// void zerr_tilde_param_get(zerr_tilde *x, t_symbol *paramname);
 
 /**
  * @memberof zerr_tilde
@@ -69,7 +94,7 @@ void goat_tilde_param_get(zerr_tilde *x, t_symbol *paramname);
  * @param paramname the name of the parameter to be updated
  * @param value the offset value to be updated
  */
-void goat_tilde_param_set(zerr_tilde *x, t_symbol *paramname, t_float value);
+// void zerr_tilde_param_set(zerr_tilde *x, t_symbol *paramname, t_float value);
 
 /**
  * @memberof zerr_tilde
@@ -80,7 +105,7 @@ void goat_tilde_param_set(zerr_tilde *x, t_symbol *paramname, t_float value);
  * @param fslot the slot to be updated
  * @param value the amount to be updated
  */
-void goat_tilde_param_amount(zerr_tilde *x, t_symbol *paramname, t_float fslot, t_float value);
+// void zerr_tilde_param_amount(zerr_tilde *x, t_symbol *paramname, t_float fslot, t_float value);
 
 /**
  * @memberof zerr_tilde
@@ -94,7 +119,7 @@ void goat_tilde_param_amount(zerr_tilde *x, t_symbol *paramname, t_float fslot, 
  * @param argc the number of arguments
  * @param argv the arguments in the order: param name, slot, modulator name
  */
-void goat_tilde_param_attach(zerr_tilde *x, t_symbol *s, int argc, t_atom *argv);
+// void zerr_tilde_param_attach(zerr_tilde *x, t_symbol *s, int argc, t_atom *argv);
 
 /**
  * @memberof zerr_tilde
@@ -104,7 +129,7 @@ void goat_tilde_param_attach(zerr_tilde *x, t_symbol *s, int argc, t_atom *argv)
  * @param paramname the name of the parameter to be updated
  * @param fslot the slot to be updated
  */
-void goat_tilde_param_detach(zerr_tilde *x, t_symbol *paramname, t_float fslot);
+// void zerr_tilde_param_detach(zerr_tilde *x, t_symbol *paramname, t_float fslot);
 
 /**
  * @memberof zerr_tilde
@@ -112,7 +137,7 @@ void goat_tilde_param_detach(zerr_tilde *x, t_symbol *paramname, t_float fslot);
  * 
  * @param x the zerr object
  */
-void goat_tilde_param_post(zerr_tilde *x);
+// void zerr_tilde_param_post(zerr_tilde *x);
 
 /**
  * @memberof zerr_tilde
@@ -120,23 +145,11 @@ void goat_tilde_param_post(zerr_tilde *x);
  * 
  * @param x the zerr object
  */
-void goat_tilde_param_reset(zerr_tilde *x);
+// void zerr_tilde_param_reset(zerr_tilde *x);
 
-/**
- * @memberof zerr_tilde
- * @brief sets up the dsp tree for a given zerr_tilde object
- * 
- * @param x the zerr object
- * @param sp the signal pointer provided by pure data
- */
-void goat_tilde_dsp(zerr_tilde *x, t_signal **sp);
 
-/**
- * @related zerr_tilde
- * @brief sets up the zerr~ external
- */
-void goat_tilde_setup(void);
 
-#ifdef __cplusplus
-}
-#endif
+
+// #ifdef CPLUSPLUS
+// }
+// #endif

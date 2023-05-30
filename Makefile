@@ -8,13 +8,12 @@
 # INCLUDES = -I../includes
 # TESTING = testing
 
-lib.name = rtap_delay6~
+lib.name = zerr~
 
 # input source file (class name == source file basename)
-class.sources = rtap_delay6~.c
+class.sources = zerr~.c
 
-rtap_delay6~.class.sources += vas_delay.c
-rtap_delay6~.class.sources += vas_mem.c
+zerr~.class.sources += zerr.c
 
 
 # all extra files to be included in binary distribution of the library
@@ -26,54 +25,68 @@ PDLIBBUILDER_DIR=pd-lib-builder/
 CC += $(INCLUDES)
 # CC +=  -mavx -DVAS_USE_AVX
 
-include $(PDLIBBUILDER_DIR)/Makefile.pdlibbuilder
-
-
-
-
-cflags += -Iinclude
-cflags += -std=gnu11
-cflags += -Wall -Wextra
-
-lib.name = goat~
-goat~.class.sources = src/goat_tilde.c
-common.sources = $(filter-out $(goat~.class.sources), $(shell find "src" -name "*.c"))
-$(info common.sources: $(common.sources))
-datafiles = $(wildcard goat_tilde.pd *.wav preset_*.txt)
-
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder
 
 # disable optimizations for debugging
-alldebug: c.flags += -O0 -DDEBUG
-alldebug: cxx.flags += -O0 -DDEBUG
+# alldebug: c.flags += -O0 -DDEBUG
+# alldebug: cxx.flags += -O0 -DDEBUG
 
-# create the documentation
-DOXYGEN=doxygen
-DOXYGEN_DIR=docs
-.PHONY: docs docs.clean
 
-docs:
-	mkdir -p $(DOXYGEN_DIR)
-	$(DOXYGEN)
+# .PHONY: clean
 
-# clean the documentation directory
-clean: docs.clean
-docs.clean:
-	rm -rf $(DOXYGEN_DIR)
+# clean:
+# 	echo "Running shell script..."
+# 	rm -f *.o
+# 	mkdir build
 
-# valgrind command for leak checks
-VG=valgrind
-VG_LOG="valgrind.log"
-VG_FLAGS=--log-file="$(VG_LOG)" --leak-check=full --show-reachable=yes --track-origins=yes -s
-.PHONY: valgrind valgrind.clean
 
-valgrind: alldebug
-	$(VG) $(VG_FLAGS) pd -noaudio *.pd
 
-clean: valgrind.clean
-valgrind.clean:
-	rm -f $(VG_LOG)
+
+
+# cflags += -Iinclude
+# cflags += -std=gnu11
+# cflags += -Wall -Wextra
+
+# lib.name = goat~
+# goat~.class.sources = src/goat_tilde.c
+# common.sources = $(filter-out $(goat~.class.sources), $(shell find "src" -name "*.c"))
+# $(info common.sources: $(common.sources))
+# datafiles = $(wildcard goat_tilde.pd *.wav preset_*.txt)
+
+# # use pd-lib-builder
+# include pd-lib-builder/Makefile.pdlibbuilder
+
+# # disable optimizations for debugging
+# alldebug: c.flags += -O0 -DDEBUG
+# alldebug: cxx.flags += -O0 -DDEBUG
+
+# # create the documentation
+# DOXYGEN=doxygen
+# DOXYGEN_DIR=docs
+# .PHONY: docs docs.clean
+
+# docs:
+# 	mkdir -p $(DOXYGEN_DIR)
+# 	$(DOXYGEN)
+
+# # clean the documentation directory
+# clean: docs.clean
+# docs.clean:
+# 	rm -rf $(DOXYGEN_DIR)
+
+# # valgrind command for leak checks
+# VG=valgrind
+# VG_LOG="valgrind.log"
+# VG_FLAGS=--log-file="$(VG_LOG)" --leak-check=full --show-reachable=yes --track-origins=yes -s
+# .PHONY: valgrind valgrind.clean
+
+# valgrind: alldebug
+# 	$(VG) $(VG_FLAGS) pd -noaudio *.pd
+
+# clean: valgrind.clean
+# valgrind.clean:
+# 	rm -f $(VG_LOG)
 
 
 
