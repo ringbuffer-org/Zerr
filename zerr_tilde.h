@@ -14,16 +14,22 @@
 
 #include "zerr.h"
 
-// #ifdef CPLUSPLUS
-// extern "C" {
-// #endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-
+/**
+ * @struct zerrout
+ * @brief zerr outlet structure
+ * 
+ * This is structure of zerr outlets for dynamic outlet creating
+ */
 typedef struct zerrout
 {
-    t_atomtype u_type;
+    // t_atomtype u_type;
     t_outlet *u_outlet;
 } t_zerrout;
+
 /**
  * @struct zerr_tilde
  * @brief main pure data external
@@ -37,14 +43,8 @@ typedef struct {
     t_int x_n;
     t_zerrout *x_vec;
 
-    // t_outlet *sigout1;  /**< signal outlet 1 */
-    // t_outlet *sigout2;  /**< signal outlet 2 */
-    // t_outlet *sigout3;  /**< signal outlet 3 */
-
-    zerr *z; /**< pointer to the zerr object */
-
+    zerr_pd *z; /**< pointer to the zerr object */
 } zerr_tilde;
-
 
 /**
  * @memberof zerr_tilde
@@ -52,7 +52,7 @@ typedef struct {
  * 
  * @return void* a pointer to the new object or `NULL` if the creation failed
  */
-void *zerr_tilde_new(void);
+void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv);
 
 /**
  * @memberof zerr_tilde
@@ -147,9 +147,7 @@ void zerr_tilde_setup(void);
  */
 // void zerr_tilde_param_reset(zerr_tilde *x);
 
+#ifdef __cplusplus
+}
+#endif
 
-
-
-// #ifdef CPLUSPLUS
-// }
-// #endif

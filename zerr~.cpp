@@ -1,74 +1,18 @@
 #include "zerr_tilde.h"
 #include "zerr.h"
-// #include "control/manager.h"
-// #include "util/mem.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static t_class *zerr_tilde_class;
 
-void *zerr_tilde_new(void) {
+void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     zerr_tilde *x = (zerr_tilde *) pd_new(zerr_tilde_class);
     if (!x) return NULL;
 
-    // t_atom defarg[2];
     t_zerrout *u;
     int i;
-    int argc = 16;
-
-    x->x_n = argc;
-    x->x_vec = (t_zerrout *)getbytes(argc * sizeof(*x->x_vec));
-
-    for (i = 0, u = x->x_vec; i < argc; u++, i++)
-    {
-        // u->u_type = gensym("signal");
-        u->u_outlet = outlet_new(&x->x_obj, &s_signal);
-        // u->u_type =  A_POINTER;
-        // u->u_outlet = outlet_new(&x->x_obj, &s_pointer);
-
-        // t_atomtype type = ap->a_type;
-        // if (type == A_SYMBOL)
-        // {
-        //     char c = *ap->a_w.w_symbol->s_name;
-        //     if (c == 's')
-        //     {
-        //         u->u_type = A_SYMBOL;
-        //         u->u_outlet = outlet_new(&x->x_obj, &s_symbol);
-        //     }
-        //     else if (c == 'p')
-        //     {
-        //         u->u_type =  A_POINTER;
-        //         u->u_outlet = outlet_new(&x->x_obj, &s_pointer);
-        //     }
-        //     else
-        //     {
-        //         if (c != 'f') pd_error(x, "unpack: %s: bad type",
-        //             ap->a_w.w_symbol->s_name);
-        //         u->u_type = A_FLOAT;
-        //         u->u_outlet = outlet_new(&x->x_obj, &s_float);
-        //     }
-        // }
-        // else
-        // {
-        //     u->u_type =  A_FLOAT;
-        //     u->u_outlet = outlet_new(&x->x_obj, &s_float);
-        // }
-    }
-
-
-
-
-
-
-
-
-
-    // x->sigout1 = outlet_new(&x->x_obj, &s_signal);
-    // if (!x->sigout1) return NULL;
-
-    // x->sigout2 = outlet_new(&x->x_obj, &s_signal);
-    // if (!x->sigout2) return NULL;
-
-    // x->sigout3 = outlet_new(&x->x_obj, &s_signal);
-    // if (!x->sigout3) return NULL;
 
     sys_config config = {
         .sample_rate = (int) sys_getsr(),
@@ -76,13 +20,17 @@ void *zerr_tilde_new(void) {
     };
     x->z = zerr_new(&config);
 
+    x->x_n = x->z->n_outlet;
+    x->x_vec = (t_zerrout *)getbytes(x->x_n * sizeof(*x->x_vec));
+
+    for (i = 0, u = x->x_vec; i < x->x_n; u++, i++){
+        u->u_outlet = outlet_new(&x->x_obj, &s_signal);
+    }
+
     return (void *) x;
 }
 
 void zerr_tilde_free(zerr_tilde *x) {
-    // outlet_free(x->sigout1);
-    // outlet_free(x->sigout2);
-    // outlet_free(x->sigout3);
     freebytes(x->x_vec, x->x_n * sizeof(*x->x_vec));
     zerr_free(x->z);
 }
@@ -111,9 +59,11 @@ void zerr_tilde_setup(void) {
     zerr_tilde_class = class_new(gensym("zerr~"),
         (t_newmethod) zerr_tilde_new,
         (t_method) zerr_tilde_free,
-        sizeof(zerr_tilde),
+        (size_t) sizeof(zerr_tilde),
         CLASS_DEFAULT,
-        0);
+        A_NULL);
+
+
     
     // class_addmethod(goat_tilde_class,
     //     (t_method) goat_tilde_graintable_get,
@@ -344,5 +294,11 @@ void zerr_tilde_setup(void) {
 //     // post("DEFAULTS:");
 //     // goat_tilde_param_post(x);
 // }
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 

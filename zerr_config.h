@@ -9,20 +9,32 @@
  */
 #pragma once
 
-// #ifndef CPLUSPLUS
-#define CPLUSPLUS
-
 // #ifndef PUREDATA
-#define PUREDATA
+// #define PUREDATA
 
-#include <stddef.h>
+// #include <stddef.h>
+#include <string>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef unsigned long t_size;
 
 /**
- * @struct zerr_config
- * @brief Configuration structure for the zerr engine.
+ * @struct sys_config
+ * @brief Puredata system configuration structure for initializing the zerr engine.
  */
 typedef struct {
     int sample_rate; /**< audio samples per second */
     int block_size; /**< size of one audio block. The vector size n of the perform method might be smaller!! */
-    // control_manager *mgr; /**< global control manager */
 } sys_config;
+
+typedef struct {
+    std::string sample_rate; /**< audio samples per second */
+    std::string block_size; /**< size of one audio block. The vector size n of the perform method might be smaller!! */
+} zerr_config;
+
+#ifdef __cplusplus
+}
+#endif

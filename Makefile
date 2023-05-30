@@ -8,13 +8,34 @@
 # INCLUDES = -I../includes
 # TESTING = testing
 
+CC  = g++
+cflags = -std=c++11
+
 lib.name = zerr~
 
 # input source file (class name == source file basename)
-class.sources = zerr~.c
+class.sources = zerr~.cpp
 
-zerr~.class.sources += zerr.c
+# zerr pd wrapper
+zerr~.class.sources += zerr.cpp
 
+common.sources = $(filter-out $(zerr~.class.sources), $(shell find "src" -name "*.c"))
+$(info common.sources: $(common.sources))
+
+# # zerr modules
+# zerr~.common.sources += src/modules/audiorouter.cpp
+# zerr~.common.sources += src/modules/mapper.cpp
+# zerr~.class.sources += src/modules/featurebank.cpp
+# zerr~.common.sources += src/modules/speakerarray.cpp
+# zerr~.common.sources += src/modules/featureextractor.cpp
+# zerr~.common.sources += src/modules/trajectorygenerator.cpp
+
+# # zerr features
+# zerr~.common.sources += src/features/centroid.cpp
+# zerr~.common.sources += src/features/zerocrossing.cpp
+
+# # zerr utils
+# zerr~.common.sources += src/utils/utils.cpp
 
 # all extra files to be included in binary distribution of the library
 datafiles =
@@ -22,8 +43,14 @@ datafiles =
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 PDLIBBUILDER_DIR=pd-lib-builder/
 
-CC += $(INCLUDES)
-# CC +=  -mavx -DVAS_USE_AVX
+CC  += -Iinclude
+CC  += -Iinclude/utils
+CC  += -Iinclude/modules
+CC  += -Iinclude/features
+CXX += -Iinclude
+CXX += -Iinclude/utils
+CXX += -Iinclude/modules
+CXX += -Iinclude/features
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder
@@ -32,30 +59,12 @@ include pd-lib-builder/Makefile.pdlibbuilder
 # alldebug: c.flags += -O0 -DDEBUG
 # alldebug: cxx.flags += -O0 -DDEBUG
 
-
-# .PHONY: clean
-
-# clean:
-# 	echo "Running shell script..."
-# 	rm -f *.o
-# 	mkdir build
-
-
-
-
-
-# cflags += -Iinclude
-# cflags += -std=gnu11
-# cflags += -Wall -Wextra
-
 # lib.name = goat~
 # goat~.class.sources = src/goat_tilde.c
 # common.sources = $(filter-out $(goat~.class.sources), $(shell find "src" -name "*.c"))
 # $(info common.sources: $(common.sources))
 # datafiles = $(wildcard goat_tilde.pd *.wav preset_*.txt)
 
-# # use pd-lib-builder
-# include pd-lib-builder/Makefile.pdlibbuilder
 
 # # disable optimizations for debugging
 # alldebug: c.flags += -O0 -DDEBUG

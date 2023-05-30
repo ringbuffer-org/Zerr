@@ -1,6 +1,2 @@
-#N canvas 523 49 648 383 12;
-#X obj 135 116 zerr~;
-#X obj 131 36 loadbang;
-#X obj 305 215 outlet~;
-#X obj 213 41 unpack float float symbol float float;
-#X connect 1 0 0 0;
+#N canvas 642 113 450 300 12;
+#X obj 75 74 zerr~, f 44;
