@@ -43,7 +43,7 @@ typedef struct {
     t_int x_n;
     t_zerrout *x_vec;
 
-    zerr_pd *z; /**< pointer to the zerr object */
+    Zerr *z; /**< pointer to the zerr object */
 } zerr_tilde;
 
 /**

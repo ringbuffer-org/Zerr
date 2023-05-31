@@ -11,17 +11,27 @@ void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     zerr_tilde *x = (zerr_tilde *) pd_new(zerr_tilde_class);
     if (!x) return NULL;
 
+    // sys_config config = {
+    //     .sample_rate = (int) sys_getsr(),
+    //     .block_size  = (int) sys_getblksize()
+    // };
+
+    SystemConfig sys_cnfg((int) sys_getsr(), (int) sys_getblksize());
+
+    // tmp input
+    // the input string muss be absolute?
+    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/circulation_8.yaml";
+    // std::string zerrCfgFile = "./configs/zerr_configs/preset1.yaml";
+
+    x->z = new Zerr(sys_cnfg, spkrCfgFile);
+    if (!x->z) return NULL;
+    x->z->initialize();
+
+    x->x_n = x->z->n_outlet; 
+    x->x_vec = (t_zerrout *)getbytes(x->x_n * sizeof(*x->x_vec));
+
     t_zerrout *u;
     int i;
-
-    sys_config config = {
-        .sample_rate = (int) sys_getsr(),
-        .block_size  = (int) sys_getblksize()
-    };
-    x->z = zerr_new(&config);
-
-    x->x_n = x->z->n_outlet;
-    x->x_vec = (t_zerrout *)getbytes(x->x_n * sizeof(*x->x_vec));
 
     for (i = 0, u = x->x_vec; i < x->x_n; u++, i++){
         u->u_outlet = outlet_new(&x->x_obj, &s_signal);
@@ -32,7 +42,7 @@ void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv) {
 
 void zerr_tilde_free(zerr_tilde *x) {
     freebytes(x->x_vec, x->x_n * sizeof(*x->x_vec));
-    zerr_free(x->z);
+    delete x->z;
 }
 
 static t_int *zerr_tilde_perform(t_int *w) {
@@ -42,7 +52,8 @@ static t_int *zerr_tilde_perform(t_int *w) {
     int n = (int) w[4];
 
     // invoke the main algorithm
-    zerr_perform(x->z, in, out, n);
+    // zerr_perform(x->z, in, out, n);
+    x->z->perform(in, out, n);
 
     return &w[5];
 }
@@ -50,6 +61,7 @@ static t_int *zerr_tilde_perform(t_int *w) {
 void zerr_tilde_dsp(zerr_tilde *x, t_signal **sp) {
     t_sample *in = sp[0]->s_vec;
     t_sample *out = sp[1]->s_vec;
+    t_sample *out3 = sp[2]->s_vec;
     int n = sp[0]->s_n;
 
     dsp_add(zerr_tilde_perform, 4, x, in, out, n);
@@ -63,8 +75,6 @@ void zerr_tilde_setup(void) {
         CLASS_DEFAULT,
         A_NULL);
 
-
-    
     // class_addmethod(goat_tilde_class,
     //     (t_method) goat_tilde_graintable_get,
     //     gensym("graintable-get"),

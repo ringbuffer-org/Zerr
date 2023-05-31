@@ -26,59 +26,56 @@
 
 #include "m_pd.h" // for testing
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
 
 /**
  * @brief Main GOAT class
  */
-typedef struct zerr_pd{
-    int n_outlet;
-    sys_config cfg; /**< Puredata config */
-} zerr_pd;
+// typedef struct zerr_pd{
+//     int n_outlet;
+//     sys_config cfg; /**< Puredata config */
+// } zerr_pd;
 
 // namespace zerr{
 
 class Zerr{
 public:
+    // n_outlet = 8;
+    int n_outlet;
     /**
     * setup configs files and 
     */
-    Zerr(std::string zerrCfgFile, std::string spkrCfgFile);
+    Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile);
     /**
     * initialize all zerr modules
     */
     void initialize();
     /**
-    * activate the audioclient and zerr callback
-    * run it forever till user interrupted
+    * callback function
     */
-    void run();
+    void perform(float *in, float *out, int n);
+    /**
+    * deconstructe zerr
+    */
+    ~Zerr();
 
 private:
     //basic config
-    std::vector<std::vector<double>> output_buffer;
+    int sample_rate; 
+    int block_size;
+    std::vector<std::vector<float>> output_buffer;
 
     // config path
     std::string zerr_cfg;
     std::string spkr_cfg;
 
     //module objects
-    zerr::FeatureBank bank;
-    zerr::TrajectoryGenerator gen;
-    zerr::Mapper mapper;
-    zerr::AudioRouter router;
-
-    /**
-    * seperarate the initialization of zerr modules and audio client
-    */
-    void _initialize_zerr();
-    void _initialize_audioclient();
-    /**
-    * hold the run function
-    */
-    void _hold();
+    zerr::FeatureBank *bank;
+    zerr::TrajectoryGenerator *gen;
+    zerr::Mapper *mapper;
+    zerr::AudioRouter *router;
 };
 
 // }  //namespace zerr
@@ -89,7 +86,7 @@ private:
  * 
  * @return zerr* the new zerr instance
  */
-zerr_pd *zerr_new(sys_config *config);
+// zerr_pd *zerr_new(sys_config *config);
 
 /**
  * @memberof zerr
@@ -97,7 +94,7 @@ zerr_pd *zerr_new(sys_config *config);
  * 
  * @param z the zerr instance to free
  */
-void zerr_free(zerr_pd *z);
+// void zerr_free(zerr_pd *z);
 
 /**
  * @memberof zerr
@@ -108,11 +105,11 @@ void zerr_free(zerr_pd *z);
  * @param out the output samples
  * @param n the number of samples
  */
-void zerr_perform(zerr_pd *z, float *in, float *out, int n);
+// void zerr_perform(zerr_pd *z, float *in, float *out, int n);
 
-#ifdef __cplusplus
-}
-#endif
+// #ifdef __cplusplus
+// }
+// #endif
 
 
 

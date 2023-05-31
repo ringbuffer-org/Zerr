@@ -5,6 +5,8 @@
 #include "features.h"
 #include "featureextractor.h"
 
+#include "m_pd.h"//debug
+
 namespace zerr {
 
 // typedef std::unique_ptr<FeatureExtractor> fe_ptr;
@@ -63,14 +65,14 @@ public:
     void print_active_features();
 
     void initialize();
-    void fetch(std::vector<double> in);
+    void fetch(zerr::input_vec in);
     void process();
     std::vector<float> send();
 private:
     std::map<std::string, CreateFunc> registed_features;
     std::vector<fe_ptr> activated_features;
 
-    std::vector<double> x;
+    zerr::input_vec x;
     std::vector<float> ys;
 
     int n_features;

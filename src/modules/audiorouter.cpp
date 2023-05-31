@@ -1,7 +1,7 @@
 #include "audiorouter.h"
 using namespace zerr;
 
-typedef std::vector<std::vector<double>> out_mat;
+typedef std::vector<input_vec> out_mat;
 
 void AudioRouter::initialize(int num_audio, int num_cntrl){
     audio_x.resize(num_audio);
@@ -12,7 +12,7 @@ void AudioRouter::initialize(int num_audio, int num_cntrl){
     }
 }
 
-void AudioRouter::fetch(audio_vec audio_in, cntrl_vec cntrl_in){
+void AudioRouter::fetch(input_vec audio_in, cntrl_vec cntrl_in){
     audio_x = audio_in;
     cntrl_x = cntrl_in;
 

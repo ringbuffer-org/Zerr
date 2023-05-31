@@ -21,12 +21,12 @@ public:
     void initialize();
     void extract();
     void reset();
-    void fetch(std::vector<double> in);
+    void fetch(std::vector<float> in);
     float send();
 
 private:
     //TODO wrap the input and output type into uniform class
-    std::vector <double> x; //input
+    std::vector <float> x; //input
     float y; //output g
 
     // params

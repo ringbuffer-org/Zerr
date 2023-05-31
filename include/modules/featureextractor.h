@@ -46,7 +46,7 @@ public:
     * fetch samples from audio stream and load to the input buffer
     * #Note: This should be take cared by audio client rather the extractor itself.
     */
-    virtual void fetch(std::vector<double> x) = 0;
+    virtual void fetch(input_vec x) = 0;
     virtual float send() = 0;
     /**
     * Check if this feature extractor is initialized

@@ -22,11 +22,11 @@ public:
     void initialize();
     void extract();
     void reset();
-    void fetch(std::vector<double> in);
+    void fetch(std::vector<float> in);
     float send();
 
 private:
-    std::vector<double> x; //input
+    std::vector<float> x; //input
     float    y; //output
 
     // params

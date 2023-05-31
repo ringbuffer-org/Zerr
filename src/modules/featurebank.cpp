@@ -33,7 +33,7 @@ void FeatureBank::initialize(){
     ys.resize(activated_features.size());
 }
 
-void FeatureBank::fetch(std::vector<double> in){
+void FeatureBank::fetch(std::vector<float> in){
     x.clear();
     x = in;
 }
@@ -42,7 +42,7 @@ void FeatureBank::process(){
     for (int i = 0; i < activated_features.size(); ++i){
         activated_features[i]->fetch(x);
         activated_features[i]->extract();
-        ys[i] = activated_features[i]->send();
+        // ys[i] = activated_features[i]->send();
     }
 }
 

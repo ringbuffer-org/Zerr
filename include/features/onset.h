@@ -21,12 +21,12 @@ public:
     void initialize();
     void extract();
     void reset();
-    void fetch(std::vector<double> in);
+    void fetch(input_vec in);
     float send();
 
 private:
     //TODO wrap the input and output
-    std::vector <double> x; //input
+    input_vec x; //input
     float y; //output g
 };
 

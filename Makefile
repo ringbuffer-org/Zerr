@@ -10,6 +10,7 @@
 
 CC  = g++
 cflags = -std=c++11
+ldflags += -L/usr/local/lib -lyaml-cpp
 
 lib.name = zerr~
 
@@ -19,23 +20,23 @@ class.sources = zerr~.cpp
 # zerr pd wrapper
 zerr~.class.sources += zerr.cpp
 
-common.sources = $(filter-out $(zerr~.class.sources), $(shell find "src" -name "*.c"))
-$(info common.sources: $(common.sources))
+# common.sources = $(filter-out $(zerr~.class.sources), $(shell find "src" -name "*.c"))
+# $(info common.sources: $(common.sources))
 
 # # zerr modules
-# zerr~.common.sources += src/modules/audiorouter.cpp
-# zerr~.common.sources += src/modules/mapper.cpp
-# zerr~.class.sources += src/modules/featurebank.cpp
-# zerr~.common.sources += src/modules/speakerarray.cpp
-# zerr~.common.sources += src/modules/featureextractor.cpp
-# zerr~.common.sources += src/modules/trajectorygenerator.cpp
+zerr~.class.sources += src/modules/audiorouter.cpp
+zerr~.class.sources += src/modules/mapper.cpp
+zerr~.class.sources += src/modules/featurebank.cpp
+zerr~.class.sources += src/modules/speakerarray.cpp
+zerr~.class.sources += src/modules/featureextractor.cpp
+zerr~.class.sources += src/modules/trajectorygenerator.cpp
 
 # # zerr features
-# zerr~.common.sources += src/features/centroid.cpp
-# zerr~.common.sources += src/features/zerocrossing.cpp
+zerr~.class.sources += src/features/centroid.cpp
+zerr~.class.sources += src/features/zerocrossing.cpp
 
 # # zerr utils
-# zerr~.common.sources += src/utils/utils.cpp
+zerr~.class.sources += src/utils/utils.cpp
 
 # all extra files to be included in binary distribution of the library
 datafiles =
@@ -51,6 +52,9 @@ CXX += -Iinclude
 CXX += -Iinclude/utils
 CXX += -Iinclude/modules
 CXX += -Iinclude/features
+CXX += -I/usr/local/include/yaml-cpp
+
+
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder

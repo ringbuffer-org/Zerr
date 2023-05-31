@@ -31,7 +31,7 @@ void ZeroCrossingRate::reset(){
     std::cout<<"ZeroCrossingRate::reset"<<std::endl;
 }
 
-void ZeroCrossingRate::fetch(std::vector <double> in){
+void ZeroCrossingRate::fetch(std::vector <float> in){
     x.clear();
     x = in;
 }

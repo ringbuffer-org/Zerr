@@ -8,6 +8,9 @@ typedef std::vector<std::string> str_vec;
 
 static const bool isTest=1;
 
+
+typedef std::vector<float> input_vec;
+
 //processing_mode
 // #define zSAMPLE 1
 // #define zBLOCK 32

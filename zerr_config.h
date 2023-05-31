@@ -13,14 +13,11 @@
 // #define PUREDATA
 
 // #include <stddef.h>
-#include <string>
+// #include <string>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef unsigned long t_size;
-
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
 /**
  * @struct sys_config
  * @brief Puredata system configuration structure for initializing the zerr engine.
@@ -30,11 +27,18 @@ typedef struct {
     int block_size; /**< size of one audio block. The vector size n of the perform method might be smaller!! */
 } sys_config;
 
-typedef struct {
-    std::string sample_rate; /**< audio samples per second */
-    std::string block_size; /**< size of one audio block. The vector size n of the perform method might be smaller!! */
-} zerr_config;
+class SystemConfig{
+public:
+    SystemConfig(int sr, int bs){sample_rate=sr;block_size=bs;}
+    int sample_rate; 
+    int block_size;
+};
 
-#ifdef __cplusplus
-}
-#endif
+// typedef struct {
+//     std::string sample_rate; /**< audio samples per second */
+//     std::string block_size; /**< size of one audio block. The vector size n of the perform method might be smaller!! */
+// } zerr_config;
+
+// #ifdef __cplusplus
+// }
+// #endif

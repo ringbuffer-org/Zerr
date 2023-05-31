@@ -21,7 +21,7 @@ void Onset::reset(){
     std::cout<<"Onset::reset"<<std::endl;
 }
 
-void Onset::fetch(std::vector <double> in){
+void Onset::fetch(input_vec in){
     x.clear();
     x = in;
 }
