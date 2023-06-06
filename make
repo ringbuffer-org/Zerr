@@ -24,3 +24,6 @@ fi
 
 helpfile="zerr~_helper.pd"
 open builddir/${helpfile}
+
+find "$(pwd)" -name ".DS_Store" -type f -delete
+echo "All .DS_Store files have been deleted."
