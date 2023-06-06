@@ -54,8 +54,6 @@ CXX += -Iinclude/modules
 CXX += -Iinclude/features
 CXX += -I/usr/local/include/yaml-cpp
 
-
-
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder
 

@@ -9,15 +9,6 @@
  */
 #pragma once
 
-// #ifndef PUREDATA
-// #define PUREDATA
-
-// #include <stddef.h>
-// #include <string>
-
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
 /**
  * @struct sys_config
  * @brief Puredata system configuration structure for initializing the zerr engine.
@@ -34,11 +25,21 @@ public:
     int block_size;
 };
 
+// typedef struct _signal
+// {
+//     int s_n;            /* number of points in the array */
+//     t_sample *s_vec;    /* the array */
+//     t_float s_sr;         /* sample rate */
+//     int s_refcount;     /* number of times used */
+//     int s_isborrowed;   /* whether we're going to borrow our array */
+//     struct _signal *s_borrowedfrom;     /* signal to borrow it from */
+//     struct _signal *s_nextfree;         /* next in freelist */
+//     struct _signal *s_nextused;         /* next in used list */
+//     int s_vecsize;      /* allocated size of array in points */
+// } t_signal;
+
 // typedef struct {
 //     std::string sample_rate; /**< audio samples per second */
 //     std::string block_size; /**< size of one audio block. The vector size n of the perform method might be smaller!! */
 // } zerr_config;
-
-// #ifdef __cplusplus
-// }
-// #endif
+ 

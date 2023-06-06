@@ -13,12 +13,15 @@
 #include <memory>
 #include <chrono>
 #include <thread>
+#include <string.h>
 
 // 
 #include "types.h"
 
 // dependencies
 #include "yaml-cpp/yaml.h"
+
+#include "m_pd.h" // for testing
 
 namespace zerr{
 /**

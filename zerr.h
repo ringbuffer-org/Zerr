@@ -38,12 +38,10 @@
 //     sys_config cfg; /**< Puredata config */
 // } zerr_pd;
 
-// namespace zerr{
-
 class Zerr{
 public:
-    // n_outlet = 8;
     int n_outlet;
+    int n_inlet=1;
     /**
     * setup configs files and 
     */
@@ -55,7 +53,17 @@ public:
     /**
     * callback function
     */
-    void perform(float *in, float *out, int n);
+    // void perform(float *in, float *out, int n);
+    void perform(float **in, float **out, int n_vec);
+    /**
+    * pd wrapper of zerr standard callback function
+    */
+    void pd_perform(float **ports, int n_vec);
+    /**
+    * return the total number of inlet plus outlet
+    * 
+    */
+    int get_port_count();
     /**
     * deconstructe zerr
     */
@@ -65,8 +73,16 @@ private:
     //basic config
     int sample_rate; 
     int block_size;
+    std::vector<std::vector<float>> input_buffer;
     std::vector<std::vector<float>> output_buffer;
-    zerr::input_vec input_buffer;
+    float **in_ptr;
+    float **out_ptr;
+    int fft_size = 2048;
+    // zerr::input_vec input_buffer;
+
+
+    // float *in_tmp;
+    std::vector<float*> in_tmp;  // Vector of float pointers
 
     // config path
     std::string zerr_cfg;
@@ -79,9 +95,7 @@ private:
     zerr::AudioRouter *router;
 };
 
-// }  //namespace zerr
-
-/**
+/*
  * @memberof zerr
  * @brief create a new zerr instance
  * 

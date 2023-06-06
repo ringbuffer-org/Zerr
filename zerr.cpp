@@ -6,7 +6,7 @@
 
 
 
-Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile): input_buffer(sys_cnfg.block_size, 0.0f){
+Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet, std::vector<float>(sys_cnfg.block_size, 0.0f)){
     // zerr_cfg = zerrCfgFile;
     spkr_cfg = spkrCfgFile;
 
@@ -24,7 +24,7 @@ void Zerr::initialize(){
     bank->regist_all();
 
     // replace with inside one time setup function
-    zerr::str_vec feature_names = {"ZeroCrossingRate", "ZeroCrossingRate"}; //, "ZeroCrossingRate"  Centroid
+    zerr::str_vec feature_names = {"ZeroCrossingRate", "ZeroCrossingRate"}; //  Centroid
     for (auto name : feature_names) {
         bank->setup(name);
     }
@@ -38,20 +38,91 @@ void Zerr::initialize(){
     router->initialize(block_size, mapper->get_n_speaker() + 1); 
 
     n_outlet = mapper->get_n_speaker();
-    post("Zerr::initialize: ");
+    // post("Zerr::initialize: ");
     post(std::to_string(mapper->get_n_speaker()).c_str());
+
+    input_buffer.resize(n_inlet, std::vector<float>(block_size, 0.0f));
+    output_buffer.resize(n_outlet, std::vector<float>(block_size, 0.0f));
+
+    in_ptr  = (float **) getbytes(n_inlet * sizeof(float **));
+    out_ptr = (float **) getbytes(n_outlet * sizeof(float **));
 }
 
-void Zerr::perform(float *in, float *out, int n){
-    // post("Zerr::in: ");
+// void Zerr::perform(float *in, float *out, int n){
 
-    // zerr::input_vec targetData(in[0], in[0] + block_size);
-    for (int i = 0; i < n; ++i){
-        input_buffer[i] = in[i];
-    }
+//     // zerr::input_vec targetData(in[0], in[0] + block_size);
+//     for (int i = 0; i < n; ++i){
+//         input_buffer[i] = in[i];
+//     }
     
 
-    bank->fetch(input_buffer);
+//     bank->fetch(input_buffer);
+//     bank->process();
+//     gen->fetch(bank->send());
+//     gen->process();
+
+//     mapper->fetch(gen->send());
+//     mapper->process();
+
+//     router->fetch(input_buffer, mapper->send());
+
+//     router->process();
+
+//     output_buffer = router->send();
+//     // post("Zerr::perform...");
+//     // post(std::to_string(n).c_str());
+//     // post(std::to_string(block_size).c_str());
+
+//     for (int i=0; i<n; i++){
+//         out[i] = output_buffer[0][i];
+//         // out[i] = 0.5;
+//         // in[i] = -0.5;
+//     }
+// }
+
+void Zerr::perform(float **in, float **out, int n_vec){
+    post("Zerr::perform");
+    // zerr::input_vec targetData(in[0], in[0] + block_size);
+    // for (int i = 0; i < n; ++i){
+    //     input_buffer[i] = in[i];
+    // }
+    
+
+    // bank->fetch(input_buffer);
+    // bank->process();
+    // gen->fetch(bank->send());
+    // gen->process();
+
+    // mapper->fetch(gen->send());
+    // mapper->process();
+
+    // router->fetch(input_buffer, mapper->send());
+
+    // router->process();
+
+    // output_buffer = router->send();
+    // // post("Zerr::perform...");
+    // // post(std::to_string(n).c_str());
+    // // post(std::to_string(block_size).c_str());
+
+    // for (int i=0; i<n; i++){
+    //     out[i] = output_buffer[0][i];
+    //     // out[i] = 0.5;
+    //     // in[i] = -0.5;
+    // }
+}
+
+void Zerr::pd_perform(float **ports, int n_vec){
+    in_ptr  = (float **) &ports[0];
+    out_ptr = (float **) &ports[n_inlet];
+    // post("Zerr::pd_perform");
+    for (int i = 0; i < n_inlet; i++) {
+        for (int j = 0; j < n_vec; j++) {
+            input_buffer[i][j] = in_ptr[i][j];
+        }
+    }
+
+    bank->fetch(input_buffer[0]);
     bank->process();
     gen->fetch(bank->send());
     gen->process();
@@ -59,19 +130,21 @@ void Zerr::perform(float *in, float *out, int n){
     mapper->fetch(gen->send());
     mapper->process();
 
-    router->fetch(input_buffer, mapper->send());
+    router->fetch(input_buffer[0], mapper->send());
 
     router->process();
 
     output_buffer = router->send();
-    post("Zerr::perform...");
-    post(std::to_string(n).c_str());
-    post(std::to_string(block_size).c_str());
 
-    for (int i=0; i<n; i++){
-        // out[i] = output_buffer[0][i];
-        out[i] = 0.5;
+    for (int i = 0; i < n_outlet; i++) {
+        for (int j = 0; j < n_vec; j++) {
+            out_ptr[i][j] = output_buffer[i][j];
+        }
     }
+}
+
+int Zerr::get_port_count(){
+    return n_inlet+n_outlet;
 }
 
 Zerr::~Zerr(){
@@ -80,47 +153,3 @@ Zerr::~Zerr(){
     delete mapper;
     delete router;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
-
-// zerr_pd *zerr_new(sys_config *config) {
-//     zerr_pd *z = (zerr_pd *) malloc(sizeof(zerr_pd));
-//     if (!z) return NULL;
-//     z->n_outlet = 6;
-//     memcpy(&z->cfg, config, sizeof(sys_config));
-
-//     return z;
-// }
-
-// void zerr_free(zerr_pd *z) {
-//     free(z);
-// }
-
-// void zerr_perform(zerr_pd *z, float *in, float *out, int n) {
-//     post("Hello world !!");
-// }
-
-// #ifdef __cplusplus
-// }
-// #endif

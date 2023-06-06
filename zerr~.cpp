@@ -11,16 +11,11 @@ void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     zerr_tilde *x = (zerr_tilde *) pd_new(zerr_tilde_class);
     if (!x) return NULL;
 
-    // sys_config config = {
-    //     .sample_rate = (int) sys_getsr(),
-    //     .block_size  = (int) sys_getblksize()
-    // };
-
+    // system config to initialize zerr
     SystemConfig sys_cnfg((int) sys_getsr(), (int) sys_getblksize());
 
     // tmp input
-    // the input string muss be absolute?
-    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/circulation_8.yaml";
+    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/circulation_8.yaml"; // random_12
     // std::string zerrCfgFile = "./configs/zerr_configs/preset1.yaml";
 
     x->z = new Zerr(sys_cnfg, spkrCfgFile);
@@ -45,26 +40,51 @@ void zerr_tilde_free(zerr_tilde *x) {
     delete x->z;
 }
 
+// static t_int *zerr_tilde_perform(t_int *w) {
+//     zerr_tilde *x = (zerr_tilde *) w[1];
+//     t_sample *in = (t_sample *) w[2];
+//     int n_outlet = x->x_n;
+
+//     t_sample *in = (t_sample *) w[2];
+//     t_sample *out = (t_sample *) w[3];
+//     int n = (int) w[4];
+
+//     // invoke the main algorithm
+//     x->z->perform(in, out, n);
+
+//     return &w[5];
+// }
+
 static t_int *zerr_tilde_perform(t_int *w) {
     zerr_tilde *x = (zerr_tilde *) w[1];
-    t_sample *in = (t_sample *) w[2];
-    t_sample *out = (t_sample *) w[3];
-    int n = (int) w[4];
+    int n_vec     = (int) w[2];
+    int n_args    = (int) w[3];
+
+    t_sample **ports = (t_sample **) &w[4];
 
     // invoke the main algorithm
-    // zerr_perform(x->z, in, out, n);
-    x->z->perform(in, out, n);
+    x->z->pd_perform(ports, n_vec);
 
-    return &w[5];
+    return &w[n_args+1];
 }
 
 void zerr_tilde_dsp(zerr_tilde *x, t_signal **sp) {
-    t_sample *in = sp[0]->s_vec;
-    // t_sample *out = sp[1]->s_vec;
-    t_sample *out = sp[4]->s_vec;
-    int n = sp[0]->s_n;
+    int n_rest = 3; // size of [x, n_vec, n_args]
 
-    dsp_add(zerr_tilde_perform, 4, x, in, out, n);
+    int n_vec = sp[0]->s_n;
+    int n_port = x->z->get_port_count();
+    int n_args = n_port + n_rest;
+
+    t_int *vec = (t_int *) getbytes(n_args * sizeof(t_int *));
+
+    vec[0] = (t_int) x;
+    vec[1] = (t_int) n_vec;
+    vec[2] = (t_int) n_args;
+    for (int i = 0; i < n_port; ++i){
+        vec[i+n_rest] = (t_int) sp[i]->s_vec;
+    }
+
+    dsp_addv(zerr_tilde_perform, n_args, vec);
 }
 
 void zerr_tilde_setup(void) {
@@ -75,7 +95,7 @@ void zerr_tilde_setup(void) {
         CLASS_DEFAULT,
         A_NULL);
 
-    // class_addmethod(goat_tilde_class,
+    // class_addmethod(zerr_tilde_class,
     //     (t_method) goat_tilde_graintable_get,
     //     gensym("graintable-get"),
     //     A_NULL);
@@ -85,6 +105,7 @@ void zerr_tilde_setup(void) {
     //     gensym("param-get"),
     //     A_DEFSYMBOL,
     //     A_NULL);
+
     // class_addmethod(goat_tilde_class,
     //     (t_method) goat_tilde_param_set,
     //     gensym("param-set"),

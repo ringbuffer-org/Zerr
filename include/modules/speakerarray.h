@@ -79,7 +79,7 @@ private:
     int n_speakers;
     std::vector<int> indexs;
     std::map<int, Speaker> speakers; //map between vector index and speaker index
-    std::map<int, std::vector<int>> contiguous;
+    std::map<int, std::vector<int>> contiguous; // warning: not used
 
     YAML::Node speaker_config;
 

@@ -42,9 +42,13 @@ void Mapper::fetch(float in){
 
 void Mapper::process(){
     // temp trigger
-    if (x > 0.95 && prev_x < 0.05){ //trigger received
-        curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
+    // if (x > 0.95 && prev_x < 0.05){ //trigger received
+    //     curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
 
+    // }
+    post(std::to_string(x).c_str());
+    if (x > 0.95){
+        curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
     }
     // std::cout<<"current index: "<<curr_idx<<std::endl;
     _update_mapping();
