@@ -40,21 +40,6 @@ void zerr_tilde_free(zerr_tilde *x) {
     delete x->z;
 }
 
-// static t_int *zerr_tilde_perform(t_int *w) {
-//     zerr_tilde *x = (zerr_tilde *) w[1];
-//     t_sample *in = (t_sample *) w[2];
-//     int n_outlet = x->x_n;
-
-//     t_sample *in = (t_sample *) w[2];
-//     t_sample *out = (t_sample *) w[3];
-//     int n = (int) w[4];
-
-//     // invoke the main algorithm
-//     x->z->perform(in, out, n);
-
-//     return &w[5];
-// }
-
 static t_int *zerr_tilde_perform(t_int *w) {
     zerr_tilde *x = (zerr_tilde *) w[1];
     int n_vec     = (int) w[2];

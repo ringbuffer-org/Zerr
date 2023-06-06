@@ -47,9 +47,9 @@ void Mapper::process(){
 
     // }
     post(std::to_string(x).c_str());
-    if (x > 0.95){
-        curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
-    }
+
+    curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
+
     // std::cout<<"current index: "<<curr_idx<<std::endl;
     _update_mapping();
 }
