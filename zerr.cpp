@@ -6,7 +6,7 @@
 
 
 
-Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile){
+Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile): input_buffer(sys_cnfg.block_size, 0.0f){
     // zerr_cfg = zerrCfgFile;
     spkr_cfg = spkrCfgFile;
 
@@ -45,9 +45,13 @@ void Zerr::initialize(){
 void Zerr::perform(float *in, float *out, int n){
     // post("Zerr::in: ");
 
-    zerr::input_vec targetData(in[0], in[0] + block_size);
+    // zerr::input_vec targetData(in[0], in[0] + block_size);
+    for (int i = 0; i < n; ++i){
+        input_buffer[i] = in[i];
+    }
+    
 
-    bank->fetch(targetData);
+    bank->fetch(input_buffer);
     bank->process();
     gen->fetch(bank->send());
     gen->process();
@@ -55,27 +59,26 @@ void Zerr::perform(float *in, float *out, int n){
     mapper->fetch(gen->send());
     mapper->process();
 
-    router->fetch(targetData, mapper->send());
+    router->fetch(input_buffer, mapper->send());
 
     router->process();
 
-    // output_buffer.clear();
-    // output_buffer = router.send();
-    // std::vector<double> targetData(in[0], in[0] + 256);
     output_buffer = router->send();
     post("Zerr::perform...");
     post(std::to_string(n).c_str());
     post(std::to_string(block_size).c_str());
-    // for (int chanCNT=0; chanCNT<n_outlet; chanCNT++){
-    //     for (int sampCNT=0; sampCNT<block_size; sampCNT++){
-    //         // out[chanCNT*block_size + sampCNT] = output_buffer[chanCNT][sampCNT];
-    //         out[sampCNT] = output_buffer[chanCNT][sampCNT];
-    //     }
-    // }
+
+    for (int i=0; i<n; i++){
+        // out[i] = output_buffer[0][i];
+        out[i] = 0.5;
+    }
 }
 
 Zerr::~Zerr(){
-
+    delete bank;
+    delete gen;
+    delete mapper;
+    delete router;
 }
 
 

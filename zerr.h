@@ -66,6 +66,7 @@ private:
     int sample_rate; 
     int block_size;
     std::vector<std::vector<float>> output_buffer;
+    zerr::input_vec input_buffer;
 
     // config path
     std::string zerr_cfg;

@@ -60,8 +60,8 @@ static t_int *zerr_tilde_perform(t_int *w) {
 
 void zerr_tilde_dsp(zerr_tilde *x, t_signal **sp) {
     t_sample *in = sp[0]->s_vec;
-    t_sample *out = sp[1]->s_vec;
-    t_sample *out3 = sp[2]->s_vec;
+    // t_sample *out = sp[1]->s_vec;
+    t_sample *out = sp[4]->s_vec;
     int n = sp[0]->s_n;
 
     dsp_add(zerr_tilde_perform, 4, x, in, out, n);
