@@ -14,9 +14,7 @@ void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     // system config to initialize zerr
     SystemConfig sys_cnfg((int) sys_getsr(), (int) sys_getblksize());
 
-    // tmp input
-    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/circulation_8.yaml"; // random_12
-    // std::string zerrCfgFile = "./configs/zerr_configs/preset1.yaml";
+    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/circulation_8.yaml"; // random_12 circulation_8
 
     x->z = new Zerr(sys_cnfg, spkrCfgFile);
     if (!x->z) return NULL;

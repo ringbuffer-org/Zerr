@@ -18,7 +18,7 @@ void ZeroCrossingRate::initialize(){
 void ZeroCrossingRate::extract(){
     assert(is_initialized());
     zero_crossings = 0;
-    for (int i = 1; i < x.size(); ++i) {
+    for (size_t i = 1; i < x.size(); ++i) {
         if ((x[i] >= 0 && x[i - 1] < 0) || (x[i] < 0 && x[i - 1] >= 0)) {
             ++zero_crossings;
         }

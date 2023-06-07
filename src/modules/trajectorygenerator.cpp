@@ -26,7 +26,7 @@ void TrajectoryGenerator::process(){
     std::vector<float> weights = {0.5, 0.5};
     tmp = weight_add(xs, weights);
     // y = (tmp > 0.5);
-    y = xs[0];
+    y = tmp;
     std::cout<<"merged!: "<<tmp<<std::endl;
 }
 

@@ -10,13 +10,14 @@
 
 #pragma once
 
-#include <string.h>
+// #include <string.h>
 
 #include "zerr_config.h"
 
 // dependencies
 #include "utils.h"
 #include "types.h"
+#include "ringbuffer.h"
 
 // modules
 #include "audiorouter.h"
@@ -74,6 +75,7 @@ private:
     int sample_rate; 
     int block_size;
     std::vector<std::vector<float>> input_buffer;
+    RingBuffer *in_buf;
     std::vector<std::vector<float>> output_buffer;
     float **in_ptr;
     float **out_ptr;

@@ -37,9 +37,11 @@ zerr~.class.sources += src/features/zerocrossing.cpp
 
 # # zerr utils
 zerr~.class.sources += src/utils/utils.cpp
+zerr~.class.sources += src/utils/ringbuffer.cpp
 
 # all extra files to be included in binary distribution of the library
-datafiles =
+datafiles = configs/spkr_configs/circulation_8.yaml
+datadirs = configs
 
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 PDLIBBUILDER_DIR=pd-lib-builder/
