@@ -21,12 +21,12 @@ public:
     void initialize();
     void extract();
     void reset();
-    void fetch(std::vector<float> in);
+    void fetch(t_blockIn in);
     float send();
 
 private:
     //TODO wrap the input and output type into uniform class
-    std::vector <float> x; //input
+    t_blockIn x; //input
     float y; //output g
 
     // params

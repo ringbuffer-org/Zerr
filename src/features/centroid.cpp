@@ -34,7 +34,7 @@ void Centroid::reset(){
     std::cout<<"Centroid::reset"<<std::endl;
 }
 
-void Centroid::fetch(std::vector <float> in){
+void Centroid::fetch(t_blockIn in){
     x.clear();
     x = in;
 }

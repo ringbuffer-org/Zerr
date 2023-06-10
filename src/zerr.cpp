@@ -41,23 +41,12 @@ void Zerr::_hold(){
 }
 
 void Zerr::_initialize_zerr(){
-    // try constexper
-    bank.regist_all();
+    t_featureList feature_names = {"Centroid", "ZeroCrossingRate", "Centroid"};// move this to zerr YAML file
 
-    // replace with inside one time setup function
-    str_vec feature_names = {"Centroid", "ZeroCrossingRate"};
-    for (auto name : feature_names) {
-        bank.setup(name);
-    }
-
-    // bank.print_all_features();
-    // bank.print_active_features();
-
-    bank.initialize();
+    bank.initialize(feature_names);
     gen.initialize();
     mapper.initialize(spkr_cfg);
     router.initialize(frame_size, mapper.get_n_speaker() + 1); 
-
 }
 
 void Zerr::_initialize_audioclient(){
@@ -95,8 +84,6 @@ int Zerr::callback_process(jack_nframes_t x, void* object)
 }
 
 int Zerr::process(jack_nframes_t nframes){
-    // std::cout<<"..."<<std::endl;
-
     // get input buffers
     for ( int i=0 ; i<nInputs; i++)
     in[i]  = (jack_default_audio_sample_t *)
@@ -114,7 +101,7 @@ int Zerr::process(jack_nframes_t nframes){
         out[chanCNT][sampCNT] = 0.0;
     }
 
-    std::vector<float> targetData(in[0], in[0] + 256);
+    t_blockIn targetData(in[0], in[0] + 256);
 
     bank.fetch(targetData);
     bank.process();
@@ -136,12 +123,3 @@ int Zerr::process(jack_nframes_t nframes){
 
     return 0;
 }
-
-
-    // just copy the input to all connected outputs for testing:works
-    // for(int chanCNT=0; chanCNT<nOutputs; chanCNT++)
-    // {
-    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++)
-    //     out[chanCNT][sampCNT] = in[0][sampCNT];
-    // }
-    // std::cout<<"nframes: "<<nframes<<std::endl;

@@ -35,7 +35,7 @@ private:
     //basic config
     // int sr = 48000;
     int frame_size = 1024; //tmp
-    std::vector<std::vector<float>> output_buffer;
+    std::vector<t_blockIn> output_buffer;
 
     // config path
     std::string zerr_cfg;

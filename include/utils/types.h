@@ -3,13 +3,39 @@
 
 namespace zerr {
 
-typedef std::vector<std::vector<double>> audio_mat;
-typedef std::vector<std::string> str_vec;
+// audio types
+#ifdef PUREDATA
+    typedef float t_sample; //puredata still only support 16bit
+#else
+    typedef double t_sample; 
+#endif
 
-static const bool isTest=1;
+typedef std::vector<t_sample> t_samples; 
 
+typedef t_samples t_blockIn;
 
-typedef std::vector<float> input_vec;
+typedef t_samples t_audioBuf;
+
+// feature types
+typedef std::string t_featureName;
+
+typedef std::vector<t_featureName> t_featureList; 
+
+typedef float t_featureVal;
+typedef std::vector<t_featureVal> t_featureVals;
+
+//spectrum types
+#ifdef PUREDATA
+    typedef float t_bin; //puredata still only support 16bit
+#else
+    typedef double t_bin; 
+#endif
+
+typedef std::vector<t_bin> specBuf;
+
+// typedef t_value t_trigger;
+// typedef t_value t_category;
+// typedef t_value t_floating;
 
 //processing_mode
 // #define zSAMPLE 1

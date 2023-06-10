@@ -22,11 +22,11 @@ public:
     void initialize();
     void extract();
     void reset();
-    void fetch(std::vector<float> in);
+    void fetch(t_blockIn in);
     float send();
 
 private:
-    std::vector<float> x; //input
+    t_blockIn x; //input
     float    y; //output
 
     // params

@@ -11,16 +11,16 @@ class AudioRouter {
 public:
     // typedef std::vector<double> audio_vec;
     typedef std::vector<float>  cntrl_vec;
-    typedef std::vector<input_vec> out_mat;
+    typedef std::vector<t_blockIn> out_mat;
 
     void initialize(int num_audio, int num_cntrl);
-    void fetch(input_vec audio_in, cntrl_vec cntrl_in);
+    void fetch(t_blockIn audio_in, cntrl_vec cntrl_in);
     void process();
     out_mat send();
     void reset();
 
 private:
-    input_vec audio_x;
+    t_blockIn audio_x;
     cntrl_vec cntrl_x;
     out_mat ys;
 }; 

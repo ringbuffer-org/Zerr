@@ -21,7 +21,7 @@ void Onset::reset(){
     std::cout<<"Onset::reset"<<std::endl;
 }
 
-void Onset::fetch(input_vec in){
+void Onset::fetch(t_blockIn in){
     x.clear();
     x = in;
 }

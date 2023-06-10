@@ -2,24 +2,25 @@
 #define UTILS_H
 
 // standard libaries
-#include<stdlib.h>
-#include<vector>
-#include<algorithm>
-#include<math.h>
-#include<iostream>
-#include<unistd.h>
+#include <stdlib.h>
+#include <vector>
+#include <algorithm>
+#include <math.h>
+#include <iostream>
+#include <unistd.h>
 #include <limits>
 #include <random>
 #include <memory>
 #include <chrono>
 #include <thread>
 #include <string.h>
+#include <complex.h>
 
-// 
 #include "types.h"
 
 // dependencies
 #include "yaml-cpp/yaml.h"
+#include <fftw3.h>
 
 // ifdef PUREDATA
 // #include "m_pd.h" // for testing
@@ -28,7 +29,7 @@ namespace zerr{
 /**
 * Print the information of unit test
 */
-void print_unit_test_info(std::string info);
+void print_info(std::string info);
 
 /**
 * Print the topic of this unit test
@@ -70,7 +71,7 @@ std::vector<T> slice(std::vector<T> const &v, int m, int n)
 /**
 * generate fake audio frames for testing
 */
-audio_mat gen_test_frames(int size, int num);
+// audio_mat gen_test_frames(int size, int num);
 
 } //namespace zerr
 #endif //UTILS_H
