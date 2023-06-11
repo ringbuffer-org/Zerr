@@ -1,13 +1,16 @@
 project('zerr', 'cpp')
+
 # build_machine.system()
+
 main_src = [
   'main.cpp',
   'src/zerr.cpp',
 ]
 
 utils_src = [
-  'src/utils/ringbuffer.cpp',
   'src/utils/utils.cpp',
+  'src/utils/ringbuffer.cpp',
+  'src/utils/frequencytransformer.cpp',
 ]
 
 modules_src = [

@@ -41,12 +41,12 @@ void Zerr::_hold(){
 }
 
 void Zerr::_initialize_zerr(){
-    t_featureList feature_names = {"Centroid", "ZeroCrossingRate", "Centroid"};// move this to zerr YAML file
+    t_featureNameList feature_names = {"Centroid", "ZeroCrossingRate"};// move this to zerr YAML file
 
     bank.initialize(feature_names);
-    gen.initialize();
-    mapper.initialize(spkr_cfg);
-    router.initialize(frame_size, mapper.get_n_speaker() + 1); 
+    // gen.initialize();
+    // mapper.initialize(spkr_cfg);
+    // router.initialize(frame_size, mapper.get_n_speaker() + 1); 
 }
 
 void Zerr::_initialize_audioclient(){
@@ -105,21 +105,22 @@ int Zerr::process(jack_nframes_t nframes){
 
     bank.fetch(targetData);
     bank.process();
-    gen.fetch(bank.send());
-    gen.process();
+    bank.send(); // test
+    // gen.fetch(bank.send());
+    // gen.process();
 
-    mapper.fetch(gen.send());
-    mapper.process();
+    // mapper.fetch(gen.send());
+    // mapper.process();
 
-    router.fetch(targetData, mapper.send());
-    router.process();
+    // router.fetch(targetData, mapper.send());
+    // router.process();
 
-    output_buffer = router.send();
+    // output_buffer = router.send();
 
-    for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
-        for(int sampCNT=0; sampCNT<nframes; sampCNT++)
-        out[chanCNT][sampCNT] = static_cast<jack_default_audio_sample_t>(output_buffer[chanCNT][sampCNT]);
-    }
+    // for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
+    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++)
+    //     out[chanCNT][sampCNT] = static_cast<jack_default_audio_sample_t>(output_buffer[chanCNT][sampCNT]);
+    // }
 
     return 0;
 }

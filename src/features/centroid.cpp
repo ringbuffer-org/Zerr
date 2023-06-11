@@ -27,19 +27,19 @@ void Centroid::extract(){
         k+=1;
     }
 
-    y = (num / denum) / (float) x.size();
+    y.original = (num / denum) / (float) x.size(); // 
 }
 
 void Centroid::reset(){
     std::cout<<"Centroid::reset"<<std::endl;
 }
 
-void Centroid::fetch(t_blockIn in){
+void Centroid::fetch(t_featureInputs in){
     x.clear();
-    x = in;
+    x = in.spec;
 }
 
-float Centroid::send(){
+t_featureValue Centroid::send(){
     return y;
 }
 

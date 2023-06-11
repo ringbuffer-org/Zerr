@@ -22,12 +22,12 @@ public:
     void initialize();
     void extract();
     void reset();
-    void fetch(t_blockIn in);
-    float send();
+    void fetch(t_featureInputs in);
+    t_featureValue send();
 
 private:
-    t_blockIn x; //input
-    float    y; //output
+    t_audioBuf       x; //input
+    t_featureValue  y; //output
 
     // params
     int zero_crossings;

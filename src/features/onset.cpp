@@ -21,11 +21,11 @@ void Onset::reset(){
     std::cout<<"Onset::reset"<<std::endl;
 }
 
-void Onset::fetch(t_blockIn in){
+void Onset::fetch(t_featureInputs in){
     x.clear();
-    x = in;
+    x = in.wave;
 }
 
-float Onset::send(){
+t_featureValue Onset::send(){
     return y;
 }

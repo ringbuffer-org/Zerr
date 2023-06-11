@@ -21,14 +21,15 @@ class RingBuffer {
 public:
     explicit RingBuffer(size_t capacity);
 
-    void enqueue(const t_blockIn& block);
+    size_t get_size() const;
+    size_t get_capacity() const;
 
-    size_t getSize() const;
-    size_t getCapacity() const;
-    t_audioBuf getBufferSamples();
+    void enqueue(const t_blockIn& block);
+    
+    void get_samples(t_sample* ptr_buffer, size_t buf_len);
 
 private:
-    t_audioBuf buffer;
+    t_samples buffer;
     size_t head;
     size_t tail;
     size_t size;

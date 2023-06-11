@@ -22,9 +22,6 @@
 #include "yaml-cpp/yaml.h"
 #include <fftw3.h>
 
-// ifdef PUREDATA
-// #include "m_pd.h" // for testing
-
 namespace zerr{
 /**
 * Print the information of unit test
@@ -46,8 +43,8 @@ void print_mat(std::vector<std::vector<double>> mat);
 /**
 * Print a vector of any type
 */
-// template <typename T>
-void print_vec(std::vector<float> vec);
+template <typename T>
+void print_vec(std::vector<T> vec);
 
 /**
 * Generate a random vector with choosen length and minimum\maximum value
@@ -72,6 +69,18 @@ std::vector<T> slice(std::vector<T> const &v, int m, int n)
 * generate fake audio frames for testing
 */
 // audio_mat gen_test_frames(int size, int num);
+inline float gaussian_lobe(int pos, double mu, double sigma, int L)
+{
+    double w     = exp( -(0.5) * pow( ((float) pos - mu) /sigma,2.0) );
+    return w;
+}
+
+
+inline float get_hann_sample(int pos, int L)
+{
+    float val = 0.5 * (1.0 - cos( (2.0*PI* (float) pos) / (float)L) );
+    return val;
+}
 
 } //namespace zerr
 #endif //UTILS_H

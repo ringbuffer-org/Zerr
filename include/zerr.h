@@ -33,8 +33,7 @@ public:
 
 private:
     //basic config
-    // int sr = 48000;
-    int frame_size = 1024; //tmp
+    // int frame_size = 1024; //tmp
     std::vector<t_blockIn> output_buffer;
 
     // config path

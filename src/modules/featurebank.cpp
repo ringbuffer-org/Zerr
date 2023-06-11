@@ -3,19 +3,19 @@ using namespace zerr;
 using namespace feature;
 
 
-FeatureBank::FeatureBank():input_buffer(1024){
+FeatureBank::FeatureBank():ring_buffer(AUDIO_BUFFER_SIZE),freq_transformer(AUDIO_BUFFER_SIZE){
     _regist_all();
 }
 
 
-void FeatureBank::setup(std::string name){
-    activated_features.push_back(_create(name));
-}
+// void FeatureBank::setup(std::string name){
+//     activated_features.push_back(_create(name));
+// }
 
 
-void FeatureBank::shutdown(std::string name){
-    std::cout<<"shutdown:\n"<<name<<std::endl;
-}
+// void FeatureBank::shutdown(std::string name){
+//     std::cout<<"shutdown:\n"<<name<<std::endl;
+// }
 
 
 void FeatureBank::print_info(std::string name){
@@ -39,7 +39,7 @@ void FeatureBank::print_active_features(){
 }
 
 
-void FeatureBank::initialize(t_featureList feature_names){
+void FeatureBank::initialize(t_featureNameList feature_names){
 
     for (auto name : feature_names) {
         activated_features.push_back(_create(name));
@@ -49,30 +49,50 @@ void FeatureBank::initialize(t_featureList feature_names){
     for (int i = 0; i < n_features; ++i){
         activated_features[i]->initialize();
     }
-    y_buf.resize(activated_features.size());
+    y.resize(activated_features.size());
+
+    x.wave.resize(AUDIO_BUFFER_SIZE);
 }
 
 
 void FeatureBank::fetch(t_blockIn in){
-    input_buffer.enqueue(in);
+    t_sample* buf_ptr=nullptr;
+    size_t buf_len;
+    ring_buffer.enqueue(in);
+
+    x.blck.clear();
+    x.blck = in;
+
+    buf_ptr = x.wave.data(); 
+    buf_len = x.wave.size(); 
+    ring_buffer.get_samples(buf_ptr, buf_len);
+
+    buf_ptr = freq_transformer.fft_input(); 
+    buf_len = freq_transformer.get_frame_size(); 
+    ring_buffer.get_samples(buf_ptr, buf_len);
+    freq_transformer.windowing();
+    freq_transformer.fft();
+    freq_transformer.power_spectrum();
+    x.spec = freq_transformer.get_power_spectrum();
 }
 
 
 void FeatureBank::process(){
+
     for (int i = 0; i < activated_features.size(); ++i){
-        activated_features[i]->fetch(input_buffer.getBufferSamples());
+        activated_features[i]->fetch(x);
         activated_features[i]->extract();
-        y_buf[i] = activated_features[i]->send();
+        y[i] = activated_features[i]->send();
     }
 }
 
 
-std::vector<float> FeatureBank::send(){
-    std::cout<<y_buf[0]<<"  "<<y_buf[1]<<"  "<<y_buf[2]<<std::endl;
-    return y_buf;
+t_featureValueList FeatureBank::send(){
+    std::cout<<"\r"<<y[0].original<<"  "<<y[1].original<<std::flush;
+    return y;
 }
 
-
+// make this an external function
 void FeatureBank::_regist_all(){
     _regist("Centroid", []() {
         return fe_ptr(new Centroid());

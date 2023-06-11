@@ -24,20 +24,20 @@ void ZeroCrossingRate::extract(){
         }
     }
 
-    y = static_cast<float>(zero_crossings) / (x.size() - 1);
+    y.original = static_cast<t_value>(zero_crossings) / (x.size() - 1);
 }
 
 void ZeroCrossingRate::reset(){
     std::cout<<"ZeroCrossingRate::reset"<<std::endl;
 }
 
-void ZeroCrossingRate::fetch(t_blockIn in){
+void ZeroCrossingRate::fetch(t_featureInputs in){
     x.clear();
-    x = in;
+    x = in.wave;
 }
 
-float ZeroCrossingRate::send(){
-    return static_cast<float>(y);
+t_featureValue ZeroCrossingRate::send(){
+    return static_cast<t_featureValue>(y);
 }
 
 

@@ -28,10 +28,10 @@ void print_mat(std::vector<std::vector<double>> mat){
     std::cout<<std::endl;
 }
 
-// template <typename T>
-void print_vec(std::vector<float> vec){
+template <typename T>
+void print_vec(std::vector<T> vec){
 
-    for (float sample:vec){
+    for (auto sample:vec){
         std::cout<<sample<<" ";
     }
     std::cout<<std::endl;

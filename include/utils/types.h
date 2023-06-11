@@ -19,35 +19,50 @@ typedef t_samples t_audioBuf;
 // feature types
 typedef std::string t_featureName;
 
-typedef std::vector<t_featureName> t_featureList; 
+typedef std::vector<t_featureName> t_featureNameList; 
 
-typedef float t_featureVal;
-typedef std::vector<t_featureVal> t_featureVals;
+typedef float t_value;
 
-//spectrum types
+typedef struct {
+    t_value original;
+    t_value normalized;
+} t_featureValue;
+
+typedef std::vector<t_featureValue> t_featureValueList;
+
+typedef t_value t_trigger;  // 0,1
+typedef t_value t_category; // 0,1,2,3,4
+typedef t_value t_floating; // float
+
+// spectrum types
 #ifdef PUREDATA
     typedef float t_bin; //puredata still only support 16bit
 #else
     typedef double t_bin; 
 #endif
 
-typedef std::vector<t_bin> specBuf;
+typedef struct {
+    t_bin real;
+    t_bin img;
+} t_complex;
 
-// typedef t_value t_trigger;
-// typedef t_value t_category;
-// typedef t_value t_floating;
+typedef std::vector<t_complex> t_fftBuf;
+typedef std::vector<t_bin> t_specBuf;
 
-//processing_mode
-// #define zSAMPLE 1
-// #define zBLOCK 32
-// #define zFRAME 2048 
+// 
+typedef struct {
+    t_blockIn  blck;
+    t_audioBuf wave;
+    t_specBuf  spec;
+} t_featureInputs ;
 
-// output_mode
-// typedef float FLOATING_POINTS; // :)
-// typedef unsigned int CATEGORY_INDEX;
-// typedef enum { On = 1, Off = 0 } TRIGGER_BANG;
-}
+// configs
+#define PI 3.14159265
 
+#define AUDIO_BUFFER_SIZE 1024 // for now AUDIO_BUFFER_SIZE & FFT_LENGTH should be same
+// #define FFT_LENGTH        1024 // may not used
+
+} // namespace zerr
 #endif //TYPES_H
 
 

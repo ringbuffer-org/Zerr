@@ -2,7 +2,10 @@
 #define FEATUREBANK_H
 
 #include "utils.h"
+
 #include "ringbuffer.h"
+#include "frequencytransformer.h"
+
 #include "features.h"
 #include "featureextractor.h"
 
@@ -28,11 +31,11 @@ public:
     /**
     * setup the feature selected by name 
     */
-    void setup(std::string name);
+    // void setup(std::string name);
     /**
     * desconstructe the used feature
     */
-    void shutdown(std::string name);
+    // void shutdown(std::string name);
     /**
     * Print the detail info of selected feature
     */
@@ -48,7 +51,7 @@ public:
     /**
     * Print the name of active features
     */
-    void initialize(t_featureList feature_names);
+    void initialize(t_featureNameList feature_names);
     /**
     * fetch: dsp callback function
     * fetch audio block and store in the buffer if needed
@@ -64,16 +67,17 @@ public:
     * send: dsp callback function
     * send results in output buffer to other module
     */
-    std::vector<float> send();
+    t_featureValueList send();
 
 private:
-
     std::map<std::string, CreateFunc> registed_features; /**< The map between all feature names and feature constructors*/
     std::vector<fe_ptr> activated_features; /**< The pointer to activated feature objects*/
 
-    // t_blockIn x;     /**< The map between all feature names and feature constructors*/
-    RingBuffer input_buffer;
-    t_featureVals y_buf; /**< The map between all feature names and feature constructors*/
+    RingBuffer ring_buffer; /**< basic ring buffer to hold audio blocks */
+    FrequencyTransformer freq_transformer; /**< fftw3 warper */
+
+    t_featureInputs x;    /**< the structure to hold different type of feature inputs */
+    t_featureValueList y; /**< The map between all feature names and feature constructors*/
 
     int n_features;
 

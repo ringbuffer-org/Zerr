@@ -39,8 +39,8 @@ public:
     /**
     * fetch samples from audio stream and load to the input buffer
     */
-    virtual void fetch(t_blockIn x) = 0;
-    virtual float send() = 0;
+    virtual void fetch(t_featureInputs x) = 0;
+    virtual t_featureValue send() = 0;
     /**
     * Check if this feature extractor is initialized
     */
