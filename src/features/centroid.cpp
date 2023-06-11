@@ -35,7 +35,8 @@ void Centroid::extract(){
         centroid /= totalMagnitude;
     }
 
-    y.original = centroid; // 
+    y.original   = centroid; // 
+    y.normalized = centroid / freq_max;
 }
 
 void Centroid::reset(){

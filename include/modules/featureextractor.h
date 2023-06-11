@@ -47,10 +47,11 @@ public:
     bool is_initialized(){return initialized;}
     void set_initialize_statue(bool s){initialized=s;}
 
-private:
-
+protected:
+    t_specBuf       x; //input
+    t_featureValue  y; //output g
+    t_systemConfigs system_configs;
     bool initialized=false; // 
-
 }; // Class FeatureExtractor
 }  // Namespace zerr 
 

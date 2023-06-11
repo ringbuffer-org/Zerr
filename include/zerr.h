@@ -32,6 +32,8 @@ public:
     */
     void run();
 
+    ~Zerr();
+
 private:
     //basic config
     std::vector<t_blockIn> output_buffer;
@@ -68,6 +70,7 @@ private:
     * hold the run function
     */
     void _hold();
+
 };
 
 }  //namespace zerr

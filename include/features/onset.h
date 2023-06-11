@@ -25,9 +25,9 @@ public:
     t_featureValue send();
 
 private:
-    t_audioBuf x; //input
-    t_featureValue y; //output g
-    t_systemConfigs system_configs;
+    // t_audioBuf x; //input
+    // t_featureValue y; //output g
+    // t_systemConfigs system_configs;
 };
 
 } //namespace feature

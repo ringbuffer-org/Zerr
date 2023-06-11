@@ -137,3 +137,8 @@ int Zerr::process(jack_nframes_t nframes){
 
     return 0;
 }
+
+Zerr::~Zerr(){
+    jack_deactivate(client);
+    jack_client_close(client);
+}

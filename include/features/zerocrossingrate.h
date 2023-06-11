@@ -26,9 +26,9 @@ public:
     t_featureValue send();
 
 private:
-    t_audioBuf      x; //input
-    t_featureValue  y; //output
-    t_systemConfigs system_configs;
+    // t_audioBuf      x; //input
+    // t_featureValue  y; //output
+    // t_systemConfigs system_configs;
 
     // params
     int zero_crossings;
