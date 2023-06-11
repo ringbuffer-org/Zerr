@@ -15,9 +15,7 @@ void print_line(int len){
     std::cout<<std::endl;
 }
 
-// template <typename T>
 void print_mat(std::vector<std::vector<double>> mat){
-    // static_assert(IsNumberType<T>::value, "Invalid data type");
 
     for (std::vector<double> chnl:mat){
         for (double sample:chnl){

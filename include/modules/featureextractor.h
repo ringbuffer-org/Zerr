@@ -27,7 +27,7 @@ public:
     /**
     * initialize the feature extraction algorithm 
     */
-    virtual void initialize() = 0;
+    virtual void initialize(t_systemConfigs sys_cfg) = 0;
     /**
     * Run algorithm on the signal in the input buffer and update the output buffer
     */

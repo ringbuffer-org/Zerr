@@ -35,19 +35,20 @@ void FeatureBank::print_active_features(){
     std::cout<<"All activated features: "<<std::endl;
     for (int i = 0; i < activated_features.size(); ++i){
         std::cout<<"  -Name: "<<activated_features[i]->get_name()<<std::endl;
+        std::cout<<"  -Category: "<<activated_features[i]->get_category()<<std::endl;
+        std::cout<<"  -Description: "<<activated_features[i]->get_description()<<std::endl;
     }
 }
 
 
-void FeatureBank::initialize(t_featureNameList feature_names){
-
+void FeatureBank::initialize(t_featureNameList feature_names, t_systemConfigs system_configs){
     for (auto name : feature_names) {
         activated_features.push_back(_create(name));
     }
 
     n_features = activated_features.size();
     for (int i = 0; i < n_features; ++i){
-        activated_features[i]->initialize();
+        activated_features[i]->initialize(system_configs);
     }
     y.resize(activated_features.size());
 
@@ -78,7 +79,6 @@ void FeatureBank::fetch(t_blockIn in){
 
 
 void FeatureBank::process(){
-
     for (int i = 0; i < activated_features.size(); ++i){
         activated_features[i]->fetch(x);
         activated_features[i]->extract();
@@ -88,7 +88,11 @@ void FeatureBank::process(){
 
 
 t_featureValueList FeatureBank::send(){
-    std::cout<<"\r"<<y[0].original<<"  "<<y[1].original<<std::flush;
+
+    #ifdef TESTMODE
+    std::cout<<y[0].original<<"  "<<y[1].original<<std::endl;
+    #endif // TESTMODE
+
     return y;
 }
 
@@ -113,5 +117,7 @@ std::unique_ptr<FeatureExtractor> FeatureBank::_create(const std::string& classN
         if (it != registed_features.end()) {
             return it->second();
         }
-        return nullptr;
+
+        throw std::runtime_error("Feature |" + className + "| not found, please check your spelling");
+        // return nullptr;
     }

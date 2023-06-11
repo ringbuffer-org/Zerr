@@ -1,8 +1,8 @@
 #ifndef FEATUREBANK_H
 #define FEATUREBANK_H
 
+#include "configs.h"
 #include "utils.h"
-
 #include "ringbuffer.h"
 #include "frequencytransformer.h"
 
@@ -13,16 +13,14 @@ namespace zerr {
 /**
 * FeatureBank is used to organise the behaviour of all feature extractors uniformly
 * It takes original audio block input and does preprocess like Buffering, FFT
-* then distributes the results to 
+* then distributes the results to all activated feature extraction algorithm
+* 
 */
 class FeatureBank {
 public:   
-    /**
-    * Function pointer type for creating objects
-    */
-    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)();
+
+    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)();/**< Function pointer type for creating FeatureExtractor objects  */
     typedef std::unique_ptr<FeatureExtractor> fe_ptr; /**< The unique_ptr of type virtual class FeatureExtractor  */
-    typedef std::vector<fe_ptr>           fe_ptr_vec; /**< Vector of all feature extractors  */
     /**
     * FeatureBank Constructor
     * Regist all available features and initialize the input buffer
@@ -51,7 +49,7 @@ public:
     /**
     * Print the name of active features
     */
-    void initialize(t_featureNameList feature_names);
+    void initialize(t_featureNameList feature_names, t_systemConfigs system_configs);
     /**
     * fetch: dsp callback function
     * fetch audio block and store in the buffer if needed
@@ -68,18 +66,26 @@ public:
     * send results in output buffer to other module
     */
     t_featureValueList send();
+    /**
+    * Reset the featurebank parameters and load new features
+    */
+    void reset(t_featureNameList feature_names);
 
 private:
+
     std::map<std::string, CreateFunc> registed_features; /**< The map between all feature names and feature constructors*/
+
     std::vector<fe_ptr> activated_features; /**< The pointer to activated feature objects*/
 
-    RingBuffer ring_buffer; /**< basic ring buffer to hold audio blocks */
-    FrequencyTransformer freq_transformer; /**< fftw3 warper */
+    RingBuffer ring_buffer; /**< basic ring buffer to hold previous audio samples */
+
+    FrequencyTransformer freq_transformer; /**< fftw3 warper to perform fft as audio signal input*/
 
     t_featureInputs x;    /**< the structure to hold different type of feature inputs */
-    t_featureValueList y; /**< The map between all feature names and feature constructors*/
 
-    int n_features;
+    t_featureValueList y; /**< The map between all feature names and feature constructors */
+
+    int n_features; /**< The number of activated features */
 
     /**
     * Regist all feature extractors to the FeatureBank

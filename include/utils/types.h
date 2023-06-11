@@ -60,7 +60,11 @@ typedef struct {
 #define PI 3.14159265
 
 #define AUDIO_BUFFER_SIZE 1024 // for now AUDIO_BUFFER_SIZE & FFT_LENGTH should be same
-// #define FFT_LENGTH        1024 // may not used
+
+typedef struct {
+    size_t sample_rate;
+    size_t block_size;
+}t_systemConfigs;
 
 } // namespace zerr
 #endif //TYPES_H

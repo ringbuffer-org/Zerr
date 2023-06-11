@@ -4,8 +4,8 @@
 Include all head files of features
 */
 #include "onset.h"
-#include "flux.h"
+// #include "flux.h"
 #include "centroid.h"
-#include "zerocrossing.h"
+#include "zerocrossingrate.h"
 
 #endif // FEATURES_H

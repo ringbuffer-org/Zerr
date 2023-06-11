@@ -5,10 +5,17 @@ using namespace zerr;
 using namespace feature;
 
 const std::string Centroid::name        = "Centroid";
-const std::string Centroid::category    = "spectrum";
+const std::string Centroid::category    = "Frequency-Domain";
 const std::string Centroid::description = "The spectral centroid is a measure used in digital signal processing to characterise a spectrum.";
 
-void Centroid::initialize(){
+void Centroid::initialize(t_systemConfigs sys_cfg){
+    #ifdef TESTMODE
+    system_configs = sys_cfg;
+    freq_max = static_cast<double>(system_configs.sample_rate) / 2.0 ;
+    std::cout<<"Centroid::initialize sample_rate | "<< system_configs.sample_rate<<std::endl;
+    std::cout<<"Centroid::initialize freq_max | "<< freq_max<<std::endl;
+    #endif
+
     _reset_param();
     if (is_initialized()==false){
         set_initialize_statue(true);
@@ -18,16 +25,17 @@ void Centroid::initialize(){
 void Centroid::extract(){
     //reset the parameters
     _reset_param();
-    // from k=1 to K:
-    for(auto it = std::next(begin(x)); it != std::end(x); ++it)
-    {
-        num   += k* *it;
-        denum += *it;
-
-        k+=1;
+    int fft_size = x.size();
+    for (int i = 0; i < fft_size; ++i) {
+        centroid += (i * freq_max / fft_size) * x[i];
+        totalMagnitude += x[i];
     }
 
-    y.original = (num / denum) / (float) x.size(); // 
+    if (totalMagnitude > 0.0) {
+        centroid /= totalMagnitude;
+    }
+
+    y.original = centroid; // 
 }
 
 void Centroid::reset(){
@@ -44,8 +52,6 @@ t_featureValue Centroid::send(){
 }
 
 void Centroid::_reset_param(){
-    k     = 0;
-    denum = 0.0000;
-    num   = 0.00001;
+    centroid = 0.0;
+    totalMagnitude = 0.0;
 }
-

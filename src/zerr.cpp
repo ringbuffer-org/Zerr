@@ -7,8 +7,8 @@ Zerr::Zerr(std::string zerrCfgFile, std::string spkrCfgFile){
 }
 
 void Zerr::initialize(){
-    _initialize_zerr();
     _initialize_audioclient();
+    _initialize_zerr();
 }
 
 void Zerr::run(){
@@ -41,9 +41,15 @@ void Zerr::_hold(){
 }
 
 void Zerr::_initialize_zerr(){
-    t_featureNameList feature_names = {"Centroid", "ZeroCrossingRate"};// move this to zerr YAML file
+    std::cout<<"initialize zerr..."<<std::endl;
 
-    bank.initialize(feature_names);
+    bank.initialize(feature_names, sys_cfg);
+
+    #ifdef TESTMODE
+    bank.print_all_features();
+    bank.print_active_features();
+    #endif // TESTMODE
+
     // gen.initialize();
     // mapper.initialize(spkr_cfg);
     // router.initialize(frame_size, mapper.get_n_speaker() + 1); 
@@ -52,6 +58,13 @@ void Zerr::_initialize_zerr(){
 void Zerr::_initialize_audioclient(){
     std::cout<<"initialize audioclient..."<<std::endl;
     client = jack_client_open("zerr", JackNullOption, &status, NULL);
+
+    #ifdef TESTMODE
+    sys_cfg.sample_rate = static_cast<size_t>(jack_get_sample_rate(client));
+    sys_cfg.block_size  = static_cast<size_t>(jack_get_buffer_size(client));
+    std::cout<<"sys_cfg.sample_rate -- "<<sys_cfg.sample_rate<<std::endl;
+    std::cout<<"sys_cfg.block_size  -- "<<sys_cfg.block_size <<std::endl;
+    #endif // TESTMODE
 
     jack_set_process_callback(this->client, this->callback_process, this);
 
@@ -94,14 +107,14 @@ int Zerr::process(jack_nframes_t nframes){
     out[i] = (jack_default_audio_sample_t *)
     jack_port_get_buffer(this->output_port[i], jack_get_buffer_size(client));
 
-    // set output buffer "0.0" // don't do this when using Puredata! because the input and output shares the same memory
+    // set output buffer "0.0"
     for(int chanCNT=0; chanCNT<nOutputs; chanCNT++)
     {
         for(int sampCNT=0; sampCNT<nframes; sampCNT++)
         out[chanCNT][sampCNT] = 0.0;
     }
 
-    t_blockIn targetData(in[0], in[0] + 256);
+    t_blockIn targetData(in[0], in[0] + nframes);
 
     bank.fetch(targetData);
     bank.process();
