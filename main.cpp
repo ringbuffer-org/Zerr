@@ -6,16 +6,13 @@ using namespace zerr;
 // zerrCfgFile "/Users/yangzeyu/Downloads/Zerr/configs/zerr_configs/preset1.yaml"
 // ./run_zerr -z "/Users/yangzeyu/Downloads/Zerr/configs/zerr_configs/preset1.yaml" -s "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/circulation_8.yaml"
 
-Zerr* zerr_client;
+Zerr* zerr_client; // define the zerr_client ptr here to make handleSignal access it easier
 
 void handleSignal(int signal) {
-    std::cout << "Received keyboard interrupt. Stopping JACK client..." << std::endl;
-
-    // Zerr* zerr = static_cast<Zerr*>(zerr_client);
+    std::cout << "Received keyboard interrupt. Stopping Zerr..." << std::endl;
 
     delete zerr_client;
 
-    // Terminate the program
     std::exit(signal);
 }
 
@@ -42,8 +39,5 @@ int main(int argc, char *argv[]){
   zerr_client->initialize();
   zerr_client->run();
 
-  // Zerr zerr_client(zerrCfgFile, spkrCfgFile);
-  // zerr_client.initialize();
-  // zerr_client.run();
   return 0;
 }

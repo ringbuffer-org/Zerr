@@ -32,7 +32,7 @@ void Mapper::_print_mapping(std::string note){
     std::cout<<std::endl;
 }
 
-void Mapper::fetch(float in){
+void Mapper::fetch(t_value in){
     //TODO: replace with ringbuffer insert
     prev_x = x; 
     x = in;
@@ -42,6 +42,9 @@ void Mapper::process(){
     if (x > 0.1 && prev_x < -0.1){ //trigger received
         curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
     }
+
+    // std::cout<<"Mapper::process  "<<curr_idx<<std::endl;
+
     _update_mapping();
 }
 
@@ -55,5 +58,11 @@ void Mapper::_update_mapping(){
 }
 
 std::vector<float> Mapper::send(){
+
+    for (auto sample:mapping){
+        std::cout<<sample<<" ";
+    }
+    std::cout<<std::endl;
+
     return mapping;
 }

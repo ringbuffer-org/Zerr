@@ -6,39 +6,31 @@ void TrajectoryGenerator::initialize(){
     // std::cout<<"initialized!"<<std::endl;
 }
 
-void TrajectoryGenerator::fetch(std::vector<float> in){
+void TrajectoryGenerator::fetch(t_featureValueList in){
     //tmp
-    xs.clear();
-    xs = in;
-
-    // std::cout<<"new input: ";
-    // for (auto x:xs){
-    //     std::cout<<x<<"  ";
-    // }
-    // std::cout<<std::endl;
+    x.clear();
+    x = in;
 }
 
 void TrajectoryGenerator::process(){
     // messy temparary process function
     // two input channels are weighted and added then compared with a constant threshold
     // the output 
-    float tmp;
-    std::vector<float> weights = {0.5, 0.5};
-    tmp = weight_add(xs, weights);
+    std::vector<t_value> weights = {0.5, 0.5};
+    y = weight_add(weights);
     // y = (tmp > 0.5);
-    y = tmp;
-    // std::cout<<"merged!: "<<tmp<<std::endl;
+    std::cout<<"merged!: "<<y<<std::endl;
 }
 
-float TrajectoryGenerator::send(){
+t_value TrajectoryGenerator::send(){
     return y;
 }
 
-float TrajectoryGenerator::weight_add(std::vector<float> xs, std::vector<float> weights){
-    float res = 0;
-    for (int i = 0; i < xs.size(); ++i)
+t_value TrajectoryGenerator::weight_add(std::vector<t_value> weights){
+    t_value res = 0;
+    for (int i = 0; i < x.size(); ++i)
     {
-        res = res + ( xs[i] * weights[i] );
+        res = res + ( x[i].original * weights[i] );
     }
     return res;
 }

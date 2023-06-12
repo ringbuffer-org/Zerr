@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include "configs.h"
+
 namespace zerr {
 
 // audio types
@@ -35,21 +37,20 @@ typedef t_value t_category; // 0,1,2,3,4
 typedef t_value t_floating; // float
 
 // spectrum types
-#ifdef PUREDATA
-    typedef float t_bin; //puredata still only support 16bit
-#else
-    typedef double t_bin; 
-#endif
+// #ifdef PUREDATA
+//     typedef float t_bin; //puredata still only support 16bit
+// #else
+//     typedef double t_bin; 
+// #endif
 
 typedef struct {
-    t_bin real;
-    t_bin img;
+    t_sample real;
+    t_sample img;
 } t_complex;
 
 typedef std::vector<t_complex> t_fftBuf;
-typedef std::vector<t_bin> t_specBuf;
+typedef std::vector<t_sample> t_specBuf;
 
-// 
 typedef struct {
     t_blockIn  blck;
     t_audioBuf wave;

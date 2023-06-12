@@ -48,7 +48,7 @@ public:
     void set_initialize_statue(bool s){initialized=s;}
 
 protected:
-    t_specBuf       x; //input
+    t_samples       x; //input
     t_featureValue  y; //output g
     t_systemConfigs system_configs;
     bool initialized=false; // 

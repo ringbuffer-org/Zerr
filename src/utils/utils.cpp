@@ -26,8 +26,8 @@ void print_mat(std::vector<std::vector<double>> mat){
     std::cout<<std::endl;
 }
 
-template <typename T>
-void print_vec(std::vector<T> vec){
+// template <typename T>
+void print_vec(std::vector<float> vec){
 
     for (auto sample:vec){
         std::cout<<sample<<" ";

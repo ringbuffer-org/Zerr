@@ -50,9 +50,9 @@ void Zerr::_initialize_zerr(){
     bank.print_active_features();
     #endif // TESTMODE
 
-    // gen.initialize();
-    // mapper.initialize(spkr_cfg);
-    // router.initialize(frame_size, mapper.get_n_speaker() + 1); 
+    gen.initialize();
+    mapper.initialize(spkr_cfg);
+    router.initialize(sys_cfg.block_size, mapper.get_n_speaker() + 1); 
 }
 
 void Zerr::_initialize_audioclient(){
@@ -108,32 +108,45 @@ int Zerr::process(jack_nframes_t nframes){
     jack_port_get_buffer(this->output_port[i], jack_get_buffer_size(client));
 
     // set output buffer "0.0"
-    for(int chanCNT=0; chanCNT<nOutputs; chanCNT++)
-    {
+    for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
         for(int sampCNT=0; sampCNT<nframes; sampCNT++)
-        out[chanCNT][sampCNT] = 0.0;
+        out[chanCNT][sampCNT] = 0.5;
     }
+
+    // for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
+    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++){
+    //         out[chanCNT][sampCNT] = in[0][sampCNT];
+    //     }
+    // }
+
+
+
+
+
+
+
 
     t_blockIn targetData(in[0], in[0] + nframes);
 
     bank.fetch(targetData);
     bank.process();
-    bank.send(); // test
-    // gen.fetch(bank.send());
-    // gen.process();
 
-    // mapper.fetch(gen.send());
-    // mapper.process();
+    gen.fetch(bank.send());
+    gen.process();
 
-    // router.fetch(targetData, mapper.send());
-    // router.process();
+    mapper.fetch(gen.send());
+    mapper.process();
 
-    // output_buffer = router.send();
+    router.fetch(targetData, mapper.send());
+    router.process();
 
-    // for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
-    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++)
-    //     out[chanCNT][sampCNT] = static_cast<jack_default_audio_sample_t>(output_buffer[chanCNT][sampCNT]);
-    // }
+    output_buffer = router.send();
+
+    for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
+        for(int sampCNT=0; sampCNT<nframes; sampCNT++){
+            out[chanCNT][sampCNT] = static_cast<jack_default_audio_sample_t>(output_buffer[chanCNT][sampCNT]);
+        }
+    }
 
     return 0;
 }

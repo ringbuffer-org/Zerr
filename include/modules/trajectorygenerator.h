@@ -19,12 +19,12 @@ public:
     /**
     * update the input control signal buffer
     */
-    void fetch(std::vector<float> in);
+    void fetch(t_featureValueList in);
     /**
     * apply the transformation to merge incoming control signals into mono control signal
     */
     void process();
-    float send();
+    t_value send();
     void reset();
 
 private:
@@ -36,23 +36,21 @@ private:
     /**
     * input control signal buffer
     */
-    std::vector<float> xs;
-    float y;
+    t_featureValueList x;
+    t_value y;
     // std::string output_mode;
     /**
     * all features should run on the same processing mode for real-time processing consistance
     */
-    // void check_processing_mode();
     /**
     * build blocks of feature to trajectory transformation
     * @params chnl: apply this function on which channel
-    * /TODO: use self-defined float type(floating, category, trigger)?
     */
     float above_threshold(float x, float thres); //
     float below_threshold(float x, float thres);
     float max(std::vector<float> xs);
     float min(std::vector<float> xs);
-    float weight_add(std::vector<float> xs, std::vector<float> weights);
+    float weight_add(std::vector<float> weights);
     float scale(float xmin, float xmax, float ymin, float ymax);
     float sample(float x, float impulse);
     float quantitative(float x, float minx, float step);
