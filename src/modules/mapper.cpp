@@ -73,10 +73,10 @@ void Mapper::_update_mapping(){
 
 std::vector<t_value> Mapper::send(){
 
-    for (auto sample:mapping){
-        std::cout<<sample<<" ";
-    }
-    std::cout<<std::endl;
+    // for (auto sample:mapping){
+    //     std::cout<<sample<<" ";
+    // }
+    // std::cout<<std::endl;
 
     return mapping;
 }

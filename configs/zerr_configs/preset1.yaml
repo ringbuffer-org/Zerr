@@ -1,22 +1,17 @@
-zerr:
-  input:
-    1: "left"
-    2: "right"
-    3: "mono"
-  features:
-      1: 
-        name: "Centroid"
-        mode: "Frame"
-        input: [1,2]
-      2: 
-        name: "ZeroCrossing"
-        mode: "Frame"
-        input: [1,2]
-  trajectory:
-    mode: "weight_add"
-  mapper:
-    array: "/Users/yangzeyu/Downloads/Zerr/configs/speakerarray/circulation_8.yaml"
-    mode: "jump"
-  router:
-    mode: "copy"
+input:
+  1: 
+    name: "mono"
+features:
+  1: 
+    name: "Centroid"
+    mode: "normalized"
+  2: 
+    name: "RMSAmplitude"
+    mode: "original"
+trajectory:
+  mode: "bypass"
+mapper:
+  mode: "triggering"
+router:
+  mode: "copy"
 

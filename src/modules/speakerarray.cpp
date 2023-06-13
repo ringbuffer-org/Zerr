@@ -25,7 +25,10 @@ void Speaker::print(){
 }
 
 void SpeakerArray::initialize(std::string config_path){
-    read_config(config_path);
+    // read_config(config_path);
+    speakers.clear();
+    speaker_config = YAML::LoadFile(config_path);
+
 
     YAML::Node speakerNodes = speaker_config["speakers"];
     int cnt = 0;
@@ -136,7 +139,6 @@ int SpeakerArray::get_next_one_speaker(int spkr_idx, int mode){
 }
 
 void SpeakerArray::read_config(std::string config_path){
-    // std::cout << "Reading speaker config!" << std::endl;
 
     // clear existing data
     speakers.clear();

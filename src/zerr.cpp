@@ -40,8 +40,26 @@ void Zerr::_hold(){
     }
 }
 
+void Zerr::_get_feature_names(){
+    feature_names.clear();
+    YAML::Node featureNode = zerrNode["features"];
+    int cnt = 0;
+    for (auto it = featureNode.begin(); it != featureNode.end(); ++it){
+
+        YAML::Node value = it->second;
+
+        std::string name = value["name"].as<std::string>();
+        feature_names.push_back(name);
+        cnt++;
+    }
+}
+
+
 void Zerr::_initialize_zerr(){
     std::cout<<"initialize zerr..."<<std::endl;
+
+    zerrNode = YAML::LoadFile(zerr_cfg);
+    _get_feature_names();
 
     bank.initialize(feature_names, sys_cfg);
 
@@ -114,11 +132,11 @@ int Zerr::process(jack_nframes_t nframes){
         out[chanCNT][sampCNT] = 0.0;
     }
 
-    for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
-        for(int sampCNT=0; sampCNT<nframes; sampCNT++){
-            out[chanCNT][sampCNT] = in[0][sampCNT];
-        }
-    }
+    // for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
+    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++){
+    //         out[chanCNT][sampCNT] = in[0][sampCNT];
+    //     }
+    // }
 
     t_blockIn targetData(in[0], in[0] + nframes);
 
