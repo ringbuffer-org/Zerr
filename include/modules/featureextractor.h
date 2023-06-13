@@ -53,8 +53,8 @@ protected:
     t_systemConfigs system_configs;
     bool initialized=false; // 
 }; // Class FeatureExtractor
-}  // Namespace zerr 
 
+}  // Namespace zerr 
 #endif // FEATUREEXTRACTOR_H
 
 

@@ -23,7 +23,9 @@ public:
     std::vector<int> get_contiguous(){return contiguous;};
 
     //Print out configs to console
+    #ifdef TESTMODE
     void print();
+    #endif //TESTMODE
 
 private:
     int idx;
@@ -78,7 +80,7 @@ public:
 private:
     int n_speakers;
     std::vector<int> indexs;
-    std::map<int, Speaker> speakers; //map between vector index and speaker index
+    std::map<int, Speaker> speakers;            //map between vector index and speaker index
     std::map<int, std::vector<int>> contiguous; // warning: not used
 
     YAML::Node speaker_config;

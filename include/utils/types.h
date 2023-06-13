@@ -15,6 +15,10 @@ namespace zerr {
 typedef std::vector<t_sample> t_samples; 
 
 typedef t_samples t_blockIn;
+typedef t_samples t_blockOut;
+
+typedef std::vector<t_blockIn>  t_blockIns;
+typedef std::vector<t_blockOut> t_blockOuts;
 
 typedef t_samples t_audioBuf;
 
@@ -35,6 +39,9 @@ typedef std::vector<t_featureValue> t_featureValueList;
 typedef t_value t_trigger;  // 0,1
 typedef t_value t_category; // 0,1,2,3,4
 typedef t_value t_floating; // float
+
+typedef t_value t_volume;
+typedef std::vector<t_volume> t_volumes;
 
 // spectrum types
 // #ifdef PUREDATA
@@ -60,7 +67,8 @@ typedef struct {
 // configs
 #define PI 3.14159265
 
-#define AUDIO_BUFFER_SIZE 2048 // for now AUDIO_BUFFER_SIZE & FFT_LENGTH should be same
+#define AUDIO_BUFFER_SIZE 1024 
+
 
 typedef struct {
     size_t sample_rate;

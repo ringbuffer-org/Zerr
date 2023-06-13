@@ -2,6 +2,9 @@
 using namespace zerr;
 
 void Mapper::initialize(std::string config_path){
+    cold_down_time = 10;
+    jump_cnt = 0;
+
     speaker_array.initialize(config_path);
     int n = speaker_array.get_n_speakers();
     _init_mapping(n);
@@ -11,9 +14,11 @@ void Mapper::initialize(std::string config_path){
     _update_mapping();
 }
 
+
 int Mapper::get_n_speaker(){
     return speaker_array.get_n_speakers();
 }
+
 
 void Mapper::_init_mapping(int n){
     mapping.clear(); //clean up the mapping if not empty
@@ -23,8 +28,8 @@ void Mapper::_init_mapping(int n){
     }
 }
 
+
 void Mapper::_print_mapping(std::string note){
-    // for testing
     std::cout<<note<<": ";
     for (t_value v: mapping){
         std::cout<<v<<"  ";
@@ -32,29 +37,39 @@ void Mapper::_print_mapping(std::string note){
     std::cout<<std::endl;
 }
 
-void Mapper::fetch(t_value in){
-    prev_x = x; 
+
+void Mapper::fetch(t_featureValueList in){
     x = in;
 }
 
-void Mapper::process(){
-    if (x > 0.1 && prev_x < -0.1){ //trigger received
-        curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
-    }
 
-    // std::cout<<"Mapper::process  "<<curr_idx<<std::endl;
+void Mapper::process(){
+
+    if (jump_cnt==0){ //trigger received
+        curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
+        jump_cnt = cold_down_time;
+    }
+    jump_cnt--;
+
+    // curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
 
     _update_mapping();
 }
 
+
 void Mapper::_update_mapping(){
-    //flush out mapping
-    for (int i = 0; i < mapping.size(); ++i){
-        mapping[i] = 0;
-    }
+
+    std::fill(mapping.begin(), mapping.end(), 0.0f);
+
+    std::vector<int> c_spkrs = speaker_array.get_contiguous_speakers(curr_idx);
+    
     mapping[0] = 1;        // index 0: virtual points
     mapping[curr_idx] = 1; // current activated index
+    for (int i = 0; i < c_spkrs.size(); ++i){
+        mapping[c_spkrs[i]] = 0.5;
+    }
 }
+
 
 std::vector<t_value> Mapper::send(){
 

@@ -12,7 +12,7 @@ namespace zerr {
 class Mapper {
 public:
     void initialize(std::string config_path);
-    void fetch(t_value in);
+    void fetch(t_featureValueList in);
     void process();
     std::vector<t_value> send();
     void reset();
@@ -34,14 +34,15 @@ private:
     void _print_mapping(std::string note);
     /**
     * input control signal
-    * TODO: use a ringbuffer instead of single float number
     */
-    t_value x;
-    int prev_x;
+    t_featureValueList x;
+    t_featureValueList prev_x;
     /**
     * temp params to achive the speaker jump
     */
+    int cold_down_time;
     int curr_idx; // set to virtual point
+    int jump_cnt;
 }; 
 
 } //namespace zerr

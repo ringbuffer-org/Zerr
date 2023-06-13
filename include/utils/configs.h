@@ -3,6 +3,11 @@
 
 // Macros
 #define TESTMODE
+
+
+// #define SAMPLELEVEL
+// #define BLOCKLEBEL
+
 // #define PUREDATA
 
 #endif //CONFIGS_H

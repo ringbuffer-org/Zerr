@@ -50,7 +50,7 @@ void Zerr::_initialize_zerr(){
     bank.print_active_features();
     #endif // TESTMODE
 
-    gen.initialize();
+    gen.initialize(feature_names.size(), "bypass");
     mapper.initialize(spkr_cfg);
     router.initialize(sys_cfg.block_size, mapper.get_n_speaker()); 
 }
@@ -137,7 +137,7 @@ int Zerr::process(jack_nframes_t nframes){
 
     output_buffer = router.send();
     // std::cout<<"output_buffer size: "<<output_buffer.size()<<"|"<<output_buffer[0].size()<<std::endl;
-    
+
     for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
         for(int sampCNT=0; sampCNT<nframes; sampCNT++){
             out[chanCNT][sampCNT] = static_cast<jack_default_audio_sample_t>(output_buffer[chanCNT][sampCNT]);

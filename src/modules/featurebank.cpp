@@ -86,7 +86,7 @@ void FeatureBank::process(){
     }
 
     #ifdef TESTMODE
-    std::cout<<y[0].original<<"  "<<y[1].original<<std::endl;
+    // std::cout<<y[0].original<<"  "<<y[1].original<<std::endl;
     #endif // TESTMODE
 }
 

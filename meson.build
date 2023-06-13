@@ -11,6 +11,7 @@ utils_src = [
   'src/utils/utils.cpp',
   'src/utils/ringbuffer.cpp',
   'src/utils/frequencytransformer.cpp',
+  'src/utils/linearinterpolator.cpp',
 ]
 
 modules_src = [
