@@ -23,6 +23,7 @@ modules_src = [
 ]
 
 features_src = [
+  'src/features/rms_amplitude.cpp',
   'src/features/centroid.cpp',
   'src/features/flux.cpp',
   'src/features/onset.cpp',

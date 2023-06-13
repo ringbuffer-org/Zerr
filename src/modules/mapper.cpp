@@ -26,14 +26,13 @@ void Mapper::_init_mapping(int n){
 void Mapper::_print_mapping(std::string note){
     // for testing
     std::cout<<note<<": ";
-    for (float v: mapping){
+    for (t_value v: mapping){
         std::cout<<v<<"  ";
     }
     std::cout<<std::endl;
 }
 
 void Mapper::fetch(t_value in){
-    //TODO: replace with ringbuffer insert
     prev_x = x; 
     x = in;
 }
@@ -57,7 +56,7 @@ void Mapper::_update_mapping(){
     mapping[curr_idx] = 1; // current activated index
 }
 
-std::vector<float> Mapper::send(){
+std::vector<t_value> Mapper::send(){
 
     for (auto sample:mapping){
         std::cout<<sample<<" ";

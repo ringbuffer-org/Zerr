@@ -84,14 +84,14 @@ void FeatureBank::process(){
         activated_features[i]->extract();
         y[i] = activated_features[i]->send();
     }
+
+    #ifdef TESTMODE
+    std::cout<<y[0].original<<"  "<<y[1].original<<std::endl;
+    #endif // TESTMODE
 }
 
 
 t_featureValueList FeatureBank::send(){
-
-    #ifdef TESTMODE
-    // std::cout<<y[0].original<<"  "<<y[1].original<<std::endl;
-    #endif // TESTMODE
 
     return y;
 }
@@ -103,6 +103,9 @@ void FeatureBank::_regist_all(){
     });
     _regist("ZeroCrossingRate", []() {
         return fe_ptr(new ZeroCrossingRate());
+    }); 
+    _regist("RMSAmplitude", []() {
+        return fe_ptr(new RMSAmplitude());
     }); 
 }
 

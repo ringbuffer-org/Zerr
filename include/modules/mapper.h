@@ -12,9 +12,9 @@ namespace zerr {
 class Mapper {
 public:
     void initialize(std::string config_path);
-    void fetch(float in);
+    void fetch(t_value in);
     void process();
-    std::vector<float> send();
+    std::vector<t_value> send();
     void reset();
 
     int get_n_speaker();
@@ -28,7 +28,7 @@ private:
     * The mapping vector e.g: [0, 1, 0.5, 0.8, 0.8, 0, 0, 0]
     * 
     */
-    std::vector<float> mapping; 
+    std::vector<t_value> mapping; 
     void _init_mapping(int n);
     void _update_mapping();
     void _print_mapping(std::string note);
@@ -36,7 +36,7 @@ private:
     * input control signal
     * TODO: use a ringbuffer instead of single float number
     */
-    float x;
+    t_value x;
     int prev_x;
     /**
     * temp params to achive the speaker jump

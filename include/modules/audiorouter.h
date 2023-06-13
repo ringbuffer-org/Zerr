@@ -9,11 +9,10 @@ namespace zerr {
 */
 class AudioRouter {
 public:
-    // typedef std::vector<double> audio_vec;
     typedef std::vector<t_value>  cntrl_vec;
     typedef std::vector<t_blockIn> out_mat;
 
-    void initialize(int num_audio, int num_cntrl);
+    void initialize(int num_audio, int num_speaker);
     void fetch(t_blockIn audio_in, cntrl_vec cntrl_in);
     void process();
     out_mat send();

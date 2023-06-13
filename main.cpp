@@ -17,7 +17,7 @@ void handleSignal(int signal) {
 }
 
 int main(int argc, char *argv[]){
-  std::signal(SIGINT, handleSignal);
+  // std::signal(SIGINT, handleSignal);
 
   std::string zerrCfgFile;
   std::string spkrCfgFile;

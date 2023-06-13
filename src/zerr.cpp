@@ -52,12 +52,13 @@ void Zerr::_initialize_zerr(){
 
     gen.initialize();
     mapper.initialize(spkr_cfg);
-    router.initialize(sys_cfg.block_size, mapper.get_n_speaker() + 1); 
+    router.initialize(sys_cfg.block_size, mapper.get_n_speaker()); 
 }
 
 void Zerr::_initialize_audioclient(){
     std::cout<<"initialize audioclient..."<<std::endl;
     client = jack_client_open("zerr", JackNullOption, &status, NULL);
+    // assert(client && "Creating Client Failed");
 
     #ifdef TESTMODE
     sys_cfg.sample_rate = static_cast<size_t>(jack_get_sample_rate(client));
@@ -110,23 +111,17 @@ int Zerr::process(jack_nframes_t nframes){
     // set output buffer "0.0"
     for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
         for(int sampCNT=0; sampCNT<nframes; sampCNT++)
-        out[chanCNT][sampCNT] = 0.5;
+        out[chanCNT][sampCNT] = 0.0;
     }
 
-    // for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
-    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++){
-    //         out[chanCNT][sampCNT] = in[0][sampCNT];
-    //     }
-    // }
-
-
-
-
-
-
-
+    for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
+        for(int sampCNT=0; sampCNT<nframes; sampCNT++){
+            out[chanCNT][sampCNT] = in[0][sampCNT];
+        }
+    }
 
     t_blockIn targetData(in[0], in[0] + nframes);
+
 
     bank.fetch(targetData);
     bank.process();
@@ -141,7 +136,8 @@ int Zerr::process(jack_nframes_t nframes){
     router.process();
 
     output_buffer = router.send();
-
+    // std::cout<<"output_buffer size: "<<output_buffer.size()<<"|"<<output_buffer[0].size()<<std::endl;
+    
     for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
         for(int sampCNT=0; sampCNT<nframes; sampCNT++){
             out[chanCNT][sampCNT] = static_cast<jack_default_audio_sample_t>(output_buffer[chanCNT][sampCNT]);

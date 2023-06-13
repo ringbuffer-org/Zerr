@@ -4,7 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Centroid::name        = "Centroid";
+const std::string Centroid::name        = "Spectral Centroid";
 const std::string Centroid::category    = "Frequency-Domain";
 const std::string Centroid::description = "The spectral centroid is a measure used in digital signal processing to characterise a spectrum.";
 

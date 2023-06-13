@@ -38,7 +38,7 @@ private:
     //basic config
     std::vector<t_blockIn> output_buffer;
     t_systemConfigs sys_cfg;
-    t_featureNameList feature_names = {"Centroid", "ZeroCrossingRate"};// move this to zerr YAML file
+    t_featureNameList feature_names = {"Centroid", "RMSAmplitude"};// move this to zerr YAML file
 
     // config path
     std::string zerr_cfg;
