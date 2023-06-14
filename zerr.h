@@ -75,7 +75,7 @@ private:
     int sample_rate; 
     int block_size;
     std::vector<std::vector<float>> input_buffer;
-    RingBuffer *in_buf;
+    zerr::RingBuffer *in_buf;
     std::vector<std::vector<float>> output_buffer;
     float **in_ptr;
     float **out_ptr;

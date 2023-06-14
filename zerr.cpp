@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+using namspace zerr;
+
 
 Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet, std::vector<float>(sys_cnfg.block_size, 0.0f)){
     // zerr_cfg = zerrCfgFile;
@@ -19,20 +21,17 @@ Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet
 }
  
 void Zerr::initialize(){
-    in_buf = new RingBuffer(fft_size);
+    in_buf = new zerr::RingBuffer(fft_size);
     // try constexper
-    bank->regist_all();
+    // bank->regist_all();
 
     // replace with inside one time setup function
-    zerr::str_vec feature_names = {"ZeroCrossingRate", "Centroid"}; //  Centroid
-    for (auto name : feature_names) {
-        bank->setup(name);
-    }
+    t_featureNameList feature_names = {"ZeroCrossingRate", "RMSAmplitude", "Centroid"}; //  Centroid
 
     // bank.print_all_features();
     // bank.print_active_features();
 
-    bank->initialize();
+    bank->initialize(feature_names, );
     gen->initialize();
     mapper->initialize(spkr_cfg);
     router->initialize(block_size, mapper->get_n_speaker() + 1); 

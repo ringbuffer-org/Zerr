@@ -2,6 +2,7 @@
 #define AUDIOROUTRT_H
 
 #include "utils.h"
+#include "linearinterpolator.h"
 
 namespace zerr {
 /**
@@ -9,20 +10,22 @@ namespace zerr {
 */
 class AudioRouter {
 public:
-    // typedef std::vector<double> audio_vec;
-    typedef std::vector<float>  cntrl_vec;
-    typedef std::vector<input_vec> out_mat;
-
-    void initialize(int num_audio, int num_cntrl);
-    void fetch(input_vec audio_in, cntrl_vec cntrl_in);
+    void initialize(int block_size, int num_channels);
+    void fetch(t_blockIn audio_in, t_volumes cntrl_in);
     void process();
-    out_mat send();
+    t_blockOuts send();
     void reset();
 
 private:
-    input_vec audio_x;
-    cntrl_vec cntrl_x;
-    out_mat ys;
+    t_blockIn audio_x;
+    t_volumes cntrl_x;
+
+    t_blockOuts y;
+
+    t_value main_volume;
+
+    LinearInterpolator linear_interpolator;
+    t_volumes cntrl_x_prev;
 }; 
 
 } //namespace zerr

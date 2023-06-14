@@ -1,40 +1,39 @@
 /**
  * @file ringbuffer.h
- * @author Zeyu Yang (zeyuuyang42@gmail.com) & ChatGPT
+ * @author Zeyu Yang (zeyuuyang42@gmail.com) 
  * @brief ringbuffer util
  * @version 0.3
  * @date 2023-06-07
  * 
  * @copyright Copyright (c) 2023
  */
-#pragma once
+#ifndef RINGBUFFER_H
+#define RINGBUFFER_H
 
 #include <vector>
 #include <iostream>
 
-// namespace zerr{
+#include "types.h"
 
-// template<typename T>
+namespace zerr{
+
 class RingBuffer {
 public:
     explicit RingBuffer(size_t capacity);
 
-    // void enqueue(const T& item);
-    // void enqueueBlock(const std::vector<float>& block);
-    void enqueue(const float& item); 
+    size_t get_size() const;
+    size_t get_capacity() const;
 
-    // std::vector<T> dequeue();
-    std::vector<float> dequeue(size_t blockSize);
-
-    size_t getSize() const;
-    size_t getCapacity() const;
-    std::vector<float> getBufferSamples();
+    void enqueue(const t_blockIn& block);
+    
+    void get_samples(t_sample* ptr_buffer, size_t buf_len);
 
 private:
-    std::vector<float> buffer;
+    t_samples buffer;
     size_t head;
     size_t tail;
     size_t size;
 };
 
-// } //namespace zerr
+} //namespace zerr
+#endif //RINGBUFFER_H

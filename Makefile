@@ -32,12 +32,15 @@ zerr~.class.sources += src/modules/featureextractor.cpp
 zerr~.class.sources += src/modules/trajectorygenerator.cpp
 
 # # zerr features
+zerr~.class.sources += src/features/rms_amplitude.cpp
 zerr~.class.sources += src/features/centroid.cpp
 zerr~.class.sources += src/features/zerocrossing.cpp
 
 # # zerr utils
 zerr~.class.sources += src/utils/utils.cpp
 zerr~.class.sources += src/utils/ringbuffer.cpp
+zerr~.class.sources += src/utils/frequencytransformer.cpp
+zerr~.class.sources += src/utils/linearinterpolator.cpp
 
 # all extra files to be included in binary distribution of the library
 datafiles = configs/spkr_configs/circulation_8.yaml

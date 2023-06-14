@@ -21,13 +21,13 @@ public:
     void initialize();
     void extract();
     void reset();
-    void fetch(input_vec in);
-    float send();
+    void fetch(t_featureInputs in);
+    t_featureValue send();
 
 private:
     //TODO wrap the input and output
-    input_vec x; //input
-    float y; //output g
+    t_featureInputs x; //input
+    t_featureValue y; //output g
 
     // params
     float spec_max      = 0;

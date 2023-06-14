@@ -1,6 +1,7 @@
 #ifndef CENTROID_H
 #define CENTROID_H
 
+#include "configs.h"
 #include "featureextractor.h"
 
 namespace zerr {
@@ -18,22 +19,23 @@ public:
     std::string get_category(){return category;}
     std::string get_description(){return description;}
 
-    void initialize();
+    void initialize(t_systemConfigs sys_cfg);
     void extract();
     void reset();
-    void fetch(std::vector<float> in);
-    float send();
+    void fetch(t_featureInputs in);
+    t_featureValue send();
 
 private:
-    //TODO wrap the input and output type into uniform class
-    std::vector <float> x; //input
-    float y; //output g
+    // t_specBuf       x; //input
+    // t_featureValue  y; //output g
+    // t_systemConfigs system_configs;
 
     // params
     void _reset_param();
-    double k     = 0;
-    double denum = 0.0000;
-    double num   = 0.00001; // use a tiny offset to avoid NaNs
+
+    double freq_max;
+    double centroid = 0.0;
+    double totalMagnitude = 0.0;
 };
 
 } //namespace feature

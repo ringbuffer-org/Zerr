@@ -18,16 +18,16 @@ public:
     std::string get_category(){return category;}
     std::string get_description(){return description;}
 
-    void initialize();
+    void initialize(t_systemConfigs sys_cfg);
     void extract();
     void reset();
-    void fetch(input_vec in);
-    float send();
+    void fetch(t_featureInputs in);
+    t_featureValue send();
 
 private:
-    //TODO wrap the input and output
-    input_vec x; //input
-    float y; //output g
+    // t_audioBuf x; //input
+    // t_featureValue y; //output g
+    // t_systemConfigs system_configs;
 };
 
 } //namespace feature

@@ -2,32 +2,31 @@
 #define UTILS_H
 
 // standard libaries
-#include<stdlib.h>
-#include<vector>
-#include<algorithm>
-#include<math.h>
-#include<iostream>
-#include<unistd.h>
+#include <stdlib.h>
+#include <vector>
+#include <algorithm>
+#include <math.h>
+#include <iostream>
+#include <unistd.h>
 #include <limits>
 #include <random>
 #include <memory>
 #include <chrono>
 #include <thread>
 #include <string.h>
+#include <complex.h>
 
-// 
 #include "types.h"
 
 // dependencies
 #include "yaml-cpp/yaml.h"
-
-#include "m_pd.h" // for testing
+#include <fftw3.h>
 
 namespace zerr{
 /**
 * Print the information of unit test
 */
-void print_unit_test_info(std::string info);
+void print_info(std::string info);
 
 /**
 * Print the topic of this unit test
@@ -39,13 +38,13 @@ void print_line(int len);
 * TODO: cannot use template for some reason
 */
 // template <typename T>
-void print_mat(std::vector<std::vector<double>> mat);
+void print_mat(std::vector<std::vector<float>> mat);
 
 /**
 * Print a vector of any type
 */
-// template <typename T>
-void print_vec(std::vector<float> vec);
+template <typename T>
+void print_vec(std::vector<T> vec);
 
 /**
 * Generate a random vector with choosen length and minimum\maximum value
@@ -69,7 +68,19 @@ std::vector<T> slice(std::vector<T> const &v, int m, int n)
 /**
 * generate fake audio frames for testing
 */
-audio_mat gen_test_frames(int size, int num);
+// audio_mat gen_test_frames(int size, int num);
+inline float gaussian_lobe(int pos, double mu, double sigma, int L)
+{
+    double w     = exp( -(0.5) * pow( ((float) pos - mu) /sigma,2.0) );
+    return w;
+}
+
+
+inline float get_hann_sample(int pos, int L)
+{
+    float val = 0.5 * (1.0 - cos( (2.0*PI* (float) pos) / (float)L) );
+    return val;
+}
 
 } //namespace zerr
 #endif //UTILS_H

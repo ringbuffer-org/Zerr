@@ -3,11 +3,9 @@ using namespace zerr;
 
 namespace zerr{
 
-void print_unit_test_info(std::string info){
-    int len = info.size();
-    print_line(len);
+void print_info(std::string info){
+    // int len = info.size();
     std::cout<<info<<std::endl;
-    print_line(len);
 }
 
 void print_line(int len){
@@ -17,12 +15,10 @@ void print_line(int len){
     std::cout<<std::endl;
 }
 
-// template <typename T>
-void print_mat(std::vector<std::vector<double>> mat){
-    // static_assert(IsNumberType<T>::value, "Invalid data type");
+void print_mat(std::vector<std::vector<float>> mat){
 
-    for (std::vector<double> chnl:mat){
-        for (double sample:chnl){
+    for (std::vector<float> chnl:mat){
+        for (float sample:chnl){
             std::cout<<sample<<" ";
         }
         std::cout<<std::endl;
@@ -33,7 +29,7 @@ void print_mat(std::vector<std::vector<double>> mat){
 // template <typename T>
 void print_vec(std::vector<float> vec){
 
-    for (float sample:vec){
+    for (auto sample:vec){
         std::cout<<sample<<" ";
     }
     std::cout<<std::endl;
@@ -55,17 +51,17 @@ std::vector<double> randomVector(int size, double min, double max) {
     return result;
 }
 
-audio_mat gen_test_frames(int size, int num){
-    audio_mat test_audio;
-    std::vector<double> tmp = randomVector(size*num, -1.0, 1.0);
-    for (int i = 0; i < num; ++i){
-        std::vector<double> sub = slice(tmp, i*size, (i+1)*size-1);
-        test_audio.push_back(sub);
-    }
-    std::cout<<"Test audio size: "<<test_audio.size()<<"*"<<test_audio[0].size()<<std::endl;
+// audio_mat gen_test_frames(int size, int num){
+//     audio_mat test_audio;
+//     std::vector<double> tmp = randomVector(size*num, -1.0, 1.0);
+//     for (int i = 0; i < num; ++i){
+//         std::vector<double> sub = slice(tmp, i*size, (i+1)*size-1);
+//         test_audio.push_back(sub);
+//     }
+//     std::cout<<"Test audio size: "<<test_audio.size()<<"*"<<test_audio[0].size()<<std::endl;
 
-    return test_audio;
-}
+//     return test_audio;
+// }
 
 
 } // namespace zerr
