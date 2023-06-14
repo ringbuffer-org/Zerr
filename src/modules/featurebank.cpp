@@ -37,6 +37,7 @@ void FeatureBank::print_active_features(){
         std::cout<<"  -Name: "<<activated_features[i]->get_name()<<std::endl;
         std::cout<<"  -Category: "<<activated_features[i]->get_category()<<std::endl;
         std::cout<<"  -Description: "<<activated_features[i]->get_description()<<std::endl;
+        std::cout<<std::endl;
     }
 }
 

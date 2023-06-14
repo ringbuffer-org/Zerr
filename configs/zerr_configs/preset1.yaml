@@ -7,7 +7,10 @@ features:
     mode: "normalized"
   2: 
     name: "RMSAmplitude"
-    mode: "original"
+    mode: "normalized"
+  3: 
+    name: "ZeroCrossingRate"
+    mode: "normalized"
 trajectory:
   mode: "bypass"
 mapper:

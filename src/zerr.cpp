@@ -18,6 +18,7 @@ void Zerr::run(){
     std::string system_playback_name;
     for (int i = 0; i < nOutputs; ++i){
         system_playback_name = "system:playback_" + std::to_string(i+nInputs+1); //+nInputs to avoid feedback loop
+        // system_playback_name = "BlackHole 64ch:playback_" + std::to_string(i+nInputs+1); //+nInputs to avoid feedback loop
         jack_connect (client, jack_port_name(output_port[i]), system_playback_name.c_str());
     }
 
@@ -85,6 +86,14 @@ void Zerr::_initialize_audioclient(){
     std::cout<<"sys_cfg.block_size  -- "<<sys_cfg.block_size <<std::endl;
     #endif // TESTMODE
 
+
+    // const char** ports = jack_get_ports(client, nullptr, nullptr, JackPortIsPhysical);
+
+    // for (int i = 0; ports[i] != nullptr; ++i) {
+    //     std::cout << ports[i] << std::endl;
+    // }
+
+
     jack_set_process_callback(this->client, this->callback_process, this);
 
     // allocate jack input ports
@@ -132,14 +141,13 @@ int Zerr::process(jack_nframes_t nframes){
         out[chanCNT][sampCNT] = 0.0;
     }
 
-    // for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
-    //     for(int sampCNT=0; sampCNT<nframes; sampCNT++){
-    //         out[chanCNT][sampCNT] = in[0][sampCNT];
-    //     }
-    // }
+    for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
+        for(int sampCNT=0; sampCNT<nframes; sampCNT++){
+            out[chanCNT][sampCNT] = in[0][sampCNT];
+        }
+    }
 
     t_blockIn targetData(in[0], in[0] + nframes);
-
 
     bank.fetch(targetData);
     bank.process();

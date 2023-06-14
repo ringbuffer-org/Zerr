@@ -38,7 +38,7 @@ void print_line(int len);
 * TODO: cannot use template for some reason
 */
 // template <typename T>
-void print_mat(std::vector<std::vector<double>> mat);
+void print_mat(std::vector<std::vector<float>> mat);
 
 /**
 * Print a vector of any type

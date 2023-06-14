@@ -2,7 +2,7 @@
 using namespace zerr;
 
 void Mapper::initialize(std::string config_path){
-    cold_down_time = 10;
+    cold_down_time = 300;
     jump_cnt = 0;
 
     speaker_array.initialize(config_path);
@@ -40,18 +40,22 @@ void Mapper::_print_mapping(std::string note){
 
 void Mapper::fetch(t_featureValueList in){
     x = in;
+
+    volume  = ((x[0].normalized*70)>0.3)?0.3:(x[0].normalized*70);
+    trigger = ((x[1].normalized*30)>0.99)?1:0;
+    width   = x[2].normalized*70;
+
+    // std::cout<<x.size()<<" "<<volume<<" "<<trigger<<" "<<width<<" "<<std::endl;
 }
 
 
 void Mapper::process(){
 
-    if (jump_cnt==0){ //trigger received
-        curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
+    if (jump_cnt==0 && trigger){ //trigger received
+        curr_idx = speaker_array.get_random_speakers(0, 1)[0];
         jump_cnt = cold_down_time;
     }
-    jump_cnt--;
-
-    // curr_idx = speaker_array.get_next_one_speaker(curr_idx, 1);
+    if (jump_cnt!=0) jump_cnt--;
 
     _update_mapping();
 }
@@ -61,15 +65,16 @@ void Mapper::_update_mapping(){
 
     std::fill(mapping.begin(), mapping.end(), 0.0f);
 
-    std::vector<int> c_spkrs = speaker_array.get_contiguous_speakers(curr_idx);
+    std::vector<t_value> distances = speaker_array.get_distance_vector(curr_idx);
     
-    mapping[0] = 1;        // index 0: virtual points
-    mapping[curr_idx] = 1; // current activated index
-    for (int i = 0; i < c_spkrs.size(); ++i){
-        mapping[c_spkrs[i]] = 0.5;
+    mapping[0] = volume;        // index 0: overall valume
+
+    t_value max_val = _calculate_normal_distribution(0, width);
+
+    for (int i = 1; i < mapping.size(); ++i){
+        mapping[i] = _calculate_normal_distribution(distances[i-1], 1)/max_val; // current activated index
     }
 }
-
 
 std::vector<t_value> Mapper::send(){
 
@@ -79,4 +84,13 @@ std::vector<t_value> Mapper::send(){
     // std::cout<<std::endl;
 
     return mapping;
+}
+
+
+t_value Mapper::_calculate_normal_distribution(t_value x, t_value alpha) {
+    t_value coefficient = 1.0 / (alpha * std::sqrt(2 * M_PI));
+    t_value exponent = -0.5 * std::pow((x / alpha), 2);
+    t_value value = coefficient * std::exp(exponent);
+    if (value < VOLUME_THRESHOLD) {value = 0;}
+    return value;
 }

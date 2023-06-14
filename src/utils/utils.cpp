@@ -15,10 +15,10 @@ void print_line(int len){
     std::cout<<std::endl;
 }
 
-void print_mat(std::vector<std::vector<double>> mat){
+void print_mat(std::vector<std::vector<float>> mat){
 
-    for (std::vector<double> chnl:mat){
-        for (double sample:chnl){
+    for (std::vector<float> chnl:mat){
+        for (float sample:chnl){
             std::cout<<sample<<" ";
         }
         std::cout<<std::endl;

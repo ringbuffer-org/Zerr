@@ -69,6 +69,8 @@ typedef struct {
 
 #define AUDIO_BUFFER_SIZE 1024 
 
+#define VOLUME_THRESHOLD  0.01
+
 
 typedef struct {
     size_t sample_rate;

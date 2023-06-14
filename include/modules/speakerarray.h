@@ -23,9 +23,8 @@ public:
     std::vector<int> get_contiguous(){return contiguous;};
 
     //Print out configs to console
-    #ifdef TESTMODE
     void print();
-    #endif //TESTMODE
+
 
 private:
     int idx;
@@ -41,10 +40,8 @@ private:
 */
 class SpeakerArray {
 public:
-    // SpeakeArray();
     /**
     * setup speaker array via the YAML config file
-    * TODO: check the YAML file sanity
     */
     void initialize(std::string config_path);
     /**
@@ -65,36 +62,36 @@ public:
     * random(0): return a random one. 
     * mono(1): return the only one that connected 
     * nearest(2): return the speaker with lowest weight(eculian distance for now)
-    * TODO: is it playful to assign the probability based on normalised weight?
-    * TODO: add type.h file
-    * Only non-weighted graph supported for now
     */
     int get_next_one_speaker(int spkr_idx, int mode);
     /**
     * get n random non-duplicated speakers from the speaker array
     */
     std::vector<int> get_contiguous_speakers(int spkr_idx);
-    // 
-    // ~SpeakeArray();
+    /**
+    *  
+    */
+    std::vector<float> get_distance_vector(int spkr_idx);
 
 private:
     int n_speakers;
     std::vector<int> indexs;
-    std::map<int, Speaker> speakers;            //map between vector index and speaker index
-    std::map<int, std::vector<int>> contiguous; // warning: not used
+    std::map<int, Speaker> speakers;
+
+    std::vector<std::vector<float>> distance_matrix;
 
     YAML::Node speaker_config;
 
     /**
     * Load the YAML speaker config file
     */
-    void read_config(std::string config_path);
-    void init_contiguous_matrix();
-    void init_speaker_indexs_map();
+    void _init_distance_matrix();
     /**
     * Helping Functions
     */
-    std::vector<int> get_random_indexs(int l, int n);
+    std::vector<int> _get_random_indexs(int l, int n);
+
+    float _calculate_distance(Speaker s1, Speaker s2);
 }; 
 
 } //namespace zerr
