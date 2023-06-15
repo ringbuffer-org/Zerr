@@ -1,16 +1,16 @@
-#ifndef ZEROCROSSING_H
-#define ZEROCROSSING_H
+#ifndef RMS_AMPLITUDE_H
+#define RMS_AMPLITUDE_H
 
+#include "configs.h"
 #include "featureextractor.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Zero Crossing rate algorithm
+* Root-mean-square amplitude algorithm
 */
-class ZeroCrossingRate : public FeatureExtractor { 
+class RMSAmplitude : public FeatureExtractor { 
 public:
-
     static const std::string name; 
     static const std::string category;
     static const std::string description; 
@@ -19,20 +19,22 @@ public:
     std::string get_category(){return category;}
     std::string get_description(){return description;}
 
-    void initialize();
+    void initialize(t_systemConfigs sys_cfg);
     void extract();
     void reset();
-    void fetch(std::vector<float> in);
-    float send();
+    void fetch(t_featureInputs in);
+    t_featureValue send();
 
 private:
-    std::vector<float> x; //input
-    float    y; //output
-
     // params
-    int zero_crossings;
+    int wave_size;
+
+    void _reset_param();
+
+    double square_sum;
+    double square_root;
 };
 
 } //namespace feature
 } //namespace zerr
-#endif // ZEROCROSSING_H
+#endif // RMS_AMPLITUDE_H

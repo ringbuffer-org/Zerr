@@ -1,44 +1,40 @@
 #include "trajectorygenerator.h"
 using namespace zerr;
 
-void TrajectoryGenerator::initialize(){
-    //tmp
-    std::cout<<"initialized!"<<std::endl;
+void TrajectoryGenerator::initialize(int N, std::string mode){
+    output_mode = mode;
+    n_features  = N;
+    if (output_mode == "bypass"){
+        y.resize(n_features);
+    }
 }
 
-void TrajectoryGenerator::fetch(std::vector<float> in){
-    //tmp
-    xs.clear();
-    xs = in;
-
-    std::cout<<"new input: ";
-    for (auto x:xs){
-        std::cout<<x<<"  ";
-    }
-    std::cout<<std::endl;
+void TrajectoryGenerator::fetch(t_featureValueList in){
+    x.clear();
+    x = in;
+    assert(x.size() == n_features);
 }
 
 void TrajectoryGenerator::process(){
-    // messy temparary process function
-    // two input channels are weighted and added then compared with a constant threshold
-    // the output 
-    float tmp;
-    std::vector<float> weights = {0.5, 0.5};
-    tmp = weight_add(xs, weights);
-    // y = (tmp > 0.5);
-    y = tmp;
-    std::cout<<"merged!: "<<tmp<<std::endl;
+    if (output_mode == "bypass") y = x;
 }
 
-float TrajectoryGenerator::send(){
+t_featureValueList TrajectoryGenerator::send(){
+
+    #ifdef TESTMODE
+    // std::cout<<"TrajectoryGenerator::send  "<<y[0].normalized<<"  "<<y[1].normalized<<std::endl;
+    #endif // TESTMODE
+
     return y;
 }
 
-float TrajectoryGenerator::weight_add(std::vector<float> xs, std::vector<float> weights){
-    float res = 0;
-    for (int i = 0; i < xs.size(); ++i)
-    {
-        res = res + ( xs[i] * weights[i] );
+
+
+
+t_value TrajectoryGenerator::weight_add(std::vector<t_value> weights){
+    t_value res = 0;
+    for (int i = 0; i < x.size(); ++i){
+        res = res + ( x[i].original * weights[i] );
     }
     return res;
 }

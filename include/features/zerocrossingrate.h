@@ -1,19 +1,19 @@
-#ifndef CENTROID_H
-#define CENTROID_H
+#ifndef ZEROCROSSINGRATE_H
+#define ZEROCROSSINGRATE_H
 
-#include "configs.h"
 #include "featureextractor.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Spectrum Centroid algorithm
+* Zero Crossing Rate algorithm
 */
-class Centroid : public FeatureExtractor { 
+class ZeroCrossingRate : public FeatureExtractor { 
 public:
-    static const std::string name; 
-    static const std::string category;
-    static const std::string description; 
+
+    static const std::string name;        /**< Feature name: Zero Crossing Rate */
+    static const std::string category;    /**< Feature category */
+    static const std::string description; /**< Feature description */
 
     std::string get_name(){return name;}
     std::string get_category(){return category;}
@@ -26,18 +26,14 @@ public:
     t_featureValue send();
 
 private:
-    // t_specBuf       x; //input
-    // t_featureValue  y; //output g
+    // t_audioBuf      x; //input
+    // t_featureValue  y; //output
     // t_systemConfigs system_configs;
 
     // params
-    void _reset_param();
-
-    double freq_max;
-    double centroid = 0.0;
-    double totalMagnitude = 0.0;
+    int zero_crossings;
 };
 
 } //namespace feature
 } //namespace zerr
-#endif // CENTROID_H
+#endif // ZEROCROSSINGRATE_H

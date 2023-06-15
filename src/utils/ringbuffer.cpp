@@ -1,61 +1,44 @@
 #include "ringbuffer.h"
-// using namespace zerr;
+using namespace zerr;
 
-// template<typename T>
 RingBuffer::RingBuffer(size_t capacity) : buffer(capacity, 0.0f), head(0), tail(0), size(0) {}
 
-// template<typename T>
-// void RingBuffer::enqueueBlock(const std::vector<float>& block) {
-//     if (block.size() > buffer.size() - size) {
-//         std::cerr << "Insufficient space in the buffer to enqueue the block." << std::endl;
-//         return;
-//     }
 
-//     for (const float& item : block) {
-//         enqueue(item);
-//     }
-// }
-
-void RingBuffer::enqueue(const float& item) {
-    if (size == buffer.size()) {
-        std::cerr << "Buffer is full. Unable to enqueue." << std::endl;
-        return;
-    }
-
-    buffer[tail] = item;
-    tail = (tail + 1) % buffer.size();
-    size++;
-}
-
-// template<typename T>
-std::vector<float> RingBuffer::dequeue(size_t blockSize) {
-    if (blockSize > size) {
-        std::cerr << "Insufficient items in the buffer to dequeue the block." << std::endl;
-        return std::vector<float>();
-    }
-
-    std::vector<float> items;
-    items.reserve(blockSize);
-
-    for (size_t i = 0; i < blockSize; ++i) {
-        items.push_back(buffer[head]);
-        head = (head + 1) % buffer.size();
-        size--;
-    }
-
-    return items;
-}
-
-// template<typename T>
-size_t RingBuffer::getSize() const {
+size_t RingBuffer::get_size() const {
     return size;
 }
 
-// template<typename T>
-size_t RingBuffer::getCapacity() const {
+
+size_t RingBuffer::get_capacity() const {
     return buffer.size();
 }
 
-std::vector<float> RingBuffer::getBufferSamples(){
-    return buffer;
+
+void RingBuffer::enqueue(const t_blockIn& block) {
+
+    assert(block.size() <= buffer.size() && "Block size must be smaller than buffer size.");
+
+    for (const t_sample& sample : block) {
+        buffer[tail] = sample;
+        tail = (tail + 1) % buffer.size();
+
+        if (size < buffer.size()) {
+            size++;
+        } else {
+            head = (head + 1) % buffer.size();
+        }
+    }
+}
+
+
+void RingBuffer::get_samples(t_sample* output_buffer, size_t buf_len) {
+    // std::cout<<"get_samples:  "<<buf_len<<" | "<<buffer.size()<<std::endl;
+
+    assert(buf_len == buffer.size() && "Output buffer size should be equal to ringbuffer size!");
+
+    size_t index = head;
+    for (size_t i = 0; i < buffer.size(); ++i) {
+        output_buffer[i] = buffer[index];
+        index = (index + 1) % buffer.size();
+    }
 }
