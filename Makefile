@@ -11,6 +11,8 @@
 CC  = g++
 cflags = -std=c++11
 ldflags += -L/usr/local/lib -lyaml-cpp
+ldflags += -L/usr/local/lib -lfftw3
+
 
 lib.name = zerr~
 
@@ -58,13 +60,10 @@ CXX += -Iinclude/utils
 CXX += -Iinclude/modules
 CXX += -Iinclude/features
 CXX += -I/usr/local/include/yaml-cpp
+CXX += -I/usr/local/include/fftw3
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder
-
-# disable optimizations for debugging
-# alldebug: c.flags += -O0 -DDEBUG
-# alldebug: cxx.flags += -O0 -DDEBUG
 
 # lib.name = goat~
 # goat~.class.sources = src/goat_tilde.c

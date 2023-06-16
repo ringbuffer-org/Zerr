@@ -1,5 +1,5 @@
 #include "zerr_tilde.h"
-#include "zerr.h"
+// #include "zerr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,21 +12,25 @@ void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     if (!x) return NULL;
 
     // system config to initialize zerr
-    SystemConfig sys_cnfg((int) sys_getsr(), (int) sys_getblksize());
+    // SystemConfig sys_cnfg((int) sys_getsr(), (int) sys_getblksize());
+    t_systemConfigs sys_cnfg;
+    sys_cnfg.sample_rate = (size_t) sys_getsr();
+    sys_cnfg.block_size  = (size_t) sys_getblksize();
 
-    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/circulation_8.yaml"; // random_12 circulation_8
+    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/EN325_21.yaml"; // random_12 circulation_8
 
     x->z = new Zerr(sys_cnfg, spkrCfgFile);
     if (!x->z) return NULL;
-    x->z->initialize();
 
-    x->x_n = x->z->n_outlet; 
-    x->x_vec = (t_zerrout *)getbytes(x->x_n * sizeof(*x->x_vec));
+    x->z->initialize(); // initialize zerr and all sub-modules
+
+    x->n_outlet = x->z->n_outlet; // get the number of outlets
+    x->x_vec = (t_zerrout *)getbytes(x->n_outlet * sizeof(*x->x_vec));
 
     t_zerrout *u;
     int i;
 
-    for (i = 0, u = x->x_vec; i < x->x_n; u++, i++){
+    for (i = 0, u = x->x_vec; i < x->n_outlet; u++, i++){
         u->u_outlet = outlet_new(&x->x_obj, &s_signal);
     }
 
@@ -34,7 +38,7 @@ void *zerr_tilde_new(t_symbol *s, int argc, t_atom *argv) {
 }
 
 void zerr_tilde_free(zerr_tilde *x) {
-    freebytes(x->x_vec, x->x_n * sizeof(*x->x_vec));
+    freebytes(x->x_vec, x->n_outlet * sizeof(*x->x_vec));
     delete x->z;
 }
 

@@ -69,11 +69,11 @@ std::vector<T> slice(std::vector<T> const &v, int m, int n)
 * generate fake audio frames for testing
 */
 // audio_mat gen_test_frames(int size, int num);
-inline float gaussian_lobe(int pos, double mu, double sigma, int L)
-{
-    double w     = exp( -(0.5) * pow( ((float) pos - mu) /sigma,2.0) );
-    return w;
-}
+// inline float gaussian_lobe(int pos, double mu, double sigma, int L)
+// {
+//     double w     = exp( -(0.5) * pow( ((float) pos - mu) /sigma,2.0) );
+//     return w;
+// }
 
 
 inline float get_hann_sample(int pos, int L)

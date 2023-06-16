@@ -14,7 +14,10 @@ namespace zerr {
 class TrajectoryGenerator {
 public:
     /**
-    * initialize the Trajectory Generator
+    * @brief initialize the Trajectory Generator
+    * 
+    * @param N ....
+    * @param mode ....
     */
     void initialize(int N, std::string mode="bypass");
     /**

@@ -7,12 +7,11 @@
  * 
  * @copyright Copyright (c) 2023
  */
-
 #pragma once
 
-#include "m_pd.h"
+#include "m_pd.h" //PureData APIs
 
-#include "zerr.h"
+#include "zerr.h" 
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,18 +31,15 @@ typedef struct zerrout
 
 /**
  * @struct zerr_tilde
- * @brief main pure data external
- * 
- * This is the main pure data interface
+ * @brief the structure of pure data external. This is the main pure data interface
  */
 typedef struct {
-    t_object x_obj; /**< parent Pure Data object */
-    t_float *f;     /**< fallback field for the main signal inlet */
+    t_object  x_obj;    /**< parent Pure Data object */
+    t_float   *f;       /**< fallback field for the main signal inlet */
+    t_int     n_outlet; /**< number of zerr outlets */
+    t_zerrout *x_vec;   /**< pointer to zerr outlets structure */
 
-    t_int x_n;
-    t_zerrout *x_vec;
-
-    Zerr *z; /**< pointer to the zerr object */
+    Zerr      *z;       /**< pointer to the zerr object */
 } zerr_tilde;
 
 /**

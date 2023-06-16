@@ -2,10 +2,10 @@
 
 #include <stdlib.h>
 
-using namspace zerr;
+// using namspace zerr;
 
 
-Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet, std::vector<float>(sys_cnfg.block_size, 0.0f)){
+Zerr::Zerr(t_systemConfigs sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)){
     // zerr_cfg = zerrCfgFile;
     spkr_cfg = spkrCfgFile;
 
@@ -16,32 +16,32 @@ Zerr::Zerr(SystemConfig sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet
     mapper = new zerr::Mapper();
     router = new zerr::AudioRouter();
 
-    sample_rate = sys_cnfg.sample_rate;
-    block_size  = sys_cnfg.block_size;
+    system_configs.sample_rate = sys_cnfg.sample_rate;
+    system_configs.block_size  = sys_cnfg.block_size;
 }
  
 void Zerr::initialize(){
-    in_buf = new zerr::RingBuffer(fft_size);
+    // in_buf = new zerr::RingBuffer(fft_size);
     // try constexper
     // bank->regist_all();
 
     // replace with inside one time setup function
-    t_featureNameList feature_names = {"ZeroCrossingRate", "RMSAmplitude", "Centroid"}; //  Centroid
+    zerr::t_featureNameList feature_names = {"ZeroCrossingRate", "RMSAmplitude", "Centroid"}; //  Centroid
 
     // bank.print_all_features();
     // bank.print_active_features();
 
-    bank->initialize(feature_names, );
-    gen->initialize();
+    bank->initialize(feature_names, system_configs);
+    gen->initialize(feature_names.size(), "bypass");
     mapper->initialize(spkr_cfg);
-    router->initialize(block_size, mapper->get_n_speaker() + 1); 
+    router->initialize(system_configs.block_size, mapper->get_n_speaker()); 
 
     n_outlet = mapper->get_n_speaker();
     // post("Zerr::initialize: ");
     post(std::to_string(mapper->get_n_speaker()).c_str());
 
-    input_buffer.resize(n_inlet, std::vector<float>(block_size, 0.0f));
-    output_buffer.resize(n_outlet, std::vector<float>(block_size, 0.0f));
+    input_buffer.resize(n_inlet, std::vector<double>(system_configs.block_size, 0.0f));
+    output_buffer.resize(n_outlet, std::vector<double>(system_configs.block_size, 0.0f));
 
     in_ptr  = (float **) getbytes(n_inlet * sizeof(float **));
     out_ptr = (float **) getbytes(n_outlet * sizeof(float **));
@@ -85,12 +85,6 @@ void Zerr::pd_perform(float **ports, int n_vec){
     in_ptr  = (float **) &ports[0];
     out_ptr = (float **) &ports[n_inlet];
 
-    for (int j = 0; j < n_vec; j++) {
-        in_buf->enqueue(in_ptr[0][j]);
-    }
-
-    in_buf->getBufferSamples();
-    // post("Zerr::pd_perform");
     for (int i = 0; i < n_inlet; i++) {
         for (int j = 0; j < n_vec; j++) {
             input_buffer[i][j] = in_ptr[i][j];
