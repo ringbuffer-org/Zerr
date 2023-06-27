@@ -1,0 +1,106 @@
+# Makefile to build class 'zerr' for Pure Data.
+# Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
+# settings and rules.
+
+# library name
+
+# add folder shortcut examples:
+# INCLUDES = -I../includes
+# TESTING = testing
+
+CC  = g++
+cflags = -std=c++11
+ldflags += -L/usr/local/lib -lyaml-cpp
+ldflags += -L/usr/local/lib -lfftw3
+
+
+lib.name = zerr_speaker_mapper~
+
+# input source file (class name == source file basename)
+class.sources = zerr_speaker_mapper~.cpp
+
+# zerr_speaker_mapper pd wrapper
+zerr_speaker_mapper~.class.sources += zerr_speaker_mapper.cpp
+
+# # zerr_speaker_mapper modules
+# zerr_speaker_mapper~.class.sources += ../../src/modules/audiorouter.cpp
+zerr_speaker_mapper~.class.sources += ../../src/modules/mapper.cpp
+# zerr_speaker_mapper~.class.sources += ../../src/modules/featurebank.cpp
+zerr_speaker_mapper~.class.sources += ../../src/modules/speakerarray.cpp
+# zerr_speaker_mapper~.class.sources += ../../src/modules/featureextractor.cpp
+# zerr_speaker_mapper~.class.sources += ../../src/modules/trajectorygenerator.cpp
+
+# # zerr_speaker_mapper features
+# zerr_speaker_mapper~.class.sources += ../../src/features/rms_amplitude.cpp
+# zerr_speaker_mapper~.class.sources += ../../src/features/centroid.cpp
+# zerr_speaker_mapper~.class.sources += ../../src/features/zerocrossing.cpp
+
+# # zerr_speaker_mapper utils
+zerr_speaker_mapper~.class.sources += ../../src/utils/utils.cpp
+zerr_speaker_mapper~.class.sources += ../../src/utils/ringbuffer.cpp
+# zerr_speaker_mapper~.class.sources += ../../src/utils/frequencytransformer.cpp
+zerr_speaker_mapper~.class.sources += ../../src/utils/linearinterpolator.cpp
+
+# all extra files to be included in binary distribution of the library
+# datafiles = configs/spkr_configs/circulation_8.yaml
+# datadirs = configs
+
+# include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
+PDLIBBUILDER_DIR=pd-lib-builder/
+
+CC  += -I../../include
+CC  += -I../../include/utils
+CC  += -I../../include/modules
+CC  += -I../../include/features
+CXX += -I../../include
+CXX += -I../../include/utils
+CXX += -I../../include/modules
+CXX += -I../../include/features
+CXX += -I/usr/local/include/yaml-cpp
+CXX += -I/usr/local/include/fftw3
+
+# use pd-lib-builder
+include pd-lib-builder/Makefile.pdlibbuilder
+
+# lib.name = goat~
+# goat~.class.sources = src/goat_tilde.c
+# common.sources = $(filter-out $(goat~.class.sources), $(shell find "src" -name "*.c"))
+# $(info common.sources: $(common.sources))
+# datafiles = $(wildcard goat_tilde.pd *.wav preset_*.txt)
+
+
+# # disable optimizations for debugging
+# alldebug: c.flags += -O0 -DDEBUG
+# alldebug: cxx.flags += -O0 -DDEBUG
+
+# # create the documentation
+# DOXYGEN=doxygen
+# DOXYGEN_DIR=docs
+# .PHONY: docs docs.clean
+
+# docs:
+# 	mkdir -p $(DOXYGEN_DIR)
+# 	$(DOXYGEN)
+
+# # clean the documentation directory
+# clean: docs.clean
+# docs.clean:
+# 	rm -rf $(DOXYGEN_DIR)
+
+# # valgrind command for leak checks
+# VG=valgrind
+# VG_LOG="valgrind.log"
+# VG_FLAGS=--log-file="$(VG_LOG)" --leak-check=full --show-reachable=yes --track-origins=yes -s
+# .PHONY: valgrind valgrind.clean
+
+# valgrind: alldebug
+# 	$(VG) $(VG_FLAGS) pd -noaudio *.pd
+
+# clean: valgrind.clean
+# valgrind.clean:
+# 	rm -f $(VG_LOG)
+
+
+
+
+

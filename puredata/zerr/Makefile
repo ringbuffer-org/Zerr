@@ -2,8 +2,6 @@
 # Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
 # settings and rules.
 
-# library name
-
 # add folder shortcut examples:
 # INCLUDES = -I../includes
 # TESTING = testing
@@ -23,23 +21,23 @@ class.sources = zerr~.cpp
 zerr~.class.sources += zerr.cpp
 
 # # zerr modules
-zerr~.class.sources += ../../src/modules/audiorouter.cpp
-zerr~.class.sources += ../../src/modules/mapper.cpp
-zerr~.class.sources += ../../src/modules/featurebank.cpp
-zerr~.class.sources += ../../src/modules/speakerarray.cpp
-zerr~.class.sources += ../../src/modules/featureextractor.cpp
-zerr~.class.sources += ../../src/modules/trajectorygenerator.cpp
+zerr~.class.sources += src/modules/audiorouter.cpp
+zerr~.class.sources += src/modules/mapper.cpp
+zerr~.class.sources += src/modules/featurebank.cpp
+zerr~.class.sources += src/modules/speakerarray.cpp
+zerr~.class.sources += src/modules/featureextractor.cpp
+zerr~.class.sources += src/modules/trajectorygenerator.cpp
 
 # # zerr features
-zerr~.class.sources += ../../src/features/rms_amplitude.cpp
-zerr~.class.sources += ../../src/features/centroid.cpp
-zerr~.class.sources += ../../src/features/zerocrossing.cpp
+zerr~.class.sources += src/features/rms_amplitude.cpp
+zerr~.class.sources += src/features/centroid.cpp
+zerr~.class.sources += src/features/zerocrossing.cpp
 
 # # zerr utils
-zerr~.class.sources += ../../src/utils/utils.cpp
-zerr~.class.sources += ../../src/utils/ringbuffer.cpp
-zerr~.class.sources += ../../src/utils/frequencytransformer.cpp
-zerr~.class.sources += ../../src/utils/linearinterpolator.cpp
+zerr~.class.sources += src/utils/utils.cpp
+zerr~.class.sources += src/utils/ringbuffer.cpp
+zerr~.class.sources += src/utils/frequencytransformer.cpp
+zerr~.class.sources += src/utils/linearinterpolator.cpp
 
 # all extra files to be included in binary distribution of the library
 datafiles = configs/spkr_configs/circulation_8.yaml
@@ -48,26 +46,19 @@ datadirs = configs
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 PDLIBBUILDER_DIR=pd-lib-builder/
 
-CC  += -I../../include
-CC  += -I../../include/utils
-CC  += -I../../include/modules
-CC  += -I../../include/features
-CXX += -I../../include
-CXX += -I../../include/utils
-CXX += -I../../include/modules
-CXX += -I../../include/features
+CC  += -Iinclude
+CC  += -Iinclude/utils
+CC  += -Iinclude/modules
+CC  += -Iinclude/features
+CXX += -Iinclude
+CXX += -Iinclude/utils
+CXX += -Iinclude/modules
+CXX += -Iinclude/features
 CXX += -I/usr/local/include/yaml-cpp
 CXX += -I/usr/local/include/fftw3
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder
-
-# lib.name = goat~
-# goat~.class.sources = src/goat_tilde.c
-# common.sources = $(filter-out $(goat~.class.sources), $(shell find "src" -name "*.c"))
-# $(info common.sources: $(common.sources))
-# datafiles = $(wildcard goat_tilde.pd *.wav preset_*.txt)
-
 
 # # disable optimizations for debugging
 # alldebug: c.flags += -O0 -DDEBUG
