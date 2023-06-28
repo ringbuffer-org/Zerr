@@ -1,7 +1,7 @@
 /**
- * @file zerr_feature_tracker.h
+ * @file zerr.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Zerr Feature Class Puredata Wrapper
+ * @brief Zerr Class Puredata Wrapper
  * @version 0.3
  * @date 2023-05-28
  * 
@@ -18,24 +18,33 @@
 #include "ringbuffer.h"
 
 // modules
+#include "audiorouter.h"
 #include "featurebank.h"
+#include "mapper.h"
+#include "trajectorygenerator.h"
 
-class ZerrFeatureTracker{
+#include "m_pd.h" // for testing
+
+class Zerr{
 public:
     int n_outlet;
     int n_inlet=1;
     /**
     * create a new zerr instance 
     */
-    ZerrFeatureTracker(t_systemConfigs sys_cnfg, t_featureNames ft_names);
+    Zerr(t_systemConfigs sys_cnfg, std::string spkrCfgFile);
     /**
     * initialize all zerr modules
     */
-    int initialize();
+    void initialize();
     /**
-    * callback function, process a block of samples
+    * callback function
     */
-    void perform(float **ports, int n_vec);
+    void perform(float **in, float **out, int n_vec);
+    /**
+    * process a block of samples
+    */
+    void pd_perform(float **ports, int n_vec);
     /**
     * return the total number of inlet plus outlet
     * 
@@ -44,16 +53,15 @@ public:
     /**
     * free a zerr instance
     */
-    ~ZerrFeatureTracker();
+    ~Zerr();
 
 private:
     //basic config
     zerr::t_systemConfigs system_configs;
-    zerr::t_featureNameList feature_names;
 
     std::vector<std::vector<double>> input_buffer;
-
-    zerr::t_featureValueList output_buffer;
+    // zerr::RingBuffer *in_buf;
+    std::vector<std::vector<double>> output_buffer;
     float **in_ptr;
     float **out_ptr;
 
@@ -61,9 +69,13 @@ private:
 
     // config path
     std::string zerr_cfg;
+    std::string spkr_cfg;
 
     //module objects
     zerr::FeatureBank         *bank;
+    zerr::TrajectoryGenerator *gen;
+    zerr::Mapper              *mapper;
+    zerr::AudioRouter         *router;
 };
 
 

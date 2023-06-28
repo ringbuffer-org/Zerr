@@ -3,7 +3,6 @@
 /*
 Include all head files of features
 */
-// #include "onset.h"
 // #include "flux.h"
 #include "rms_amplitude.h"
 #include "centroid.h"

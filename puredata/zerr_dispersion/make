@@ -10,8 +10,6 @@ find $(pwd)/ -type f -name "*.o" -delete
 mv *.pd_darwin builddir 
 cp *.pd        builddir
 
-cp *.pd_darwin ../../externals/
-
 pd_name="Pd"
 pd_pgid="$(pgrep ${pd_name})"
 
@@ -24,7 +22,7 @@ else
   echo "Closed ${pd_name} successfully."
 fi
 
-helpfile="zerr_feature_tracker~_helper.pd"
+helpfile="zerr~_helper.pd"
 open builddir/${helpfile}
 
 find "$(pwd)" -name ".DS_Store" -type f -delete

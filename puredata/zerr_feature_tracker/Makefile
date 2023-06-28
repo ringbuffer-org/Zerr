@@ -1,4 +1,4 @@
-# Makefile to build class 'zerr' for Pure Data.
+# Makefile to build class 'zerr_feature_tracker' for Pure Data.
 # Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
 # settings and rules.
 
@@ -22,13 +22,8 @@ class.sources = zerr_feature_tracker~.cpp
 # zerr_feature_tracker pd wrapper
 zerr_feature_tracker~.class.sources += zerr_feature_tracker.cpp
 
-# # zerr_feature_tracker modules
-# zerr_feature_tracker~.class.sources += ../../src/modules/audiorouter.cpp
-# zerr_feature_tracker~.class.sources += ../../src/modules/mapper.cpp
+# zerr_feature_tracker modules
 zerr_feature_tracker~.class.sources += ../../src/modules/featurebank.cpp
-# zerr~.class.sources += ../../src/modules/speakerarray.cpp
-# zerr_feature_tracker~.class.sources += ../../src/modules/featureextractor.cpp
-# zerr_feature_tracker~.class.sources += ../../src/modules/trajectorygenerator.cpp
 
 # # zerr_feature_tracker features
 zerr_feature_tracker~.class.sources += ../../src/features/rms_amplitude.cpp
@@ -41,9 +36,6 @@ zerr_feature_tracker~.class.sources += ../../src/utils/ringbuffer.cpp
 zerr_feature_tracker~.class.sources += ../../src/utils/frequencytransformer.cpp
 zerr_feature_tracker~.class.sources += ../../src/utils/linearinterpolator.cpp
 
-# all extra files to be included in binary distribution of the library
-# datafiles = configs/spkr_configs/circulation_8.yaml
-# datadirs = configs
 
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 PDLIBBUILDER_DIR=pd-lib-builder/
@@ -62,43 +54,6 @@ CXX += -I/usr/local/include/fftw3
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder
 
-# lib.name = goat~
-# goat~.class.sources = src/goat_tilde.c
-# common.sources = $(filter-out $(goat~.class.sources), $(shell find "src" -name "*.c"))
-# $(info common.sources: $(common.sources))
-# datafiles = $(wildcard goat_tilde.pd *.wav preset_*.txt)
-
-
-# # disable optimizations for debugging
-# alldebug: c.flags += -O0 -DDEBUG
-# alldebug: cxx.flags += -O0 -DDEBUG
-
-# # create the documentation
-# DOXYGEN=doxygen
-# DOXYGEN_DIR=docs
-# .PHONY: docs docs.clean
-
-# docs:
-# 	mkdir -p $(DOXYGEN_DIR)
-# 	$(DOXYGEN)
-
-# # clean the documentation directory
-# clean: docs.clean
-# docs.clean:
-# 	rm -rf $(DOXYGEN_DIR)
-
-# # valgrind command for leak checks
-# VG=valgrind
-# VG_LOG="valgrind.log"
-# VG_FLAGS=--log-file="$(VG_LOG)" --leak-check=full --show-reachable=yes --track-origins=yes -s
-# .PHONY: valgrind valgrind.clean
-
-# valgrind: alldebug
-# 	$(VG) $(VG_FLAGS) pd -noaudio *.pd
-
-# clean: valgrind.clean
-# valgrind.clean:
-# 	rm -f $(VG_LOG)
 
 
 

@@ -1,4 +1,4 @@
-#N canvas 106 -1237 2454 1104 12;
+#N canvas 1440 -515 2454 1104 12;
 #X obj 44 -192 adc~ 8;
 #X obj 536 -81 phasor~ 50;
 #X floatatom 536 -114 5 0 0 0 - - -;

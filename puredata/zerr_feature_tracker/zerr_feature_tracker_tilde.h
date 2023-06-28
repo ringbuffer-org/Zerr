@@ -1,9 +1,9 @@
 /**
  * @file zerr_feature_tracker_tilde.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief zerr~ Pure Data External
- * @version 0.3
- * @date 2023-05-28
+ * @brief zerr_feature_tracker~ Pure Data External
+ * @version 0.4
+ * @date 2023-06-27
  * 
  * @copyright Copyright (c) 2023
  */
@@ -30,7 +30,7 @@ typedef struct zerrout
 } t_zerrout;
 
 /**
- * @struct zerr_tilde
+ * @struct zerr_feature_tracker_tilde
  * @brief the structure of pure data external. This is the main pure data interface
  */
 typedef struct {
@@ -72,76 +72,6 @@ void zerr_feature_tracker_tilde_dsp(zerr_feature_tracker_tilde *x, t_signal **sp
  * @brief sets up the zerr~ external
  */
 void zerr_feature_tracker_tilde_setup(void);
-
-/**
- * @memberof zerr_feature_tracker_tilde
- * @brief get a single or all parameter values from the zerr object
- * 
- * @param x the zerr object
- * @param paramname the name of the parameter to get. If `NULL` or empty, all parameters are returned
- */
-// void zerr_tilde_param_get(zerr_feature_tracker_tilde *x, t_symbol *paramname);
-
-/**
- * @memberof zerr_feature_tracker_tilde
- * @brief updates a parameter's value
- * 
- * @param x the zerr object
- * @param paramname the name of the parameter to be updated
- * @param value the offset value to be updated
- */
-// void zerr_tilde_param_set(zerr_feature_tracker_tilde *x, t_symbol *paramname, t_float value);
-
-/**
- * @memberof zerr_feature_tracker_tilde
- * @brief updates a parameter slot's amount of influence
- * 
- * @param x the zerr object
- * @param paramname the name of the parameter to be updated
- * @param fslot the slot to be updated
- * @param value the amount to be updated
- */
-// void zerr_tilde_param_amount(zerr_feature_tracker_tilde *x, t_symbol *paramname, t_float fslot, t_float value);
-
-/**
- * @memberof zerr_feature_tracker_tilde
- * @brief connects a modulator to a parameter.
- * Any other modulator on that slot will be disconnected.
- * Due to a bug in the windows version of Pure Data, this method had to be implemented using
- * A_GIMME instead of the parameter list A_SYMBOL, A_FLOAT, A_SYMBOL.
- * 
- * @param x the zerr object
- * @param s unused symbol representation of the following arguments
- * @param argc the number of arguments
- * @param argv the arguments in the order: param name, slot, modulator name
- */
-// void zerr_tilde_param_attach(zerr_feature_tracker_tilde *x, t_symbol *s, int argc, t_atom *argv);
-
-/**
- * @memberof zerr_feature_tracker_tilde
- * @brief disconnects a modulator from a parameter
- * 
- * @param x the zerr object
- * @param paramname the name of the parameter to be updated
- * @param fslot the slot to be updated
- */
-// void zerr_feature_tracker_tilde_param_detach(zerr_feature_tracker_tilde *x, t_symbol *paramname, t_float fslot);
-
-/**
- * @memberof zerr_feature_tracker_tilde
- * @brief posts all parameters to the debug console
- * 
- * @param x the zerr object
- */
-// void zerr_tilde_param_post(zerr_feature_tracker_tilde *x);
-
-/**
- * @memberof zerr_feature_tracker_tilde
- * @brief resets all the parameters to default and detaches modulators
- * 
- * @param x the zerr object
- */
-// void zerr_tilde_param_reset(zerr_feature_tracker_tilde *x);
 
 #ifdef __cplusplus
 }

@@ -18,3 +18,9 @@ typedef struct {
     size_t sample_rate;
     size_t block_size;
 }t_systemConfigs;
+
+
+typedef struct {
+    char **names;  // Pointer to the list of strings
+    int num;     // Number of strings in the list
+} t_featureNames;
