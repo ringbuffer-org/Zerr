@@ -31,6 +31,7 @@ void Flux::extract(){
 }
 
 void Flux::reset(){
+    _reset_param();
     #ifdef TESTMODE
     std::cout<<"Flux::reset"<<std::endl;
     #endif //TESTMODE

@@ -1,5 +1,5 @@
 /**
- * @file zerr_config.h
+ * @file puredata_config.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief Zerr Puredata Config File
  * @version 0.3
@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 /**
- * @struct sys_config
+ * @struct t_systemConfigs
  * @brief Puredata system configuration structure for initializing the zerr engine.
  */
 typedef struct {

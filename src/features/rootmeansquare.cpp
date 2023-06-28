@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "root_mean_square.h"
+#include "rootmeansquare.h"
 
 using namespace zerr;
 using namespace feature;

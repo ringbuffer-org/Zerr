@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "zero_crossing_rate.h"
+#include "zerocrossingrate.h"
 
 using namespace zerr;
 using namespace feature;
