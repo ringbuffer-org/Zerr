@@ -26,10 +26,6 @@ public:
     t_featureValue send();
 
 private:
-    // t_specBuf       x; //input
-    // t_featureValue  y; //output g
-    // t_systemConfigs system_configs;
-
     // params
     void _reset_param();
 

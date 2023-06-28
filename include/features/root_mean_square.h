@@ -1,5 +1,5 @@
-#ifndef RMS_AMPLITUDE_H
-#define RMS_AMPLITUDE_H
+#ifndef ROOT_MEAN_SQUARE  
+#define ROOT_MEAN_SQUARE
 
 #include "configs.h"
 #include "featureextractor.h"
@@ -7,9 +7,9 @@
 namespace zerr {
 namespace feature{
 /**
-* Root-mean-square amplitude algorithm
+* Root-mean-square algorithm
 */
-class RMSAmplitude : public FeatureExtractor { 
+class RootMeanSquare : public FeatureExtractor { 
 public:
     static const std::string name; 
     static const std::string category;
@@ -37,4 +37,4 @@ private:
 
 } //namespace feature
 } //namespace zerr
-#endif // RMS_AMPLITUDE_H
+#endif // ROOT_MEAN_SQUARE

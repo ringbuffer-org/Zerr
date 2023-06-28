@@ -2,8 +2,8 @@
 using namespace zerr;
 
 void Mapper::initialize(std::string config_path){
-    cold_down_time = 300;
-    jump_cnt = 0;
+    // cold_down_time = 300;
+    // jump_cnt = 0;
 
     speaker_array.initialize(config_path);
     int n = speaker_array.get_n_speakers();
@@ -42,7 +42,7 @@ void Mapper::fetch(t_featureValueList in){
     x = in;
 
     volume  = ((x[0].normalized*70)>0.3)?0.3:(x[0].normalized*70);
-    trigger = ((x[1].normalized*30)>0.99)?1:0;
+    trigger = ((x[1].normalized*70)>0.7)?1:0;
     width   = x[2].normalized*70;
 
     // std::cout<<x.size()<<" "<<volume<<" "<<trigger<<" "<<width<<" "<<std::endl;
@@ -51,11 +51,11 @@ void Mapper::fetch(t_featureValueList in){
 
 void Mapper::process(){
 
-    if (jump_cnt==0 && trigger){ //trigger received
+    if (trigger){ 
         curr_idx = speaker_array.get_random_speakers(0, 1)[0];
-        jump_cnt = cold_down_time;
+        // jump_cnt = cold_down_time;
     }
-    if (jump_cnt!=0) jump_cnt--;
+    // if (jump_cnt!=0) jump_cnt--;
 
     _update_mapping();
 }

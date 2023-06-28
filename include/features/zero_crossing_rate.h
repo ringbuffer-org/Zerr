@@ -1,18 +1,19 @@
-#ifndef ONSET_H
-#define ONSET_H
+#ifndef ZEROCROSSINGRATE_H
+#define ZEROCROSSINGRATE_H
 
 #include "featureextractor.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Amplitude-based simple onset detection
+* Zero Crossing Rate algorithm
 */
-class Onset : public FeatureExtractor {
+class ZeroCrossingRate : public FeatureExtractor { 
 public:
-    static const std::string name; 
-    static const std::string category;
-    static const std::string description; 
+
+    static const std::string name;        /**< Feature name: Zero Crossing Rate */
+    static const std::string category;    /**< Feature category */
+    static const std::string description; /**< Feature description */
 
     std::string get_name(){return name;}
     std::string get_category(){return category;}
@@ -25,11 +26,10 @@ public:
     t_featureValue send();
 
 private:
-    // t_audioBuf x; //input
-    // t_featureValue y; //output g
-    // t_systemConfigs system_configs;
+    // params
+    int zero_crossings;
 };
 
 } //namespace feature
 } //namespace zerr
-#endif // ONSET_H
+#endif // ZEROCROSSINGRATE_H

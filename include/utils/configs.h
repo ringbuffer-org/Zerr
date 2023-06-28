@@ -4,6 +4,8 @@
 // Macros
 #define TESTMODE
 
+#define SIGNALRATE
+
 
 // #define SAMPLELEVEL
 // #define BLOCKLEBEL

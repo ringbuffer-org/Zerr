@@ -3,10 +3,16 @@
 /*
 Include all head files of features
 */
-// #include "onset.h"
-// #include "flux.h"
-#include "rms_amplitude.h"
+// time-domain features
+#include "root_mean_square.h"
+#include "zero_crossing_rate.h"
+// #include "amplitude_envelope.h"
+
+// spectral-domain features
+#include "flux.h"
 #include "centroid.h"
-#include "zerocrossingrate.h"
+// #include "rolloff.h"
+// #include "crest.h"
+// #include "flatness.h"
 
 #endif // FEATURES_H
