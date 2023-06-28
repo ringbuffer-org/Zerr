@@ -26,9 +26,10 @@ zerr_feature_tracker~.class.sources += zerr_feature_tracker.cpp
 zerr_feature_tracker~.class.sources += ../../src/modules/featurebank.cpp
 
 # # zerr_feature_tracker features
-zerr_feature_tracker~.class.sources += ../../src/features/rms_amplitude.cpp
+zerr_feature_tracker~.class.sources += ../../src/features/root_mean_square.cpp
 zerr_feature_tracker~.class.sources += ../../src/features/centroid.cpp
-zerr_feature_tracker~.class.sources += ../../src/features/zerocrossing.cpp
+zerr_feature_tracker~.class.sources += ../../src/features/zero_crossing_rate.cpp
+zerr_feature_tracker~.class.sources += ../../src/features/flux.cpp
 
 # # zerr_feature_tracker utils
 zerr_feature_tracker~.class.sources += ../../src/utils/utils.cpp

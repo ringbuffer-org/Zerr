@@ -1,10 +1,10 @@
 #include "utils.h"
-#include "zerocrossingrate.h"
+#include "zero_crossing_rate.h"
 
 using namespace zerr;
 using namespace feature;
 
-const std::string ZeroCrossingRate::name        = "Zero Crossing Rate";
+const std::string ZeroCrossingRate::name        = "Zero crossing rate";
 const std::string ZeroCrossingRate::category    = "Time-Domain";
 const std::string ZeroCrossingRate::description = "The zero crossing rate (ZCR) is a measure of how frequently a signal changes its sign. It represents the rate at which the signal crosses the zero amplitude level over a given time period.";
 

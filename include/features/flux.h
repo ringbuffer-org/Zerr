@@ -1,6 +1,8 @@
 #ifndef FLUX_H
 #define FLUX_H
 
+#include "utils.h"
+#include "configs.h"
 #include "featureextractor.h"
 
 namespace zerr {
@@ -18,20 +20,16 @@ public:
     std::string get_category(){return category;}
     std::string get_description(){return description;}
 
-    void initialize();
+    void initialize(t_systemConfigs sys_cfg);
     void extract();
     void reset();
     void fetch(t_featureInputs in);
     t_featureValue send();
 
 private:
-    //TODO wrap the input and output
-    t_featureInputs x; //input
-    t_featureValue y; //output g
+    t_samples     pre_x; //input
+    void _reset_param();
 
-    // params
-    float spec_max      = 0;
-    float dist          = 0;
 };
 
 } //namespace feature
