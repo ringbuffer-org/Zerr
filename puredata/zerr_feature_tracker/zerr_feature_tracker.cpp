@@ -12,9 +12,8 @@ ZerrFeatureTracker::ZerrFeatureTracker(t_systemConfigs sys_cnfg, t_featureNames 
     for (int i = 0; i < ft_names.num; ++i){
         feature_names.push_back(ft_names.names[i]);
     }
-    
 }
- 
+
 
 int ZerrFeatureTracker::initialize(){
 
@@ -49,12 +48,11 @@ void ZerrFeatureTracker::perform(float **ports, int n_vec){
 
     bank->fetch(input_buffer[0]);
     bank->process();
-
     output_buffer = bank->send();
 
     for (int i = 0; i < n_outlet; i++) {
         for (int j = 0; j < n_vec; j++) {
-            out_ptr[i][j] = output_buffer[i].original;
+            out_ptr[i][j] = output_buffer[i][j];
         }
     }
 

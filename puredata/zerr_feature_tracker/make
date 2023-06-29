@@ -7,10 +7,12 @@ mkdir -p builddir
 make
 
 find $(pwd)/ -type f -name "*.o" -delete
-mv *.pd_darwin builddir 
-cp *.pd        builddir
 
 cp *.pd_darwin ../../externals/
+cp *.pd        ../../externals/
+
+mv *.pd_darwin builddir 
+cp *.pd        builddir
 
 pd_name="Pd"
 pd_pgid="$(pgrep ${pd_name})"

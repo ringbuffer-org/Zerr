@@ -28,7 +28,7 @@ zerr_feature_tracker~.class.sources += ../../src/modules/featurebank.cpp
 # # zerr_feature_tracker features
 zerr_feature_tracker~.class.sources += ../../src/features/amplitudeenvelope.cpp
 zerr_feature_tracker~.class.sources += ../../src/features/centroid.cpp
-zerr_feature_tracker~.class.sources += ../../src/features/crest.cpp
+zerr_feature_tracker~.class.sources += ../../src/features/crestfactor.cpp
 zerr_feature_tracker~.class.sources += ../../src/features/flatness.cpp
 zerr_feature_tracker~.class.sources += ../../src/features/flux.cpp
 zerr_feature_tracker~.class.sources += ../../src/features/rolloff.cpp
