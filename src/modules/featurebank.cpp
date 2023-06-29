@@ -8,16 +8,6 @@ FeatureBank::FeatureBank():ring_buffer(AUDIO_BUFFER_SIZE),freq_transformer(AUDIO
 }
 
 
-// void FeatureBank::setup(std::string name){
-//     activated_features.push_back(_create(name));
-// }
-
-
-// void FeatureBank::shutdown(std::string name){
-//     std::cout<<"shutdown:\n"<<name<<std::endl;
-// }
-
-
 void FeatureBank::print_info(std::string name){
     std::cout<<"print_info:\n"<<name<<std::endl;
 }
@@ -80,12 +70,11 @@ void FeatureBank::fetch(t_blockIn in){
 
 
 void FeatureBank::process(){
-    for (int i = 0; i < activated_features.size(); ++i){
+    for (size_t i = 0; i < activated_features.size(); ++i){
         activated_features[i]->fetch(x);
         activated_features[i]->extract();
         y[i] = activated_features[i]->send();
     }
-
 }
 
 
@@ -93,20 +82,37 @@ t_featureValueList FeatureBank::send(){
     return y;
 }
 
-// make this an external function
+
+// TODO: make this an external function
 void FeatureBank::_regist_all(){
-    _regist("Centroid", []() {
-        return fe_ptr(new Centroid());
-    });
-    _regist("ZeroCrossingRate", []() {
-        return fe_ptr(new ZeroCrossingRate());
-    }); 
+
     _regist("RootMeanSquare", []() {
         return fe_ptr(new RootMeanSquare());
     }); 
+    _regist("ZeroCrossingRate", []() {
+        return fe_ptr(new ZeroCrossingRate());
+    }); 
+    // _regist("AmplitudeEnvelope", []() {
+    //     return fe_ptr(new AmplitudeEnvelope());
+    // }); 
     _regist("Flux", []() {
         return fe_ptr(new Flux());
     }); 
+    _regist("Centroid", []() {
+        return fe_ptr(new Centroid());
+    });
+    _regist("Rolloff", []() {
+        return fe_ptr(new Rolloff());
+    });
+    _regist("CrestFactor", []() {
+        return fe_ptr(new CrestFactor());
+    });
+    _regist("Flatness", []() {
+        return fe_ptr(new Flatness());
+    });
+    _regist("ZeroCrossings", []() {
+        return fe_ptr(new ZeroCrossings());
+    });
 }
 
 
@@ -122,5 +128,4 @@ std::unique_ptr<FeatureExtractor> FeatureBank::_create(const std::string& classN
         }
 
         throw std::runtime_error("Feature |" + className + "| not found, please check your spelling");
-        // return nullptr;
     }

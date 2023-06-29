@@ -1,15 +1,17 @@
 #ifndef CREST_H
 #define CREST_H
 
+#include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
+#include "linearinterpolator.h"
 
 namespace zerr {
 namespace feature{
 /**
 * Crest algorithm
 */
-class Crest : public FeatureExtractor { 
+class CrestFactor : public FeatureExtractor { 
 public:
     static const std::string name;
     static const std::string category;
@@ -23,11 +25,15 @@ public:
     void extract();
     void reset();
     void fetch(t_featureInputs in);
-    t_featureValue send();
+    t_featureBuf send();
 
 private:
-
     void _reset_param();
+
+    t_featureValue prv_y;
+    t_featureValue crr_y;
+
+    LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature

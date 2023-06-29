@@ -12,7 +12,7 @@ Include all head files of features
 #include "flux.h"
 #include "centroid.h"
 #include "rolloff.h"
-#include "crest.h"
+#include "crestfactor.h"
 #include "flatness.h"
 
 // sample-level features

@@ -1,127 +1,274 @@
 speakers:
   1:
-    x: 2.977
-    y: 0.326
-    z: -0.450
-    directness: 1.0
-    connected: [1]
+    position: 
+      cartesian:
+        x:         2.977
+        y:         0.326
+        z:        -0.450
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   2:
-    x: 1.768
-    y: -1.950
-    z: -0.450
-    directness: 1.0
-    connected: [2]
+    position: 
+      cartesian:
+        x:         1.768
+        y:        -1.950
+        z:        -0.450
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   3:
-    x: 0.071
-    y: -2.034
-    z: -0.450
-    directness: 1.0
-    connected: [3]
+    position: 
+      cartesian:
+        x:         0.071
+        y:        -2.034
+        z:        -0.450
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   4:
-    x: -1.790
-    y: -1.900
-    z: -0.450
-    directness: 1.0
-    connected: [4]
+    position: 
+      cartesian:
+        x:        -1.790
+        y:        -1.900
+        z:        -0.450
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   5:
-    x: -2.937
-    y: 0.010
-    z: -0.450
-    directness: 1.0
-    connected: [5]
+    position: 
+      cartesian:
+        x:        -2.937
+        y:         0.010
+        z:        -0.450
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   6:
-    x: -1.699
-    y: 2.607
-    z: -0.450
-    directness: 1.0
-    connected: [6]
+    position: 
+      cartesian:
+        x:        -1.699
+        y:         2.607
+        z:        -0.450
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   7:
-    x: 0.013
-    y: 2.673
-    z: -0.450
-    directness: 1.0
-    connected: [7]
+    position: 
+      cartesian:
+        x:         0.013
+        y:         2.673
+        z:        -0.450 
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   8:
-    x: 1.663
-    y: 2.650
-    z: -0.450
-    directness: 1.0
-    connected: [8]
+    position: 
+      cartesian:
+        x:         1.663
+        y:         2.650
+        z:        -0.450
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   9:
-    x: 3.265
-    y: -1.065
-    z: 0.410
-    directness: 1.0
-    connected: [9]
+    position: 
+      cartesian:
+        x:         3.265
+        y:        -1.065
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   10:
-    x: 0.995
-    y: -2.268
-    z: 0.410
-    directness: 1.0
-    connected: [10]
+    position: 
+      cartesian:
+        x:         0.995
+        y:        -2.268
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   11:
-    x: -1.269
-    y: -2.318
-    z: 0.410
-    directness: 1.0
-    connected: [11]
+    position: 
+      cartesian:
+        x:        -1.269
+        y:        -2.318
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   12:
-    x: -3.124
-    y: -1.250
-    z: 0.410
-    directness: 1.0
-    connected: [12]
+    position: 
+      cartesian:
+        x:        -3.124
+        y:        -1.250
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   13:
-    x: -3.249
-    y: 1.433
-    z: 0.410
-    directness: 1.0
-    connected: [13]
+    position: 
+      cartesian:
+        x:        -3.249
+        y:         1.433
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   14:
-    x: -1.553
-    y: 2.814
-    z: 0.410
-    directness: 1.0
-    connected: [14]
+    position: 
+      cartesian:
+        x:        -1.553
+        y:         2.814
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   15:
-    x: 1.254
-    y: 2.946
-    z: 0.410
-    directness: 1.0
-    connected: [15]
+    position: 
+      cartesian:
+        x:         1.254
+        y:         2.946
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   16:
-    x: 3.145
-    y: 1.474
-    z: 0.410
-    directness: 1.0
-    connected: [16]
+    position: 
+      cartesian:
+        x:         3.145
+        y:         1.474
+        z:         0.410
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   17:
-    x: 0.973
-    y: -0.922
-    z: 0.865
-    directness: 1.0
-    connected: [17]
+    position: 
+      cartesian:
+        x:         0.973
+        y:        -0.922
+        z:         0.865
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   18:
-    x: -0.955
-    y: -0.941
-    z: 0.862
-    directness: 1.0
-    connected: [18]
+    position: 
+      cartesian:
+        x:        -0.955
+        y:        -0.941
+        z:         0.862
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   19:
-    x: -0.998
-    y: 0.886
-    z: 0.853
-    directness: 1.0
-    connected: [19]
+    position: 
+      cartesian:
+        x:        -0.998
+        y:         0.886
+        z:         0.853
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   20:
-    x: 0.959
-    y: 0.991
-    z: 0.887
-    directness: 1.0
-    connected: [20]
+    position: 
+      cartesian:
+        x:         0.959
+        y:         0.991
+        z:         0.887
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0
   21:
-    x: 0.000
-    y: 0.000
-    z: 1.296
-    directness: 1.0
-    connected: [21]
+    position: 
+      cartesian:
+        x:         0.000
+        y:         0.000
+        z:         1.296
+      spherical:
+        azimuth:   0.0
+        elevation: 0.0
+        distance:  0.0
+    orientation:
+      yaw:         0.0
+      pitch:       0.0

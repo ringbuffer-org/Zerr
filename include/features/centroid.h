@@ -1,13 +1,15 @@
 #ifndef CENTROID_H
 #define CENTROID_H
 
+#include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
+#include "linearinterpolator.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Spectrum Centroid algorithm
+* Spectral Centroid algorithm
 */
 class Centroid : public FeatureExtractor { 
 public:
@@ -23,15 +25,17 @@ public:
     void extract();
     void reset();
     void fetch(t_featureInputs in);
-    t_featureValue send();
+    t_featureBuf send();
 
 private:
-    // params
     void _reset_param();
 
+    t_featureValue prv_y;
+    t_featureValue crr_y;
+
     double freq_max;
-    double centroid = 0.0;
-    double totalMagnitude = 0.0;
+
+    LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature

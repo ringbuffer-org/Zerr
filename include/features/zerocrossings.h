@@ -1,6 +1,7 @@
 #ifndef ZEROCROSSINGS_H
 #define ZEROCROSSINGS_H
 
+#include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
 
@@ -23,11 +24,13 @@ public:
     void extract();
     void reset();
     void fetch(t_featureInputs in);
-    t_featureValue send();
+    t_featureBuf send();
 
 private:
-
     void _reset_param();
+    bool _isZeroCrossing(t_sample first, t_sample second);
+
+    t_sample last_sample;
 };
 
 } //namespace feature

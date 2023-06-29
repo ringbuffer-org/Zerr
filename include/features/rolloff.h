@@ -1,13 +1,15 @@
 #ifndef ROLLOFF_H
 #define ROLLOFF_H
 
+#include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
+#include "linearinterpolator.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Rolloff algorithm
+* Spectral Rolloff algorithm
 */
 class Rolloff : public FeatureExtractor { 
 public:
@@ -23,11 +25,18 @@ public:
     void extract();
     void reset();
     void fetch(t_featureInputs in);
-    t_featureValue send();
+    t_featureBuf send();
 
 private:
-
     void _reset_param();
+
+    t_featureValue prv_y;
+    t_featureValue crr_y;
+
+    double freq_max;
+    double rolloffPercent=0.85; //todo: add function to set this
+
+    LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature

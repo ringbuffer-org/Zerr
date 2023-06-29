@@ -1,8 +1,10 @@
 #ifndef ROOT_MEAN_SQUARE  
 #define ROOT_MEAN_SQUARE
 
+#include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
+#include "linearinterpolator.h"
 
 namespace zerr {
 namespace feature{
@@ -23,16 +25,15 @@ public:
     void extract();
     void reset();
     void fetch(t_featureInputs in);
-    t_featureValue send();
+    t_featureBuf send();
 
 private:
-    // params
-    int wave_size;
-
     void _reset_param();
 
-    double square_sum;
-    double square_root;
+    t_featureValue prv_y;
+    t_featureValue crr_y;
+
+    LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature

@@ -13,27 +13,17 @@ namespace zerr {
 /**
 * FeatureBank is used to organise the behaviour of all feature extractors uniformly
 * It takes original audio block input and does preprocess like Buffering, FFT
-* then distributes the results to all activated feature extraction algorithm
-* 
+* then distributes the results to all activated feature extraction algorithms
 */
 class FeatureBank {
 public:   
-
-    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)();/**< Function pointer type for creating FeatureExtractor objects  */
+    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)(); /**< Function pointer type for creating FeatureExtractor objects  */
     typedef std::unique_ptr<FeatureExtractor> fe_ptr; /**< The unique_ptr of type virtual class FeatureExtractor  */
     /**
     * FeatureBank Constructor
     * Regist all available features and initialize the input buffer
     */
     FeatureBank();
-    /**
-    * setup the feature selected by name 
-    */
-    // void setup(std::string name);
-    /**
-    * desconstructe the used feature
-    */
-    // void shutdown(std::string name);
     /**
     * Print the detail info of selected feature
     */
@@ -53,6 +43,7 @@ public:
     /**
     * fetch: dsp callback function
     * fetch audio block and store in the buffer if needed
+    * Warning: n_vec could be smaller than system block_size. Error occurs in this scenario
     */
     void fetch(t_blockIn in);
     /**

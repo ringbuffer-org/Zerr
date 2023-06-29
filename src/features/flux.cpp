@@ -11,6 +11,7 @@ void Flux::initialize(t_systemConfigs sys_cfg){
     system_configs = sys_cfg;
 
     _reset_param();
+
     if (is_initialized()==false){
         set_initialize_statue(true);
     }
@@ -19,34 +20,45 @@ void Flux::initialize(t_systemConfigs sys_cfg){
 void Flux::extract(){
 
     t_value flux = 0.0;
-    t_value diff = 0;
+    t_value diff = 0.0;
 
     for (size_t i = 0; i < x.size(); ++i) {
-            diff  = x[i] - pre_x[i];
-            flux += diff * diff;
+        diff  = x[i] - prv_x[i];
+        flux += diff * diff;
     }
 
-    y.original = std::sqrt(flux);
-    y.normalized = y.original;
+    crr_y = std::sqrt(flux);
 }
 
 void Flux::reset(){
     _reset_param();
-    #ifdef TESTMODE
-    std::cout<<"Flux::reset"<<std::endl;
-    #endif //TESTMODE
 }
 
 void Flux::fetch(t_featureInputs in){
-    pre_x = x;
+    prv_x = x;
     x = in.spec;
+
+    prv_y = crr_y;
 }
 
-t_featureValue Flux::send(){
+t_featureBuf Flux::send(){
+    linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
+
+    for (size_t i = 0; i < system_configs.block_size; ++i){
+
+        y[i] = linear_interpolator.get_value();
+
+        linear_interpolator.next_step();
+    }
+
     return y;
 }
 
 void Flux::_reset_param(){
-    pre_x.resize(AUDIO_BUFFER_SIZE, 0.0f);
+    prv_x.resize(AUDIO_BUFFER_SIZE, 0.0f);
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
+
+    prv_y = 0.0;
+    crr_y = 0.0;
+    y.resize(system_configs.block_size, 0.0f);
 }

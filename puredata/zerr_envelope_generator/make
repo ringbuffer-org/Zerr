@@ -7,6 +7,10 @@ mkdir -p builddir
 make
 
 find $(pwd)/ -type f -name "*.o" -delete
+
+cp *.pd_darwin ../../externals/
+cp *.pd        ../../externals/
+
 mv *.pd_darwin builddir 
 cp *.pd        builddir
 
@@ -22,7 +26,8 @@ else
   echo "Closed ${pd_name} successfully."
 fi
 
-helpfile="zerr_speaker_mapper~_helper.pd"
+# open object test patch
+helpfile="zerr_envelope_generator~_helper.pd"
 open builddir/${helpfile}
 
 find "$(pwd)" -name ".DS_Store" -type f -delete
