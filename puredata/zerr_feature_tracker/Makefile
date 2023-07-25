@@ -11,8 +11,7 @@
 CC  = g++
 cflags = -std=c++11
 ldflags += -L/usr/local/lib -lyaml-cpp
-ldflags += -L/usr/local/lib -lfftw3
-
+ldflags += -L/opt/homebrew/Cellar/fftw/3.3.10_1/lib -lfftw3
 
 lib.name = zerr_feature_tracker~
 
