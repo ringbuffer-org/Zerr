@@ -1,3 +1,12 @@
+/**
+ * @file rootmeansquare.h
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Implementation of root-mean-square algorithm
+ * @date 2023-05-28
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef ROOT_MEAN_SQUARE  
 #define ROOT_MEAN_SQUARE
 
@@ -9,7 +18,11 @@
 namespace zerr {
 namespace feature{
 /**
-* Root-mean-square algorithm
+* The RMS value of a set of values (or a continuous-time waveform) is 
+* the square root of the arithmetic mean of the squares of the values, 
+* or the square of the function that defines the continuous waveform. 
+* 
+* https://en.wikipedia.org/wiki/Root_mean_square
 */
 class RootMeanSquare : public FeatureExtractor { 
 public:
@@ -38,4 +51,5 @@ private:
 
 } //namespace feature
 } //namespace zerr
+
 #endif // ROOT_MEAN_SQUARE

@@ -1,3 +1,12 @@
+/**
+ * @file rolloff.h
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Implementation of spectral rolloff algorithm
+ * @date 2023-05-28
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef ROLLOFF_H
 #define ROLLOFF_H
 
@@ -9,7 +18,9 @@
 namespace zerr {
 namespace feature{
 /**
-* Spectral Rolloff algorithm
+* The spectral rolloff is a measure used in signal processing to determine the frequency 
+* below which a specified percentage of the total spectral energy lies. It is often used 
+* to distinguish between harmonic and non-harmonic content in an audio signal.
 */
 class Rolloff : public FeatureExtractor { 
 public:

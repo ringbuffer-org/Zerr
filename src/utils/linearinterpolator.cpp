@@ -1,13 +1,6 @@
 #include "linearinterpolator.h"
 using namespace zerr;
 
-// void LinearInterpolator::initialize(int size){
-//     output_size = size;
-//     inter_val.resize(output_size);
-//     start_val.resize(output_size);
-//     stop_val.resize(output_size);
-// }
-
 void LinearInterpolator::set_value(t_value start, t_value stop, int len){
     start_val = start;
     stop_val  = stop;

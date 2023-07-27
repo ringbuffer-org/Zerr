@@ -11,8 +11,7 @@
 CC  = g++
 cflags = -std=c++11
 ldflags += -L/usr/local/lib -lyaml-cpp
-ldflags += -L/usr/local/lib -lfftw3
-
+ldflags += -L/opt/homebrew/Cellar/fftw/3.3.10_1/lib -lfftw3
 
 lib.name = zerr_envelope_generator~
 
@@ -47,7 +46,7 @@ CXX += -I../../include/utils
 CXX += -I../../include/modules
 CXX += -I../../include/features
 CXX += -I/usr/local/include/yaml-cpp
-CXX += -I/usr/local/include/fftw3
+CXX += -I/opt/homebrew/Cellar/fftw/3.3.10_1/include
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder

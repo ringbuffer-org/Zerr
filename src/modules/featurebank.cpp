@@ -92,9 +92,6 @@ void FeatureBank::_regist_all(){
     _regist("ZeroCrossingRate", []() {
         return fe_ptr(new ZeroCrossingRate());
     }); 
-    // _regist("AmplitudeEnvelope", []() {
-    //     return fe_ptr(new AmplitudeEnvelope());
-    // }); 
     _regist("Flux", []() {
         return fe_ptr(new Flux());
     }); 

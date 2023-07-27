@@ -1,11 +1,9 @@
-#include "zerr_speaker_mapper.h"
+#include "zerr_envelope_generator.h"
 
 #include <stdlib.h>
 
-// using namspace zerr_speaker_mapper;
 
-
-ZerrSpeakerMapper::ZerrSpeakerMapper(t_systemConfigs sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)){
+ZerrEnvelopeGenerator::ZerrEnvelopeGenerator(zerr::t_systemConfigs sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)){
     spkr_cfg = spkrCfgFile;
 
     mapper = new zerr::Mapper();
@@ -14,7 +12,7 @@ ZerrSpeakerMapper::ZerrSpeakerMapper(t_systemConfigs sys_cnfg, std::string spkrC
     system_configs.block_size  = sys_cnfg.block_size;
 }
  
-void ZerrSpeakerMapper::initialize(){
+void ZerrEnvelopeGenerator::initialize(){
 
     // replace with inside one time setup function
     // zerr::t_featureNameList feature_names = {"ZeroCrossingRate", "RMSAmplitude", "Centroid"}; //  Centroid
@@ -40,7 +38,7 @@ void ZerrSpeakerMapper::initialize(){
 //     post("Zerr::perform");
 // }
 
-void ZerrSpeakerMapper::perform(float **ports, int n_vec){
+void ZerrEnvelopeGenerator::perform(float **ports, int n_vec){
 
 
     in_ptr  = (float **) &ports[0];
@@ -63,11 +61,11 @@ void ZerrSpeakerMapper::perform(float **ports, int n_vec){
     }
 }
 
-int ZerrSpeakerMapper::get_port_count(){
+int ZerrEnvelopeGenerator::get_port_count(){
     return n_inlet+n_outlet;
 }
 
-ZerrSpeakerMapper::~ZerrSpeakerMapper(){
+ZerrEnvelopeGenerator::~ZerrEnvelopeGenerator(){
     // delete bank;
     // delete gen;
     delete mapper;

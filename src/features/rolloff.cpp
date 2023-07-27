@@ -18,8 +18,8 @@ void Rolloff::initialize(t_systemConfigs sys_cfg){
     }
 }
 
-void Rolloff::extract(){
 
+void Rolloff::extract(){
     // Calculate the total energy in the spectrum
     double totalEnergy = std::accumulate(x.begin(), x.end(), 0.0);
     
@@ -40,14 +40,17 @@ void Rolloff::extract(){
     crr_y = freq_max;
 }
 
+
 void Rolloff::reset(){
     _reset_param();
 }
+
 
 void Rolloff::fetch(t_featureInputs in){
     x = in.spec;
     prv_y = crr_y;
 }
+
 
 t_featureBuf Rolloff::send(){
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
@@ -60,10 +63,12 @@ t_featureBuf Rolloff::send(){
     return y;
 }
 
-void Rolloff::_reset_param(){
+
+void Rolloff::_reset_param(){f
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
 
     prv_y = 0.0;
     crr_y = 0.0;
+
     y.resize(system_configs.block_size, 0.0f);
 }

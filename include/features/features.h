@@ -1,18 +1,24 @@
+/**
+ * @file features.h
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Include all feature head files 
+ * @date 2023-07-27
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef FEATURES_H
 #define FEATURES_H
-/*
-Include all head files of features
-*/
+
 // time-domain features
 #include "rootmeansquare.h"
 #include "zerocrossingrate.h"
-#include "amplitudeenvelope.h"
+#include "crestfactor.h"
 
 // spectral-domain features
 #include "flux.h"
 #include "centroid.h"
 #include "rolloff.h"
-#include "crestfactor.h"
 #include "flatness.h"
 
 // sample-level features

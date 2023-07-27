@@ -6,7 +6,8 @@ using namespace feature;
 
 const std::string RootMeanSquare::name        = "Root-Mean-Squre Amplitude";
 const std::string RootMeanSquare::category    = "Time-Domain";
-const std::string RootMeanSquare::description = "the RMS is defined as the square root of the mean over time of the square of the vertical distance of the graph from the rest state";
+const std::string RootMeanSquare::description = "The RMS is defined as the square root of the mean over time of the square of the vertical distance of the graph from the rest state";
+
 
 void RootMeanSquare::initialize(t_systemConfigs sys_cfg){
     system_configs = sys_cfg;
@@ -17,6 +18,7 @@ void RootMeanSquare::initialize(t_systemConfigs sys_cfg){
         set_initialize_statue(true);
     }
 }
+
 
 void RootMeanSquare::extract(){
     double square_sum  = 0;
@@ -32,14 +34,17 @@ void RootMeanSquare::extract(){
     crr_y   = square_root;
 }
 
+
 void RootMeanSquare::reset(){
     _reset_param();
 }
+
 
 void RootMeanSquare::fetch(t_featureInputs in){
     x = in.wave;
     prv_y = crr_y;
 }
+
 
 t_featureBuf RootMeanSquare::send(){
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
@@ -52,11 +57,13 @@ t_featureBuf RootMeanSquare::send(){
     return y;
 }
 
+
 void RootMeanSquare::_reset_param(){
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
 
     prv_y = 0.0;
     crr_y = 0.0;
+
     y.resize(system_configs.block_size, 0.0f);
 }
 

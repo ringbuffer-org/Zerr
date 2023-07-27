@@ -2,9 +2,7 @@
 #define CONFIGS_H
 
 // Macros
-#define TESTMODE    /**< Print log info */
-// #define SAMPLELEVEL /**< Output all feature result in sample level */
-// #define PUREDATA    /**< PUREDATA specified configs */
+#define TESTMODE       /**< Print log info when TESTMODE Macro defined */
 
 #define PI 3.14159265
 #define AUDIO_BUFFER_SIZE 1024 

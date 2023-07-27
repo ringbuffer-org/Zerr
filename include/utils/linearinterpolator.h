@@ -6,24 +6,6 @@
 
 namespace zerr{
 
-// class LinearInterpolator{
-// public:
-//     void      initialize(int size);
-//     void      set_values(t_volumes start, t_volumes stop, int len);
-//     t_volumes get_value();
-//     void      next_step();
-
-
-// private:
-//     t_volumes inter_val;
-//     t_volumes start_val;
-//     t_volumes stop_val;
-
-//     int n_steps;
-//     int position;
-//     int output_size;
-// };
-
 class LinearInterpolator{
 public:
     void    set_value(t_value start, t_value stop, int len);
@@ -40,4 +22,5 @@ private:
 };
 
 } // zerr
+
 #endif // LINEARINTERPOLATOR_H

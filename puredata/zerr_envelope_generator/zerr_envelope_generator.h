@@ -1,16 +1,14 @@
 /**
- * @file zerr_speaker_mapper.h
+ * @file zerr_envelope_generator.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Zerr Class Puredata Wrapper
+ * @brief Envelope Generator Class Puredata Wrapper
  * @version 0.3
  * @date 2023-05-28
  * 
  * @copyright Copyright (c) 2023
  */
-
 #pragma once
 
-#include "zerr_config.h"
 
 // dependencies
 #include "utils.h"
@@ -22,14 +20,15 @@
 
 #include "m_pd.h" // for testing
 
-class ZerrSpeakerMapper{
+
+class ZerrEnvelopeGenerator{
 public:
     int n_outlet;
     int n_inlet=3;
     /**
     * create a new zerr_speaker_mapper instance 
     */
-    ZerrSpeakerMapper(t_systemConfigs sys_cnfg, std::string spkrCfgFile);
+    ZerrEnvelopeGenerator(zerr::t_systemConfigs sys_cnfg, std::string spkrCfgFile);
     /**
     * initialize all zerr_speaker_mapper modules
     */
@@ -50,7 +49,7 @@ public:
     /**
     * free a zerr_speaker_mapper instance
     */
-    ~ZerrSpeakerMapper();
+    ~ZerrEnvelopeGenerator();
 
 private:
     //basic config
@@ -61,17 +60,12 @@ private:
     float **in_ptr;
     float **out_ptr;
 
-    // std::vector<float*> in_tmp;  // Vector of float pointers
-
     // config path
     std::string zerr_cfg;
     std::string spkr_cfg;
 
     //module objects
-    // zerr::FeatureBank         *bank;
-    // zerr::TrajectoryGenerator *gen;
     zerr::Mapper              *mapper;
-    // zerr::AudioRouter         *router;
 };
 
 
