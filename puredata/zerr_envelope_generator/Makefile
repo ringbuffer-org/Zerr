@@ -1,8 +1,6 @@
-# Makefile to build class 'zerr' for Pure Data.
+# Makefile to build object 'zerr_envelope_generator' for Pure Data.
 # Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
 # settings and rules.
-
-# library name
 
 # add folder shortcut examples:
 # INCLUDES = -I../includes
@@ -21,11 +19,11 @@ class.sources = zerr_envelope_generator~.cpp
 # zerr_envelope_generator pd wrapper
 zerr_envelope_generator~.class.sources += zerr_envelope_generator.cpp
 
-# # zerr_envelope_generator modules
-zerr_envelope_generator~.class.sources += ../../src/modules/mapper.cpp
+# zerr_envelope_generator modules
+zerr_envelope_generator~.class.sources += ../../src/modules/envelopegenerator.cpp
 zerr_envelope_generator~.class.sources += ../../src/modules/speakerarray.cpp
 
-# # zerr_envelope_generator utils
+# zerr_envelope_generator utils
 zerr_envelope_generator~.class.sources += ../../src/utils/utils.cpp
 zerr_envelope_generator~.class.sources += ../../src/utils/ringbuffer.cpp
 zerr_envelope_generator~.class.sources += ../../src/utils/linearinterpolator.cpp

@@ -12,14 +12,14 @@ void *zerr_envelope_generator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     zerr_envelope_generator_tilde *x = (zerr_envelope_generator_tilde *) pd_new(zerr_envelope_generator_tilde_class);
     if (!x) return NULL;
 
-    t_systemConfigs sys_cnfg;
+    zerr::t_systemConfigs sys_cnfg;
     sys_cnfg.sample_rate = (size_t) sys_getsr();
     sys_cnfg.block_size  = (size_t) sys_getblksize();
 
     // remove this
-    std::string spkrCfgFile = "/Users/yangzeyu/Downloads/Zerr/configs/spkr_configs/EN325_21.yaml"; 
+    std::string spkrCfgFile = "/Users/zeyuyang42/Documents/workspace/Zerr/configs/spkr_configs/eruption_8.yaml"; 
 
-    x->z = new ZerrSpeakerMapper(sys_cnfg, spkrCfgFile);
+    x->z = new ZerrEnvelopeGenerator(sys_cnfg, spkrCfgFile);
     if (!x->z) return NULL;
 
     x->z->initialize(); // initialize zerr_envelope_generator and all sub-modules

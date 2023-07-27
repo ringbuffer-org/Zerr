@@ -1,7 +1,7 @@
 /**
  * @file zerr_envelope_generator.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Envelope Generator Class Puredata Wrapper
+ * @brief EnvelopeGenerator Class Puredata Wrapper
  * @version 0.3
  * @date 2023-05-28
  * 
@@ -16,7 +16,7 @@
 #include "ringbuffer.h"
 
 // modules
-#include "mapper.h"
+#include "envelopegenerator.h"
 
 #include "m_pd.h" // for testing
 
@@ -33,10 +33,6 @@ public:
     * initialize all zerr_speaker_mapper modules
     */
     void initialize();
-    /**
-    * callback function
-    */
-    // void perform(float **in, float **out, int n_vec);
     /**
     * process a block of samples
     */
@@ -65,7 +61,7 @@ private:
     std::string spkr_cfg;
 
     //module objects
-    zerr::Mapper              *mapper;
+    zerr::EnvelopeGenerator              *envelope_generator;
 };
 
 

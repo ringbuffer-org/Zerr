@@ -2,6 +2,7 @@
 #define SPEAKERARRAY_H
 
 #include "utils.h"
+#include "types.h"
 
 namespace zerr {
 /**

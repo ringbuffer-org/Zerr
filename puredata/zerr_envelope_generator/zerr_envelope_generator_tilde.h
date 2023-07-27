@@ -2,8 +2,8 @@
  * @file zerr_envelope_generator_tilde.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief zerr_envelope_generator~ Pure Data External
- * @version 0.3
- * @date 2023-05-28
+ * @version 0.4
+ * @date 2023-07-27
  * 
  * @copyright Copyright (c) 2023
  */
@@ -23,11 +23,11 @@ extern "C" {
  * 
  * This is structure of zerr_envelope_generator outlets for dynamic outlet creating
  */
-typedef struct zerrout
-{
+typedef struct zerrout {
     // t_atomtype u_type;
     t_outlet *u_outlet;
 } t_zerrout;
+
 
 /**
  * @struct zerr_envelope_generator_tilde

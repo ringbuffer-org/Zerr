@@ -2,6 +2,7 @@
  * @file envelopegenerator.h 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief Envelope Generator Class Implementation
+ * @version 0.4
  * @date 2023-07-27
  * 
  * @copyright Copyright (c) 2023
