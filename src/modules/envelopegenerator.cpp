@@ -1,4 +1,4 @@
-#include "mapper.h"
+#include "envelopegenerator.h"
 using namespace zerr;
 
 void Mapper::initialize(std::string config_path){

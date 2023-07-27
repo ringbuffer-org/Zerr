@@ -46,7 +46,9 @@ CXX += -I../../include/utils
 CXX += -I../../include/modules
 CXX += -I../../include/features
 CXX += -I/usr/local/include/yaml-cpp
-CXX += -I/opt/homebrew/Cellar/fftw/3.3.10_1/include
+
+CC += -I../../dependencies/include/fftw3
+CXX += -I../../dependencies/include/fftw3
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder

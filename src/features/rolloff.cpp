@@ -64,7 +64,7 @@ t_featureBuf Rolloff::send(){
 }
 
 
-void Rolloff::_reset_param(){f
+void Rolloff::_reset_param(){
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
 
     prv_y = 0.0;
