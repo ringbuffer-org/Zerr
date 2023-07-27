@@ -1,3 +1,3 @@
 # Zerr
 
-Autogenous Spatialization (for Arbitrary Loudspeaker Configurations)
+Autogenous Spatialization for Arbitrary Loudspeaker Configurations
