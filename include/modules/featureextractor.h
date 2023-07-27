@@ -6,13 +6,9 @@
 namespace zerr {
 /**
 * Virtual Class that defines the basic structure of Feature extractor
-* TODO: wrap input and output to class
 */
 class FeatureExtractor {
 public: 
-    /**
-    * add this object to the static registry
-    */
     /**
     * Virtual desctructor for dealing with virtual methods
     */
@@ -40,24 +36,24 @@ public:
     * fetch samples from audio stream and load to the input buffer
     */
     virtual void fetch(t_featureInputs x) = 0;
-    virtual t_featureValue send() = 0;
     /**
-    * Check if this feature extractor is initialized
+    * send the process results back
+    */
+    virtual t_featureBuf send() = 0;
+    /**
+    * statue polling about if the feature extractor is initialized
     */
     bool is_initialized(){return initialized;}
     void set_initialize_statue(bool s){initialized=s;}
 
 protected:
-    t_samples       x; //input
-    t_featureValue  y; //output g
+    t_samples       x; /**< input data in t_samples type, the base type of t_blockIn, t_audioBuf, t_specBuf*/
+    t_featureBuf    y; /**< output data */
+
     t_systemConfigs system_configs;
     bool initialized=false; // 
 }; // Class FeatureExtractor
 
-}  // Namespace zerr 
+}      // Namespace zerr 
 #endif // FEATUREEXTRACTOR_H
-
-
-
-
 

@@ -20,6 +20,7 @@
 
 // dependencies
 #include "yaml-cpp/yaml.h"
+// #include "fftw3/fftw3.h"
 #include <fftw3.h>
 
 namespace zerr{
@@ -56,8 +57,7 @@ std::vector<double> randomVector(int size, double min, double max);
 * get part of std::vector by index
 */
 template<typename T>
-std::vector<T> slice(std::vector<T> const &v, int m, int n)
-{
+std::vector<T> slice(std::vector<T> const &v, int m, int n){
     auto first = v.cbegin() + m;
     auto last = v.cbegin() + n + 1;
  
@@ -76,8 +76,7 @@ std::vector<T> slice(std::vector<T> const &v, int m, int n)
 // }
 
 
-inline float get_hann_sample(int pos, int L)
-{
+inline float get_hann_sample(int pos, int L){
     float val = 0.5 * (1.0 - cos( (2.0*PI* (float) pos) / (float)L) );
     return val;
 }

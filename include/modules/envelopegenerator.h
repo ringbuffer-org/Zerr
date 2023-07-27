@@ -1,5 +1,14 @@
-#ifndef MAPPER_H
-#define MAPPER_H
+/**
+ * @file envelopegenerator.h 
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Envelope Generator Class Implementation
+ * @version 0.4
+ * @date 2023-07-27
+ * 
+ * @copyright Copyright (c) 2023
+ */
+#ifndef ENVELOPEGENERATOR_H
+#define ENVELOPEGENERATOR_H
 
 #include "utils.h"
 #include "types.h"
@@ -7,10 +16,9 @@
 
 namespace zerr {
 /**
-* This class applies mapping strategy based on input control signal and the speaker array setups
-* For demonstraction now only the trigger jump implemented
+* EnvelopeGenerator applies mapping strategy based on input control signal and the speaker array setups
 */
-class Mapper {
+class EnvelopeGenerator { 
 public:
     void initialize(std::string config_path);
     void fetch(t_featureValueList in);
@@ -22,7 +30,7 @@ public:
 
 private:
     /**
-    * The 
+    * The SpeakerArray
     */
     SpeakerArray speaker_array;
     /**
@@ -36,7 +44,6 @@ private:
     * input control signal
     */
     t_featureValueList x;
-    // t_featureValueList prev_x;
     t_value volume;
     t_value trigger;
     t_value floating;
@@ -52,4 +59,4 @@ private:
 }; 
 
 } //namespace zerr
-#endif // MAPPER_H
+#endif // ENVELOPEGENERATOR_H

@@ -1,5 +1,14 @@
-#ifndef CENTROID_H
-#define CENTROID_H
+/**
+ * @file rolloff.h
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Implementation of spectral rolloff algorithm
+ * @date 2023-05-28
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
+#ifndef ROLLOFF_H
+#define ROLLOFF_H
 
 #include "utils.h"
 #include "configs.h"
@@ -9,13 +18,15 @@
 namespace zerr {
 namespace feature{
 /**
-* Spectral Centroid algorithm
+* The spectral rolloff is a measure used in signal processing to determine the frequency 
+* below which a specified percentage of the total spectral energy lies. It is often used 
+* to distinguish between harmonic and non-harmonic content in an audio signal.
 */
-class Centroid : public FeatureExtractor { 
+class Rolloff : public FeatureExtractor { 
 public:
-    static const std::string name; 
+    static const std::string name;
     static const std::string category;
-    static const std::string description; 
+    static const std::string description;
 
     std::string get_name(){return name;}
     std::string get_category(){return category;}
@@ -34,10 +45,11 @@ private:
     t_featureValue crr_y;
 
     double freq_max;
+    double rolloffPercent=0.85; //todo: add function to set this
 
     LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature
 } //namespace zerr
-#endif // CENTROID_H
+#endif // ROLLOFF_H

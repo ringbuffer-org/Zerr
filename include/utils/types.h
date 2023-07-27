@@ -4,73 +4,48 @@
 #include "configs.h"
 
 namespace zerr {
-
-// audio types
-#ifdef PUREDATA
-    typedef float t_sample; //puredata still only support 16bit
-#else
-    typedef double t_sample; 
-#endif
-
-typedef std::vector<t_sample> t_samples; 
-
-typedef t_samples t_blockIn;
-typedef t_samples t_blockOut;
-
-typedef std::vector<t_blockIn>  t_blockIns;
-typedef std::vector<t_blockOut> t_blockOuts;
-
-typedef t_samples t_audioBuf;
-
-// feature types
-typedef std::string t_featureName;
-
-typedef std::vector<t_featureName> t_featureNameList; 
-
-typedef float t_value;
-
-typedef struct {
-    t_value original;
-    t_value normalized;
-} t_featureValue;
-
-typedef std::vector<t_featureValue> t_featureValueList;
-
-typedef t_value t_trigger;  // 0,1
-typedef t_value t_category; // 0,1,2,3,4
-typedef t_value t_floating; // float
-
-typedef t_value t_volume;
-typedef std::vector<t_volume> t_volumes;
-
-// spectrum types
-// #ifdef PUREDATA
-//     typedef float t_bin; //puredata still only support 16bit
-// #else
-//     typedef double t_bin; 
-// #endif
+// basic types
+typedef double t_sample; /**< base type of all single audio-related value */
+typedef float  t_value;  /**< base type of all single non-audio value */
 
 typedef struct {
     t_sample real;
     t_sample img;
-} t_complex;
+} t_complex; /**< complex number */
 
-typedef std::vector<t_complex> t_fftBuf;
-typedef std::vector<t_sample> t_specBuf;
+// audio types
+typedef std::vector<t_sample> t_samples; /**< basic type of all kinds of audio vector */
+
+typedef t_samples t_blockIn;  /**< input audio block */
+typedef t_samples t_blockOut; /**< output audio block */
+typedef t_samples t_audioBuf; /**< buffered audio frame */
+
+typedef std::vector<t_blockIn>  t_blockIns;  /**< multi-channel input audio blocks: unused */
+typedef std::vector<t_blockOut> t_blockOuts; /**< multi-channel output audio blocks: unused */
+typedef std::vector<t_audioBuf> t_audioBufs; /**< multi-channel audio buffer: unused */
+
+// spectral types
+typedef std::vector<t_complex> t_fftBuf; /**< complex buffer for fft output */
+typedef std::vector<t_sample> t_specBuf; /**< spectral power buffer */
 
 typedef struct {
-    t_blockIn  blck;
-    t_audioBuf wave;
-    t_specBuf  spec;
-} t_featureInputs ;
+    t_blockIn  blck; /**< single audio block */
+    t_audioBuf wave; /**< buffered audio frame */
+    t_specBuf  spec; /**< spectral power */
+} t_featureInputs;   /**< structure for different feature extractor input data*/
 
-// configs
-#define PI 3.14159265
+// feature types
+typedef std::string t_featureName; /**< Identification name of the feature */
+typedef std::vector<t_featureName> t_featureNameList; /**< The list of feature name to be activated */
 
-#define AUDIO_BUFFER_SIZE 1024 
+typedef std::vector<t_value> t_values; /**< base type of all non-audio vector */
 
-#define VOLUME_THRESHOLD  0.01
+typedef t_value t_featureValue;  /**< feature value calculated via block */
+typedef t_values t_featureBuf;   /**< feature value in sample level or after interpolation */
+typedef std::vector<t_featureBuf> t_featureValueList; /**< list of all extracted features */
 
+typedef t_value t_volume;
+typedef std::vector<t_volume> t_volumes;
 
 typedef struct {
     size_t sample_rate;

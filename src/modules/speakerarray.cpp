@@ -51,7 +51,7 @@ void SpeakerArray::initialize(std::string config_path){
         // s.print();
         indexs.push_back(index);
         speakers.insert({index, s});
-        //update counter
+
         cnt++;
     }
 

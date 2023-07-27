@@ -1,7 +1,10 @@
 #ifndef ZEROCROSSINGRATE_H
 #define ZEROCROSSINGRATE_H
 
+#include "utils.h"
+#include "configs.h"
 #include "featureextractor.h"
+#include "linearinterpolator.h"
 
 namespace zerr {
 namespace feature{
@@ -10,7 +13,6 @@ namespace feature{
 */
 class ZeroCrossingRate : public FeatureExtractor { 
 public:
-
     static const std::string name;        /**< Feature name: Zero Crossing Rate */
     static const std::string category;    /**< Feature category */
     static const std::string description; /**< Feature description */
@@ -23,11 +25,17 @@ public:
     void extract();
     void reset();
     void fetch(t_featureInputs in);
-    t_featureValue send();
+    t_featureBuf send();
 
 private:
+    void _reset_param();
+
+    t_featureValue prv_y;
+    t_featureValue crr_y;
     // params
-    int zero_crossings;
+    // int zero_crossings;
+
+    LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature

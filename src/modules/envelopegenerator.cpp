@@ -1,7 +1,7 @@
-#include "mapper.h"
+#include "envelopegenerator.h"
 using namespace zerr;
 
-void Mapper::initialize(std::string config_path){
+void EnvelopeGenerator::initialize(std::string config_path){
     // cold_down_time = 300;
     // jump_cnt = 0;
 
@@ -15,12 +15,12 @@ void Mapper::initialize(std::string config_path){
 }
 
 
-int Mapper::get_n_speaker(){
+int EnvelopeGenerator::get_n_speaker(){
     return speaker_array.get_n_speakers();
 }
 
 
-void Mapper::_init_mapping(int n){
+void EnvelopeGenerator::_init_mapping(int n){
     mapping.clear(); //clean up the mapping if not empty
     mapping.push_back(1); // index 0: virtual point to store the overall vol
     for (int i = 0; i < n; ++i){
@@ -29,7 +29,7 @@ void Mapper::_init_mapping(int n){
 }
 
 
-void Mapper::_print_mapping(std::string note){
+void EnvelopeGenerator::_print_mapping(std::string note){
     std::cout<<note<<": ";
     for (t_value v: mapping){
         std::cout<<v<<"  ";
@@ -38,18 +38,18 @@ void Mapper::_print_mapping(std::string note){
 }
 
 
-void Mapper::fetch(t_featureValueList in){
+void EnvelopeGenerator::fetch(t_featureValueList in){
     x = in;
 
-    volume  = ((x[0].normalized*70)>0.3)?0.3:(x[0].normalized*70);
-    trigger = ((x[1].normalized*70)>0.7)?1:0;
-    width   = x[2].normalized*70;
+    volume  = 0.0;
+    trigger = 0.0;
+    width   = 0.0;
 
     // std::cout<<x.size()<<" "<<volume<<" "<<trigger<<" "<<width<<" "<<std::endl;
 }
 
 
-void Mapper::process(){
+void EnvelopeGenerator::process(){
 
     if (trigger){ 
         curr_idx = speaker_array.get_random_speakers(0, 1)[0];
@@ -61,7 +61,7 @@ void Mapper::process(){
 }
 
 
-void Mapper::_update_mapping(){
+void EnvelopeGenerator::_update_mapping(){
 
     std::fill(mapping.begin(), mapping.end(), 0.0f);
 
@@ -76,7 +76,7 @@ void Mapper::_update_mapping(){
     }
 }
 
-std::vector<t_value> Mapper::send(){
+std::vector<t_value> EnvelopeGenerator::send(){
 
     // for (auto sample:mapping){
     //     std::cout<<sample<<" ";
@@ -87,7 +87,7 @@ std::vector<t_value> Mapper::send(){
 }
 
 
-t_value Mapper::_calculate_normal_distribution(t_value x, t_value alpha) {
+t_value EnvelopeGenerator::_calculate_normal_distribution(t_value x, t_value alpha) {
     t_value coefficient = 1.0 / (alpha * std::sqrt(2 * M_PI));
     t_value exponent = -0.5 * std::pow((x / alpha), 2);
     t_value value = coefficient * std::exp(exponent);

@@ -1,0 +1,73 @@
+speakers:
+  1:
+    x: 6.3
+    y: 6.7
+    z: 7.7
+    directness: 1.0
+    connected: []
+  2:
+    x: 5.4
+    y: 2.5
+    z: 5.7
+    directness: 1.0
+    connected: []
+  3:
+    x: 4.7
+    y: 2.2
+    z: 2.1
+    directness: 1.0
+    connected: []
+  4:
+    x: 2.5
+    y: 3.3
+    z: 3.4
+    directness: 1.0
+    connected: []
+  5:
+    x: 5.2
+    y: 5.8
+    z: 2.1
+    directness: 1.0
+    connected: []
+  6:
+    x: 5.5
+    y: 3.2
+    z: 6.5
+    directness: 1.0
+    connected: []
+  7:
+    x: 6.1
+    y: 6.4
+    z: 5.4
+    directness: 1.0
+    connected: []
+  8:
+    x: 6.5
+    y: 3.6
+    z: 7.3
+    directness: 1.0
+    connected: []
+  9:
+    x: 5.3
+    y: 7.8
+    z: 7.4
+    directness: 1.0
+    connected: []
+  10:
+    x: 6.9
+    y: 6.1
+    z: 2.4
+    directness: 1.0
+    connected: []
+  11:
+    x: 5.0
+    y: 7.4
+    z: 2.3
+    directness: 1.0
+    connected: []
+  12:
+    x: 2.8
+    y: 6.7
+    z: 2.6
+    directness: 1.0
+    connected: []

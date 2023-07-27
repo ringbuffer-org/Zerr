@@ -1,21 +1,20 @@
-#ifndef CENTROID_H
-#define CENTROID_H
+#ifndef ZEROCROSSINGS_H
+#define ZEROCROSSINGS_H
 
 #include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
-#include "linearinterpolator.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Spectral Centroid algorithm
+* ZeroCrossings algorithm
 */
-class Centroid : public FeatureExtractor { 
+class ZeroCrossings : public FeatureExtractor { 
 public:
-    static const std::string name; 
+    static const std::string name;
     static const std::string category;
-    static const std::string description; 
+    static const std::string description;
 
     std::string get_name(){return name;}
     std::string get_category(){return category;}
@@ -29,15 +28,11 @@ public:
 
 private:
     void _reset_param();
+    bool _isZeroCrossing(t_sample first, t_sample second);
 
-    t_featureValue prv_y;
-    t_featureValue crr_y;
-
-    double freq_max;
-
-    LinearInterpolator linear_interpolator;
+    t_sample last_sample;
 };
 
 } //namespace feature
 } //namespace zerr
-#endif // CENTROID_H
+#endif // ZEROCROSSINGS_H

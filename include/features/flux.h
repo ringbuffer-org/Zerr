@@ -4,11 +4,12 @@
 #include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
+#include "linearinterpolator.h"
 
 namespace zerr {
 namespace feature{
 /**
-* Spectrum Centroid algorithm
+* Spectrum Flux algorithm
 */
 class Flux : public FeatureExtractor {
 public:
@@ -24,12 +25,16 @@ public:
     void extract();
     void reset();
     void fetch(t_featureInputs in);
-    t_featureValue send();
+    t_featureBuf send();
 
 private:
-    t_samples     pre_x; //input
     void _reset_param();
 
+    t_samples      prv_x; 
+    t_featureValue prv_y;
+    t_featureValue crr_y;
+
+    LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature

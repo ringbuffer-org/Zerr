@@ -1,5 +1,5 @@
-#ifndef CENTROID_H
-#define CENTROID_H
+#ifndef CREST_H
+#define CREST_H
 
 #include "utils.h"
 #include "configs.h"
@@ -9,13 +9,13 @@
 namespace zerr {
 namespace feature{
 /**
-* Spectral Centroid algorithm
+* Crest algorithm
 */
-class Centroid : public FeatureExtractor { 
+class CrestFactor : public FeatureExtractor { 
 public:
-    static const std::string name; 
+    static const std::string name;
     static const std::string category;
-    static const std::string description; 
+    static const std::string description;
 
     std::string get_name(){return name;}
     std::string get_category(){return category;}
@@ -33,11 +33,9 @@ private:
     t_featureValue prv_y;
     t_featureValue crr_y;
 
-    double freq_max;
-
     LinearInterpolator linear_interpolator;
 };
 
 } //namespace feature
 } //namespace zerr
-#endif // CENTROID_H
+#endif // CREST_H
