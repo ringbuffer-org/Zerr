@@ -1,27 +1,34 @@
 #include "envelopegenerator.h"
 using namespace zerr;
 
-void EnvelopeGenerator::initialize(std::string config_path){
-    // cold_down_time = 300;
-    // jump_cnt = 0;
+EnvelopeGenerator::EnvelopeGenerator(std::string spkr_cfg, std::string mode){
+    this->speaker_config = spkr_cfg;
+    this->mode = mode;
 
-    speaker_array.initialize(config_path);
-    int n = speaker_array.get_n_speakers();
-    _init_mapping(n);
-    std::vector<int> tmp;
-    tmp = speaker_array.get_random_speakers(0, 1);
-    curr_idx = tmp[0];
-    _update_mapping();
+    speaker_manager = new SpeakerManager(this->speaker_config);
+}
+
+bool EnvelopeGenerator::initialize(){
+    if (!speaker_manager->initialize()) return false;
+
+
+
+    // int n = speaker_manager.get_n_unmasked_speakers();
+    // _init_mapping(n);
+    // std::vector<int> tmp;
+    // tmp = speaker_manager.get_random_speakers(0, 1);
+    // curr_idx = tmp[0];
+    // _update_mapping();
 }
 
 
-int EnvelopeGenerator::get_n_speaker(){
-    return speaker_array.get_n_speakers();
-}
+// int EnvelopeGenerator::get_n_speaker(){
+//     return speaker_manager.get_n_speakers();
+// }
 
 
 void EnvelopeGenerator::_init_mapping(int n){
-    mapping.clear(); //clean up the mapping if not empty
+    mapping.clear(); 
     mapping.push_back(1); // index 0: virtual point to store the overall vol
     for (int i = 0; i < n; ++i){
         mapping.push_back(0);
@@ -29,61 +36,38 @@ void EnvelopeGenerator::_init_mapping(int n){
 }
 
 
-void EnvelopeGenerator::_print_mapping(std::string note){
-    std::cout<<note<<": ";
-    for (t_value v: mapping){
-        std::cout<<v<<"  ";
-    }
-    std::cout<<std::endl;
-}
-
-
 void EnvelopeGenerator::fetch(t_featureValueList in){
     x = in;
-
-    volume  = 0.0;
-    trigger = 0.0;
-    width   = 0.0;
-
-    // std::cout<<x.size()<<" "<<volume<<" "<<trigger<<" "<<width<<" "<<std::endl;
 }
 
 
 void EnvelopeGenerator::process(){
+    
+    // if (trigger){ 
+    //     curr_idx = speaker_manager.get_random_speakers(0, 1)[0];
+    // }
 
-    if (trigger){ 
-        curr_idx = speaker_array.get_random_speakers(0, 1)[0];
-        // jump_cnt = cold_down_time;
-    }
-    // if (jump_cnt!=0) jump_cnt--;
-
-    _update_mapping();
+    // _update_mapping();
 }
 
 
 void EnvelopeGenerator::_update_mapping(){
 
-    std::fill(mapping.begin(), mapping.end(), 0.0f);
+    // std::fill(mapping.begin(), mapping.end(), 0.0f);
 
-    std::vector<t_value> distances = speaker_array.get_distance_vector(curr_idx);
+    // std::vector<t_value> distances = speaker_manager.get_distance_vector(curr_idx);
     
-    mapping[0] = volume;        // index 0: overall valume
+    // mapping[0] = volume;        // index 0: overall valume
 
-    t_value max_val = _calculate_normal_distribution(0, width);
+    // t_value max_val = _calculate_normal_distribution(0, width);
 
-    for (int i = 1; i < mapping.size(); ++i){
-        mapping[i] = _calculate_normal_distribution(distances[i-1], 1)/max_val; // current activated index
-    }
+    // for (int i = 1; i < mapping.size(); ++i){
+    //     mapping[i] = _calculate_normal_distribution(distances[i-1], 1)/max_val; // current activated index
+    // }
 }
 
-std::vector<t_value> EnvelopeGenerator::send(){
-
-    // for (auto sample:mapping){
-    //     std::cout<<sample<<" ";
-    // }
-    // std::cout<<std::endl;
-
-    return mapping;
+t_blockOut EnvelopeGenerator::send(){
+    // return mapping;
 }
 
 

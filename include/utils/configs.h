@@ -1,8 +1,8 @@
 #ifndef CONFIGS_H
 #define CONFIGS_H
 
-// Macros
-#define TESTMODE       /**< Print log info when TESTMODE Macro defined */
+#define TESTMODE       /**< Print log when TESTMODE Macro defined */
+#define PUREDATA       /**< Include Puredata specified functions  */
 
 #define PI 3.14159265
 #define AUDIO_BUFFER_SIZE 1024 

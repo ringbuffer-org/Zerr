@@ -1,0 +1,50 @@
+standard:
+  1:
+    position:
+      cartesian:
+      x: 3.0
+      y: 1.7
+      z: 0.0
+  2:
+    position:
+      cartesian:
+      x: 1.7
+      y: 1.7
+      z: 1.7
+  3:
+    position:
+      cartesian:
+      x: 0.0
+      y: 1.7
+      z: -3.0
+  4:
+    position:
+      cartesian:
+      x: 0.0
+      y: 1.7
+      z: 1.7
+  5:
+    position:
+      cartesian:
+      x: 0.0
+      y: 1.7
+      z: 1.7
+  6:
+    position:
+      cartesian:
+      x: 0.0
+      y: 1.7
+      z: 1.7
+  7:
+    position:
+      cartesian:
+      x: 0.0
+      y: 1.7
+      z: 1.7
+  8:
+    position:
+      cartesian:
+      x: 0.0
+      y: 1.7
+      z: 1.7
+

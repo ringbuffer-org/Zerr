@@ -9,9 +9,3 @@
  */
 #pragma once
 #include <stddef.h>
-
-
-typedef struct {
-    size_t sample_rate;
-    size_t block_size;
-}t_systemConfigs;

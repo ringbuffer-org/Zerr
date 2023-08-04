@@ -1,39 +1,40 @@
 #include "zerr_envelope_generator.h"
 
-#include <stdlib.h>
 
 
-ZerrEnvelopeGenerator::ZerrEnvelopeGenerator(zerr::t_systemConfigs sys_cnfg, std::string spkrCfgFile): input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)){
-    spkr_cfg = spkrCfgFile;
+ZerrEnvelopeGenerator::ZerrEnvelopeGenerator(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile): 
+                        input_buffer(n_inlet, std::vector<double>(systemCfgs.block_size, 0.0f)){
+    this->system_configs = systemCfgs;
+    this->speaker_config = spkrCfgFile;
+    this->selection_mode = selectionMode;
 
-    envelope_generator = new zerr::EnvelopeGenerator();
-
-    system_configs.sample_rate = sys_cnfg.sample_rate;
-    system_configs.block_size  = sys_cnfg.block_size;
+    envelope_generator = new zerr::EnvelopeGenerator(speaker_config, selection_mode);
 }
  
 
-void ZerrEnvelopeGenerator::initialize(){
-
-    envelope_generator->initialize(spkr_cfg);
+bool ZerrEnvelopeGenerator::initialize(){
+    envelope_generator->initialize();
 
     // n_outlet = envelope_generator->get_n_speaker();
 
+
+    return true;
+
     // post(std::to_string(envelope_generator->get_n_speaker()).c_str());
 
-    input_buffer.resize(n_inlet, std::vector<double>(system_configs.block_size, 0.0f));
-    output_buffer.resize(n_outlet, std::vector<double>(system_configs.block_size, 0.0f));
+    // input_buffer.resize(n_inlet, std::vector<double>(system_configs.block_size, 0.0f));
+    // output_buffer.resize(n_outlet, std::vector<double>(system_configs.block_size, 0.0f));
 
-    in_ptr  = (float **) getbytes(n_inlet * sizeof(float **));
-    out_ptr = (float **) getbytes(n_outlet * sizeof(float **));
+    // in_ptr  = (float **) getbytes(n_inlet * sizeof(float **));
+    // out_ptr = (float **) getbytes(n_outlet * sizeof(float **));
 }
 
 
 void ZerrEnvelopeGenerator::perform(float **ports, int n_vec){
 
 
-    in_ptr  = (float **) &ports[0];
-    out_ptr = (float **) &ports[n_inlet];
+    // in_ptr  = (float **) &ports[0];
+    // out_ptr = (float **) &ports[n_inlet];
 
     // for (int i = 0; i < n_inlet; i++) {
     //     for (int j = 0; j < n_vec; j++) {
@@ -65,5 +66,5 @@ int ZerrEnvelopeGenerator::get_port_count(){
 
 
 ZerrEnvelopeGenerator::~ZerrEnvelopeGenerator(){
-    // delete envelope_generator;
+    delete envelope_generator;
 }

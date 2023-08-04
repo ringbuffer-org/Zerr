@@ -2,8 +2,8 @@
  * @file zerr_envelope_generator_tilde.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief zerr_envelope_generator~ Pure Data External
- * @version 0.4
- * @date 2023-07-27
+ * @version 0.5
+ * @date 2023-08-02
  * 
  * @copyright Copyright (c) 2023
  */
@@ -12,6 +12,7 @@
 #include "m_pd.h" //PureData APIs
 
 #include "zerr_envelope_generator.h" 
+#include "configs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,26 +25,25 @@ extern "C" {
  * This is structure of zerr_envelope_generator outlets for dynamic outlet creating
  */
 typedef struct zerrout {
-    // t_atomtype u_type;
     t_outlet *u_outlet;
 } t_zerrout;
-
 
 /**
  * @struct zerr_envelope_generator_tilde
  * @brief the structure of pure data external. This is the main pure data interface
  */
 typedef struct {
-    t_object  x_obj;    /**< parent Pure Data object */
-    t_float   *f;       /**< fallback field for the main signal inlet */
+    t_object  x_obj; /**< parent Pure Data object */
+    t_float   *f;    /**< fallback field for the main signal inlet */
 
-    t_inlet *in2;
-    t_inlet *in3;
+    //t_inlet *main_inlet; /The main inlet is created by PD automatically
+    t_inlet *spread_inlet; /**< inlet to receive spread control signal */
+    t_inlet *volume_inlet; /**< inlet to receive volume control signal */
 
-    t_int     n_outlet; /**< number of zerr_envelope_generator outlets */
-    t_zerrout *x_vec;   /**< pointer to zerr_envelope_generator outlets structure */
+    t_int      n_outlet; /**< number of the object outlets */
+    t_zerrout  *x_vec;   /**< pointer to the outlets structure */
 
-    ZerrEnvelopeGenerator      *z;       /**< pointer to the zerr_envelope_generator object */
+    ZerrEnvelopeGenerator *z;       /**< zerr_envelope_generator object */
 } zerr_envelope_generator_tilde;
 
 /**

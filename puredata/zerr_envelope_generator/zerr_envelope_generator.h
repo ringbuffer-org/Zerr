@@ -8,57 +8,56 @@
  * @copyright Copyright (c) 2023
  */
 #pragma once
-
-
-// dependencies
-#include "utils.h"
+// standard 
+#include <stdlib.h>
+// utils
 #include "types.h"
+#include "utils.h"
 #include "ringbuffer.h"
-
 // modules
 #include "envelopegenerator.h"
 
-#include "m_pd.h" // for testing
-
-
 class ZerrEnvelopeGenerator{
 public:
-    int n_outlet;
-    int n_inlet=3;
+    const int n_inlet = 3; /**< number of inlets: main(1)/spread(2)/valume(3) */
+    int n_outlet;          /**< number of outlets: assgined according to the speaker configuration*/
     /**
-    * create a new zerr_speaker_mapper instance 
+    * @brief create a new zerr_envelope_generator instance 
+    * @param systemCfgs puredata basic system configuration: sample_rate, block_size
+    * @param selectionMode the corresponding mode of the envelope generator to the control signal: trigger & trajectory
+    * @param spkrCfgFile path of the speaker array configuration
     */
-    ZerrEnvelopeGenerator(zerr::t_systemConfigs sys_cnfg, std::string spkrCfgFile);
+    ZerrEnvelopeGenerator(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile);
     /**
-    * initialize all zerr_speaker_mapper modules
+    * @brief initialize zerr_envelope_generator modules
+    * @return bool status of initialized or not
     */
-    void initialize();
+    bool initialize();
     /**
-    * process a block of samples
+    * @brief main callback function to perform process on buffer.
+    * @param ports pointers to the in/out ports(in/out share the same memory)
+    * @param n_vec actual audio vector size. Could be smaller than system block size
     */
     void perform(float **ports, int n_vec);
     /**
-    * return the total number of inlet plus outlet
-    * 
+    * @brief return the total number of inlet plus outlet
     */
     int get_port_count();
     /**
-    * free a zerr_speaker_mapper instance
+    * @brief free a zerr_envelope_generator instance
     */
     ~ZerrEnvelopeGenerator();
 
 private:
-    //basic config
-    zerr::t_systemConfigs system_configs;
+    zerr::t_systemConfigs system_configs;  /**< TODO */
 
-    std::vector<std::vector<double>> input_buffer;
-    std::vector<std::vector<double>> output_buffer;
-    float **in_ptr;
-    float **out_ptr;
+    std::vector<std::vector<double>> input_buffer;  /**< TODO */
+    std::vector<std::vector<double>> output_buffer; /**< TODO */
+    float **in_ptr;  /**< TODO */
+    float **out_ptr; /**< TODO */
 
-    // config path
-    std::string zerr_cfg;
-    std::string spkr_cfg;
+    std::string speaker_config;
+    std::string selection_mode;
 
     //module objects
     zerr::EnvelopeGenerator              *envelope_generator;

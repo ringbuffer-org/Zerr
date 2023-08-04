@@ -21,9 +21,10 @@ zerr_envelope_generator~.class.sources += zerr_envelope_generator.cpp
 
 # zerr_envelope_generator modules
 zerr_envelope_generator~.class.sources += ../../src/modules/envelopegenerator.cpp
-zerr_envelope_generator~.class.sources += ../../src/modules/speakerarray.cpp
+zerr_envelope_generator~.class.sources += ../../src/modules/speakermanager.cpp
 
 # zerr_envelope_generator utils
+zerr_envelope_generator~.class.sources += ../../src/utils/logger.cpp
 zerr_envelope_generator~.class.sources += ../../src/utils/utils.cpp
 zerr_envelope_generator~.class.sources += ../../src/utils/ringbuffer.cpp
 zerr_envelope_generator~.class.sources += ../../src/utils/linearinterpolator.cpp
