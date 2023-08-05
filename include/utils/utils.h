@@ -33,7 +33,20 @@ bool isEqualTo1(t_value value, t_value epsilon = std::numeric_limits<t_value>::e
 * @brief TODO
 */
 bool isEqualTo0(t_value value, t_value epsilon = std::numeric_limits<t_value>::epsilon());
+/**
+* @brief TODO
+*/
+// std::vector<t_sample>& operator+=(std::vector<t_sample>& lhs, const std::vector<t_sample>& rhs) {
+//     if (lhs.size() != rhs.size()) {
+//         throw std::runtime_error("Vector sizes must be equal for element-wise addition.");
+//     }
 
+//     for (size_t i = 0; i < lhs.size(); ++i) {
+//         lhs[i] += rhs[i];
+//     }
+
+//     return lhs;
+// }
 
 } // zerr
 #endif //UTILS_H
