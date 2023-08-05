@@ -25,8 +25,14 @@ std::string formatString(const char* format, ...) {
     return std::string(buffer.data());
 }
 
+
 bool isEqualTo1(t_value value, t_value epsilon) {
     return std::abs(value - 1.0) < epsilon;
+}
+
+
+bool isEqualTo0(t_value value, t_value epsilon) {
+    return std::abs(value) < epsilon;
 }
 
 } // zerr

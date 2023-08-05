@@ -1,9 +1,9 @@
 /**
  * @file speakermanager.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Implementation of Speaker & SpeakerManager Class
- * @version 0.4
- * @date 2023-07-27
+ * @brief  Speaker & SpeakerManager Class Implementation
+ * @version 0.5
+ * @date 2023-08-05
  * 
  * @copyright Copyright (c) 2023
  */

@@ -75,12 +75,14 @@ void EnvelopeGenerator::_process_trigger(){
         currIdx = speakerManager->get_indexs_by_trigger(inputBuffer[0][i], currIdx, triggerMode);
         channel = indexChannelLookup[currIdx];
         // logger->logDebug(formatString("EnvelopeGenerator::_process_trigger currIdx %d channel %d", currIdx, channel));
-        // outputBuffer[channel][i] = inputBuffer[2][i];
+        outputBuffer[channel][i] = inputBuffer[2][i];
 
         distances = speakerManager->get_distance_vector(currIdx);
-        maxVal = _calculate_normal_distribution(0, inputBuffer[1][i]);
+        // maxVal = _calculate_normal_distribution(0, inputBuffer[1][i]);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
-            outputBuffer[chnl][i] = _calculate_normal_distribution(distances[chnl], inputBuffer[1][i])/maxVal*inputBuffer[2][i]; // current activated index
+            if (chnl == channel) {continue;}
+            // outputBuffer[chnl][i] = _calculate_normal_distribution(distances[chnl], inputBuffer[1][i])/maxVal*inputBuffer[2][i]; // current activated index
+            outputBuffer[chnl][i] += _calculate_gain(distances[chnl], inputBuffer[1][i]) * inputBuffer[2][i]; // current activated index
         }
     }
 }
@@ -93,8 +95,6 @@ void EnvelopeGenerator::_process_trajectory(){
     t_pair speakerPair;
     t_pair channelPair;
 
-    // t_samples& trajectoryVal =  inputBuffer[2];
-    // t_samples& volume =  inputBuffer[2];
     t_samples& volume =  inputBuffer[2];
 
     t_value panRatio;
@@ -124,7 +124,7 @@ t_blockOuts EnvelopeGenerator::send(){
     return outputBuffer;
 }
 
-// TODO: Adjust the parameter
+
 t_value EnvelopeGenerator::_calculate_normal_distribution(t_value x, t_value alpha) {
     t_value coefficient = 1.0 / (alpha * std::sqrt(2 * M_PI));
     t_value exponent = -0.5 * std::pow((x / alpha), 2);
@@ -134,8 +134,12 @@ t_value EnvelopeGenerator::_calculate_normal_distribution(t_value x, t_value alp
 }
 
 
+t_value EnvelopeGenerator::_calculate_gain(t_value x, t_value theta) {
+    x = x * DISTANCE_SCALE;
 
+    t_value tmp = tan(theta*PI/2.0);
 
+    t_value gain = isEqualTo0(tmp, VOLUME_THRESHOLD)?0.0:1.0 - x/tan(theta*PI/2.0);
 
-
-
+    return gain<0.0?0.0:gain;
+}

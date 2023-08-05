@@ -59,21 +59,25 @@ public:
     * @param TODO
     */
     void set_current_speaker(t_index newIdx);
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
     void process();
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
     t_blockOuts send();
+
+
+
+
+
     void reset();
 
 private:
@@ -90,7 +94,6 @@ private:
 
     SpeakerManager        *speakerManager; /**< TODO */
     Logger                *logger;         /**< TODO */
-    
 
     std::map<t_index, int> indexChannelLookup;  /**< TODO */
     /**
@@ -114,28 +117,20 @@ private:
     * @param TODO
     */
     void _set_index_channel_lookup(t_indexs indexs);
-
-    
-
-
-
     /**
-    * 
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
     */
-    // std::vector<t_value> mapping; 
-    // void _init_mapping(int n);
-    // void _update_mapping();
-    // void _print_mapping(std::string note);
-    /**
-    * input control signal
-    */
-    // t_featureValueList x;
-    // t_value volume;
-    // t_value trigger;
-    // t_value floating;
-    // t_value width;
-
     t_value _calculate_normal_distribution(t_value x, t_value alpha);
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    t_value _calculate_gain(t_value x, t_value theta); 
 }; 
 
 } //namespace zerr

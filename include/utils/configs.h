@@ -12,6 +12,8 @@
 
 #define PI 3.14159265           /**< TODO  */
 #define AUDIO_BUFFER_SIZE 1024  /**< TODO  */
-#define VOLUME_THRESHOLD  0.01  /**< TODO  */
+#define VOLUME_THRESHOLD  1e-4  /**< TODO  */
+
+#define DISTANCE_SCALE    1e-1  /**< TODO  */
 
 #endif //CONFIGS_H

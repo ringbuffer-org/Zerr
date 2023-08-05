@@ -29,7 +29,10 @@ std::string formatString(const char* format, ...);
 * @brief TODO
 */
 bool isEqualTo1(t_value value, t_value epsilon = std::numeric_limits<t_value>::epsilon());
-
+/**
+* @brief TODO
+*/
+bool isEqualTo0(t_value value, t_value epsilon = std::numeric_limits<t_value>::epsilon());
 
 
 } // zerr
