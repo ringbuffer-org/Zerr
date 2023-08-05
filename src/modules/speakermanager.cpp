@@ -24,30 +24,30 @@ void Speaker::print_all(){
 
 
 void Speaker::_print_index(){
-    // std::string formated = formatString("Speaker ID: %d", index);
-    // logger->logInfo("formated");
-    
-    std::cout << "Speaker ID: " << index << "\n"; 
+    logger->logInfo(formatString("Speaker ID: %d", index));
 }
 
 
 void Speaker::_print_position(){
-    std::cout << "Cartesian Position: " << "\n"; 
-    std::cout  << "\t"<< "x: " << position.cartesian.x << "\n"; 
-    std::cout  << "\t"<< "y: " << position.cartesian.y << "\n";
-    std::cout  << "\t"<< "z: " << position.cartesian.z << "\n";
-
-    std::cout << "Spherical Position: " << "\n"; 
-    std::cout  << "\t"<< "azimuth:   " << position.spherical.azimuth << "\n"; 
-    std::cout  << "\t"<< "elevation: " << position.spherical.elevation << "\n";
-    std::cout  << "\t"<< "distance:  " << position.spherical.distance << "\n";
+    logger->logInfo("Cartesian Position: ");
+    logger->logInfo(formatString("    x: %.2f", position.cartesian.x));
+    logger->logInfo(formatString("    y: %.2f", position.cartesian.y));
+    logger->logInfo(formatString("    z: %.2f", position.cartesian.z));
+    logger->logInfo("Spherical Position: ");
+    logger->logInfo(formatString("    azimuth:   : %.2f", position.spherical.azimuth));
+    logger->logInfo(formatString("    elevation: : %.2f", position.spherical.elevation));
+    logger->logInfo(formatString("    distance:  : %.2f", position.spherical.distance));
 }
 
 
 void Speaker::_print_orientation(){
-    std::cout << "Orientation: " << "\n"; 
-    std::cout  << "\t"<< "yaw:   " << orientation.yaw  << "\n";
-    std::cout  << "\t"<< "pitch: " << orientation.pitch  << "\n";
+    // std::cout << "Orientation: " << "\n"; 
+    // std::cout  << "\t"<< "yaw:   " << orientation.yaw  << "\n";
+    // std::cout  << "\t"<< "pitch: " << orientation.pitch  << "\n";
+
+    logger->logInfo("Orientation: ");
+    logger->logInfo(formatString("    yaw:   : %.2f", orientation.yaw));
+    logger->logInfo(formatString("    pitch: : %.2f", orientation.pitch));
 }
 
 
@@ -88,72 +88,112 @@ bool SpeakerManager::initialize(){
 
         int index = key.as<int>(); // assign the key to speaker index
 
-        
         t_cartesian cartesian; // parse the position values in cartesian coordinate
         t_spherical spherical; // parse the position values in spherical coordinate
-        
-        if (value["position"]["cartesian"]) {
-            logger->logDebug("SpeakerManager::initialize cartesian in use");
-            // value["position"]["cartesian"]["x"].as<float>();
+
+        bool is_zero_cartesian = true;
+        bool is_zero_spherical = true;
+
+        if (value["position"]["cartesian"] && 
+                !value["position"]["cartesian"].IsNull()) {
             cartesian.x = value["position"]["cartesian"]["x"].as<t_value>();
             cartesian.y = value["position"]["cartesian"]["y"].as<t_value>();
             cartesian.z = value["position"]["cartesian"]["z"].as<t_value>();
+            is_zero_cartesian = false;
         }
 
-        // t_cartesian cartesian; // parse the position values in cartesian coordinate
-        // cartesian.x = value["position"]["cartesian"]["x"].as<t_value>();
-        // cartesian.y = value["position"]["cartesian"]["y"].as<t_value>();
-        // cartesian.z = value["position"]["cartesian"]["z"].as<t_value>();
+        if (value["position"]["spherical"] && 
+                !value["position"]["spherical"].IsNull()) {
+            spherical.azimuth   = value["position"]["spherical"]["azimuth"].as<t_value>();
+            spherical.elevation = value["position"]["spherical"]["elevation"].as<t_value>();
+            spherical.distance  = value["position"]["spherical"]["distance"].as<t_value>();
+            is_zero_spherical = false;
+        }
 
-        // t_spherical spherical; // parse the position values in spherical coordinate
-        // spherical.azimuth   = value["position"]["spherical"]["azimuth"].as<t_value>();
-        // spherical.elevation = value["position"]["spherical"]["elevation"].as<t_value>();
-        // spherical.distance  = value["position"]["spherical"]["distance"].as<t_value>();
+        // both cartesian and spherical in origin is not allowed
+        assert(!(is_zero_cartesian && is_zero_spherical));
+        // TODO: check if the given two types of coordinate the same
+        // if (is_zero_cartesian && is_zero_spherical) {check_coordinate_consistency(cartesian, spherical)} 
 
-        // // check if the cartesian coordinate in origin(not assigned)
-        // bool is_zero_cartesian = (cartesian.x==0.0 
-        //                        && cartesian.y==0.0 
-        //                        && cartesian.z==0.0); 
+        #ifdef TESTMODE
+        // logger->logDebug(formatString("is_zero_cartesian: %u", is_zero_cartesian));
+        // logger->logDebug(formatString("is_zero_spherical: %u", is_zero_spherical));
+        #endif //TESTMODE
 
-        // // check if the spherical coordinate in origin(not assigned)
-        // bool is_zero_spherical = (spherical.azimuth  ==0.0 
-        //                        && spherical.elevation==0.0 
-        //                        && spherical.distance ==0.0); 
-        // // both cartesian and spherical in origin is not allowed
-        // assert(!(is_zero_cartesian && is_zero_spherical));     
-        // // check if the given two types of coordinate the same
-        // // if (is_zero_cartesian && is_zero_spherical) {check_coordinate_consistency(cartesian, spherical)} 
+        cartesian = is_zero_cartesian?_spherical2cartesian(spherical):cartesian; // fill the cartesian if it's not assigned
+        spherical = is_zero_spherical?_cartesian2spherical(cartesian):spherical; // fill the spherical if it's not assigned
 
-        // #ifdef TESTMODE
-        // // std::cout<<"is_zero_spherical: "<<is_zero_spherical<<std::endl;
-        // // std::cout<<"is_zero_cartesian: "<<is_zero_cartesian<<std::endl;
-        // #endif //TESTMODE
+        t_position position;
+        position.cartesian = cartesian;
+        position.spherical = spherical;
 
-        // cartesian = is_zero_cartesian?_spherical2cartesian(spherical):cartesian; // fill the cartesian if it's not assigned
-        // spherical = is_zero_spherical?_cartesian2spherical(cartesian):spherical; // fill the spherical if it's not assigned
+        t_orientation orientation;
+        if (value["orientation"] && 
+                !value["orientation"].IsNull()) {
+            orientation.yaw   = value["orientation"]["yaw"].as<t_value>();
+            orientation.pitch = value["orientation"]["pitch"].as<t_value>();
+        }else { // TODO: keep the orientation structure
+            orientation.yaw = 0.0;
+            orientation.pitch = 0.0;
+        }
 
-        // t_position position;
-        // position.cartesian = cartesian;
-        // position.spherical = spherical;
+        // Setup Speaker structure
+        Speaker s(index, position, orientation);
 
-        // t_orientation orientation;
-        // orientation.yaw   = value["orientation"]["yaw"].as<t_value>();
-        // orientation.pitch = value["orientation"]["pitch"].as<t_value>();
+        #ifdef TESTMODE
+        s.print_all();
+        #endif //TESTMODE
 
-        // // Setup Speaker structure
-        // Speaker s(index, position, orientation);
+        speakers.insert({index, s});
 
-        // #ifdef TESTMODE
-        // s.print_all();
-        // #endif //TESTMODE
+        unmasked.push_back(index);
+    }
+    _init_distance_matrix();
 
-        // // indexs.push_back(index);
-        // speakers.insert({index, s});
+    // initialize the specific configs
+    // every speaker is unmasked when at initialize point
+    #ifdef TESTMODE
+    // for (size_t i = 0; i < unmasked.size(); ++i) {
+    //     logger->logInfo(formatString("unmasked %u %d", i, unmasked[i]));
+    // }
+    #endif //TESTMODE
 
-        // cnt++;
+    for (int i = 0; i < unmasked.size(); ++i){
+        subindex.push_back(unmasked[i]);
+    }
+    std::sort(subindex.begin(), subindex.end());
+
+    #ifdef TESTMODE
+    // for (size_t i = 0; i < subindex.size(); ++i) {
+    //     logger->logInfo(formatString("subindex %u %d", i, subindex[i]));
+    // }
+    #endif //TESTMODE
+
+
+
+    // topology_matrix
+    for (size_t i = 0; i < unmasked.size(); ++i){
+        t_indexs tmp_idx = unmasked; // deepcopy
+        topology_matrix[unmasked[i]] = tmp_idx;
     }
 
-    // n_speakers = cnt;
+    #ifdef TESTMODE
+    // logger->logInfo("---------------------");
+    // logger->logInfo("topology_matrix------");
+    // for (const auto& maps : topology_matrix) {
+    //     t_index  key   = maps.first;
+    //     t_indexs value = maps.second;
+    //     logger->logInfo(formatString("ID: %d", key));
+    //     logger->logInfo("  Connected:");
+    //     for (int i = 0; i < value.size(); ++i){
+    //         logger->logInfo(formatString("  %d", value[i]));
+    //      } 
+    // }
+    #endif //TESTMODE
+
+
+
+
 
     //load specific configuration of the active sub speaker array
     // YAML::Node specificNodes = speaker_config["specific"][mode];
@@ -183,37 +223,25 @@ bool SpeakerManager::initialize(){
     //     topology_matrix[key.as<t_index>()] = tmp_idx;
     // }
 
-    // #ifdef TESTMODE
-    // std::cout << "---------------------" << "\n"; 
-    // std::cout << "topology_matrix------" << "\n"; 
-    // for (const auto& maps : topology_matrix) {
-    //     t_index  key   = maps.first;
-    //     t_indexs value = maps.second;
-    //     std::cout << "ID: " << key << std::endl;
-    //     std::cout << "  Connected: ";
-    //     for (int i = 0; i < value.size(); ++i){
-    //          std::cout << value[i] << " ";
-    //      } 
-    //     std::cout << std::endl;
-    // }
-    // #endif //TESTMODE
-
     // set the speaker manager as initialized
-    initialized=true;
+    // initialized=true;
 
-    return initialized;
+    return true;
 }
 
 
 size_t SpeakerManager::get_n_all_speakers() {
-    // _is_initialized();
     return speakers.size();
 }
 
 
 size_t SpeakerManager::get_n_unmasked_speakers() {
-    // _is_initialized();
     return unmasked.size();
+}
+
+
+t_indexs SpeakerManager::get_unmasked_indexs(){
+    return unmasked;
 }
 
 
@@ -238,6 +266,16 @@ t_pair SpeakerManager::get_indexs_by_trajectory(t_value trajectory_val){
     t_index upper = subindex[std::ceil(scaled)];
 
     return std::make_pair(lower, upper);
+}
+
+
+t_value SpeakerManager::get_panning_ratio(t_value trajectory_val){
+    trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
+    trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
+
+    t_value scaled = trajectory_val * (subindex.size() - 1);
+
+    return (scaled - std::floor(scaled)) / (std::ceil(scaled) - std::floor(scaled));
 }
 
 
@@ -286,10 +324,8 @@ t_pair SpeakerManager::get_indexs_by_geometry(std::vector<t_value> pos, std::vec
 
 
 t_index SpeakerManager::get_indexs_by_trigger(t_value trigger, t_index curr_spkr, int mode){
-
-    assert(trigger<0.01 || trigger>0.99);
-    // not a positive trigger, just return the original one
-    if (trigger<0.01) return curr_spkr;
+    // just return the original one when trigger doesn't close to 1.0
+    if (!isEqualTo1(trigger, TRIGGER_THRESHOLD)) return curr_spkr;
     // load all connected speakers from the topology matrix
     t_indexs candidates = topology_matrix[curr_spkr];
     // if only one speaker connected to the current one, just return it
@@ -298,17 +334,14 @@ t_index SpeakerManager::get_indexs_by_trigger(t_value trigger, t_index curr_spkr
     t_index selected;
     int n_candidates = candidates.size();
     switch(mode){
-        case 0: //"Random"
+        case 0: // "Random"
             selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
             break;
-        case 1: //"Nearest"
+        case 1: // "Nearest"
             selected = _find_nearest(curr_spkr, candidates);
             break;
-        case 2: //"All"
-            selected = candidates[0];
-            break;
         default:
-            throw std::invalid_argument( "Unknow speaker selecting mode.");
+            throw std::invalid_argument( "Unknow trigger mode.");
     }
 
     return selected;
@@ -316,13 +349,12 @@ t_index SpeakerManager::get_indexs_by_trigger(t_value trigger, t_index curr_spkr
 
 
 std::vector<t_value> SpeakerManager::get_distance_vector(int spkr_idx){
-    return distance_matrix[spkr_idx-1]; // speaker index starts from 1
+    return distance_matrix[spkr_idx]; 
 }
 
 
-void SpeakerManager::_is_initialized() {
-    assert(initialized==true 
-        && "ERROR: SpeakerManager isn't initialized");
+t_index SpeakerManager::get_random_index(){
+    return unmasked[_get_random_indexs(unmasked.size(), 1)[0]];
 }
 
 

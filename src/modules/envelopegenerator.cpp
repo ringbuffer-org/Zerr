@@ -1,76 +1,130 @@
 #include "envelopegenerator.h"
 using namespace zerr;
 
-EnvelopeGenerator::EnvelopeGenerator(std::string spkr_cfg, std::string mode){
-    this->speaker_config = spkr_cfg;
-    this->mode = mode;
 
-    speaker_manager = new SpeakerManager(this->speaker_config);
+EnvelopeGenerator::EnvelopeGenerator(t_systemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode){
+    this->systemCfgs    = systemCfgs;
+    this->spkrCfgFile   = spkrCfgFile;
+    this->selectionMode = selectionMode;
+
+    speakerManager = new SpeakerManager(this->spkrCfgFile);
+
+    logger = new Logger();
+    #ifdef TESTMODE
+    logger->setLogLevel(LogLevel::INFO);
+    #endif //TESTMODE
 }
 
 bool EnvelopeGenerator::initialize(){
-    if (!speaker_manager->initialize()) return false;
+    if (!speakerManager->initialize()) return false;
 
+    int numOutlet = get_n_speaker();
 
+    inputBuffer.resize(numInlet,   t_samples(systemCfgs.block_size, 0.0f));
+    outputBuffer.resize(numOutlet, t_samples(systemCfgs.block_size, 0.0f));
 
-    // int n = speaker_manager.get_n_unmasked_speakers();
-    // _init_mapping(n);
-    // std::vector<int> tmp;
-    // tmp = speaker_manager.get_random_speakers(0, 1);
-    // curr_idx = tmp[0];
-    // _update_mapping();
-}
+    _set_index_channel_lookup(speakerManager->get_unmasked_indexs());
 
+    currIdx = speakerManager->get_random_index();
+    #ifdef TESTMODE
+    logger->logDebug(formatString("EnvelopeGenerator::initialize currIdx %d", currIdx));
+    #endif //TESTMODE
 
-// int EnvelopeGenerator::get_n_speaker(){
-//     return speaker_manager.get_n_speakers();
-// }
-
-
-void EnvelopeGenerator::_init_mapping(int n){
-    mapping.clear(); 
-    mapping.push_back(1); // index 0: virtual point to store the overall vol
-    for (int i = 0; i < n; ++i){
-        mapping.push_back(0);
+    if (selectionMode!="trigger" && selectionMode!="trajectory"){ 
+        logger->logError("EnvelopeGenerator::initialize Unknown selection mode: " + selectionMode);
+        return false;
     }
+
+    triggerMode = 0; // Random
+
+    return true;
 }
 
 
-void EnvelopeGenerator::fetch(t_featureValueList in){
-    x = in;
+void EnvelopeGenerator::fetch(t_blockIns in){
+    inputBuffer = in;
+}
+
+
+int EnvelopeGenerator::get_n_speaker(){
+    return speakerManager->get_n_unmasked_speakers();
+}
+
+
+void EnvelopeGenerator::set_current_speaker(t_index newIdx){
+    currIdx = newIdx;
 }
 
 
 void EnvelopeGenerator::process(){
-    
-    // if (trigger){ 
-    //     curr_idx = speaker_manager.get_random_speakers(0, 1)[0];
-    // }
+    if (selectionMode=="trigger"){_process_trigger();}
+    if (selectionMode=="trajectory"){_process_trajectory();}
+}
 
-    // _update_mapping();
+//TODO: Clean this up
+void EnvelopeGenerator::_process_trigger(){
+    int channel;
+    for (auto& buffer : outputBuffer) {
+        buffer.assign(buffer.size(), 0.0f);
+    }
+
+    std::vector<t_value> distances;
+    t_value maxVal;
+
+    for (size_t i = 0; i < inputBuffer[0].size(); ++i){
+        currIdx = speakerManager->get_indexs_by_trigger(inputBuffer[0][i], currIdx, triggerMode);
+        channel = indexChannelLookup[currIdx];
+        // logger->logDebug(formatString("EnvelopeGenerator::_process_trigger currIdx %d channel %d", currIdx, channel));
+        // outputBuffer[channel][i] = inputBuffer[2][i];
+
+        distances = speakerManager->get_distance_vector(currIdx);
+        maxVal = _calculate_normal_distribution(0, inputBuffer[1][i]);
+        for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
+            outputBuffer[chnl][i] = _calculate_normal_distribution(distances[chnl], inputBuffer[1][i])/maxVal*inputBuffer[2][i]; // current activated index
+        }
+    }
+}
+
+//TODO: Clean this up
+void EnvelopeGenerator::_process_trajectory(){
+    for (auto& buffer : outputBuffer) {
+        buffer.assign(buffer.size(), 0.0f);
+    }
+    t_pair speakerPair;
+    t_pair channelPair;
+
+    // t_samples& trajectoryVal =  inputBuffer[2];
+    // t_samples& volume =  inputBuffer[2];
+    t_samples& volume =  inputBuffer[2];
+
+    t_value panRatio;
+    for (size_t i = 0; i < inputBuffer[0].size(); ++i){
+        speakerPair = speakerManager->get_indexs_by_trajectory(inputBuffer[0][i]);
+        channelPair.first  = indexChannelLookup[speakerPair.first];
+        channelPair.second = indexChannelLookup[speakerPair.second];
+        if (speakerPair.first == speakerPair.second) {
+            outputBuffer[channelPair.first][i] = volume[i];
+        } else { // linear panning TODO: change to crossfade
+            panRatio = speakerManager->get_panning_ratio(inputBuffer[0][i]);
+            outputBuffer[channelPair.first][i]  = volume[i] * (1 - panRatio);
+            outputBuffer[channelPair.second][i] = volume[i] * panRatio;
+        }
+    }
 }
 
 
-void EnvelopeGenerator::_update_mapping(){
-
-    // std::fill(mapping.begin(), mapping.end(), 0.0f);
-
-    // std::vector<t_value> distances = speaker_manager.get_distance_vector(curr_idx);
-    
-    // mapping[0] = volume;        // index 0: overall valume
-
-    // t_value max_val = _calculate_normal_distribution(0, width);
-
-    // for (int i = 1; i < mapping.size(); ++i){
-    //     mapping[i] = _calculate_normal_distribution(distances[i-1], 1)/max_val; // current activated index
-    // }
-}
-
-t_blockOut EnvelopeGenerator::send(){
-    // return mapping;
+void EnvelopeGenerator::_set_index_channel_lookup(t_indexs indexs){
+    for (size_t i = 0; i < indexs.size(); ++i){
+        indexChannelLookup[indexs[i]] = i;
+    }
 }
 
 
+t_blockOuts EnvelopeGenerator::send(){
+    return outputBuffer;
+}
+
+// TODO: Adjust the parameter
 t_value EnvelopeGenerator::_calculate_normal_distribution(t_value x, t_value alpha) {
     t_value coefficient = 1.0 / (alpha * std::sqrt(2 * M_PI));
     t_value exponent = -0.5 * std::pow((x / alpha), 2);
@@ -78,3 +132,10 @@ t_value EnvelopeGenerator::_calculate_normal_distribution(t_value x, t_value alp
     if (value < VOLUME_THRESHOLD) {value = 0;}
     return value;
 }
+
+
+
+
+
+
+

@@ -2,7 +2,7 @@
 
 namespace zerr{
 
-std::string zerr::formatString(const char* format, ...) {
+std::string formatString(const char* format, ...) {
     va_list args;
     va_start(args, format);
 
@@ -23,6 +23,10 @@ std::string zerr::formatString(const char* format, ...) {
     va_end(args);
 
     return std::string(buffer.data());
+}
+
+bool isEqualTo1(t_value value, t_value epsilon) {
+    return std::abs(value - 1.0) < epsilon;
 }
 
 } // zerr

@@ -38,9 +38,13 @@ void *zerr_envelope_generator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     // #endif //TESTMODE 
     char spkrCfgFile[MAXPDSTRING];
     strcat(spkrCfgFile, dirResult);
-    strcat(spkrCfgFile, "/"); // TODO: use "/" could cause trouble in Windows system
+    #ifdef WINDOWS
+    strcat(spkrCfgFile, "\\"); 
+    #else
+    strcat(spkrCfgFile, "/"); 
+    #endif //WINDOWS
     strcat(spkrCfgFile, nameResult);
-    
+
     x->z = new ZerrEnvelopeGenerator(systemCfgs, selectionMode, spkrCfgFile); 
     if (!x->z) return NULL;
 
@@ -51,8 +55,7 @@ void *zerr_envelope_generator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     x->volume_inlet = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
 
     // create outlets
-    // x->n_outlet = x->z->n_outlet; // get the number of outlets
-    x->n_outlet = 8; // get the number of outlets
+    x->n_outlet = x->z->numOutlet; // get the number of outlets
     x->x_vec = (t_zerrout *)getbytes(x->n_outlet * sizeof(*x->x_vec));
     t_zerrout *u;
     int i;

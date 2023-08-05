@@ -12,6 +12,8 @@
 
 // #include "utils.h"
 #include "types.h"
+#include "logger.h"
+
 #include "speakermanager.h"
 
 namespace zerr {
@@ -20,49 +22,118 @@ namespace zerr {
 */
 class EnvelopeGenerator { 
 public:
-    EnvelopeGenerator(std::string spkr_cfg, std::string mode);
-
-
-
-
-
-
-
+    const int numInlet = 3; /**< number of inlets: main(1)/spread(2)/valume(3) */
+    int numOutlet;          /**< number of outlets: assgined according to the speaker configuration*/
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    EnvelopeGenerator(t_systemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode);
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
     bool initialize();
-    void fetch(t_featureValueList in);
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    void fetch(t_blockIns in);
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    int get_n_speaker();
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    void set_current_speaker(t_index newIdx);
+
+
+
+
+
+
+
+
+
+
+
+
+
     void process();
-    t_blockOut send();
+    t_blockOuts send();
     void reset();
 
 private:
-    SpeakerManager *speaker_manager; /**< SpeakerManager object inside */
-    std::string speaker_config;
-    std::string mode;
+    t_index               currIdx;         /**< TODO */
 
+    t_systemConfigs       systemCfgs;      /**< TODO */
 
+    std::string           spkrCfgFile;     /**< TODO */
+    std::string           selectionMode;   /**< TODO */
+    int                   triggerMode;     /**< TODO */
 
+    t_blockIns            inputBuffer;     /**< TODO */
+    t_blockOuts           outputBuffer;    /**< TODO */
 
+    SpeakerManager        *speakerManager; /**< TODO */
+    Logger                *logger;         /**< TODO */
+    
 
+    std::map<t_index, int> indexChannelLookup;  /**< TODO */
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    void _process_trigger();
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    void _process_trajectory();
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    void _set_index_channel_lookup(t_indexs indexs);
 
-
+    
 
 
 
     /**
     * 
     */
-    std::vector<t_value> mapping; 
-    void _init_mapping(int n);
-    void _update_mapping();
-    void _print_mapping(std::string note);
+    // std::vector<t_value> mapping; 
+    // void _init_mapping(int n);
+    // void _update_mapping();
+    // void _print_mapping(std::string note);
     /**
     * input control signal
     */
-    t_featureValueList x;
-    t_value volume;
-    t_value trigger;
-    t_value floating;
-    t_value width;
+    // t_featureValueList x;
+    // t_value volume;
+    // t_value trigger;
+    // t_value floating;
+    // t_value width;
 
     t_value _calculate_normal_distribution(t_value x, t_value alpha);
 }; 

@@ -2,8 +2,8 @@
  * @file zerr_envelope_generator.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief EnvelopeGenerator Class Puredata Wrapper
- * @version 0.3
- * @date 2023-05-28
+ * @version 0.4
+ * @date 2023-08-04
  * 
  * @copyright Copyright (c) 2023
  */
@@ -14,13 +14,14 @@
 #include "types.h"
 #include "utils.h"
 #include "ringbuffer.h"
+#include "logger.h"
 // modules
 #include "envelopegenerator.h"
 
 class ZerrEnvelopeGenerator{
 public:
-    const int n_inlet = 3; /**< number of inlets: main(1)/spread(2)/valume(3) */
-    int n_outlet;          /**< number of outlets: assgined according to the speaker configuration*/
+    const int numInlet = 3; /**< number of inlets: main(1)/spread(2)/volume(3) */
+    int numOutlet;          /**< number of outlets: assgined according to the speaker configuration*/
     /**
     * @brief create a new zerr_envelope_generator instance 
     * @param systemCfgs puredata basic system configuration: sample_rate, block_size
@@ -41,6 +42,7 @@ public:
     void perform(float **ports, int n_vec);
     /**
     * @brief return the total number of inlet plus outlet
+    * @return TODO
     */
     int get_port_count();
     /**
@@ -49,18 +51,19 @@ public:
     ~ZerrEnvelopeGenerator();
 
 private:
-    zerr::t_systemConfigs system_configs;  /**< TODO */
+    zerr::t_systemConfigs systemCfgs;  /**< TODO */
 
-    std::vector<std::vector<double>> input_buffer;  /**< TODO */
-    std::vector<std::vector<double>> output_buffer; /**< TODO */
-    float **in_ptr;  /**< TODO */
-    float **out_ptr; /**< TODO */
+    zerr::t_blockIns  inputBuffer;  /**< TODO */
+    zerr::t_blockOuts outputBuffer; /**< TODO */
+    float **inPtr;                  /**< TODO */
+    float **outPtr;                 /**< TODO */
 
-    std::string speaker_config;
-    std::string selection_mode;
+    std::string spkrCfgFile;   /**< TODO */
+    std::string selectionMode; /**< TODO */
 
     //module objects
-    zerr::EnvelopeGenerator              *envelope_generator;
+    zerr::EnvelopeGenerator  *envelopeGenerator; /**< TODO */
+    zerr::Logger             *logger;            /**< TODO */
 };
 
 

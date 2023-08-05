@@ -7,7 +7,7 @@
 // #include <algorithm>
 // #include <math.h>
 // #include <unistd.h>
-// #include <limits>
+#include <limits>
 // #include <random>
 // #include <memory>
 // #include <chrono>
@@ -25,6 +25,11 @@ namespace zerr {
 * @brief EnvelopeGenerator generates evelope stream according to input control signal and the speaker array setups
 */
 std::string formatString(const char* format, ...);
+/**
+* @brief TODO
+*/
+bool isEqualTo1(t_value value, t_value epsilon = std::numeric_limits<t_value>::epsilon());
+
 
 
 } // zerr

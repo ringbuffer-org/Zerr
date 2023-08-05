@@ -2,69 +2,68 @@
 
 
 
-ZerrEnvelopeGenerator::ZerrEnvelopeGenerator(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile): 
-                        input_buffer(n_inlet, std::vector<double>(systemCfgs.block_size, 0.0f)){
-    this->system_configs = systemCfgs;
-    this->speaker_config = spkrCfgFile;
-    this->selection_mode = selectionMode;
+ZerrEnvelopeGenerator::ZerrEnvelopeGenerator(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile){
+    this->systemCfgs    = systemCfgs;
+    this->spkrCfgFile   = spkrCfgFile;
+    this->selectionMode = selectionMode;
 
-    envelope_generator = new zerr::EnvelopeGenerator(speaker_config, selection_mode);
+    envelopeGenerator = new zerr::EnvelopeGenerator(systemCfgs, spkrCfgFile, selectionMode);
+    logger = new zerr::Logger();
+    #ifdef TESTMODE
+    logger->setLogLevel(zerr::LogLevel::INFO);
+    #endif //TESTMODE
 }
  
 
 bool ZerrEnvelopeGenerator::initialize(){
-    envelope_generator->initialize();
+    if (!envelopeGenerator->initialize()) {return false;};
+    numOutlet = envelopeGenerator->get_n_speaker();
 
-    // n_outlet = envelope_generator->get_n_speaker();
+    inputBuffer.resize(numInlet,   zerr::t_samples(systemCfgs.block_size, 0.0f));
+    outputBuffer.resize(numOutlet, zerr::t_samples(systemCfgs.block_size, 0.0f));
 
+    inPtr  = (float **) getbytes(numInlet * sizeof(float **));
+    outPtr = (float **) getbytes(numOutlet * sizeof(float **));
 
+    logger->logInfo("ZerrEnvelopeGenerator::initialize initialized");
     return true;
-
-    // post(std::to_string(envelope_generator->get_n_speaker()).c_str());
-
-    // input_buffer.resize(n_inlet, std::vector<double>(system_configs.block_size, 0.0f));
-    // output_buffer.resize(n_outlet, std::vector<double>(system_configs.block_size, 0.0f));
-
-    // in_ptr  = (float **) getbytes(n_inlet * sizeof(float **));
-    // out_ptr = (float **) getbytes(n_outlet * sizeof(float **));
 }
 
 
-void ZerrEnvelopeGenerator::perform(float **ports, int n_vec){
+void ZerrEnvelopeGenerator::perform(float **ports, int blockSize){
+    inPtr  = (float **) &ports[0];
+    outPtr = (float **) &ports[numInlet];
 
+    for (int i = 0; i < numInlet; i++) {
+        for (int j = 0; j < blockSize; j++) {
+            inputBuffer[i][j] = inPtr[i][j];
+        }
+    }
 
-    // in_ptr  = (float **) &ports[0];
-    // out_ptr = (float **) &ports[n_inlet];
+    try {
+        envelopeGenerator->fetch(inputBuffer); 
+        envelopeGenerator->process();
+        outputBuffer = envelopeGenerator->send();
+    }
+    catch (...) {
+        // logger->logError("ZerrEnvelopeGenerator::perform process failed...");
+        return;
+    }
 
-    // for (int i = 0; i < n_inlet; i++) {
-    //     for (int j = 0; j < n_vec; j++) {
-    //         input_buffer[i][j] = in_ptr[i][j];
-    //     }
-    // }
-
-    // envelope_generator->fetch(input_buffer); //buggy
-    // envelope_generator->process();
-    // output_buffer = envelope_generator->send();
-// 
-    // for (int i = 0; i < n_outlet; i++) {
-    //     for (int j = 0; j < n_vec; j++) {
-    //         out_ptr[i][j] = output_buffer[i][j];
-    //     }
-    // }
-    // for (int i = 0; i < n_outlet; i++) {
-    //     for (int j = 0; j < n_vec; j++) {
-    //         out_ptr[i][j] = 0.0;
-    //     }
-    // }
-
+    for (int i = 0; i < numOutlet; i++) {
+        for (int j = 0; j < blockSize; j++) {
+            outPtr[i][j] = outputBuffer[i][j];
+        }
+    }
 }
 
 
 int ZerrEnvelopeGenerator::get_port_count(){
-    return n_inlet+n_outlet;
+    return numInlet + numOutlet;
 }
 
 
 ZerrEnvelopeGenerator::~ZerrEnvelopeGenerator(){
-    delete envelope_generator;
+    delete envelopeGenerator;
+    delete logger;
 }

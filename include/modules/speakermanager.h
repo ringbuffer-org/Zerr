@@ -78,6 +78,18 @@ public:
     */
     size_t get_n_unmasked_speakers(); 
     /**
+    *  TODO
+    */
+    t_indexs get_unmasked_indexs();
+    /**
+    *  TODO
+    */
+    void set_unmasked_indexs();
+    /**
+    *  TODO
+    */
+    t_index get_random_index();
+    /**
     * return the speaker class acoording to speaker index
     */
     Speaker get_speaker_by_index(t_index spkr_idx);
@@ -85,6 +97,10 @@ public:
     * get the pair of speaker indexs in sorted list acoording to the trajectory input
     */
     t_pair get_indexs_by_trajectory(t_value trajectory_val);
+    /**
+    * TODO
+    */
+    t_value get_panning_ratio(t_value trajectory_val);
     /**
     * get the index of speaker that is geometrially close to the input.
     */
@@ -95,9 +111,22 @@ public:
     */
     t_index get_indexs_by_trigger(t_value trigger, t_index curr_spkr, int mode);
     /**
-    *  
+    *  TODO
     */
     std::vector<float> get_distance_vector(int spkr_idx);
+
+    /**
+    *  TODO
+    */
+    void set_subindex();
+    /**
+    *  TODO
+    */
+    void set_topology_matrix();
+    /**
+    *  TODO
+    */
+    void reset(std::string config_path);
 
 private:
     Logger *logger;         /**< logger object for logging message in different environment */
@@ -107,19 +136,14 @@ private:
     std::string config_path;   /**< file path of speaker array configuration */
     YAML::Node speaker_config; /**< loaded YAML Node structure of speaker array configuration */
     
-    std::map<t_index, Speaker> speakers; /**< -----  */
+    std::map<t_index, Speaker> speakers; /**< TODO  */
 
+    std::map<t_index, std::vector<t_value>> distance_matrix; /**< TODO */
 
-    std::map<t_index, std::vector<t_value>> distance_matrix;/**< -----  */
-
-    t_indexs unmasked; /**< -----  */
-    t_indexs subindex; /**< -----  */
-    std::map<t_index, t_indexs> topology_matrix; /**< -----  */
+    t_indexs unmasked;                           /**< TODO */
+    t_indexs subindex;                           /**< TODO */
+    std::map<t_index, t_indexs> topology_matrix; /**< TODO */
     
-    /**
-    * @brief Check if the SpeakerManager is proper initialized
-    */
-    void _is_initialized();
     /**
     * @brief  
     */

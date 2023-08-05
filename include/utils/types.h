@@ -78,6 +78,8 @@ typedef std::vector<t_index> t_indexs;
 
 
 typedef std::pair<t_index, t_index> t_pair;
+// typedef std::pair<t_index, t_value> SpeakerVolStatus
+// typedef std::pair<SpeakerVolStatus, SpeakerVolStatus> SpeakerVolPair;
 
 // system config type
 typedef struct {
@@ -85,7 +87,10 @@ typedef struct {
     size_t block_size;
 }t_systemConfigs;
 
-
+enum SelectionMode {
+    trigger,
+    trajectory
+};
 
 } // namespace zerr
 #endif //TYPES_H

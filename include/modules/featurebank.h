@@ -70,7 +70,7 @@ private:
 
     RingBuffer ring_buffer; /**< basic ring buffer to hold previous audio samples */
 
-    FrequencyTransformer freq_transformer; /**< fftw3 warper to perform fft as audio signal input*/
+    FrequencyTransformer freq_transformer; /**< fftw3 warper to perform fft on audio signal input*/
 
     t_featureInputs x;    /**< the structure to hold different type of feature inputs */
 
