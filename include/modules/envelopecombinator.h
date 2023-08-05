@@ -50,13 +50,6 @@ public:
     * @param TODO
     */
     int get_block_size(){return systemCfgs.block_size;}
-//     /**
-//     * @brief TODO
-//     * @param TODO
-//     * @param TODO
-//     * @param TODO
-//     */
-//     void set_current_speaker(t_index newIdx);
     /**
     * @brief TODO
     * @param TODO
@@ -79,10 +72,9 @@ private:
 
     Logger                *logger;          /**< TODO */
 
-    t_blockIns            inputBuffer;      /**< TODO */
-    t_blockOuts           outputBuffer;     /**< TODO */
+    t_blockIns             inputBuffer;      /**< TODO */
+    t_blockOuts            outputBuffer;     /**< TODO */
 
-//     std::map<t_index, int> indexChannelLookup;  /**< TODO */
     /**
     * @brief TODO
     * @param TODO
@@ -96,28 +88,14 @@ private:
     * @param TODO
     * @param TODO
     */
-    void _process_square_root();
-//     /**
-//     * @brief TODO
-//     * @param TODO
-//     * @param TODO
-//     * @param TODO
-//     */
-//     void _set_index_channel_lookup(t_indexs indexs);
-//     /**
-//     * @brief TODO
-//     * @param TODO
-//     * @param TODO
-//     * @param TODO
-//     */
-//     t_value _calculate_normal_distribution(t_value x, t_value alpha);
-//     /**
-//     * @brief TODO
-//     * @param TODO
-//     * @param TODO
-//     * @param TODO
-//     */
-//     t_value _calculate_gain(t_value x, t_value theta); 
+    void _process_root();
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    void _process_max();
 }; 
 
 } //namespace zerr

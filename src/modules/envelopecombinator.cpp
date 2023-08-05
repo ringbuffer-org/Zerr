@@ -21,7 +21,7 @@ bool EnvelopeCombinator::initialize(){
     inputBuffer.resize(numInlet,   t_samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, t_samples(systemCfgs.block_size, 0.0f));
 
-    if (combinationMode!="add" && combinationMode!="root"){ //TODO: change to enumerate and add to type.h
+    if (combinationMode!="add" && combinationMode!="root" && combinationMode!="max"){ //TODO: change to enumerate and add to type.h
         logger->logError("EnvelopeCombinator::initialize Unknown combination mode: " + combinationMode);
         return false;
     }
@@ -37,7 +37,8 @@ void EnvelopeCombinator::fetch(t_blockIns in){
 
 void EnvelopeCombinator::process(){
     if (combinationMode=="add"){_process_add();return;}
-    if (combinationMode=="root"){_process_square_root();return;}
+    if (combinationMode=="root"){_process_root();return;}
+    if (combinationMode=="max"){_process_max();return;}
 }
 
 
@@ -57,7 +58,7 @@ void EnvelopeCombinator::_process_add(){
 }
 
 
-void EnvelopeCombinator::_process_square_root(){
+void EnvelopeCombinator::_process_root(){
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
@@ -70,7 +71,28 @@ void EnvelopeCombinator::_process_square_root(){
             for (int j = 0; j < numSource; ++j) {
                 multi_tmp *= inputBuffer[i + j*numChannel][k];
             }
-            outputBuffer[i][k] = std::pow(multi_tmp, exponent);
+            outputBuffer[i][k] = std::pow(std::abs(multi_tmp), exponent);
+        }
+    }
+}
+
+
+void EnvelopeCombinator::_process_max(){
+    // clean the output buffer
+    for (auto& buffer : outputBuffer) {
+        buffer.assign(buffer.size(), 0.0f);
+    }
+    double exponent = 1.0 / (double) numSource;
+    t_sample maxVal;
+    t_sample tmp;
+    for (int i = 0; i < numChannel; ++i) {
+        for (int k = 0; k < systemCfgs.block_size; ++k) {
+            maxVal = 0;
+            for (int j = 0; j < numSource; ++j) {
+                tmp = inputBuffer[i + j*numChannel][k];
+                maxVal = tmp>maxVal?tmp:maxVal;
+            }
+            outputBuffer[i][k] = maxVal;
         }
     }
 }
