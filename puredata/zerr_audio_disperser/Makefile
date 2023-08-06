@@ -1,4 +1,4 @@
-# Makefile to build class 'zerr' for Pure Data.
+# Makefile to build object 'zerr_envelope_combinator~' for Pure Data.
 # Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
 # settings and rules.
 
@@ -9,89 +9,45 @@
 CC  = g++
 cflags = -std=c++11
 ldflags += -L/usr/local/lib -lyaml-cpp
-ldflags += -L/usr/local/lib -lfftw3
+ldflags += -L/opt/homebrew/Cellar/fftw/3.3.10_1/lib -lfftw3
 
-
-lib.name = zerr~
+lib.name = zerr_audio_disperser~
 
 # input source file (class name == source file basename)
-class.sources = zerr~.cpp
+class.sources = zerr_audio_disperser~.cpp
 
-# zerr pd wrapper
-zerr~.class.sources += zerr.cpp
+# zerr_audio_disperser pd wrapper
+zerr_audio_disperser~.class.sources += zerr_audio_disperser.cpp
 
-# # zerr modules
-zerr~.class.sources += src/modules/audiorouter.cpp
-zerr~.class.sources += src/modules/mapper.cpp
-zerr~.class.sources += src/modules/featurebank.cpp
-zerr~.class.sources += src/modules/speakerarray.cpp
-zerr~.class.sources += src/modules/featureextractor.cpp
-zerr~.class.sources += src/modules/trajectorygenerator.cpp
+# zerr_audio_disperser modules
+zerr_audio_disperser~.class.sources += ../../src/modules/audiodisperser.cpp
 
-# # zerr features
-zerr~.class.sources += src/features/rms_amplitude.cpp
-zerr~.class.sources += src/features/centroid.cpp
-zerr~.class.sources += src/features/zerocrossing.cpp
-
-# # zerr utils
-zerr~.class.sources += src/utils/utils.cpp
-zerr~.class.sources += src/utils/ringbuffer.cpp
-zerr~.class.sources += src/utils/frequencytransformer.cpp
-zerr~.class.sources += src/utils/linearinterpolator.cpp
+# zerr_audio_disperser utils
+zerr_audio_disperser~.class.sources += ../../src/utils/logger.cpp
+zerr_audio_disperser~.class.sources += ../../src/utils/utils.cpp
+zerr_audio_disperser~.class.sources += ../../src/utils/ringbuffer.cpp            #TODO: remove if not used 
+zerr_audio_disperser~.class.sources += ../../src/utils/linearinterpolator.cpp    #TODO: remove if not used
 
 # all extra files to be included in binary distribution of the library
-datafiles = configs/spkr_configs/circulation_8.yaml
-datadirs = configs
 
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 PDLIBBUILDER_DIR=pd-lib-builder/
 
-CC  += -Iinclude
-CC  += -Iinclude/utils
-CC  += -Iinclude/modules
-CC  += -Iinclude/features
-CXX += -Iinclude
-CXX += -Iinclude/utils
-CXX += -Iinclude/modules
-CXX += -Iinclude/features
-CXX += -I/usr/local/include/yaml-cpp
-CXX += -I/usr/local/include/fftw3
+CC  += -I../../include
+CC  += -I../../include/utils
+CC  += -I../../include/modules
+CC  += -I../../include/features
+CC  += -I../../dependencies/include/fftw3   #TODO: remove if not used 
+
+CXX += -I../../include
+CXX += -I../../include/utils
+CXX += -I../../include/modules
+CXX += -I../../include/features
+CXX += -I/usr/local/include/yaml-cpp       #TODO: remove if not used 
+CXX += -I../../dependencies/include/fftw3  #TODO: remove if not used 
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder
-
-# # disable optimizations for debugging
-# alldebug: c.flags += -O0 -DDEBUG
-# alldebug: cxx.flags += -O0 -DDEBUG
-
-# # create the documentation
-# DOXYGEN=doxygen
-# DOXYGEN_DIR=docs
-# .PHONY: docs docs.clean
-
-# docs:
-# 	mkdir -p $(DOXYGEN_DIR)
-# 	$(DOXYGEN)
-
-# # clean the documentation directory
-# clean: docs.clean
-# docs.clean:
-# 	rm -rf $(DOXYGEN_DIR)
-
-# # valgrind command for leak checks
-# VG=valgrind
-# VG_LOG="valgrind.log"
-# VG_FLAGS=--log-file="$(VG_LOG)" --leak-check=full --show-reachable=yes --track-origins=yes -s
-# .PHONY: valgrind valgrind.clean
-
-# valgrind: alldebug
-# 	$(VG) $(VG_FLAGS) pd -noaudio *.pd
-
-# clean: valgrind.clean
-# valgrind.clean:
-# 	rm -f $(VG_LOG)
-
-
 
 
 

@@ -56,12 +56,7 @@ void ZerrEnvelopeCombinator::perform(float **ports, int blockSize){
 }
 
 
-// int ZerrEnvelopeCombinator::get_port_count(){
-//     return numInlet + numOutlet;
-// }
-
-
 ZerrEnvelopeCombinator::~ZerrEnvelopeCombinator(){
-    // delete envelopeCombinator;
+    delete envelopeCombinator;
     delete logger;
 }
