@@ -55,8 +55,8 @@ CXX += -I../../include/modules
 CXX += -I../../include/features
 
 # CXX += -I/usr/local/include/yaml-cpp
-CC += -I../../dependencies/include/fftw3
-CXX += -I../../dependencies/include/fftw3
+CC  += -I../../dependencies/fftw3
+CXX += -I../../dependencies/fftw3
 
 # use pd-lib-builder
 include pd-lib-builder/Makefile.pdlibbuilder

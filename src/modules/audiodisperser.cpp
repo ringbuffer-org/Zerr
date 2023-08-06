@@ -37,7 +37,7 @@ void AudioDisperser::process(){
     t_samples& source =  inputBuffer[0];
 
     for (int i = 1; i < numInlet; ++i) {
-        for (int j = 0; j < systemCfgs.block_size; ++j) {
+        for (size_t j = 0; j < systemCfgs.block_size; ++j) {
             outputBuffer[i-1][j] = source[j] * inputBuffer[i][j];
         }
     }

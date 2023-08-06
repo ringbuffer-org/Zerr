@@ -95,11 +95,6 @@ void zerr_feature_tracker_tilde_setup(void) {
         CLASS_DEFAULT,
         A_GIMME,0);
 
-    // class_addmethod(zerr_tilde_class,
-    //     (t_method) goat_tilde_graintable_get,
-    //     gensym("graintable-get"),
-    //     A_NULL);
-
     class_addmethod(zerr_feature_tracker_tilde_class,
         (t_method) zerr_feature_tracker_tilde_dsp,
         gensym("dsp"),

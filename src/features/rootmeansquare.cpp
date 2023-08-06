@@ -25,7 +25,7 @@ void RootMeanSquare::extract(){
     double square_root = 0;
     int    x_size      = x.size();
 
-    for (size_t i = 0; i < x_size; ++i) {
+    for (int i = 0; i < x_size; ++i) {
         square_sum += x[i]*x[i];
     }
     square_sum = square_sum / x_size;

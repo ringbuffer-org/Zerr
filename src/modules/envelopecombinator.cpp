@@ -54,7 +54,7 @@ void EnvelopeCombinator::_process_add(){
 
     for (int i = 0; i < numChannel; ++i) {
         for (int j = 0; j < numSource; ++j) {
-            for (int k = 0; k < systemCfgs.block_size; ++k) {
+            for (size_t k = 0; k < systemCfgs.block_size; ++k) {
                 outputBuffer[i][k] += inputBuffer[i + j*numChannel][k];
             }
         }
@@ -71,7 +71,7 @@ void EnvelopeCombinator::_process_root(){
     double exponent = 1.0 / (double) numSource;
     t_sample multi_tmp;
     for (int i = 0; i < numChannel; ++i) {
-        for (int k = 0; k < systemCfgs.block_size; ++k) {
+        for (size_t k = 0; k < systemCfgs.block_size; ++k) {
             multi_tmp = 1;
             for (int j = 0; j < numSource; ++j) {
                 multi_tmp *= inputBuffer[i + j*numChannel][k];
@@ -91,7 +91,7 @@ void EnvelopeCombinator::_process_max(){
     t_sample maxVal;
     t_sample tmp;
     for (int i = 0; i < numChannel; ++i) {
-        for (int k = 0; k < systemCfgs.block_size; ++k) {
+        for (size_t k = 0; k < systemCfgs.block_size; ++k) {
             maxVal = 0;
             for (int j = 0; j < numSource; ++j) {
                 tmp = inputBuffer[i + j*numChannel][k];

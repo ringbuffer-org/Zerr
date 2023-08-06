@@ -65,7 +65,6 @@ public:
     */
     t_blockOuts send();
 private:
-    int                    numSource;       /**< TODO */
     int                    numChannel;      /**< TODO */
     zerr::t_systemConfigs  systemCfgs;      /**< system configuration: sample_rate, block_size */
     std::string            combinationMode; /**< TODO */
