@@ -1,12 +1,14 @@
 #ifndef TYPES_H
 #define TYPES_H
+#include <vector>
 
 #include "configs.h"
 
 namespace zerr {
 // basic types
-typedef double t_sample; /**< base type of all single audio-related value */
-typedef float  t_value;  /**< base type of all single non-audio value */
+typedef double t_sample; /**< base type of audio-related value */
+typedef float  t_value;  /**< base type of config value */
+typedef int    t_index;  /**< base type of index value */
 
 typedef struct {
     t_sample real;
@@ -37,6 +39,11 @@ typedef struct {
 // feature types
 typedef std::string t_featureName; /**< Identification name of the feature */
 typedef std::vector<t_featureName> t_featureNameList; /**< The list of feature name to be activated */
+typedef struct {
+    char **names;  // Pointer to the list of strings
+    int num;     // Number of strings in the list
+} t_featureNames;
+
 
 typedef std::vector<t_value> t_values; /**< base type of all non-audio vector */
 
@@ -47,10 +54,48 @@ typedef std::vector<t_featureBuf> t_featureValueList; /**< list of all extracted
 typedef t_value t_volume;
 typedef std::vector<t_volume> t_volumes;
 
+
+// speaker configuration type
+// coordinates
+typedef struct {
+    t_value x;
+    t_value y;
+    t_value z;
+} t_cartesian;
+
+typedef struct {
+    t_value azimuth;
+    t_value elevation;
+    t_value distance;
+} t_spherical;
+
+typedef struct {
+    t_cartesian cartesian;
+    t_spherical spherical;
+} t_position;
+
+typedef struct {
+    t_value yaw;
+    t_value pitch;
+} t_orientation;
+// specific configs
+typedef std::vector<t_index> t_indexs;
+
+
+typedef std::pair<t_index, t_index> t_pair;
+// typedef std::pair<t_index, t_value> SpeakerVolStatus
+// typedef std::pair<SpeakerVolStatus, SpeakerVolStatus> SpeakerVolPair;
+
+// system config type
 typedef struct {
     size_t sample_rate;
     size_t block_size;
 }t_systemConfigs;
+
+enum SelectionMode {
+    trigger,
+    trajectory
+};
 
 } // namespace zerr
 #endif //TYPES_H
