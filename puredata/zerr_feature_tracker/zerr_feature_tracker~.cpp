@@ -12,7 +12,7 @@ void *zerr_feature_tracker_tilde_new(t_symbol *s, int argc, t_atom *argv) {
 
     if (argc < 1) return NULL;
 
-    t_featureNames ft_names;
+    zerr::t_featureNames ft_names;
     ft_names.names = (char **)malloc(argc * sizeof(char *));;
     ft_names.num   = argc;
 
@@ -27,7 +27,7 @@ void *zerr_feature_tracker_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     }
 
     // system config to initialize zerr
-    t_systemConfigs sys_cnfg;
+    zerr::t_systemConfigs sys_cnfg;
     sys_cnfg.sample_rate = (size_t) sys_getsr();
     sys_cnfg.block_size  = (size_t) sys_getblksize();
 

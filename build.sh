@@ -47,7 +47,7 @@ echo "---- Build successful!"
 cd $main_path
 
 find $(pwd)/ -type f -name "*.o" -delete
-find $(pwd)/ -type f -name $pd_file_ext -exec cp {} externals/ \;
+find $(pwd)/ -type f -name $pd_file_ext -exec mv {} externals/ \;
 
 pd_name="Pd"
 pd_pgid="$(pgrep ${pd_name})"

@@ -39,6 +39,11 @@ typedef struct {
 // feature types
 typedef std::string t_featureName; /**< Identification name of the feature */
 typedef std::vector<t_featureName> t_featureNameList; /**< The list of feature name to be activated */
+typedef struct {
+    char **names;  // Pointer to the list of strings
+    int num;     // Number of strings in the list
+} t_featureNames;
+
 
 typedef std::vector<t_value> t_values; /**< base type of all non-audio vector */
 

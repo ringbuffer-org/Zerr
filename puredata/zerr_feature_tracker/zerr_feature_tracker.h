@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "zerr_config.h"
+// #include "zerr_config.h"
 
 // dependencies
 #include "utils.h"
@@ -27,7 +27,7 @@ public:
     /**
     * create a new zerr instance 
     */
-    ZerrFeatureTracker(t_systemConfigs sys_cnfg, t_featureNames ft_names);
+    ZerrFeatureTracker(zerr::t_systemConfigs sys_cnfg, zerr::t_featureNames ft_names);
     /**
     * initialize all zerr modules
     */
