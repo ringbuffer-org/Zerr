@@ -8,8 +8,7 @@
 
 CC  = g++
 cflags = -std=c++11
-ldflags += -L/usr/local/lib -lyaml-cpp
-ldflags += -L/opt/homebrew/Cellar/fftw/3.3.10_1/lib -lfftw3
+ldflags += -L../../dependencies/lib/yaml-cpp -lyaml-cpp
 
 lib.name = zerr_envelope_generator~
 
@@ -26,30 +25,20 @@ zerr_envelope_generator~.class.sources += ../../src/modules/speakermanager.cpp
 # zerr_envelope_generator utils
 zerr_envelope_generator~.class.sources += ../../src/utils/logger.cpp
 zerr_envelope_generator~.class.sources += ../../src/utils/utils.cpp
-zerr_envelope_generator~.class.sources += ../../src/utils/ringbuffer.cpp
-zerr_envelope_generator~.class.sources += ../../src/utils/linearinterpolator.cpp
+# zerr_envelope_generator~.class.sources += ../../src/utils/ringbuffer.cpp            # keep it for future
+# zerr_envelope_generator~.class.sources += ../../src/utils/linearinterpolator.cpp    # keep it for future
 
-# all extra files to be included in binary distribution of the library
-# datafiles = configs/spkr_configs/circulation_8.yaml
-# datadirs = configs
-
-# include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
-PDLIBBUILDER_DIR=pd-lib-builder/
-
-CC  += -I../../include
+# zerr_envelope_combinator headers
 CC  += -I../../include/utils
 CC  += -I../../include/modules
-CC  += -I../../include/features
-CXX += -I../../include
+
 CXX += -I../../include/utils
 CXX += -I../../include/modules
-CXX += -I../../include/features
-CXX += -I/usr/local/include/yaml-cpp
 
-CC += -I../../dependencies/include/fftw3
-CXX += -I../../dependencies/include/fftw3
+CC  += -I../../dependencies/include/yaml-cpp
+CXX += -I../../dependencies/include/yaml-cpp
 
-# use pd-lib-builder
+# include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 include pd-lib-builder/Makefile.pdlibbuilder
 
 

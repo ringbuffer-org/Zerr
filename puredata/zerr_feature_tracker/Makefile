@@ -10,8 +10,8 @@
 
 CC  = g++
 cflags = -std=c++11
-# ldflags += -L../../dependencies/yaml-cpp/lib -lyaml-cpp
-ldflags += -L/opt/homebrew/Cellar/fftw/3.3.10_1/lib -lfftw3
+# ldflags += -L../../dependencies/lib/yaml-cpp -lyaml-cpp    # keep it for future
+ldflags += -L../../dependencies/lib/fftw3/ -lfftw3
 
 lib.name = zerr_feature_tracker~
 
@@ -40,25 +40,22 @@ zerr_feature_tracker~.class.sources += ../../src/utils/ringbuffer.cpp
 zerr_feature_tracker~.class.sources += ../../src/utils/frequencytransformer.cpp
 zerr_feature_tracker~.class.sources += ../../src/utils/linearinterpolator.cpp
 
-# include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
-PDLIBBUILDER_DIR=pd-lib-builder/
-
 # include all headers
-CC  += -I../../include
 CC  += -I../../include/utils
 CC  += -I../../include/modules
 CC  += -I../../include/features
 
-CXX += -I../../include
 CXX += -I../../include/utils
 CXX += -I../../include/modules
 CXX += -I../../include/features
 
-# CXX += -I/usr/local/include/yaml-cpp
-CC  += -I../../dependencies/fftw3
-CXX += -I../../dependencies/fftw3
+# CC  += -I../../dependencies/include/yaml-cpp    # keep it for future
+# CXX += -I../../dependencies/include/yaml-cpp    # keep it for future
 
-# use pd-lib-builder
+CC  += -I../../dependencies/include/fftw3
+CXX += -I../../dependencies/include/fftw3
+
+# include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 include pd-lib-builder/Makefile.pdlibbuilder
 
 

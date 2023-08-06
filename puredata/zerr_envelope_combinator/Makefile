@@ -8,8 +8,7 @@
 
 CC  = g++
 cflags = -std=c++11
-ldflags += -L/usr/local/lib -lyaml-cpp
-ldflags += -L/opt/homebrew/Cellar/fftw/3.3.10_1/lib -lfftw3
+# ldflags += -L../../dependencies/lib/yaml-cpp -lyaml-cpp    # keep it for future
 
 lib.name = zerr_envelope_combinator~
 
@@ -25,28 +24,18 @@ zerr_envelope_combinator~.class.sources += ../../src/modules/envelopecombinator.
 # zerr_envelope_combinator utils
 zerr_envelope_combinator~.class.sources += ../../src/utils/logger.cpp
 zerr_envelope_combinator~.class.sources += ../../src/utils/utils.cpp
-zerr_envelope_combinator~.class.sources += ../../src/utils/ringbuffer.cpp            #TODO: remove if not used 
-zerr_envelope_combinator~.class.sources += ../../src/utils/linearinterpolator.cpp    #TODO: remove if not used
 
-# all extra files to be included in binary distribution of the library
-
-# include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
-PDLIBBUILDER_DIR=pd-lib-builder/
-
-CC  += -I../../include
+# zerr_envelope_combinator headers
 CC  += -I../../include/utils
 CC  += -I../../include/modules
-CC  += -I../../include/features
-CC  += -I../../dependencies/include/fftw3   #TODO: remove if not used 
 
-CXX += -I../../include
 CXX += -I../../include/utils
 CXX += -I../../include/modules
-CXX += -I../../include/features
-CXX += -I/usr/local/include/yaml-cpp       #TODO: remove if not used 
-CXX += -I../../dependencies/include/fftw3  #TODO: remove if not used 
 
-# use pd-lib-builder
+# CC  += -I../../dependencies/include/yaml-cpp    # keep it for future
+# CXX += -I../../dependencies/include/yaml-cpp    # keep it for future
+
+# include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 include pd-lib-builder/Makefile.pdlibbuilder
 
 
