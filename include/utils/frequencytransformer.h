@@ -11,6 +11,7 @@
 #define FREQUENCYTRANSFORMER_H
 
 #include "utils.h"
+#include <fftw3.h>
 #include "types.h"
 namespace zerr {
 

@@ -36,17 +36,10 @@ bool isEqualTo0(t_value value, t_value epsilon = std::numeric_limits<t_value>::e
 /**
 * @brief TODO
 */
-// std::vector<t_sample>& operator+=(std::vector<t_sample>& lhs, const std::vector<t_sample>& rhs) {
-//     if (lhs.size() != rhs.size()) {
-//         throw std::runtime_error("Vector sizes must be equal for element-wise addition.");
-//     }
-
-//     for (size_t i = 0; i < lhs.size(); ++i) {
-//         lhs[i] += rhs[i];
-//     }
-
-//     return lhs;
-// }
+inline float get_hann_sample(int pos, int L){
+    float val = 0.5 * (1.0 - cos( (2.0*PI* (float) pos) / (float)L) );
+    return val;
+}
 
 } // zerr
 #endif //UTILS_H

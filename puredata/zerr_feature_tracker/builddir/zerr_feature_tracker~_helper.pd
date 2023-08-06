@@ -1,36 +1,29 @@
-#N canvas 489 -903 1645 739 12;
+#N canvas 1512 -433 1645 739 12;
 #X obj 41 241 snapshot~;
-#X floatatom 42 272 5 0 0 0 - - -;
+#X floatatom 42 272 5 0 0 0 - - - 0;
 #X obj 190 225 snapshot~;
-#X floatatom 191 256 5 0 0 0 - - -;
+#X floatatom 191 256 5 0 0 0 - - - 0;
 #X obj 350 326 snapshot~;
-#X floatatom 351 357 10 0 0 0 - - -;
-#X obj 51 186 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
-#X floatatom 575 10 5 0 2000 0 F0 - -;
-#X floatatom 191 325 5 0 0 0 - - -;
+#X floatatom 351 357 10 0 0 0 - - - 0;
+#X obj 51 186 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
+#X floatatom 575 10 5 0 2000 0 F0 - - 0;
+#X floatatom 191 325 5 0 0 0 - - - 0;
 #X obj 190 295 * 24000;
-#X floatatom 651 31 5 0 100 0 - - -;
+#X floatatom 651 31 5 0 100 0 - - - 0;
 #X obj 505 292 snapshot~;
-#X floatatom 504 327 5 0 0 0 - - -;
+#X floatatom 504 327 5 0 0 0 - - - 0;
 #X obj 656 283 snapshot~;
-#X floatatom 657 315 5 0 0 0 - - -;
-#X obj 211 165 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
+#X floatatom 657 315 5 0 0 0 - - - 0;
+#X obj 211 165 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
 #X obj 815 275 snapshot~;
-#X floatatom 816 307 5 0 0 0 - - -;
+#X floatatom 816 307 5 0 0 0 - - - 0;
 #X obj 969 252 snapshot~;
-#X floatatom 970 284 10 0 100000 0 - - -;
-#X obj 372 268 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
-#X obj 524 228 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
-#X obj 671 216 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
-#X obj 831 221 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
-#X obj 989 180 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
+#X floatatom 970 284 10 0 100000 0 - - - 0;
+#X obj 372 268 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
+#X obj 524 228 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
+#X obj 671 216 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
+#X obj 831 221 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
+#X obj 989 180 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
 #X text 27 294 RootMeanSquare;
 #X text 168 355 ZeroCrossingRate;
 #X text 1159 612 AmplitudeEnvelope;
@@ -39,8 +32,7 @@
 #X text 638 337 Rolloff;
 #X text 802 336 Crest;
 #X text 950 317 Flatness;
-#X obj 42 130 zerr_feature_tracker~ RootMeanSquare ZeroCrossingRate
-Flux Centroid Rolloff CrestFactor Flatness ZeroCrossings, f 155;
+#X obj 42 130 zerr_feature_tracker~ RootMeanSquare ZeroCrossingRate Flux Centroid Rolloff CrestFactor Flatness ZeroCrossings, f 155;
 #X obj 52 209 metro 100;
 #X obj 212 188 metro 100;
 #X obj 373 292 metro 100;
@@ -51,24 +43,20 @@ Flux Centroid Rolloff CrestFactor Flatness ZeroCrossings, f 155;
 #X obj 426 4 noise~;
 #X obj 426 35 lop~ 1000;
 #X obj 651 56 / 100;
-#X floatatom 866 99 5 0 100 0 - - -;
-#X floatatom 500 24 5 0 100 0 - - -;
+#X floatatom 866 99 5 0 100 0 - - - 0;
+#X floatatom 500 24 5 0 100 0 - - - 0;
 #X obj 500 49 / 100;
 #X obj 426 83 *~ 0.5;
 #X obj 577 90 *~ 0.5;
 #X obj 1105 252 tabwrite~ array1;
-#X obj 1162 195 tgl 15 1 empty empty empty 17 7 0 10 -262144 -1 -1
-1 1;
+#X obj 1162 195 tgl 15 1 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 1 1;
 #N canvas 0 22 450 278 (subpatch) 0;
 #X array array1 100 float 3;
-#A 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1;
+#A 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1;
 #X coords 0 1 100 -1 200 140 1;
 #X restore 820 453 graph;
 #X obj 1236 178 env~;
-#X obj 1235 273 vu 15 120 empty empty -1 -8 0 10 -66577 -1 1 0;
+#X obj 1235 273 vu 15 120 empty empty -1 -8 0 10 #404040 #000000 1 0;
 #X obj 576 33 osc~ 1;
 #X obj 1236 208 log 10;
 #X obj 1133 221 metro 1;
