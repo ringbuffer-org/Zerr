@@ -6,4 +6,5 @@
 
 builddir/
 pd-api/
-dependencies/
+fftw3/
+Yaml-cpp/

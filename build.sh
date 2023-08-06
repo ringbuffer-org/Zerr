@@ -23,28 +23,28 @@ esac
 
 echo $pd_file_ext
 
-
 find $(pwd)/ -type f -name "*.o" -delete
 find $(pwd)/ -type f -name $pd_file_ext -delete
 
 main_path=$(pwd)
+
 cd puredata/zerr_audio_disperser
 make -f Makefile
-
 cd $main_path
+
 cd puredata/zerr_envelope_combinator
 make -f Makefile
-
 cd $main_path
+
 cd puredata/zerr_envelope_generator
 make -f Makefile
-
 cd $main_path
+
 cd puredata/zerr_feature_tracker
 make -f Makefile
+cd $main_path
 
 echo "---- Build successful!"
-cd $main_path
 
 find $(pwd)/ -type f -name "*.o" -delete
 find $(pwd)/ -type f -name $pd_file_ext -exec mv {} externals/ \;
