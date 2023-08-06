@@ -59,7 +59,7 @@ CC += -I../../dependencies/include/fftw3
 CXX += -I../../dependencies/include/fftw3
 
 # use pd-lib-builder
-include pd-lib-builder/Makefile.pdlibbuilder
+include ../pd-lib-builder/Makefile.pdlibbuilder
 
 
 
