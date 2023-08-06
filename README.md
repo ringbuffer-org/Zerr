@@ -63,8 +63,16 @@ You can use the **build.sh** script to build all externals together.  The built 
 
 ### zerr_feature_tracker~
 
+![Snipaste_2023-08-07_00-37-16](img/Snipaste_2023-08-07_00-37-16.png)
+
 ### zerr_envelope_generator~
+
+![Snipaste_2023-08-07_00-42-28](img/Snipaste_2023-08-07_00-42-28.png)
 
 ### zerr_envelope_combinator~
 
+![Snipaste_2023-08-07_00-42-34](img/Snipaste_2023-08-07_00-42-34.png)
+
 ### zerr_audio_disperser~
+
+![Snipaste_2023-08-07_00-42-39](img/Snipaste_2023-08-07_00-42-39.png)
