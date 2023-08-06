@@ -1,8 +1,31 @@
 #!/bin/bash
 set -e
 
+kernel_name=$(uname -s)
+# pd_file_ext=
+case "$kernel_name" in
+    Linux*)
+        echo "Linux"
+        pd_file_ext="*.pd_linux"
+        ;;
+    Darwin*)
+        echo "macOS"
+        pd_file_ext="*.pd_darwin"
+        ;;
+    CYGWIN* | MINGW* | MSYS*)
+        echo "Windows"
+        pd_file_ext="*.pd_dll"
+        ;;
+    *)
+        echo "Unknown"
+        ;;
+esac
+
+echo $pd_file_ext
+
+
 find $(pwd)/ -type f -name "*.o" -delete
-find $(pwd)/ -type f -name "*.pd_darwin" -delete
+find $(pwd)/ -type f -name $pd_file_ext -delete
 
 main_path=$(pwd)
 cd puredata/zerr_audio_disperser
@@ -24,7 +47,7 @@ echo "---- Build successful!"
 cd $main_path
 
 find $(pwd)/ -type f -name "*.o" -delete
-find $(pwd)/ -type f -name "*.pd_darwin" -exec cp {} externals/ \;
+find $(pwd)/ -type f -name $pd_file_ext -exec cp {} externals/ \;
 
 pd_name="Pd"
 pd_pgid="$(pgrep ${pd_name})"
