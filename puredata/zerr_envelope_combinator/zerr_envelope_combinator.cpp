@@ -1,5 +1,19 @@
 #include "zerr_envelope_combinator.h"
 
+// this one was needed to compile on linux
+// (error: ‘strdup’ was not declared in this scope)
+char* strdup (const char* s)
+{
+  size_t slen = strlen(s);
+  char* result = (char*) malloc(slen + 1);
+  if(result == NULL)
+  {
+    return NULL;
+  }
+
+  memcpy(result, s, slen+1);
+  return result;
+}
 
 ZerrEnvelopeCombinator::ZerrEnvelopeCombinator(int numSource, int numChannel, zerr::t_systemConfigs systemCfgs, std::string combinationMode){
     envelopeCombinator = new zerr::EnvelopeCombinator(numSource, numChannel, systemCfgs, combinationMode);
@@ -39,7 +53,7 @@ void ZerrEnvelopeCombinator::perform(float **ports, int blockSize){
     }
 
     try {
-        envelopeCombinator->fetch(inputBuffer); 
+        envelopeCombinator->fetch(inputBuffer);
         envelopeCombinator->process();
         outputBuffer = envelopeCombinator->send();
     }

@@ -17,7 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdarg>
-
+#include <cstring>
 #include "types.h"
 
 namespace zerr {
