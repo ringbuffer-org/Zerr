@@ -47,7 +47,7 @@ Make sure you have **Make** installed :)
 
 ### 1. Dependencies
 
-Zerr depends on  [fftw3][http://fftw.org/] and  [yaml-cpp][https://github.com/jbeder/yaml-cpp]. Please follow the instruction from each page for installment. The default location for headers and libraries are the **lib** and **include** inside **dependencies** folder. You can copy the files there. Otherwise please edit the dependency path in Makefile.
+Zerr depends on  [fftw3](http://fftw.org/) and  [yaml-cpp](https://github.com/jbeder/yaml-cpp). Please follow the instruction from each page for installment. The default location for headers and libraries are the **lib** and **include** inside **dependencies** folder. You can copy the files there. Otherwise please edit the dependency path in Makefile.
 
 ### 2. Build separately
 
