@@ -19,6 +19,8 @@
 #include <cstdarg>
 #include <cstring>
 #include "types.h"
+#include <cassert>
+#include <algorithm>
 
 namespace zerr {
 /**
