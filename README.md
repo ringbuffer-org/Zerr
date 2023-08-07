@@ -8,7 +8,7 @@ The main branch contains only the source code and configuration files of Zerr* s
 
 ### PD_modules
 
-**PD_modules** branch contains the implementation of Zerr* in [PureData][https://puredata.info/] the graphic audio coding environment created by [Miller Puckette][http://msp.ucsd.edu/]. You can build your own Zerr* PureData external from scratch using this branch.
+**PD_modules** branch contains the implementation of Zerr* in [PureData](https://puredata.info/) the graphic audio coding environment created by [Miller Puckette](http://msp.ucsd.edu/). You can build your own Zerr* PureData external from scratch using this branch.
 
 ### PD_releases
 
@@ -16,7 +16,7 @@ The main branch contains only the source code and configuration files of Zerr* s
 
 ### JACK
 
-**JACK** branch contains the implementation of Zerr* using [JACK Audio Connection Kit][https://jackaudio.org/]. This branch is now obsolete.
+**JACK** branch contains the implementation of Zerr* using [JACK Audio Connection Kit](https://jackaudio.org/). This branch is now obsolete.
 
 ### Tests
 
