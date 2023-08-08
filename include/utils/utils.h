@@ -5,20 +5,22 @@
 // #include <stdlib.h>
 // #include <vector>
 // #include <algorithm>
-// #include <math.h>
+#include <math.h>
 // #include <unistd.h>
 #include <limits>
 // #include <random>
 // #include <memory>
 // #include <chrono>
 // #include <thread>
-// #include <string.h>
+#include <string>
 // #include <complex.h>
 #include <iostream>
 #include <sstream>
 #include <cstdarg>
-
+#include <cstring>
 #include "types.h"
+#include <cassert>
+#include <algorithm>
 
 namespace zerr {
 /**

@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 #include <vector>
+#include <string>
 
 #include "configs.h"
 
