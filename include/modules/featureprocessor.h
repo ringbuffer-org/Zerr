@@ -1,5 +1,5 @@
-#ifndef TRAJECTORYGENERATOR_H
-#define TRAJECTORYGENERATOR_H
+#ifndef FEATUREPROCESSOR_H
+#define FEATUREPROCESSOR_H
 
 #include "utils.h"
 #include "featurebank.h"
@@ -11,7 +11,7 @@ namespace zerr {
 * This class is set to bypass for now
 * Cause when testing in PD, this could achieve easily by PD objects
 */
-class TrajectoryGenerator {
+class FeatureProcessor {
 public:
     /**
     * @brief initialize the Trajectory Generator
@@ -46,15 +46,11 @@ private:
     * build blocks of feature to trajectory transformation
     * @params chnl: apply this function on which channel
     */
-    float above_threshold(float x, float thres); //
-    float below_threshold(float x, float thres);
-    float max(std::vector<float> xs);
-    float min(std::vector<float> xs);
-    float weight_add(std::vector<float> weights);
-    float scale(float xmin, float xmax, float ymin, float ymax);
-    float sample(float x, float impulse);
-    float quantitative(float x, float minx, float step);
+    float zero_crossing(float x, float thres); //
+    float local_extrema(float x, float thres);
+    float inflection(std::vector<float> xs);
+    float threshold(std::vector<float> weights);
 }; 
 
 } //namespace zerr
-#endif // TRAJECTORYGENERATOR_H
+#endif // FEATUREPROCESSOR

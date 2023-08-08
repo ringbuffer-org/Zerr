@@ -5,6 +5,5 @@
 *.pd_dll
 
 builddir/
-pd-api/
 fftw3/
-Yaml-cpp/
+yaml-cpp/

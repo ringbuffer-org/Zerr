@@ -1,51 +1,50 @@
 standard:
-  1:
+  9:
     position: 
       cartesian:
-        x:         2.977
-        y:         0.326
-        z:        -0.450
-  2:
+        x:         3.265
+        y:        -1.065
+        z:         0.410
+  10:
     position: 
       cartesian:
-        x:         1.768
-        y:        -1.950
-        z:        -0.450
-  3:
+        x:         0.995
+        y:        -2.268
+        z:         0.410
+  11:
     position: 
       cartesian:
-        x:         0.071
-        y:        -2.034
-        z:        -0.450
-  4:
+        x:        -1.269
+        y:        -2.318
+        z:         0.410
+  12:
     position: 
       cartesian:
-        x:        -1.790
-        y:        -1.900
-        z:        -0.450
-  5:
+        x:        -3.124
+        y:        -1.250
+        z:         0.410
+  13:
     position: 
       cartesian:
-        x:        -2.937
-        y:         0.010
-        z:        -0.450
-  6:
+        x:        -3.249
+        y:         1.433
+        z:         0.410
+  14:
     position: 
       cartesian:
-        x:        -1.699
-        y:         2.607
-        z:        -0.450
-  7:
+        x:        -1.553
+        y:         2.814
+        z:         0.410
+  15:
     position: 
       cartesian:
-        x:         0.013
-        y:         2.673
-        z:        -0.450 
-  8:
+        x:         1.254
+        y:         2.946
+        z:         0.410
+  16:
     position: 
       cartesian:
-        x:         1.663
-        y:         2.650
-        z:        -0.450
-
+        x:         3.145
+        y:         1.474
+        z:         0.410
 
