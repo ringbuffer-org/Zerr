@@ -9,7 +9,7 @@
 #include "ringbuffer.h"
 #include "frequencytransformer.h"
 
-#include "features.h"
+#include "zerr_features.h"
 #include "featureextractor.h"
 
 namespace zerr {

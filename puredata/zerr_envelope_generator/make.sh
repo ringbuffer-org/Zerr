@@ -1,29 +1,45 @@
 #!/bin/bash
 set -e
 
+kernel_name=$(uname -s)
+# pd_file_ext=
+case "$kernel_name" in
+    Linux*)
+        echo "Linux"
+        pd_file_ext="*.pd_linux"
+        ;;
+    Darwin*)
+        echo "macOS"
+        pd_file_ext="*.pd_darwin"
+        ;;
+    CYGWIN* | MINGW* | MSYS*)
+        echo "Windows"
+        pd_file_ext="*.pd_dll"
+        ;;
+    *)
+        echo "Unknown"
+        ;;
+esac
+
+echo $pd_file_ext
+
 find $(pwd)/ -type f -name "*.o" -delete
-find $(pwd)/ -type f -name "*.pd_darwin" -delete
+find $(pwd)/ -type f -name $pd_file_ext -delete
 
 mkdir -p builddir
 make
-# if [ $? -eq 2 ]; then
-#   echo "---- make failed, exist"
-#   exist 0
-# else
-  echo "---- Build successful!"
-  echo "---- Continuing with the rest of the script."
-# fi
 
-
+echo "---- Build successful!"
+echo "---- Continuing with the rest of the script."
 
 find $(pwd)/ -type f -name "*.o" -delete
 
-cp *.pd_darwin ../../externals/
-cp *.pd        ../../externals/
+cp $pd_file_ext ../../externals/
+cp *.pd         ../../externals/
 
-mv *.pd_darwin builddir 
-cp *.pd        builddir
-cp *.yaml      builddir
+mv $pd_file_ext builddir 
+cp *.pd         builddir
+cp *.yaml       builddir
 
 pd_name="Pd"
 pd_pgid="$(pgrep ${pd_name})"
@@ -40,6 +56,3 @@ fi
 # open object test patch
 helpfile="zerr_envelope_generator~_helper.pd"
 open builddir/${helpfile}
-
-find "$(pwd)" -name ".DS_Store" -type f -delete
-echo "---- All .DS_Store files have been deleted."
