@@ -73,28 +73,6 @@ private:
 
     t_blockIns             inputBuffer;      /**< TODO */
     t_blockOuts            outputBuffer;     /**< TODO */
-
-    // /**
-    // * @brief TODO
-    // * @param TODO
-    // * @param TODO
-    // * @param TODO
-    // */
-    // void _process_add();
-    // /**
-    // * @brief TODO
-    // * @param TODO
-    // * @param TODO
-    // * @param TODO
-    // */
-    // void _process_root();
-    // /**
-    // * @brief TODO
-    // * @param TODO
-    // * @param TODO
-    // * @param TODO
-    // */
-    // void _process_max();
 }; 
 
 } //namespace zerr

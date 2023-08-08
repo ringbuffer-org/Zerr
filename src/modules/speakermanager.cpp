@@ -1,7 +1,7 @@
 #include "speakermanager.h"
 using namespace zerr;
 
-/* Speaker Class Implementations */
+
 Speaker::Speaker(t_index index, t_position position, t_orientation orientation){
     logger = new Logger();
 
@@ -41,10 +41,6 @@ void Speaker::_print_position(){
 
 
 void Speaker::_print_orientation(){
-    // std::cout << "Orientation: " << "\n"; 
-    // std::cout  << "\t"<< "yaw:   " << orientation.yaw  << "\n";
-    // std::cout  << "\t"<< "pitch: " << orientation.pitch  << "\n";
-
     logger->logInfo("Orientation: ");
     logger->logInfo(formatString("    yaw:   : %.2f", orientation.yaw));
     logger->logInfo(formatString("    pitch: : %.2f", orientation.pitch));
@@ -62,7 +58,6 @@ SpeakerManager::SpeakerManager(std::string config_path){
     #ifdef TESTMODE
     logger->setLogLevel(LogLevel::INFO);
     #endif //TESTMODE
-    logger->logInfo("SpeakerManager::SpeakerManager logger initialized");
     logger->logInfo("SpeakerManager::SpeakerManager " + config_path);
 }
 
@@ -115,11 +110,6 @@ bool SpeakerManager::initialize(){
         // TODO: check if the given two types of coordinate the same
         // if (is_zero_cartesian && is_zero_spherical) {check_coordinate_consistency(cartesian, spherical)} 
 
-        #ifdef TESTMODE
-        // logger->logDebug(formatString("is_zero_cartesian: %u", is_zero_cartesian));
-        // logger->logDebug(formatString("is_zero_spherical: %u", is_zero_spherical));
-        #endif //TESTMODE
-
         cartesian = is_zero_cartesian?_spherical2cartesian(spherical):cartesian; // fill the cartesian if it's not assigned
         spherical = is_zero_spherical?_cartesian2spherical(cartesian):spherical; // fill the spherical if it's not assigned
 
@@ -158,7 +148,7 @@ bool SpeakerManager::initialize(){
     // }
     #endif //TESTMODE
 
-    for (int i = 0; i < unmasked.size(); ++i){
+    for (size_t i = 0; i < unmasked.size(); ++i){
         subindex.push_back(unmasked[i]);
     }
     std::sort(subindex.begin(), subindex.end());
@@ -169,9 +159,7 @@ bool SpeakerManager::initialize(){
     // }
     #endif //TESTMODE
 
-
-
-    // topology_matrix
+    // topology_matrix every speaker is connected
     for (size_t i = 0; i < unmasked.size(); ++i){
         t_indexs tmp_idx = unmasked; // deepcopy
         topology_matrix[unmasked[i]] = tmp_idx;
@@ -190,9 +178,6 @@ bool SpeakerManager::initialize(){
     //      } 
     // }
     #endif //TESTMODE
-
-
-
 
 
     //load specific configuration of the active sub speaker array
@@ -242,6 +227,11 @@ size_t SpeakerManager::get_n_unmasked_speakers() {
 
 t_indexs SpeakerManager::get_unmasked_indexs(){
     return unmasked;
+}
+
+
+t_index SpeakerManager::get_random_index(){
+    return unmasked[_get_random_indexs(unmasked.size(), 1)[0]];
 }
 
 
@@ -353,23 +343,42 @@ std::vector<t_value> SpeakerManager::get_distance_vector(int spkr_idx){
 }
 
 
-t_index SpeakerManager::get_random_index(){
-    return unmasked[_get_random_indexs(unmasked.size(), 1)[0]];
+void SpeakerManager::set_unmasked_indexs(t_indexs idxs, std::string action){
+    if (action=="set"){
+        this->unmasked = idxs;
+        distance_matrix.clear();
+        _init_distance_matrix();
+    }else{
+        logger->logError("SpeakerManager::set_unmasked_indexs unknow action " + action);
+    }
+    #ifdef TESTMODE
+    for (size_t i = 0; i < unmasked.size(); ++i) {
+        logger->logInfo(formatString("unmasked %u %d", i, unmasked[i]));
+    }
+    #endif //TESTMODE
+}
+
+
+void SpeakerManager::set_subindex(t_indexs idxs, std::string action){
+    // TODO: check that the indexs in subindex exist in unmasked
+    if (action=="set"){
+        subindex.clear();
+        subindex = idxs;
+        logger->logError("SpeakerManager::set_subindex set!");
+    }else{
+        logger->logError("SpeakerManager::set_subindex unknow action " + action);
+    }
 }
 
 
 void SpeakerManager::_init_distance_matrix(){
     int n_speakers = get_n_unmasked_speakers();
-    // distance_matrix.resize(n_speakers);
-    // for (auto& vec : distance_matrix) {
-    //     vec.resize(n_speakers);
-    // }
 
     for (int i = 0; i < n_speakers; ++i){
         distance_matrix[unmasked[i]] = {};
         for (int j = 0; j < n_speakers; ++j){
-            Speaker s1 = get_speaker_by_index(unmasked[i]); // speaker index starts from 1
-            Speaker s2 = get_speaker_by_index(unmasked[j]); // speaker index starts from 1
+            Speaker s1 = get_speaker_by_index(unmasked[i]);  
+            Speaker s2 = get_speaker_by_index(unmasked[j]);  
             distance_matrix[unmasked[i]].push_back(_calculate_distance(s1, s2));
         }
     }

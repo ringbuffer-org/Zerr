@@ -6,7 +6,11 @@ extern "C" {
 
 static t_class *zerr_envelope_generator_tilde_class;
 
-void *zerr_envelope_generator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
+
+// void goat_tilde_param_attach(goat_tilde *x, __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) 
+
+
+void *zerr_envelope_generator_tilde_new(__attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
     zerr_envelope_generator_tilde *x = (zerr_envelope_generator_tilde *) pd_new(zerr_envelope_generator_tilde_class);
     if (!x) return NULL;
 
@@ -87,6 +91,25 @@ static t_int *zerr_envelope_generator_tilde_perform(t_int *w) {
 }
 
 
+void zerr_envelope_generator_tilde_param_set(zerr_envelope_generator_tilde *x, 
+    __attribute__((unused)) t_symbol *s, int argc, t_atom *argv){
+
+    if (argc < 2) error("zerr_envelope_generator~: not enough args to parse");
+
+    if (argv[0].a_type != A_SYMBOL) error("zerr_envelope_generator~: no mask action given"); 
+    char* paramName = strdup(atom_getsymbol(argv)->s_name);
+
+    int *indexs_list = (int *)getbytes(argc-1 * sizeof(int));
+
+    for (int i = 1; i < argc; ++i){
+        if (argv[i].a_type != A_FLOAT) error("zerr_envelope_generator~: incorrect index number"); 
+        indexs_list[i-1] = (int)argv[i].a_w.w_float;
+    }
+
+    x->z->set_unmasked_indexs(indexs_list, argc-1);
+}
+
+
 void zerr_envelope_generator_tilde_dsp(zerr_envelope_generator_tilde *x, t_signal **sp) {
     int n_rest = 3; // size of [x, n_vec, n_args]
 
@@ -116,6 +139,12 @@ void zerr_envelope_generator_tilde_setup(void) {
         A_GIMME,0);
 
     class_addmethod(zerr_envelope_generator_tilde_class,
+        (t_method) zerr_envelope_generator_tilde_param_set,
+        gensym("masks"),
+        A_GIMME,
+        A_NULL);
+
+    class_addmethod(zerr_envelope_generator_tilde_class,
         (t_method) zerr_envelope_generator_tilde_dsp,
         gensym("dsp"),
         A_CANT,
@@ -124,7 +153,6 @@ void zerr_envelope_generator_tilde_setup(void) {
     // class_sethelpsymbol(zerr_envelope_generator_tilde_class, gensym("zerr_envelope_generator~"));
     CLASS_MAINSIGNALIN(zerr_envelope_generator_tilde_class, zerr_envelope_generator_tilde, f);
 }
-
 
 #ifdef __cplusplus
 }

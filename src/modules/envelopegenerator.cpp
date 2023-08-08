@@ -15,6 +15,7 @@ EnvelopeGenerator::EnvelopeGenerator(t_systemConfigs systemCfgs, std::string spk
     #endif //TESTMODE
 }
 
+
 bool EnvelopeGenerator::initialize(){
     if (!speakerManager->initialize()) return false;
 
@@ -56,6 +57,12 @@ void EnvelopeGenerator::set_current_speaker(t_index newIdx){
 }
 
 
+void EnvelopeGenerator::set_unmasked_indexs(t_indexs idxs, std::string action){
+    logger->logDebug("EnvelopeGenerator::set_unmasked_indexs set!");
+    speakerManager->set_unmasked_indexs(idxs, action);
+}
+
+
 void EnvelopeGenerator::process(){
     if (selectionMode=="trigger"){_process_trigger();}
     if (selectionMode=="trajectory"){_process_trajectory();}
@@ -74,14 +81,11 @@ void EnvelopeGenerator::_process_trigger(){
     for (size_t i = 0; i < inputBuffer[0].size(); ++i){
         currIdx = speakerManager->get_indexs_by_trigger(inputBuffer[0][i], currIdx, triggerMode);
         channel = indexChannelLookup[currIdx];
-        // logger->logDebug(formatString("EnvelopeGenerator::_process_trigger currIdx %d channel %d", currIdx, channel));
         outputBuffer[channel][i] = inputBuffer[2][i];
 
         distances = speakerManager->get_distance_vector(currIdx);
-        // maxVal = _calculate_normal_distribution(0, inputBuffer[1][i]);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channel) {continue;}
-            // outputBuffer[chnl][i] = _calculate_normal_distribution(distances[chnl], inputBuffer[1][i])/maxVal*inputBuffer[2][i]; // current activated index
             outputBuffer[chnl][i] += _calculate_gain(distances[chnl], inputBuffer[1][i]) * inputBuffer[2][i]; // current activated index
         }
     }
@@ -104,7 +108,7 @@ void EnvelopeGenerator::_process_trajectory(){
         channelPair.second = indexChannelLookup[speakerPair.second];
         if (speakerPair.first == speakerPair.second) {
             outputBuffer[channelPair.first][i] = volume[i];
-        } else { // linear panning TODO: change to crossfade
+        } else { // linear panning TODO: change to crossfade 
             panRatio = speakerManager->get_panning_ratio(inputBuffer[0][i]);
             outputBuffer[channelPair.first][i]  = volume[i] * (1 - panRatio);
             outputBuffer[channelPair.second][i] = volume[i] * panRatio;

@@ -46,6 +46,14 @@ public:
     */
     int get_port_count();
     /**
+    * @brief TODO
+    */
+    void set_unmasked_indexs(int * idxs, size_t size);
+    /**
+    * @brief TODO
+    */
+    // bool process_messages();
+    /**
     * @brief free a zerr_envelope_generator instance
     */
     ~ZerrEnvelopeGenerator();

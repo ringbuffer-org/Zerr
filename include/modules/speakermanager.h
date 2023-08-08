@@ -27,104 +27,137 @@ namespace zerr {
 */
 class Speaker {
 public:
+    /**
+    * @brief
+    */
     Speaker(t_index index, t_position position, t_orientation orientation);
-
-    // All the getters
+    /**
+    * @brief
+    */
     t_index get_index(){return index;}; 
-
+    /**
+    * @brief
+    */
     t_value get_x(){return position.cartesian.x;};
+    /**
+    * @brief
+    */
     t_value get_y(){return position.cartesian.y;};
+    /**
+    * @brief
+    */
     t_value get_z(){return position.cartesian.z;};
-
+    /**
+    * @brief
+    */
     t_value get_azimuth()  {return position.spherical.azimuth;};
+    /**
+    * @brief
+    */
     t_value get_elevation(){return position.spherical.elevation;};
+    /**
+    * @brief
+    */
     t_value get_distance() {return position.spherical.distance;};
-
+    /**
+    * @brief
+    */
     t_value get_yaw()  {return orientation.yaw;};
+    /**
+    * @brief
+    */
     t_value get_pitch(){return orientation.pitch;};
-    
-    // All the printers
+    /**
+    * @brief
+    */
     void print_all();
-    void _print_index();
-    void _print_position();
-    void _print_orientation();
 
 private:
-    Logger *logger;
-
-    t_index       index;
-    t_position    position;
-    t_orientation orientation;
+    Logger       *logger;      /**< TODO */
+    t_index       index;       /**< TODO */
+    t_position    position;    /**< TODO */
+    t_orientation orientation; /**< TODO */
+    /**
+    * @brief
+    */
+    void _print_index();
+    /**
+    * @brief
+    */
+    void _print_position();
+    /**
+    * @brief
+    */
+    void _print_orientation();
 } ;
 
 
 /**
-* SpeakerManager class is for loading speaker array configuration file 
+* @brief SpeakerManager class is for loading speaker array configuration file 
 * and accessing & choosing speakers
 */
 class SpeakerManager {
 public:
     SpeakerManager(std::string config_path);
     /**
-    * setup speaker array via the YAML config file and specified subgroup mode
+    * @brief setup speaker array via the YAML config file and specified subgroup mode
     */
     bool initialize();
     /**
-    * get the number of speakers in this speaker array setup
+    * @brief get the number of speakers in this speaker array setup
     */
     size_t get_n_all_speakers(); 
     /**
-    * get the number of speakers in this speaker array setup
+    * @brief get the number of speakers in this speaker array setup
     */
     size_t get_n_unmasked_speakers(); 
     /**
-    *  TODO
+    * @brief TODO
     */
     t_indexs get_unmasked_indexs();
     /**
-    *  TODO
-    */
-    void set_unmasked_indexs();
-    /**
-    *  TODO
+    * @brief TODO
     */
     t_index get_random_index();
     /**
-    * return the speaker class acoording to speaker index
+    * @brief return the speaker class acoording to speaker index
     */
     Speaker get_speaker_by_index(t_index spkr_idx);
     /**
-    * get the pair of speaker indexs in sorted list acoording to the trajectory input
+    * @brief get the pair of speaker indexs in sorted list acoording to the trajectory input
     */
     t_pair get_indexs_by_trajectory(t_value trajectory_val);
     /**
-    * TODO
+    * @brief TODO
     */
     t_value get_panning_ratio(t_value trajectory_val);
     /**
-    * get the index of speaker that is geometrially close to the input.
+    * @brief get the index of speaker that is geometrially close to the input.
     */
     t_pair get_indexs_by_geometry(std::vector<t_value> pos, std::vector<bool> mask, std::string coordinate);
     /**
-    * jump between different speakers using trigger signal
+    * @brief jump between different speakers using trigger signal
     * the 
     */
     t_index get_indexs_by_trigger(t_value trigger, t_index curr_spkr, int mode);
     /**
-    *  TODO
+    * @brief TODO
     */
     std::vector<float> get_distance_vector(int spkr_idx);
-
     /**
-    *  TODO
+    * @brief TODO
     */
-    void set_subindex();
+    void set_unmasked_indexs(t_indexs idxs, std::string action);
     /**
-    *  TODO
+    * @brief TODO
+    */
+    void set_subindex(t_indexs idxs, std::string action);
+    /**
+    * @brief TODO
     */
     void set_topology_matrix();
     /**
-    *  TODO
+    * @brief TODO
     */
     void reset(std::string config_path);
 

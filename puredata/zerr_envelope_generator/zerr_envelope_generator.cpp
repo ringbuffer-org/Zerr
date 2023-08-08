@@ -63,6 +63,12 @@ int ZerrEnvelopeGenerator::get_port_count(){
 }
 
 
+void ZerrEnvelopeGenerator::set_unmasked_indexs(int * idxs, size_t size){
+    zerr::t_indexs indexVec(idxs, idxs + size);
+    envelopeGenerator->set_unmasked_indexs(indexVec, "set");
+}
+
+
 ZerrEnvelopeGenerator::~ZerrEnvelopeGenerator(){
     delete envelopeGenerator;
     delete logger;
