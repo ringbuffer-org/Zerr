@@ -8,7 +8,8 @@
 
 CC  = g++
 cflags = -std=c++11
-ldflags += -L../../dependencies/lib/yaml-cpp -lyaml-cpp
+ldflags += -L../../dependencies/lib/yaml-cpp 
+ldlibs += -lyaml-cpp
 
 lib.name = zerr_envelope_generator~
 
