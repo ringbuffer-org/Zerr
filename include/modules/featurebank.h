@@ -3,13 +3,14 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include "configs.h"
 // #include "utils.h"
 #include "ringbuffer.h"
 #include "frequencytransformer.h"
 
-#include "features.h"
+#include "audio_features.h"
 #include "featureextractor.h"
 
 namespace zerr {
