@@ -28,43 +28,49 @@ namespace zerr {
 class Speaker {
 public:
     /**
-    * @brief
+    * @brief assgining index and geometry configuration when creating speaker instance
+    * @param index the uniqe identification index of Speaker
+    * @param position cartesian and spherical coordinates
+    * @param orientation yaw & pitch orientation
     */
     Speaker(t_index index, t_position position, t_orientation orientation);
     /**
-    * @brief
+    * @brief return the identification index of this speaker instance
+    * @return t_index index number
     */
     t_index get_index(){return index;}; 
     /**
-    * @brief
+    * @brief return the x in Cartesian coordinate of this speaker instance
+    * @return x coordinate value
     */
     t_value get_x(){return position.cartesian.x;};
     /**
-    * @brief
+    * @brief return the y in Cartesian coordinate of this speaker instance
+    * @return y coordinate value
     */
     t_value get_y(){return position.cartesian.y;};
     /**
-    * @brief
+    * @brief return the z in Cartesian coordinate of this speaker instance
     */
     t_value get_z(){return position.cartesian.z;};
     /**
-    * @brief
+    * @brief return the azimuth in spherical coordinate of this speaker instance
     */
     t_value get_azimuth()  {return position.spherical.azimuth;};
     /**
-    * @brief
+    * @brief return the elevation in spherical coordinate of this speaker instance
     */
     t_value get_elevation(){return position.spherical.elevation;};
     /**
-    * @brief
+    * @brief return the distance in spherical coordinate of this speaker instance
     */
     t_value get_distance() {return position.spherical.distance;};
     /**
-    * @brief
+    * @brief return the yaw in orientation of this speaker instance
     */
     t_value get_yaw()  {return orientation.yaw;};
     /**
-    * @brief
+    * @brief return the pitch in orientation of this speaker instance
     */
     t_value get_pitch(){return orientation.pitch;};
     /**
@@ -89,7 +95,7 @@ private:
     * @brief
     */
     void _print_orientation();
-} ;
+};
 
 
 /**
@@ -155,6 +161,10 @@ public:
     /**
     * @brief TODO
     */
+    void printTopoMatrix();
+    /**
+    * @brief TODO
+    */
     void set_subindex(t_indexs idxs, std::string action);
     /**
     * @brief TODO
@@ -168,7 +178,7 @@ public:
 private:
     Logger *logger;         /**< logger object for logging message in different environment */
 
-    bool initialized=false; /**< indicator of whether the speaker manager object has been initialized or not */
+    // bool initialized=false; /**< indicator of whether the speaker manager object has been initialized or not */
 
     std::string config_path;   /**< file path of speaker array configuration */
     YAML::Node speaker_config; /**< loaded YAML Node structure of speaker array configuration */
@@ -179,7 +189,7 @@ private:
 
     t_indexs unmasked;                           /**< TODO */
     t_indexs subindex;                           /**< TODO */
-    std::map<t_index, t_indexs> topology_matrix; /**< TODO */
+    std::map<t_index, t_indexs> topoMatrix; /**< TODO */
     
     /**
     * @brief  
@@ -240,6 +250,10 @@ private:
     */
     void _del_unmasked_indexs(t_indexs idxs);
 }; 
+
+#ifdef PUREDATA // explicit instantiation required for PD
+template bool isInKey<int, Speaker>(int element, std::map<t_index, Speaker> map);
+#endif //PUREDATA
 
 } //namespace zerr
 #endif // SPEAKERARRAY_H

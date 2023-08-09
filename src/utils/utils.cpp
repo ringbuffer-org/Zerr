@@ -35,6 +35,20 @@ bool isEqualTo0(t_value value, t_value epsilon) {
     return std::abs(value) < epsilon;
 }
 
+
+template<typename T>
+bool isInVec(T element, std::vector<T> vector){
+    auto it = std::find(vector.begin(), vector.end(), element);
+    return it == vector.end()?false:true;
+}
+// explicit instantiation required for PD
+template bool isInVec<int>(int element, std::vector<int> vector);
+
+
+
+
+
+
 std::vector<double> applyMovingAverage(const std::vector<double>& segment, int windowSize) {
     std::vector<double> filteredSegment(segment.size(), 0.0);
 

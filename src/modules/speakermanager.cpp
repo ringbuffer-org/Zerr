@@ -113,7 +113,7 @@ bool SpeakerManager::initialize(){
         cartesian = is_zero_cartesian?_spherical2cartesian(spherical):cartesian; // fill the cartesian if it's not assigned
         spherical = is_zero_spherical?_cartesian2spherical(cartesian):spherical; // fill the spherical if it's not assigned
 
-        t_position position;
+        t_position            position;
         position.cartesian = cartesian;
         position.spherical = spherical;
 
@@ -142,74 +142,16 @@ bool SpeakerManager::initialize(){
 
     // initialize the specific configs
     // every speaker is unmasked when at initialize point
-    #ifdef TESTMODE
-    // for (size_t i = 0; i < unmasked.size(); ++i) {
-    //     logger->logInfo(formatString("unmasked %u %d", i, unmasked[i]));
-    // }
-    #endif //TESTMODE
-
     for (size_t i = 0; i < unmasked.size(); ++i){
         subindex.push_back(unmasked[i]);
     }
     std::sort(subindex.begin(), subindex.end());
 
-    #ifdef TESTMODE
-    // for (size_t i = 0; i < subindex.size(); ++i) {
-    //     logger->logInfo(formatString("subindex %u %d", i, subindex[i]));
-    // }
-    #endif //TESTMODE
-
-    // topology_matrix every speaker is connected
+    // topoMatrix every speaker is connected
     for (size_t i = 0; i < unmasked.size(); ++i){
         t_indexs tmp_idx = unmasked; // deepcopy
-        topology_matrix[unmasked[i]] = tmp_idx;
+        topoMatrix[unmasked[i]] = tmp_idx;
     }
-
-    #ifdef TESTMODE
-    // logger->logInfo("---------------------");
-    // logger->logInfo("topology_matrix------");
-    // for (const auto& maps : topology_matrix) {
-    //     t_index  key   = maps.first;
-    //     t_indexs value = maps.second;
-    //     logger->logInfo(formatString("ID: %d", key));
-    //     logger->logInfo("  Connected:");
-    //     for (int i = 0; i < value.size(); ++i){
-    //         logger->logInfo(formatString("  %d", value[i]));
-    //      } 
-    // }
-    #endif //TESTMODE
-
-
-    //load specific configuration of the active sub speaker array
-    // YAML::Node specificNodes = speaker_config["specific"][mode];
-    // assert(specificNodes["unmasked"].IsSequence() && "SpeakerManager::initialize: unmasked property must be a list");
-    // assert(specificNodes["subindex"].IsSequence() && "SpeakerManager::initialize: subindex property must be a list");
-
-    // for (size_t i = 0; i < specificNodes["unmasked"].size(); ++i) {
-    //     unmasked.push_back(specificNodes["unmasked"][i].as<t_index>());
-    // }
-    // _init_distance_matrix();
-
-    // for (size_t i = 0; i < specificNodes["subindex"].size(); ++i) {
-    //     subindex.push_back(specificNodes["subindex"][i].as<t_index>());
-    // }
-
-    // // topology_matrix
-    // YAML::Node topologyNode = specificNodes["topology"];
-    // for (auto it = topologyNode.begin(); it != topologyNode.end(); ++it){
-    //     YAML::Node key   = it->first;
-    //     YAML::Node value = it->second;
-
-    //     t_indexs tmp_idx;
-    //     assert(value.IsSequence() && "SpeakerManager::initialize: topology property must be a list");
-    //     for (size_t i = 0; i < value.size(); ++i) {
-    //         tmp_idx.push_back(value[i].as<t_index>());
-    //     } 
-    //     topology_matrix[key.as<t_index>()] = tmp_idx;
-    // }
-
-    // set the speaker manager as initialized
-    // initialized=true;
 
     return true;
 }
@@ -317,7 +259,7 @@ t_index SpeakerManager::get_indexs_by_trigger(t_value trigger, t_index curr_spkr
     // just return the original one when trigger doesn't close to 1.0
     if (!isEqualTo1(trigger, TRIGGER_THRESHOLD)) return curr_spkr;
     // load all connected speakers from the topology matrix
-    t_indexs candidates = topology_matrix[curr_spkr];
+    t_indexs candidates = topoMatrix[curr_spkr];
     // if only one speaker connected to the current one, just return it
     if (candidates.size()==1) return candidates[0];
 
@@ -359,8 +301,10 @@ void SpeakerManager::manage_unmasked_indexs(std::string action, t_indexs idxs){
 
     #ifdef TESTMODE
     print_unmasked_indexs();
+    printTopoMatrix();
     #endif //TESTMODE
 }
+
 
 void SpeakerManager::print_unmasked_indexs(){
     for (size_t i = 0; i < unmasked.size(); ++i) {
@@ -369,8 +313,18 @@ void SpeakerManager::print_unmasked_indexs(){
 }
 
 
+void SpeakerManager::printTopoMatrix(){
+    for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
+        post("");
+        for (int i = 0; i < it->second.size(); ++i){
+            // logger->logInfo(it->second);
+            postfloat(it->second[i]);
+        }
+    }
+}
+
+
 void SpeakerManager::set_subindex(t_indexs idxs, std::string action){
-    // TODO: check that the indexs in subindex exist in unmasked
     if (action=="set"){
         subindex.clear();
         subindex = idxs;
@@ -423,7 +377,6 @@ float SpeakerManager::_calculate_distance(Speaker s1, Speaker s2){
 
 
 std::vector<int> SpeakerManager::_get_random_indexs(int l, int n){
-    //TODO: remove duplicate
     assert(l >= n); 
     int idx;
     std::vector<int> random_indexs;
@@ -481,22 +434,20 @@ void SpeakerManager::_set_unmasked_indexs(t_indexs idxs){
     }
     std::sort(subindex.begin(), subindex.end());
 
-    topology_matrix.clear();
+    topoMatrix.clear();
     for (size_t i = 0; i < unmasked.size(); ++i){
         t_indexs tmp_idx = unmasked; // deepcopy
-        topology_matrix[unmasked[i]] = tmp_idx;
+        topoMatrix[unmasked[i]] = tmp_idx;
     }
 }
 
 
 void SpeakerManager::_add_unmasked_indexs(t_indexs idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
-        auto spkLoc = speakers.find(idxs[i]);
-        if(spkLoc == speakers.end()) {
-            logger->logError("SpeakerManager::_add_unmasked_indexs unknow speaker index!");
+        if(!isInKey<t_index, Speaker>(idxs[i], speakers)) {
+            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs unknow speaker index %d!", idxs[i]));
             return;
         }
-
         auto mskLoc = std::find(unmasked.begin(), unmasked.end(), idxs[i]);
         if(mskLoc == unmasked.end()) {
             unmasked.push_back(idxs[i]);
@@ -509,17 +460,63 @@ void SpeakerManager::_add_unmasked_indexs(t_indexs idxs){
 
 void SpeakerManager::_del_unmasked_indexs(t_indexs idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
-        auto spkLoc = speakers.find(idxs[i]);
-        if(spkLoc == speakers.end()) {
+        // check if the input index is valid
+        if(!isInKey<t_index, Speaker>(idxs[i], speakers)) {
             logger->logError("SpeakerManager::set_unmasked_indexs unknow speaker index!");
             return;
         }
-        auto mskLoc = std::find(unmasked.begin(), unmasked.end(), idxs[i]);
-        if(mskLoc == unmasked.end()) {
-            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already masked, ignored", idxs[i]));
+        // remove from unmasked
+        if(!isInVec<t_index>(idxs[i], unmasked)) {
+            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already removed, ignored", idxs[i]));
         }else{
             unmasked.erase(std::remove(unmasked.begin(), unmasked.end(), idxs[i]), unmasked.end());
-            // TODO: remove from topology and subindex
+        }
+        // remove from subindex
+        if(!isInVec<t_index>(idxs[i], subindex)) {
+            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already removed, ignored", idxs[i]));
+        }else{
+            subindex.erase(std::remove(subindex.begin(), subindex.end(), idxs[i]), subindex.end());
+        }
+        // TODO: remove from topology matrix
+        if (isInKey<t_index, t_indexs>(idxs[i], topoMatrix)) {
+            topoMatrix.erase(idxs[i]);
+        } 
+        for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
+            if(isInVec<t_index>(idxs[i], it->second)) {
+                it->second.erase(std::remove(it->second.begin(), it->second.end(), idxs[i]), it->second.end());
+            }
         }
     }
 }
+
+
+    //load specific configuration of the active sub speaker array
+    // YAML::Node specificNodes = speaker_config["specific"][mode];
+    // assert(specificNodes["unmasked"].IsSequence() && "SpeakerManager::initialize: unmasked property must be a list");
+    // assert(specificNodes["subindex"].IsSequence() && "SpeakerManager::initialize: subindex property must be a list");
+
+    // for (size_t i = 0; i < specificNodes["unmasked"].size(); ++i) {
+    //     unmasked.push_back(specificNodes["unmasked"][i].as<t_index>());
+    // }
+    // _init_distance_matrix();
+
+    // for (size_t i = 0; i < specificNodes["subindex"].size(); ++i) {
+    //     subindex.push_back(specificNodes["subindex"][i].as<t_index>());
+    // }
+
+    // // topology_matrix
+    // YAML::Node topologyNode = specificNodes["topology"];
+    // for (auto it = topologyNode.begin(); it != topologyNode.end(); ++it){
+    //     YAML::Node key   = it->first;
+    //     YAML::Node value = it->second;
+
+    //     t_indexs tmp_idx;
+    //     assert(value.IsSequence() && "SpeakerManager::initialize: topology property must be a list");
+    //     for (size_t i = 0; i < value.size(); ++i) {
+    //         tmp_idx.push_back(value[i].as<t_index>());
+    //     } 
+    //     topology_matrix[key.as<t_index>()] = tmp_idx;
+    // }
+
+    // set the speaker manager as initialized
+    // initialized=true;

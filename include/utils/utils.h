@@ -1,26 +1,28 @@
+/**
+ * @file utils.h
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief  Utilities of Zerr* system
+ * @version 0.1.1
+ * @date 2023-08-09
+ * 
+ * @copyright Copyright (c) 2023
+ */
 #ifndef UTILS_H
 #define UTILS_H
 
-// standard libaries
-// #include <stdlib.h>
-// #include <vector>
-// #include <algorithm>
-#include <math.h>
-// #include <unistd.h>
-#include <limits>
-// #include <random>
-// #include <memory>
-// #include <chrono>
-// #include <thread>
-#include <string>
-// #include <complex.h>
 #include <iostream>
+#include <math.h>
+#include <limits>
+#include <string>
 #include <sstream>
 #include <cstdarg>
 #include <cstring>
-#include "types.h"
 #include <cassert>
 #include <algorithm>
+#include <vector>
+#include <map>
+
+#include "types.h"
 
 namespace zerr {
 /**
@@ -53,6 +55,25 @@ bool isEqualTo0(t_value value, t_value epsilon = std::numeric_limits<t_value>::e
 inline float get_hann_sample(int pos, int L){
     float val = 0.5 * (1.0 - cos( (2.0*PI* (float) pos) / (float)L) );
     return val;
+}
+/**
+* @brief find if certain element is inside the std::vector
+* @param element the element to be found
+* @param vector the std:vector may contain the element
+* @return bool is the element in the vector or not
+*/
+template<typename T>
+bool isInVec(T element, std::vector<T> vector);
+/**
+* @brief find if certain element is inside the std::vector
+* @param element the element to be found
+* @param vector the std:vector may contain the element
+* @return bool is the element in the vector or not
+*/
+template<typename T, typename U>
+bool isInKey(T element, std::map<T, U> map){
+    auto it = map.find(element);
+    return it == map.end()?false:true;
 }
 /**
 * @brief TODO

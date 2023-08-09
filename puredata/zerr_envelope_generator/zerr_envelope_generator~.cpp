@@ -28,19 +28,17 @@ void *zerr_envelope_generator_tilde_new(__attribute__((unused)) t_symbol *s, int
 
     // find the absolute path of config file
     t_canvas *canvas = canvas_getcurrent();
+
+    const char *dir;
+    dir = canvas_getdir(canvas)->s_name;
+
     char dirResult[MAXPDSTRING], *nameResult;
-    if ((canvas_open(canvas, spkrCfgName, "", dirResult, &nameResult, MAXPDSTRING, 0)) < 0){
+    if ((canvas_open(canvas, spkrCfgName, ".yaml", dirResult, &nameResult, MAXPDSTRING, 0)) < 0){
         pd_error(0, "%s: can't open", spkrCfgName);
         return NULL;
     }
-
-    // #ifdef TESTMODE
-    // t_symbol *canvas_dir = canvas_getdir(canvas);
-    // char* canvas_dir_path = strdup(canvas_dir->s_name);  //TODO: add this to system config
-    // post("current working directory:");
-    // post(canvas_dir_path);
-    // #endif //TESTMODE 
-    char spkrCfgFile[MAXPDSTRING];
+    
+    char spkrCfgFile[MAXPDSTRING]="";
     strcat(spkrCfgFile, dirResult);
     #ifdef WINDOWS
     strcat(spkrCfgFile, "\\"); 
@@ -48,6 +46,7 @@ void *zerr_envelope_generator_tilde_new(__attribute__((unused)) t_symbol *s, int
     strcat(spkrCfgFile, "/"); 
     #endif //WINDOWS
     strcat(spkrCfgFile, nameResult);
+    post(spkrCfgFile);
 
     x->z = new ZerrEnvelopeGenerator(systemCfgs, selectionMode, spkrCfgFile); 
     if (!x->z) return NULL;
