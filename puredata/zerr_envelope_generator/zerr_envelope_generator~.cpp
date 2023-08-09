@@ -94,19 +94,30 @@ static t_int *zerr_envelope_generator_tilde_perform(t_int *w) {
 void zerr_envelope_generator_tilde_param_set(zerr_envelope_generator_tilde *x, 
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv){
 
-    if (argc < 2) error("zerr_envelope_generator~: not enough args to parse");
-
-    if (argv[0].a_type != A_SYMBOL) error("zerr_envelope_generator~: no mask action given"); 
-    char* paramName = strdup(atom_getsymbol(argv)->s_name);
-
-    int *indexs_list = (int *)getbytes(argc-1 * sizeof(int));
-
-    for (int i = 1; i < argc; ++i){
-        if (argv[i].a_type != A_FLOAT) error("zerr_envelope_generator~: incorrect index number"); 
-        indexs_list[i-1] = (int)argv[i].a_w.w_float;
+    if (argc < 2) {
+        error("zerr_envelope_generator~: not enough args to parse");
+        return;
     }
 
-    x->z->set_unmasked_indexs(indexs_list, argc-1);
+    if (argv[0].a_type != A_SYMBOL) {
+        error("zerr_envelope_generator~: no mask action given"); 
+        return;
+    }
+
+    char* action = strdup(atom_getsymbol(argv)->s_name);
+
+    int idx_size = argc-1;
+    int *indexs_list = (int *)getbytes(idx_size* sizeof(int));
+
+    for (int i = 0; i < idx_size; ++i){
+        if (argv[i+1].a_type != A_FLOAT) {
+            error("zerr_envelope_generator~: incorrect index number"); 
+            return;
+        }
+        indexs_list[i] = (int)argv[i+1].a_w.w_float;
+    }
+
+    x->z->set_unmasked_indexs(action, indexs_list, argc-1);
 }
 
 

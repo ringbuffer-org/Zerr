@@ -1,4 +1,4 @@
-#N canvas 72 39 1440 788 12;
+#N canvas 2127 108 1440 788 12;
 #N canvas 0 22 450 278 (subpatch) 0;
 #X array array1 100 float 3;
 #A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
@@ -210,7 +210,7 @@
 #X obj 275 612 * -1;
 #X msg 211 591 1;
 #X obj 309 647 phasor~ 0.1;
-#X msg 117 417 set mask 12 13 14;
+#X msg 117 416 masks set 12 13 14;
 #X obj 203 456 zerr_envelope_generator~ trajectory circulation_8.yaml;
 #X connect 10 0 27 2;
 #X connect 11 0 13 0;

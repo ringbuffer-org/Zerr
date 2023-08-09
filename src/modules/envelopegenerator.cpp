@@ -57,9 +57,8 @@ void EnvelopeGenerator::set_current_speaker(t_index newIdx){
 }
 
 
-void EnvelopeGenerator::set_unmasked_indexs(t_indexs idxs, std::string action){
-    logger->logDebug("EnvelopeGenerator::set_unmasked_indexs set!");
-    speakerManager->set_unmasked_indexs(idxs, action);
+void EnvelopeGenerator::set_unmasked_indexs(std::string action, t_indexs idxs){
+    speakerManager->set_unmasked_indexs(action, idxs);
 }
 
 

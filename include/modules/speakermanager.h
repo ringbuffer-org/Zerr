@@ -147,7 +147,7 @@ public:
     /**
     * @brief TODO
     */
-    void set_unmasked_indexs(t_indexs idxs, std::string action);
+    void set_unmasked_indexs(std::string action, t_indexs idxs);
     /**
     * @brief TODO
     */
@@ -211,7 +211,12 @@ private:
     * @return  
     */
     t_index _find_nearest(t_index curr_spkr, t_indexs candidates);
-    
+    /**
+    * @brief  
+    * @param  
+    * @return  
+    */
+    bool _check_index_exist(t_index idx);
 }; 
 
 } //namespace zerr

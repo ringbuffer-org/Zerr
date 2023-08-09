@@ -48,7 +48,7 @@ public:
     /**
     * @brief TODO
     */
-    void set_unmasked_indexs(int * idxs, size_t size);
+    void set_unmasked_indexs(char* action, int* idxs, size_t size);
     /**
     * @brief TODO
     */

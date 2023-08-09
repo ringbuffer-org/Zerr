@@ -65,7 +65,7 @@ public:
     * @param idxs
     * @param action
     */
-    void set_unmasked_indexs(t_indexs idxs, std::string action);
+    void set_unmasked_indexs(std::string action, t_indexs idxs);
     /**
     * @brief reset all parameters and reinitialize. emtpy for now
     */
