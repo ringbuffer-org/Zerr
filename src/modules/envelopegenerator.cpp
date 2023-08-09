@@ -133,6 +133,10 @@ void EnvelopeGenerator::_set_index_channel_lookup(t_indexs indexs){
 
 
 t_blockOuts EnvelopeGenerator::send(){
+    // TODO: tmp solution ask for advices
+    for (size_t i = 0; i < outputBuffer.size(); ++i){
+        outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
+    }
     return outputBuffer;
 }
 

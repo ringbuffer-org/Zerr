@@ -16,4 +16,6 @@
 
 #define DISTANCE_SCALE    1e-1  /**< TODO  */
 
+// #define AVERAGEFILTER_WINDOWSIZE 11
+
 #endif //CONFIGS_H

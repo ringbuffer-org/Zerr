@@ -54,6 +54,13 @@ inline float get_hann_sample(int pos, int L){
     float val = 0.5 * (1.0 - cos( (2.0*PI* (float) pos) / (float)L) );
     return val;
 }
+/**
+* @brief TODO
+* @param TODO
+* @param TODO
+* @return TODO
+*/
+std::vector<double> applyMovingAverage(const std::vector<double>& segment, int windowSize);
 
 } // zerr
 #endif //UTILS_H

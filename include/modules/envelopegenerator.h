@@ -10,7 +10,7 @@
 #ifndef ENVELOPEGENERATOR_H
 #define ENVELOPEGENERATOR_H
 
-// #include "utils.h"
+#include "utils.h"
 #include "types.h"
 #include "logger.h"
 

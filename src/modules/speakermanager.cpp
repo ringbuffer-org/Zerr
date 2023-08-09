@@ -470,9 +470,24 @@ void SpeakerManager::_set_unmasked_indexs(t_indexs idxs){
         }
     }
     unmasked = idxs;
+
+    // reset also distance matrix and topology to init state
     distance_matrix.clear();
     _init_distance_matrix();
+
+    subindex.clear();
+    for (size_t i = 0; i < unmasked.size(); ++i){
+        subindex.push_back(unmasked[i]);
+    }
+    std::sort(subindex.begin(), subindex.end());
+
+    topology_matrix.clear();
+    for (size_t i = 0; i < unmasked.size(); ++i){
+        t_indexs tmp_idx = unmasked; // deepcopy
+        topology_matrix[unmasked[i]] = tmp_idx;
+    }
 }
+
 
 void SpeakerManager::_add_unmasked_indexs(t_indexs idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
@@ -491,6 +506,7 @@ void SpeakerManager::_add_unmasked_indexs(t_indexs idxs){
     }
 }
 
+
 void SpeakerManager::_del_unmasked_indexs(t_indexs idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
         auto spkLoc = speakers.find(idxs[i]);
@@ -503,6 +519,7 @@ void SpeakerManager::_del_unmasked_indexs(t_indexs idxs){
             logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already masked, ignored", idxs[i]));
         }else{
             unmasked.erase(std::remove(unmasked.begin(), unmasked.end(), idxs[i]), unmasked.end());
+            // TODO: remove from topology and subindex
         }
     }
 }

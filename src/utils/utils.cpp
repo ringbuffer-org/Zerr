@@ -35,6 +35,24 @@ bool isEqualTo0(t_value value, t_value epsilon) {
     return std::abs(value) < epsilon;
 }
 
+std::vector<double> applyMovingAverage(const std::vector<double>& segment, int windowSize) {
+    std::vector<double> filteredSegment(segment.size(), 0.0);
+
+    for (int i = 0; i < segment.size(); ++i) {
+        double sum = 0.0;
+        int count = 0;
+        for (int j = i - windowSize + 1; j <= i; ++j) {
+            if (j >= 0) {
+                sum += segment[j];
+                ++count;
+            }
+        }
+        filteredSegment[i] = sum / count;
+    }
+
+    return filteredSegment;
+}
+
 } // zerr
 
 
