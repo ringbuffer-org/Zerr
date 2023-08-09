@@ -91,7 +91,7 @@ static t_int *zerr_envelope_generator_tilde_perform(t_int *w) {
 }
 
 
-void zerr_envelope_generator_tilde_param_set(zerr_envelope_generator_tilde *x, 
+void zerr_envelope_generator_tilde_set_masks(zerr_envelope_generator_tilde *x, 
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv){
 
     if (argc < 2) {
@@ -117,9 +117,15 @@ void zerr_envelope_generator_tilde_param_set(zerr_envelope_generator_tilde *x,
         indexs_list[i] = (int)argv[i+1].a_w.w_float;
     }
 
-    x->z->set_unmasked_indexs(action, indexs_list, argc-1);
+    x->z->manage_unmasked_indexs(action, indexs_list, argc-1);
 }
 
+
+void zerr_envelope_generator_tilde_print(
+    zerr_envelope_generator_tilde *x, t_symbol *paramname){
+    char* name = paramname->s_name;
+    x->z->print_parameters(name);
+}
 
 void zerr_envelope_generator_tilde_dsp(zerr_envelope_generator_tilde *x, t_signal **sp) {
     int n_rest = 3; // size of [x, n_vec, n_args]
@@ -150,9 +156,15 @@ void zerr_envelope_generator_tilde_setup(void) {
         A_GIMME,0);
 
     class_addmethod(zerr_envelope_generator_tilde_class,
-        (t_method) zerr_envelope_generator_tilde_param_set,
+        (t_method) zerr_envelope_generator_tilde_set_masks,
         gensym("masks"),
         A_GIMME,
+        A_NULL);
+
+    class_addmethod(zerr_envelope_generator_tilde_class,
+        (t_method) zerr_envelope_generator_tilde_print,
+        gensym("print"),
+        A_SYMBOL,
         A_NULL);
 
     class_addmethod(zerr_envelope_generator_tilde_class,

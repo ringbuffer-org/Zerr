@@ -343,59 +343,29 @@ std::vector<t_value> SpeakerManager::get_distance_vector(int spkr_idx){
 }
 
 
-void SpeakerManager::set_unmasked_indexs(std::string action, t_indexs idxs){
+void SpeakerManager::manage_unmasked_indexs(std::string action, t_indexs idxs){
     if (action=="set"){
-        for (size_t i = 0; i < idxs.size(); ++i){
-            auto it = speakers.find(idxs[i]);
-            if(it == speakers.end()) {
-                logger->logError(formatString("SpeakerManager::set_unmasked_indexs unknow speaker index %d!", idxs[i]));
-                return;
-            }
-        }
-        unmasked = idxs;
-        distance_matrix.clear();
-        _init_distance_matrix();
+        _set_unmasked_indexs(idxs);
     }
     else if (action=="add"){
-        for (size_t i = 0; i < idxs.size(); ++i){
-            auto spkLoc = speakers.find(idxs[i]);
-            if(spkLoc == speakers.end()) {
-                logger->logError("SpeakerManager::set_unmasked_indexs unknow speaker index!");
-                return;
-            }
-
-            auto mskLoc = std::find(unmasked.begin(), unmasked.end(), idxs[i]);
-            if(mskLoc == unmasked.end()) {
-                unmasked.push_back(idxs[i]);
-            }else{
-                logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already unmasked, ignored", idxs[i]));
-            }
-        }
+        _add_unmasked_indexs(idxs);
     }
     else if (action=="del"){
-        for (size_t i = 0; i < idxs.size(); ++i){
-            auto spkLoc = speakers.find(idxs[i]);
-            if(spkLoc == speakers.end()) {
-                logger->logError("SpeakerManager::set_unmasked_indexs unknow speaker index!");
-                return;
-            }
-            auto mskLoc = std::find(unmasked.begin(), unmasked.end(), idxs[i]);
-            if(mskLoc == unmasked.end()) {
-                logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already masked, ignored", idxs[i]));
-            }else{
-                unmasked.erase(std::remove(unmasked.begin(), unmasked.end(), idxs[i]), unmasked.end());
-            }
-        }
+        _del_unmasked_indexs(idxs);
     }
     else{
-        logger->logError("SpeakerManager::set_unmasked_indexs unknow action" + action);
+        logger->logWarning("SpeakerManager::set_unmasked_indexs unknow action" + action);
     }
 
     #ifdef TESTMODE
+    print_unmasked_indexs();
+    #endif //TESTMODE
+}
+
+void SpeakerManager::print_unmasked_indexs(){
     for (size_t i = 0; i < unmasked.size(); ++i) {
         logger->logInfo(formatString("masks %u %d", i, unmasked[i]));
     }
-    #endif //TESTMODE
 }
 
 
@@ -490,3 +460,49 @@ t_spherical SpeakerManager::_cartesian2spherical(t_cartesian cartesian){
     return spherical;
 }
 
+
+void SpeakerManager::_set_unmasked_indexs(t_indexs idxs){
+    for (size_t i = 0; i < idxs.size(); ++i){
+        auto it = speakers.find(idxs[i]);
+        if(it == speakers.end()) {
+            logger->logError(formatString("SpeakerManager::_set_unmasked_indexs unknow speaker index %d!", idxs[i]));
+            return;
+        }
+    }
+    unmasked = idxs;
+    distance_matrix.clear();
+    _init_distance_matrix();
+}
+
+void SpeakerManager::_add_unmasked_indexs(t_indexs idxs){
+    for (size_t i = 0; i < idxs.size(); ++i){
+        auto spkLoc = speakers.find(idxs[i]);
+        if(spkLoc == speakers.end()) {
+            logger->logError("SpeakerManager::_add_unmasked_indexs unknow speaker index!");
+            return;
+        }
+
+        auto mskLoc = std::find(unmasked.begin(), unmasked.end(), idxs[i]);
+        if(mskLoc == unmasked.end()) {
+            unmasked.push_back(idxs[i]);
+        }else{
+            logger->logWarning(formatString("SpeakerManager::_add_unmasked_indexs index %d already unmasked, ignored", idxs[i]));
+        }
+    }
+}
+
+void SpeakerManager::_del_unmasked_indexs(t_indexs idxs){
+    for (size_t i = 0; i < idxs.size(); ++i){
+        auto spkLoc = speakers.find(idxs[i]);
+        if(spkLoc == speakers.end()) {
+            logger->logError("SpeakerManager::set_unmasked_indexs unknow speaker index!");
+            return;
+        }
+        auto mskLoc = std::find(unmasked.begin(), unmasked.end(), idxs[i]);
+        if(mskLoc == unmasked.end()) {
+            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already masked, ignored", idxs[i]));
+        }else{
+            unmasked.erase(std::remove(unmasked.begin(), unmasked.end(), idxs[i]), unmasked.end());
+        }
+    }
+}

@@ -48,11 +48,11 @@ public:
     /**
     * @brief TODO
     */
-    void set_unmasked_indexs(char* action, int* idxs, size_t size);
+    void manage_unmasked_indexs(char* action, int* idxs, size_t size);
     /**
     * @brief TODO
     */
-    // bool process_messages();
+    void print_parameters(char* name);
     /**
     * @brief free a zerr_envelope_generator instance
     */

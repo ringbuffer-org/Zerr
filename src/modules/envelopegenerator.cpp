@@ -57,8 +57,17 @@ void EnvelopeGenerator::set_current_speaker(t_index newIdx){
 }
 
 
-void EnvelopeGenerator::set_unmasked_indexs(std::string action, t_indexs idxs){
-    speakerManager->set_unmasked_indexs(action, idxs);
+void EnvelopeGenerator::manage_unmasked_indexs(std::string action, t_indexs idxs){
+    speakerManager->manage_unmasked_indexs(action, idxs);
+}
+
+
+void EnvelopeGenerator::print_parameters(std::string name){
+    if (name=="masks"){
+        speakerManager->print_unmasked_indexs();
+    }else{
+        logger->logError("EnvelopeGenerator::print_parameters unknown parameter " + name);
+    }
 }
 
 

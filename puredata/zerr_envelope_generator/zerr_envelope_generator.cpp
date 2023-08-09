@@ -63,13 +63,14 @@ int ZerrEnvelopeGenerator::get_port_count(){
 }
 
 
-void ZerrEnvelopeGenerator::set_unmasked_indexs(char* action, int* idxs, size_t size){
+void ZerrEnvelopeGenerator::manage_unmasked_indexs(char* action, int* idxs, size_t size){
     zerr::t_indexs indexVec(idxs, idxs + size);
-    // zerr::t_indexs indexVec;
-    // for (size_t i = 0; i < size; ++i){
-    //     indexVec.push_back(idxs[i]);
-    // }
-    envelopeGenerator->set_unmasked_indexs(action, indexVec);
+    envelopeGenerator->manage_unmasked_indexs(action, indexVec);
+}
+
+
+void ZerrEnvelopeGenerator::print_parameters(char* name){
+    envelopeGenerator->print_parameters(name);
 }
 
 

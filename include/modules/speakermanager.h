@@ -147,7 +147,11 @@ public:
     /**
     * @brief TODO
     */
-    void set_unmasked_indexs(std::string action, t_indexs idxs);
+    void manage_unmasked_indexs(std::string action, t_indexs idxs);
+    /**
+    * @brief TODO
+    */
+    void print_unmasked_indexs();
     /**
     * @brief TODO
     */
@@ -217,6 +221,24 @@ private:
     * @return  
     */
     bool _check_index_exist(t_index idx);
+    /**
+    * @brief  
+    * @param  
+    * @return  
+    */
+    void _set_unmasked_indexs(t_indexs idxs);
+    /**
+    * @brief  
+    * @param  
+    * @return  
+    */
+    void _add_unmasked_indexs(t_indexs idxs);
+    /**
+    * @brief  
+    * @param  
+    * @return  
+    */
+    void _del_unmasked_indexs(t_indexs idxs);
 }; 
 
 } //namespace zerr
