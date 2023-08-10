@@ -34,6 +34,7 @@ void ZeroCrossings::reset(){
 
 void ZeroCrossings::fetch(t_featureInputs in){
     x = in.blck;
+    y.clear();
     y.resize(x.size(), 0.0f);
 }
 

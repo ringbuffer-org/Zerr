@@ -1,13 +1,13 @@
-#include "zerr_feature_tracker_tilde.h"
+#include "zerr_features_tilde.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static t_class *zerr_feature_tracker_tilde_class;
+static t_class *zerr_features_tilde_class;
 
-void *zerr_feature_tracker_tilde_new(t_symbol *s, int argc, t_atom *argv) {
-    zerr_feature_tracker_tilde *x = (zerr_feature_tracker_tilde *) pd_new(zerr_feature_tracker_tilde_class);
+void *zerr_features_tilde_new(t_symbol *s, int argc, t_atom *argv) {
+    zerr_features_tilde *x = (zerr_features_tilde *) pd_new(zerr_features_tilde_class);
     if (!x) return NULL;
 
     if (argc < 1) return NULL;
@@ -50,13 +50,13 @@ void *zerr_feature_tracker_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     return (void *) x;
 }
 
-void zerr_feature_tracker_tilde_free(zerr_feature_tracker_tilde *x) {
+void zerr_features_tilde_free(zerr_features_tilde *x) {
     freebytes(x->x_vec, x->n_outlet * sizeof(*x->x_vec));
     delete x->z;
 }
 
-static t_int *zerr_feature_tracker_tilde_perform(t_int *w) {
-    zerr_feature_tracker_tilde *x = (zerr_feature_tracker_tilde *) w[1];
+static t_int *zerr_features_tilde_perform(t_int *w) {
+    zerr_features_tilde *x = (zerr_features_tilde *) w[1];
     int n_vec     = (int) w[2];
     int n_args    = (int) w[3];
 
@@ -68,7 +68,7 @@ static t_int *zerr_feature_tracker_tilde_perform(t_int *w) {
     return &w[n_args+1];
 }
 
-void zerr_feature_tracker_tilde_dsp(zerr_feature_tracker_tilde *x, t_signal **sp) {
+void zerr_features_tilde_dsp(zerr_features_tilde *x, t_signal **sp) {
     int n_rest = 3; // size of [x, n_vec, n_args]
 
     int n_vec = sp[0]->s_n;
@@ -84,25 +84,25 @@ void zerr_feature_tracker_tilde_dsp(zerr_feature_tracker_tilde *x, t_signal **sp
         vec[i+n_rest] = (t_int) sp[i]->s_vec;
     }
 
-    dsp_addv(zerr_feature_tracker_tilde_perform, n_args, vec);
+    dsp_addv(zerr_features_tilde_perform, n_args, vec);
 }
 
-void zerr_feature_tracker_tilde_setup(void) {
-    zerr_feature_tracker_tilde_class = class_new(gensym("zerr_feature_tracker~"),
-        (t_newmethod) zerr_feature_tracker_tilde_new,
-        (t_method) zerr_feature_tracker_tilde_free,
-        (size_t) sizeof(zerr_feature_tracker_tilde),
+void zerr_features_tilde_setup(void) {
+    zerr_features_tilde_class = class_new(gensym("zerr_features~"),
+        (t_newmethod) zerr_features_tilde_new,
+        (t_method) zerr_features_tilde_free,
+        (size_t) sizeof(zerr_features_tilde),
         CLASS_DEFAULT,
         A_GIMME,0);
 
-    class_addmethod(zerr_feature_tracker_tilde_class,
-        (t_method) zerr_feature_tracker_tilde_dsp,
+    class_addmethod(zerr_features_tilde_class,
+        (t_method) zerr_features_tilde_dsp,
         gensym("dsp"),
         A_CANT,
         A_NULL);
 
     // class_sethelpsymbol(zerr_tilde_class, gensym("zerr~"));
-    CLASS_MAINSIGNALIN(zerr_feature_tracker_tilde_class, zerr_feature_tracker_tilde, f);
+    CLASS_MAINSIGNALIN(zerr_features_tilde_class, zerr_features_tilde, f);
 }
 
 #ifdef __cplusplus

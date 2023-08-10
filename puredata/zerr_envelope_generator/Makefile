@@ -1,4 +1,4 @@
-# Makefile to build object 'zerr_envelope_generator' for Pure Data.
+# Makefile to build object 'zerr_envelopes' for Pure Data.
 # Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
 # settings and rules.
 
@@ -11,23 +11,23 @@ cflags = -std=c++11
 ldflags += -L../../dependencies/lib/yaml-cpp 
 ldlibs += -lyaml-cpp
 
-lib.name = zerr_envelope_generator~
+lib.name = zerr_envelopes~
 
 # input source file (class name == source file basename)
-class.sources = zerr_envelope_generator~.cpp
+class.sources = zerr_envelopes~.cpp
 
-# zerr_envelope_generator pd wrapper
-zerr_envelope_generator~.class.sources += zerr_envelope_generator.cpp
+# zerr_envelopes pd wrapper
+zerr_envelopes~.class.sources += zerr_envelopes.cpp
 
-# zerr_envelope_generator modules
-zerr_envelope_generator~.class.sources += ../../src/modules/envelopegenerator.cpp
-zerr_envelope_generator~.class.sources += ../../src/modules/speakermanager.cpp
+# zerr_envelopes modules
+zerr_envelopes~.class.sources += ../../src/modules/envelopegenerator.cpp
+zerr_envelopes~.class.sources += ../../src/modules/speakermanager.cpp
 
-# zerr_envelope_generator utils
-zerr_envelope_generator~.class.sources += ../../src/utils/logger.cpp
-zerr_envelope_generator~.class.sources += ../../src/utils/utils.cpp
-# zerr_envelope_generator~.class.sources += ../../src/utils/ringbuffer.cpp            # keep it for future
-# zerr_envelope_generator~.class.sources += ../../src/utils/linearinterpolator.cpp    # keep it for future
+# zerr_envelopes utils
+zerr_envelopes~.class.sources += ../../src/utils/logger.cpp
+zerr_envelopes~.class.sources += ../../src/utils/utils.cpp
+# zerr_envelopes~.class.sources += ../../src/utils/ringbuffer.cpp            # keep it for future
+# zerr_envelopes~.class.sources += ../../src/utils/linearinterpolator.cpp    # keep it for future
 
 # zerr_envelope_combinator headers
 CC  += -I../../include/utils

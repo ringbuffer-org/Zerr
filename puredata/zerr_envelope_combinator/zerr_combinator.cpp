@@ -1,4 +1,4 @@
-#include "zerr_envelope_combinator.h"
+#include "zerr_combinator.h"
 
 // this one was needed to compile on linux
 // (error: ‘strdup’ was not declared in this scope)

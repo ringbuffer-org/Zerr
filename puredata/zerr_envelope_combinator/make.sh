@@ -32,7 +32,7 @@ else
 fi
 
 # open object test patch
-helpfile="zerr_envelope_combinator~_helper.pd"
+helpfile="zerr_combinator~_helper.pd"
 open builddir/${helpfile}
 
 find "$(pwd)" -name ".DS_Store" -type f -delete

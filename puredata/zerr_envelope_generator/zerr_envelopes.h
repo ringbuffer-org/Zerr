@@ -1,5 +1,5 @@
 /**
- * @file zerr_envelope_generator.h
+ * @file zerr_envelopes.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief EnvelopeGenerator Class Puredata Wrapper
  * @version 0.4
@@ -23,14 +23,14 @@ public:
     const int numInlet = 3; /**< number of inlets: main(1)/spread(2)/volume(3) */
     int numOutlet;          /**< number of outlets: assgined according to the speaker configuration*/
     /**
-    * @brief create a new zerr_envelope_generator instance 
+    * @brief create a new zerr_envelopes instance 
     * @param systemCfgs puredata basic system configuration: sample_rate, block_size
     * @param selectionMode the corresponding mode of the envelope generator to the control signal: trigger & trajectory
     * @param spkrCfgFile path of the speaker array configuration
     */
     ZerrEnvelopeGenerator(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile);
     /**
-    * @brief initialize zerr_envelope_generator modules
+    * @brief initialize zerr_envelopes modules
     * @return bool status of initialized or not
     */
     bool initialize();
@@ -58,7 +58,7 @@ public:
     */
     void print_parameters(char* name);
     /**
-    * @brief free a zerr_envelope_generator instance
+    * @brief free a zerr_envelopes instance
     */
     ~ZerrEnvelopeGenerator();
 

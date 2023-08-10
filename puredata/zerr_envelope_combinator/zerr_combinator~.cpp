@@ -1,13 +1,13 @@
-#include "zerr_envelope_combinator_tilde.h"
+#include "zerr_combinator_tilde.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static t_class *zerr_envelope_combinator_tilde_class;
+static t_class *zerr_combinator_tilde_class;
 
-void *zerr_envelope_combinator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
-    zerr_envelope_combinator_tilde *x = (zerr_envelope_combinator_tilde *) pd_new(zerr_envelope_combinator_tilde_class);
+void *zerr_combinator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
+    zerr_combinator_tilde *x = (zerr_combinator_tilde *) pd_new(zerr_combinator_tilde_class);
     if (!x) return NULL;
 
     zerr::t_systemConfigs systemCfgs;
@@ -51,15 +51,15 @@ void *zerr_envelope_combinator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
 }
 
 
-void zerr_envelope_combinator_tilde_free(zerr_envelope_combinator_tilde *x) {
+void zerr_combinator_tilde_free(zerr_combinator_tilde *x) {
     freebytes(x->x_in_vec, x->n_inlet * sizeof(*x->x_in_vec));
     freebytes(x->x_out_vec, x->n_outlet * sizeof(*x->x_out_vec));
     delete x->z;
 }
 
 
-static t_int *zerr_envelope_combinator_tilde_perform(t_int *w) {
-    zerr_envelope_combinator_tilde *x = (zerr_envelope_combinator_tilde *) w[1];
+static t_int *zerr_combinator_tilde_perform(t_int *w) {
+    zerr_combinator_tilde *x = (zerr_combinator_tilde *) w[1];
     int n_vec     = (int) w[2];
     int n_args    = (int) w[3];
 
@@ -72,7 +72,7 @@ static t_int *zerr_envelope_combinator_tilde_perform(t_int *w) {
 }
 
 
-void zerr_envelope_combinator_tilde_dsp(zerr_envelope_combinator_tilde *x, t_signal **sp) {
+void zerr_combinator_tilde_dsp(zerr_combinator_tilde *x, t_signal **sp) {
     int n_rest = 3; // size of [x, n_vec, n_args]
 
     int n_vec = sp[0]->s_n;
@@ -88,26 +88,26 @@ void zerr_envelope_combinator_tilde_dsp(zerr_envelope_combinator_tilde *x, t_sig
         vec[i+n_rest] = (t_int) sp[i]->s_vec;
     }
 
-    dsp_addv(zerr_envelope_combinator_tilde_perform, n_args, vec);
+    dsp_addv(zerr_combinator_tilde_perform, n_args, vec);
 }
 
 
-void zerr_envelope_combinator_tilde_setup(void) {
-    zerr_envelope_combinator_tilde_class = class_new(gensym("zerr_envelope_combinator~"),
-        (t_newmethod) zerr_envelope_combinator_tilde_new,
-        (t_method) zerr_envelope_combinator_tilde_free,
-        (size_t) sizeof(zerr_envelope_combinator_tilde),
+void zerr_combinator_tilde_setup(void) {
+    zerr_combinator_tilde_class = class_new(gensym("zerr_combinator~"),
+        (t_newmethod) zerr_combinator_tilde_new,
+        (t_method) zerr_combinator_tilde_free,
+        (size_t) sizeof(zerr_combinator_tilde),
         CLASS_DEFAULT,
         A_GIMME,0);
 
-    class_addmethod(zerr_envelope_combinator_tilde_class,
-        (t_method) zerr_envelope_combinator_tilde_dsp,
+    class_addmethod(zerr_combinator_tilde_class,
+        (t_method) zerr_combinator_tilde_dsp,
         gensym("dsp"),
         A_CANT,
         A_NULL);
 
-    // class_sethelpsymbol(zerr_envelope_combinator_tilde_class, gensym("zerr_envelope_combinator~"));
-    CLASS_MAINSIGNALIN(zerr_envelope_combinator_tilde_class, zerr_envelope_combinator_tilde, f);
+    // class_sethelpsymbol(zerr_combinator_tilde_class, gensym("zerr_combinator~"));
+    CLASS_MAINSIGNALIN(zerr_combinator_tilde_class, zerr_combinator_tilde, f);
 }
 
 

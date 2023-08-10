@@ -1,4 +1,4 @@
-#include "zerr_audio_disperser.h"
+#include "zerr_disperser.h"
 
 
 ZerrAudioDisperser::ZerrAudioDisperser(int numChannel, zerr::t_systemConfigs systemCfgs){

@@ -18,7 +18,7 @@ else
   echo "Close ${pd_pgid} successfully."
 fi
 
-echo "Opening zerr_feature_tracker~_helper.pd..."
-helpfile="zerr_feature_tracker~_helper.pd"
+echo "Opening zerr_features~_helper.pd..."
+helpfile="zerr_features~_helper.pd"
 open builddir/${helpfile}
 echo "Done!"

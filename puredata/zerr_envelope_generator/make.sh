@@ -54,5 +54,5 @@ else
 fi
 
 # open object test patch
-helpfile="zerr_envelope_generator~_helper.pd"
+helpfile="zerr_envelopes~_helper.pd"
 open builddir/${helpfile}

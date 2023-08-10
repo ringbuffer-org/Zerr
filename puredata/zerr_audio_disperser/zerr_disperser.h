@@ -1,7 +1,7 @@
 /**
- * @file zerr_envelope_combinator.h
+ * @file zerr_disperser.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief EnvelopeCombinator Class Puredata Wrapper
+ * @brief AudioDisperser Class Puredata Wrapper
  * @version 0.4
  * @date 2023-08-04
  * 
@@ -16,22 +16,20 @@
 // #include "ringbuffer.h"
 #include "logger.h"
 // modules
-#include "envelopecombinator.h"
+#include "audiodisperser.h"
 
-class ZerrEnvelopeCombinator{
+class ZerrAudioDisperser{
 public:
-    int numInlet;     /**< number of inlets: equal to the number of source multiple number of channel in each source*/
-    int numOutlet;    /**< number of outlets: assgined according to the speaker configuration*/
+    int numInlet;     /**< number of inlets*/
+    int numOutlet;    /**< number of outlets*/
     /**
-    * @brief create a new ZerrEnvelopeCombinator instance 
-    * @param numSource the number of intput multi-channel envelope source
+    * @brief create a new ZerrAudioDisperser instance 
     * @param numChannel the number of channel of each source. 
     * @param systemCfgs puredata basic system configuration: sample_rate, block_size
-    * @param combinationMode select the mode about how to combine the envelopes
     */
-    ZerrEnvelopeCombinator(int numSource, int numChannel, zerr::t_systemConfigs systemCfgs, std::string combinationMode);
+    ZerrAudioDisperser(int numChannel, zerr::t_systemConfigs systemCfgs);
     /**
-    * @brief initialize ZerrEnvelopeCombinator modules
+    * @brief initialize ZerrAudioDisperser modules
     * @return bool status of initialized or not
     */
     bool initialize();
@@ -47,9 +45,9 @@ public:
     */
     int get_port_count(); //TODO: remove if not needed
     /**
-    * @brief free a zerr_envelope_generator instance
+    * @brief free a ZerrAudioDisperser instance
     */
-    ~ZerrEnvelopeCombinator();
+    ~ZerrAudioDisperser();
 
 private:
     zerr::t_blockIns  inputBuffer;  /**< multi-channel input buffer  */
@@ -58,8 +56,8 @@ private:
     float **outPtr;                 /**< PD-style output data pointer */
 
     //module objects
-    zerr::EnvelopeCombinator  *envelopeCombinator;  /**< TODO */
-    zerr::Logger              *logger;              /**< TODO */
+    zerr::AudioDisperser      *audioDisperser;  /**< TODO */
+    zerr::Logger              *logger;          /**< TODO */
 };
 
 

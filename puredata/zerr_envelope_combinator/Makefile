@@ -1,4 +1,4 @@
-# Makefile to build object 'zerr_envelope_combinator~' for Pure Data.
+# Makefile to build object 'zerr_combinator~' for Pure Data.
 # Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
 # settings and rules.
 
@@ -10,22 +10,22 @@ CC  = g++
 cflags = -std=c++11
 # ldflags += -L../../dependencies/lib/yaml-cpp -lyaml-cpp    # keep it for future
 
-lib.name = zerr_envelope_combinator~
+lib.name = zerr_combinator~
 
 # input source file (class name == source file basename)
-class.sources = zerr_envelope_combinator~.cpp
+class.sources = zerr_combinator~.cpp
 
-# zerr_envelope_combinator pd wrapper
-zerr_envelope_combinator~.class.sources += zerr_envelope_combinator.cpp
+# zerr_combinator pd wrapper
+zerr_combinator~.class.sources += zerr_combinator.cpp
 
-# zerr_envelope_combinator modules
-zerr_envelope_combinator~.class.sources += ../../src/modules/envelopecombinator.cpp
+# zerr_combinator modules
+zerr_combinator~.class.sources += ../../src/modules/envelopecombinator.cpp
 
-# zerr_envelope_combinator utils
-zerr_envelope_combinator~.class.sources += ../../src/utils/logger.cpp
-zerr_envelope_combinator~.class.sources += ../../src/utils/utils.cpp
+# zerr_combinator utils
+zerr_combinator~.class.sources += ../../src/utils/logger.cpp
+zerr_combinator~.class.sources += ../../src/utils/utils.cpp
 
-# zerr_envelope_combinator headers
+# zerr_combinator headers
 CC  += -I../../include/utils
 CC  += -I../../include/modules
 

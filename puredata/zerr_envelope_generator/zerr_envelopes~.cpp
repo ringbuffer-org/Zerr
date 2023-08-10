@@ -1,17 +1,17 @@
-#include "zerr_envelope_generator_tilde.h"
+#include "zerr_envelopes_tilde.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static t_class *zerr_envelope_generator_tilde_class;
+static t_class *zerr_envelopes_tilde_class;
 
 
 // void goat_tilde_param_attach(goat_tilde *x, __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) 
 
 
-void *zerr_envelope_generator_tilde_new(__attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
-    zerr_envelope_generator_tilde *x = (zerr_envelope_generator_tilde *) pd_new(zerr_envelope_generator_tilde_class);
+void *zerr_envelopes_tilde_new(__attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
+    zerr_envelopes_tilde *x = (zerr_envelopes_tilde *) pd_new(zerr_envelopes_tilde_class);
     if (!x) return NULL;
 
     zerr::t_systemConfigs systemCfgs;
@@ -51,7 +51,7 @@ void *zerr_envelope_generator_tilde_new(__attribute__((unused)) t_symbol *s, int
     x->z = new ZerrEnvelopeGenerator(systemCfgs, selectionMode, spkrCfgFile); 
     if (!x->z) return NULL;
 
-    if (!x->z->initialize()) return NULL; // initialize zerr_envelope_generator and all sub-modules
+    if (!x->z->initialize()) return NULL; // initialize zerr_envelopes and all sub-modules
 
     // create inlets
     x->spread_inlet = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
@@ -70,14 +70,14 @@ void *zerr_envelope_generator_tilde_new(__attribute__((unused)) t_symbol *s, int
 }
 
 
-void zerr_envelope_generator_tilde_free(zerr_envelope_generator_tilde *x) {
+void zerr_envelopes_tilde_free(zerr_envelopes_tilde *x) {
     freebytes(x->x_vec, x->n_outlet * sizeof(*x->x_vec));
     delete x->z;
 }
 
 
-static t_int *zerr_envelope_generator_tilde_perform(t_int *w) {
-    zerr_envelope_generator_tilde *x = (zerr_envelope_generator_tilde *) w[1];
+static t_int *zerr_envelopes_tilde_perform(t_int *w) {
+    zerr_envelopes_tilde *x = (zerr_envelopes_tilde *) w[1];
     int n_vec     = (int) w[2];
     int n_args    = (int) w[3];
 
@@ -90,16 +90,16 @@ static t_int *zerr_envelope_generator_tilde_perform(t_int *w) {
 }
 
 
-void zerr_envelope_generator_tilde_active_speakers(zerr_envelope_generator_tilde *x, 
+void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x, 
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv){
 
     if (argc < 2) {
-        pd_error(x, "zerr_envelope_generator~: not enough args to parse");
+        pd_error(x, "zerr_envelopes~: not enough args to parse");
         return;
     }
 
     if (argv[0].a_type != A_SYMBOL) {
-        pd_error(x, "zerr_envelope_generator~: no mask action given"); 
+        pd_error(x, "zerr_envelopes~: no mask action given"); 
         return;
     }
 
@@ -110,7 +110,7 @@ void zerr_envelope_generator_tilde_active_speakers(zerr_envelope_generator_tilde
 
     for (int i = 0; i < idx_size; ++i){
         if (argv[i+1].a_type != A_FLOAT) {
-            error("zerr_envelope_generator~: incorrect index number"); 
+            error("zerr_envelopes~: incorrect index number"); 
             return;
         }
         indexs_list[i] = (int)argv[i+1].a_w.w_float;
@@ -120,16 +120,16 @@ void zerr_envelope_generator_tilde_active_speakers(zerr_envelope_generator_tilde
 }
 
 
-void zerr_envelope_generator_tilde_trajectory(zerr_envelope_generator_tilde *x, 
+void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x, 
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv){
 
     if (argc < 2) {
-        pd_error(x, "zerr_envelope_generator~: not enough args to parse");
+        pd_error(x, "zerr_envelopes~: not enough args to parse");
         return;
     }
 
     if (argv[0].a_type != A_SYMBOL) {
-        pd_error(x, "zerr_envelope_generator~: no action given"); 
+        pd_error(x, "zerr_envelopes~: no action given"); 
         return;
     }
 
@@ -140,7 +140,7 @@ void zerr_envelope_generator_tilde_trajectory(zerr_envelope_generator_tilde *x,
 
     for (int i = 0; i < idx_size; ++i){
         if (argv[i+1].a_type != A_FLOAT) {
-            error("zerr_envelope_generator~: incorrect index number"); 
+            error("zerr_envelopes~: incorrect index number"); 
             return;
         }
         indexs_list[i] = (int)argv[i+1].a_w.w_float;
@@ -150,13 +150,13 @@ void zerr_envelope_generator_tilde_trajectory(zerr_envelope_generator_tilde *x,
 }
 
 
-void zerr_envelope_generator_tilde_print(
-    zerr_envelope_generator_tilde *x, t_symbol *paramname){
+void zerr_envelopes_tilde_print(
+    zerr_envelopes_tilde *x, t_symbol *paramname){
     char* name = paramname->s_name;
     x->z->print_parameters(name);
 }
 
-void zerr_envelope_generator_tilde_dsp(zerr_envelope_generator_tilde *x, t_signal **sp) {
+void zerr_envelopes_tilde_dsp(zerr_envelopes_tilde *x, t_signal **sp) {
     int n_rest = 3; // size of [x, n_vec, n_args]
 
     int n_vec = sp[0]->s_n;
@@ -172,44 +172,44 @@ void zerr_envelope_generator_tilde_dsp(zerr_envelope_generator_tilde *x, t_signa
         vec[i+n_rest] = (t_int) sp[i]->s_vec;
     }
 
-    dsp_addv(zerr_envelope_generator_tilde_perform, n_args, vec);
+    dsp_addv(zerr_envelopes_tilde_perform, n_args, vec);
 }
 
 
-void zerr_envelope_generator_tilde_setup(void) {
-    zerr_envelope_generator_tilde_class = class_new(gensym("zerr_envelope_generator~"),
-        (t_newmethod) zerr_envelope_generator_tilde_new,
-        (t_method) zerr_envelope_generator_tilde_free,
-        (size_t) sizeof(zerr_envelope_generator_tilde),
+void zerr_envelopes_tilde_setup(void) {
+    zerr_envelopes_tilde_class = class_new(gensym("zerr_envelopes~"),
+        (t_newmethod) zerr_envelopes_tilde_new,
+        (t_method) zerr_envelopes_tilde_free,
+        (size_t) sizeof(zerr_envelopes_tilde),
         CLASS_DEFAULT,
         A_GIMME,0);
 
-    class_addmethod(zerr_envelope_generator_tilde_class,
-        (t_method) zerr_envelope_generator_tilde_active_speakers,
+    class_addmethod(zerr_envelopes_tilde_class,
+        (t_method) zerr_envelopes_tilde_active_speakers,
         gensym("active-speakers"),
         A_GIMME,
         A_NULL);
 
-    class_addmethod(zerr_envelope_generator_tilde_class,
-        (t_method) zerr_envelope_generator_tilde_trajectory,
+    class_addmethod(zerr_envelopes_tilde_class,
+        (t_method) zerr_envelopes_tilde_trajectory,
         gensym("trajectory"),
         A_GIMME,
         A_NULL);
 
-    class_addmethod(zerr_envelope_generator_tilde_class,
-        (t_method) zerr_envelope_generator_tilde_print,
+    class_addmethod(zerr_envelopes_tilde_class,
+        (t_method) zerr_envelopes_tilde_print,
         gensym("print"),
         A_SYMBOL,
         A_NULL);
 
-    class_addmethod(zerr_envelope_generator_tilde_class,
-        (t_method) zerr_envelope_generator_tilde_dsp,
+    class_addmethod(zerr_envelopes_tilde_class,
+        (t_method) zerr_envelopes_tilde_dsp,
         gensym("dsp"),
         A_CANT,
         A_NULL);
 
-    // class_sethelpsymbol(zerr_envelope_generator_tilde_class, gensym("zerr_envelope_generator~"));
-    CLASS_MAINSIGNALIN(zerr_envelope_generator_tilde_class, zerr_envelope_generator_tilde, f);
+    // class_sethelpsymbol(zerr_envelopes_tilde_class, gensym("zerr_envelopes~"));
+    CLASS_MAINSIGNALIN(zerr_envelopes_tilde_class, zerr_envelopes_tilde, f);
 }
 
 #ifdef __cplusplus
