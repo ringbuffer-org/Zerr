@@ -25,6 +25,14 @@ std::string formatString(const char* format, ...) {
     return std::string(buffer.data());
 }
 
+// template<typename T>
+// std::string formatVector(std::vector<T> vector){
+//     std::string formated = "";
+//     for (size_t i = 0; i < vector.size(); ++i){
+//         formated += formated + std::to_string(vector[i]);
+//     }
+// }
+
 
 bool isEqualTo1(t_value value, t_value epsilon) {
     return std::abs(value - 1.0) < epsilon;
@@ -43,10 +51,6 @@ bool isInVec(T element, std::vector<T> vector){
 }
 // explicit instantiation required for PD
 template bool isInVec<int>(int element, std::vector<int> vector);
-
-
-
-
 
 
 std::vector<double> applyMovingAverage(const std::vector<double>& segment, int windowSize) {

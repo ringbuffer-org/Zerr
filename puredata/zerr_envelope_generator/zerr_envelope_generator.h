@@ -52,6 +52,10 @@ public:
     /**
     * @brief TODO
     */
+    void setTrajectoryVector(int* idxs, size_t size);
+    /**
+    * @brief TODO
+    */
     void print_parameters(char* name);
     /**
     * @brief free a zerr_envelope_generator instance

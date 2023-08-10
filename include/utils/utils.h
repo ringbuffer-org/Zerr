@@ -33,6 +33,21 @@ namespace zerr {
 */
 std::string formatString(const char* format, ...);
 /**
+* @brief transfer vector to string with tab separated
+* @param vector vector to be formated
+* @return std::string formated string
+*/
+// template<typename T>
+// std::string formatVector(std::vector<T> vector);
+template<typename T>
+std::string formatVector(std::vector<T> vector){
+    std::string formated = "";
+    for (size_t i = 0; i < vector.size(); ++i){
+        formated = formated + "  " + std::to_string(vector[i]);
+    }
+    return formated;
+}
+/**
 * @brief compare the float number with 1
 * @param value the float number to be compared with 1
 * @param epsilon the error threshold

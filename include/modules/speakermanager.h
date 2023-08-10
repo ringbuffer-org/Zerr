@@ -7,8 +7,8 @@
  * 
  * @copyright Copyright (c) 2023
  */
-#ifndef SPEAKERARRAY_H
-#define SPEAKERARRAY_H
+#ifndef SPEAKERMANAGER_H
+#define SPEAKERMANAGER_H
 #include <iostream>
 #include <random>
 #include <cmath>
@@ -74,17 +74,17 @@ public:
     */
     t_value get_pitch(){return orientation.pitch;};
     /**
-    * @brief
+    * @brief pring all configuration: index, position, orientation
     */
     void print_all();
 
 private:
-    Logger       *logger;      /**< TODO */
-    t_index       index;       /**< TODO */
-    t_position    position;    /**< TODO */
-    t_orientation orientation; /**< TODO */
+    Logger        *logger;      /**< logger  */
+    t_index        index;       /**< TODO */
+    t_position     position;    /**< TODO */
+    t_orientation  orientation; /**< TODO */
     /**
-    * @brief
+    * @brief 
     */
     void _print_index();
     /**
@@ -112,15 +112,15 @@ public:
     /**
     * @brief get the number of speakers in this speaker array setup
     */
-    size_t get_n_all_speakers(); 
+    size_t getNumAllSpeakers(); 
     /**
     * @brief get the number of speakers in this speaker array setup
     */
-    size_t get_n_unmasked_speakers(); 
+    size_t getNumActiveSpeakers(); 
     /**
     * @brief TODO
     */
-    t_indexs get_unmasked_indexs();
+    t_indexs getActiveSpeakerIndexs();
     /**
     * @brief TODO
     */
@@ -138,7 +138,8 @@ public:
     */
     t_value get_panning_ratio(t_value trajectory_val);
     /**
-    * @brief get the index of speaker that is geometrially close to the input.
+    * @brief get the index of speaker that is geometrially close to the input. 
+    *        This method is obsolete and will be removed in the future.
     */
     t_pair get_indexs_by_geometry(std::vector<t_value> pos, std::vector<bool> mask, std::string coordinate);
     /**
@@ -153,11 +154,11 @@ public:
     /**
     * @brief TODO
     */
-    void manage_unmasked_indexs(std::string action, t_indexs idxs);
+    void manageActiveSpeakerIndexs(std::string action, t_indexs idxs);
     /**
     * @brief TODO
     */
-    void print_unmasked_indexs();
+    void printActiveSpeakerIndexs();
     /**
     * @brief TODO
     */
@@ -165,7 +166,11 @@ public:
     /**
     * @brief TODO
     */
-    void set_subindex(t_indexs idxs, std::string action);
+    void printTrajectoryVector();
+    /**
+    * @brief TODO
+    */
+    void setTrajectoryVector(t_indexs idxs);
     /**
     * @brief TODO
     */
@@ -176,20 +181,19 @@ public:
     void reset(std::string config_path);
 
 private:
-    Logger *logger;         /**< logger object for logging message in different environment */
+    Logger *logger;             /**< logger object for logging message in different environment */
 
-    // bool initialized=false; /**< indicator of whether the speaker manager object has been initialized or not */
+    std::string config_path;    /**< file path of speaker array configuration */
+    YAML::Node speaker_config;  /**< loaded YAML Node structure of speaker array configuration */
 
-    std::string config_path;   /**< file path of speaker array configuration */
-    YAML::Node speaker_config; /**< loaded YAML Node structure of speaker array configuration */
-    
-    std::map<t_index, Speaker> speakers; /**< TODO  */
+    std::map<t_index, Speaker> speakers;         /**< TODO  */
 
     std::map<t_index, std::vector<t_value>> distance_matrix; /**< TODO */
 
-    t_indexs unmasked;                           /**< TODO */
-    t_indexs subindex;                           /**< TODO */
-    std::map<t_index, t_indexs> topoMatrix; /**< TODO */
+    // specific speaker configurations
+    t_indexs                     actvSpkIdx;    /**< TODO */
+    t_indexs                     trajVector;    /**< TODO */
+    std::map<t_index, t_indexs>  topoMatrix;    /**< TODO */
     
     /**
     * @brief  
@@ -236,24 +240,25 @@ private:
     * @param  
     * @return  
     */
-    void _set_unmasked_indexs(t_indexs idxs);
+    void setActiveSpeakerIndexs(t_indexs idxs);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    void _add_unmasked_indexs(t_indexs idxs);
+    void addActiveSpeakerIndexs(t_indexs idxs);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    void _del_unmasked_indexs(t_indexs idxs);
+    void delActiveSpeakerIndexs(t_indexs idxs);
 }; 
 
 #ifdef PUREDATA // explicit instantiation required for PD
 template bool isInKey<int, Speaker>(int element, std::map<t_index, Speaker> map);
+template std::string formatVector<t_index>(std::vector<t_index> vector);
 #endif //PUREDATA
 
 } //namespace zerr
-#endif // SPEAKERARRAY_H
+#endif // SPEAKERMANAGER_H

@@ -16,7 +16,7 @@ Speaker::Speaker(t_index index, t_position position, t_orientation orientation){
 
 
 void Speaker::print_all(){
-    logger->logInfo("---------------------");
+    logger->logInfo("-----------------------");
     _print_index();
     _print_position();
     _print_orientation();
@@ -136,44 +136,44 @@ bool SpeakerManager::initialize(){
 
         speakers.insert({index, s});
 
-        unmasked.push_back(index);
+        actvSpkIdx.push_back(index);
     }
     _init_distance_matrix();
 
     // initialize the specific configs
-    // every speaker is unmasked when at initialize point
-    for (size_t i = 0; i < unmasked.size(); ++i){
-        subindex.push_back(unmasked[i]);
+    // every speaker is actvSpkIdx when at initialize point
+    for (size_t i = 0; i < actvSpkIdx.size(); ++i){
+        trajVector.push_back(actvSpkIdx[i]);
     }
-    std::sort(subindex.begin(), subindex.end());
+    std::sort(trajVector.begin(), trajVector.end());
 
     // topoMatrix every speaker is connected
-    for (size_t i = 0; i < unmasked.size(); ++i){
-        t_indexs tmp_idx = unmasked; // deepcopy
-        topoMatrix[unmasked[i]] = tmp_idx;
+    for (size_t i = 0; i < actvSpkIdx.size(); ++i){
+        t_indexs tmp_idx = actvSpkIdx; // deepcopy
+        topoMatrix[actvSpkIdx[i]] = tmp_idx;
     }
 
     return true;
 }
 
 
-size_t SpeakerManager::get_n_all_speakers() {
+size_t SpeakerManager::getNumAllSpeakers() {
     return speakers.size();
 }
 
 
-size_t SpeakerManager::get_n_unmasked_speakers() {
-    return unmasked.size();
+size_t SpeakerManager::getNumActiveSpeakers() {
+    return actvSpkIdx.size();
 }
 
 
-t_indexs SpeakerManager::get_unmasked_indexs(){
-    return unmasked;
+t_indexs SpeakerManager::getActiveSpeakerIndexs(){
+    return actvSpkIdx;
 }
 
 
 t_index SpeakerManager::get_random_index(){
-    return unmasked[_get_random_indexs(unmasked.size(), 1)[0]];
+    return actvSpkIdx[_get_random_indexs(actvSpkIdx.size(), 1)[0]];
 }
 
 
@@ -192,10 +192,10 @@ t_pair SpeakerManager::get_indexs_by_trajectory(t_value trajectory_val){
     trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
     trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
 
-    t_value scaled = trajectory_val * (subindex.size() - 1);
+    t_value scaled = trajectory_val * (trajVector.size() - 1);
 
-    t_index lower = subindex[std::floor(scaled)];
-    t_index upper = subindex[std::ceil(scaled)];
+    t_index lower = trajVector[std::floor(scaled)];
+    t_index upper = trajVector[std::ceil(scaled)];
 
     return std::make_pair(lower, upper);
 }
@@ -205,7 +205,7 @@ t_value SpeakerManager::get_panning_ratio(t_value trajectory_val){
     trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
     trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
 
-    t_value scaled = trajectory_val * (subindex.size() - 1);
+    t_value scaled = trajectory_val * (trajVector.size() - 1);
 
     return (scaled - std::floor(scaled)) / (std::ceil(scaled) - std::floor(scaled));
 }
@@ -285,64 +285,71 @@ std::vector<t_value> SpeakerManager::get_distance_vector(int spkr_idx){
 }
 
 
-void SpeakerManager::manage_unmasked_indexs(std::string action, t_indexs idxs){
+void SpeakerManager::manageActiveSpeakerIndexs(std::string action, t_indexs idxs){
     if (action=="set"){
-        _set_unmasked_indexs(idxs);
+        setActiveSpeakerIndexs(idxs);
     }
     else if (action=="add"){
-        _add_unmasked_indexs(idxs);
+        addActiveSpeakerIndexs(idxs);
     }
     else if (action=="del"){
-        _del_unmasked_indexs(idxs);
+        delActiveSpeakerIndexs(idxs);
     }
     else{
-        logger->logWarning("SpeakerManager::set_unmasked_indexs unknow action" + action);
+        logger->logWarning("SpeakerManager::set_actvSpkIdx_indexs unknow action" + action);
     }
 
     #ifdef TESTMODE
-    print_unmasked_indexs();
+    printActiveSpeakerIndexs();
     printTopoMatrix();
     #endif //TESTMODE
 }
 
-
-void SpeakerManager::print_unmasked_indexs(){
-    for (size_t i = 0; i < unmasked.size(); ++i) {
-        logger->logInfo(formatString("masks %u %d", i, unmasked[i]));
-    }
+                           
+void SpeakerManager::printActiveSpeakerIndexs(){
+    logger->logInfo("Active Speakers: ");
+    logger->logInfo("    " + formatVector<t_index>(actvSpkIdx));
 }
 
 
 void SpeakerManager::printTopoMatrix(){
+    logger->logInfo("Topological Matrix: ");
     for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
-        post("");
-        for (int i = 0; i < it->second.size(); ++i){
-            // logger->logInfo(it->second);
-            postfloat(it->second[i]);
-        }
+        logger->logInfo("    " + std::to_string(it->first) + " | " + formatVector<t_index>(it->second));
     }
 }
 
 
-void SpeakerManager::set_subindex(t_indexs idxs, std::string action){
-    if (action=="set"){
-        subindex.clear();
-        subindex = idxs;
-    }else{
-        logger->logError("SpeakerManager::set_subindex unknow action " + action);
+void SpeakerManager::printTrajectoryVector(){
+    logger->logInfo("Trajectory Vector: ");
+    logger->logInfo("    " + formatVector<t_index>(trajVector));
+}
+
+
+void SpeakerManager::setTrajectoryVector(t_indexs idxs){
+    t_indexs tmpTrajVector;
+    // trajVector.clear();
+    for (size_t i = 0; i < idxs.size(); ++i){
+        if(!isInVec<t_index>(idxs[i], actvSpkIdx)) {
+            logger->logError(formatString("SpeakerManager: speaker %d is not activated!", idxs[i]));
+            return;
+        }else{
+            tmpTrajVector.push_back(idxs[i]);
+        }
     }
+    trajVector = tmpTrajVector;
+    printTrajectoryVector();
 }
 
 
 void SpeakerManager::_init_distance_matrix(){
-    int n_speakers = get_n_unmasked_speakers();
-
+    int n_speakers = getNumActiveSpeakers();
     for (int i = 0; i < n_speakers; ++i){
-        distance_matrix[unmasked[i]] = {};
+        distance_matrix[actvSpkIdx[i]] = {};
         for (int j = 0; j < n_speakers; ++j){
-            Speaker s1 = get_speaker_by_index(unmasked[i]);  
-            Speaker s2 = get_speaker_by_index(unmasked[j]);  
-            distance_matrix[unmasked[i]].push_back(_calculate_distance(s1, s2));
+            Speaker s1 = get_speaker_by_index(actvSpkIdx[i]);  
+            Speaker s2 = get_speaker_by_index(actvSpkIdx[j]);  
+            distance_matrix[actvSpkIdx[i]].push_back(_calculate_distance(s1, s2));
         }
     }
 }
@@ -404,6 +411,7 @@ t_cartesian SpeakerManager::_spherical2cartesian(t_spherical spherical){
     return cartesian;
 }
 
+
 t_spherical SpeakerManager::_cartesian2spherical(t_cartesian cartesian){
     t_spherical spherical;
     spherical.distance  = sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y + cartesian.z * cartesian.z);
@@ -414,70 +422,76 @@ t_spherical SpeakerManager::_cartesian2spherical(t_cartesian cartesian){
 }
 
 
-void SpeakerManager::_set_unmasked_indexs(t_indexs idxs){
+void SpeakerManager::setActiveSpeakerIndexs(t_indexs idxs){
+    actvSpkIdx.clear();
     for (size_t i = 0; i < idxs.size(); ++i){
         auto it = speakers.find(idxs[i]);
         if(it == speakers.end()) {
-            logger->logError(formatString("SpeakerManager::_set_unmasked_indexs unknow speaker index %d!", idxs[i]));
+            logger->logError(formatString("SpeakerManager::_set_actvSpkIdx_indexs unknow speaker index %d!", idxs[i]));
             return;
+        }        
+        // add to actvSpkIdx
+        if(isInVec<t_index>(idxs[i], actvSpkIdx)) {
+            logger->logWarning(formatString("SpeakerManager: index %d already added, ignored", idxs[i]));
+        }else{
+            actvSpkIdx.push_back(idxs[i]);
         }
     }
-    unmasked = idxs;
-
-    // reset also distance matrix and topology to init state
+    // reset also distance matrix and topoMatrix to init state
     distance_matrix.clear();
     _init_distance_matrix();
 
-    subindex.clear();
-    for (size_t i = 0; i < unmasked.size(); ++i){
-        subindex.push_back(unmasked[i]);
+    trajVector.clear();
+    for (size_t i = 0; i < actvSpkIdx.size(); ++i){
+        trajVector.push_back(actvSpkIdx[i]);
     }
-    std::sort(subindex.begin(), subindex.end());
+    std::sort(trajVector.begin(), trajVector.end()); 
 
     topoMatrix.clear();
-    for (size_t i = 0; i < unmasked.size(); ++i){
-        t_indexs tmp_idx = unmasked; // deepcopy
-        topoMatrix[unmasked[i]] = tmp_idx;
+    for (size_t i = 0; i < actvSpkIdx.size(); ++i){
+        t_indexs tmp_idx = actvSpkIdx;  
+        topoMatrix[actvSpkIdx[i]] = tmp_idx;
     }
 }
 
 
-void SpeakerManager::_add_unmasked_indexs(t_indexs idxs){
-    for (size_t i = 0; i < idxs.size(); ++i){
-        if(!isInKey<t_index, Speaker>(idxs[i], speakers)) {
-            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs unknow speaker index %d!", idxs[i]));
-            return;
-        }
-        auto mskLoc = std::find(unmasked.begin(), unmasked.end(), idxs[i]);
-        if(mskLoc == unmasked.end()) {
-            unmasked.push_back(idxs[i]);
-        }else{
-            logger->logWarning(formatString("SpeakerManager::_add_unmasked_indexs index %d already unmasked, ignored", idxs[i]));
-        }
-    }
-}
-
-
-void SpeakerManager::_del_unmasked_indexs(t_indexs idxs){
+void SpeakerManager::addActiveSpeakerIndexs(t_indexs idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
         // check if the input index is valid
-        if(!isInKey<t_index, Speaker>(idxs[i], speakers)) {
-            logger->logError("SpeakerManager::set_unmasked_indexs unknow speaker index!");
+        if(!isInKey<t_index, Speaker>(idxs[i], speakers)){
+            logger->logError("SpeakerManager unknow speaker index!");
             return;
         }
-        // remove from unmasked
-        if(!isInVec<t_index>(idxs[i], unmasked)) {
-            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already removed, ignored", idxs[i]));
+        // add to actvSpkIdx
+        if(isInVec<t_index>(idxs[i], actvSpkIdx)) {
+            logger->logWarning(formatString("SpeakerManager: index %d already added, ignored", idxs[i]));
         }else{
-            unmasked.erase(std::remove(unmasked.begin(), unmasked.end(), idxs[i]), unmasked.end());
+            actvSpkIdx.push_back(idxs[i]);
         }
-        // remove from subindex
-        if(!isInVec<t_index>(idxs[i], subindex)) {
-            logger->logWarning(formatString("SpeakerManager::set_unmasked_indexs index %d already removed, ignored", idxs[i]));
+    }
+}
+
+
+void SpeakerManager::delActiveSpeakerIndexs(t_indexs idxs){
+    for (size_t i = 0; i < idxs.size(); ++i){
+        // check if the input index is valid
+        if(!isInKey<t_index, Speaker>(idxs[i], speakers)){
+            logger->logError("SpeakerManager unknow speaker index!");
+            return;
+        }
+        // remove from actvSpkIdx
+        if(!isInVec<t_index>(idxs[i], actvSpkIdx)) {
+            logger->logWarning(formatString("SpeakerManager index %d already removed, ignored", idxs[i]));
         }else{
-            subindex.erase(std::remove(subindex.begin(), subindex.end(), idxs[i]), subindex.end());
+            actvSpkIdx.erase(std::remove(actvSpkIdx.begin(), actvSpkIdx.end(), idxs[i]), actvSpkIdx.end());
         }
-        // TODO: remove from topology matrix
+        // remove from trajVector
+        if(!isInVec<t_index>(idxs[i], trajVector)) {
+            logger->logWarning(formatString("SpeakerManager index %d already removed, ignored", idxs[i]));
+        }else{
+            trajVector.erase(std::remove(trajVector.begin(), trajVector.end(), idxs[i]), trajVector.end());
+        }
+        // remove from topology matrix
         if (isInKey<t_index, t_indexs>(idxs[i], topoMatrix)) {
             topoMatrix.erase(idxs[i]);
         } 
@@ -492,16 +506,16 @@ void SpeakerManager::_del_unmasked_indexs(t_indexs idxs){
 
     //load specific configuration of the active sub speaker array
     // YAML::Node specificNodes = speaker_config["specific"][mode];
-    // assert(specificNodes["unmasked"].IsSequence() && "SpeakerManager::initialize: unmasked property must be a list");
-    // assert(specificNodes["subindex"].IsSequence() && "SpeakerManager::initialize: subindex property must be a list");
+    // assert(specificNodes["actvSpkIdx"].IsSequence() && "SpeakerManager::initialize: actvSpkIdx property must be a list");
+    // assert(specificNodes["trajVector"].IsSequence() && "SpeakerManager::initialize: trajVector property must be a list");
 
-    // for (size_t i = 0; i < specificNodes["unmasked"].size(); ++i) {
-    //     unmasked.push_back(specificNodes["unmasked"][i].as<t_index>());
+    // for (size_t i = 0; i < specificNodes["actvSpkIdx"].size(); ++i) {
+    //     actvSpkIdx.push_back(specificNodes["actvSpkIdx"][i].as<t_index>());
     // }
     // _init_distance_matrix();
 
-    // for (size_t i = 0; i < specificNodes["subindex"].size(); ++i) {
-    //     subindex.push_back(specificNodes["subindex"][i].as<t_index>());
+    // for (size_t i = 0; i < specificNodes["trajVector"].size(); ++i) {
+    //     trajVector.push_back(specificNodes["trajVector"][i].as<t_index>());
     // }
 
     // // topology_matrix
@@ -517,6 +531,3 @@ void SpeakerManager::_del_unmasked_indexs(t_indexs idxs){
     //     } 
     //     topology_matrix[key.as<t_index>()] = tmp_idx;
     // }
-
-    // set the speaker manager as initialized
-    // initialized=true;

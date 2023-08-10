@@ -46,7 +46,6 @@ void ZerrEnvelopeGenerator::perform(float **ports, int blockSize){
         outputBuffer = envelopeGenerator->send();
     }
     catch (...) {
-        // logger->logError("ZerrEnvelopeGenerator::perform process failed...");
         return;
     }
 
@@ -66,6 +65,12 @@ int ZerrEnvelopeGenerator::get_port_count(){
 void ZerrEnvelopeGenerator::manage_unmasked_indexs(char* action, int* idxs, size_t size){
     zerr::t_indexs indexVec(idxs, idxs + size);
     envelopeGenerator->manage_unmasked_indexs(action, indexVec);
+}
+
+
+void ZerrEnvelopeGenerator::setTrajectoryVector(int* idxs, size_t size){
+    zerr::t_indexs indexVec(idxs, idxs + size);
+    envelopeGenerator->setTrajectoryVector(indexVec);
 }
 
 

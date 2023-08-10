@@ -79,12 +79,13 @@ void zerr_envelope_generator_tilde_setup(void);
 
 /**
  * @memberof zerr_envelope_generator_tilde
- * @brief get a single or all parameter values from the zerr_envelope_generator object
+ * @brief updates a parameter's value
  * 
  * @param x the zerr_envelope_generator object
- * @param paramname the name of the parameter to get. If `NULL` or empty, all parameters are returned
+ * @param paramname the name of the parameter to be updated
+ * @param value the offset value to be updated
  */
-// void zerr_envelope_generator_tilde_param_get(zerr_envelope_generator_tilde *x, t_symbol *paramname);
+void zerr_envelope_generator_tilde_active_speakers(zerr_envelope_generator_tilde *x, t_symbol *s, int argc, t_atom *argv);
 
 /**
  * @memberof zerr_envelope_generator_tilde
@@ -94,7 +95,7 @@ void zerr_envelope_generator_tilde_setup(void);
  * @param paramname the name of the parameter to be updated
  * @param value the offset value to be updated
  */
-void zerr_envelope_generator_tilde_set_masks(zerr_envelope_generator_tilde *x, t_symbol *s, int argc, t_atom *argv);
+void zerr_envelope_generator_tilde_trajectory(zerr_envelope_generator_tilde *x, t_symbol *s, int argc, t_atom *argv);
 
 /**
  * @memberof zerr_envelope_generator_tilde

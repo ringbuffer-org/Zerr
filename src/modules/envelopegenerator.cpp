@@ -24,7 +24,7 @@ bool EnvelopeGenerator::initialize(){
     inputBuffer.resize(numInlet,   t_samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, t_samples(systemCfgs.block_size, 0.0f));
 
-    _set_index_channel_lookup(speakerManager->get_unmasked_indexs());
+    _set_index_channel_lookup(speakerManager->getActiveSpeakerIndexs());
 
     currIdx = speakerManager->get_random_index();
     #ifdef TESTMODE
@@ -48,7 +48,7 @@ void EnvelopeGenerator::fetch(t_blockIns in){
 
 
 int EnvelopeGenerator::get_n_speaker(){
-    return speakerManager->get_n_unmasked_speakers();
+    return speakerManager->getNumActiveSpeakers();
 }
 
 
@@ -58,13 +58,18 @@ void EnvelopeGenerator::set_current_speaker(t_index newIdx){
 
 
 void EnvelopeGenerator::manage_unmasked_indexs(std::string action, t_indexs idxs){
-    speakerManager->manage_unmasked_indexs(action, idxs);
+    speakerManager->manageActiveSpeakerIndexs(action, idxs);
+}
+
+
+void EnvelopeGenerator::setTrajectoryVector(t_indexs idxs){
+    speakerManager->setTrajectoryVector(idxs);
 }
 
 
 void EnvelopeGenerator::print_parameters(std::string name){
     if (name=="masks"){
-        speakerManager->print_unmasked_indexs();
+        speakerManager->printActiveSpeakerIndexs();
     }else{
         logger->logError("EnvelopeGenerator::print_parameters unknown parameter " + name);
     }
@@ -85,7 +90,6 @@ void EnvelopeGenerator::_process_trigger(){
 
     std::vector<t_value> distances;
     t_value maxVal;
-
     for (size_t i = 0; i < inputBuffer[0].size(); ++i){
         currIdx = speakerManager->get_indexs_by_trigger(inputBuffer[0][i], currIdx, triggerMode);
         channel = indexChannelLookup[currIdx];
@@ -94,7 +98,7 @@ void EnvelopeGenerator::_process_trigger(){
         distances = speakerManager->get_distance_vector(currIdx);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channel) {continue;}
-            outputBuffer[chnl][i] += _calculate_gain(distances[chnl], inputBuffer[1][i]) * inputBuffer[2][i]; // current activated index
+            outputBuffer[chnl][i] += calculateGain(distances[chnl], inputBuffer[1][i]) * inputBuffer[2][i]; // current activated index
         }
     }
 }
@@ -108,8 +112,10 @@ void EnvelopeGenerator::_process_trajectory(){
     t_pair channelPair;
 
     t_samples& volume =  inputBuffer[2];
+    t_samples& spread =  inputBuffer[1];
 
     t_value panRatio;
+    std::vector<t_value> distances;
     for (size_t i = 0; i < inputBuffer[0].size(); ++i){
         speakerPair = speakerManager->get_indexs_by_trajectory(inputBuffer[0][i]);
         channelPair.first  = indexChannelLookup[speakerPair.first];
@@ -120,6 +126,18 @@ void EnvelopeGenerator::_process_trajectory(){
             panRatio = speakerManager->get_panning_ratio(inputBuffer[0][i]);
             outputBuffer[channelPair.first][i]  = volume[i] * (1 - panRatio);
             outputBuffer[channelPair.second][i] = volume[i] * panRatio;
+        }
+        // process the spread of first speaker
+        distances = speakerManager->get_distance_vector(speakerPair.first);
+        for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
+            if (chnl == channelPair.first) {continue;}
+            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i] * (1 - panRatio); // current activated index
+        }
+        // process the spread of second speaker
+        distances = speakerManager->get_distance_vector(speakerPair.second);
+        for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
+            if (chnl == channelPair.second) {continue;}
+            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i] * panRatio; // current activated index
         }
     }
 }
@@ -133,7 +151,7 @@ void EnvelopeGenerator::_set_index_channel_lookup(t_indexs indexs){
 
 
 t_blockOuts EnvelopeGenerator::send(){
-    // TODO: tmp solution ask for advices
+    // TODO: make this optional
     for (size_t i = 0; i < outputBuffer.size(); ++i){
         outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
     }
@@ -141,16 +159,7 @@ t_blockOuts EnvelopeGenerator::send(){
 }
 
 
-t_value EnvelopeGenerator::_calculate_normal_distribution(t_value x, t_value alpha) {
-    t_value coefficient = 1.0 / (alpha * std::sqrt(2 * M_PI));
-    t_value exponent = -0.5 * std::pow((x / alpha), 2);
-    t_value value = coefficient * std::exp(exponent);
-    if (value < VOLUME_THRESHOLD) {value = 0;}
-    return value;
-}
-
-
-t_value EnvelopeGenerator::_calculate_gain(t_value x, t_value theta) {
+t_value EnvelopeGenerator::calculateGain(t_value x, t_value theta) {
     x = x * DISTANCE_SCALE;
 
     t_value tmp = tan(theta*PI/2.0);

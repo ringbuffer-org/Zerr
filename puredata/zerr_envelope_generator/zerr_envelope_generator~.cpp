@@ -37,7 +37,7 @@ void *zerr_envelope_generator_tilde_new(__attribute__((unused)) t_symbol *s, int
         pd_error(0, "%s: can't open", spkrCfgName);
         return NULL;
     }
-    
+
     char spkrCfgFile[MAXPDSTRING]="";
     strcat(spkrCfgFile, dirResult);
     #ifdef WINDOWS
@@ -90,16 +90,16 @@ static t_int *zerr_envelope_generator_tilde_perform(t_int *w) {
 }
 
 
-void zerr_envelope_generator_tilde_set_masks(zerr_envelope_generator_tilde *x, 
+void zerr_envelope_generator_tilde_active_speakers(zerr_envelope_generator_tilde *x, 
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv){
 
     if (argc < 2) {
-        error("zerr_envelope_generator~: not enough args to parse");
+        pd_error(x, "zerr_envelope_generator~: not enough args to parse");
         return;
     }
 
     if (argv[0].a_type != A_SYMBOL) {
-        error("zerr_envelope_generator~: no mask action given"); 
+        pd_error(x, "zerr_envelope_generator~: no mask action given"); 
         return;
     }
 
@@ -117,6 +117,36 @@ void zerr_envelope_generator_tilde_set_masks(zerr_envelope_generator_tilde *x,
     }
 
     x->z->manage_unmasked_indexs(action, indexs_list, argc-1);
+}
+
+
+void zerr_envelope_generator_tilde_trajectory(zerr_envelope_generator_tilde *x, 
+    __attribute__((unused)) t_symbol *s, int argc, t_atom *argv){
+
+    if (argc < 2) {
+        pd_error(x, "zerr_envelope_generator~: not enough args to parse");
+        return;
+    }
+
+    if (argv[0].a_type != A_SYMBOL) {
+        pd_error(x, "zerr_envelope_generator~: no action given"); 
+        return;
+    }
+
+    char* action = strdup(atom_getsymbol(argv)->s_name);
+
+    int idx_size = argc-1;
+    int *indexs_list = (int *)getbytes(idx_size* sizeof(int));
+
+    for (int i = 0; i < idx_size; ++i){
+        if (argv[i+1].a_type != A_FLOAT) {
+            error("zerr_envelope_generator~: incorrect index number"); 
+            return;
+        }
+        indexs_list[i] = (int)argv[i+1].a_w.w_float;
+    }
+
+    x->z->setTrajectoryVector(indexs_list, argc-1);
 }
 
 
@@ -155,8 +185,14 @@ void zerr_envelope_generator_tilde_setup(void) {
         A_GIMME,0);
 
     class_addmethod(zerr_envelope_generator_tilde_class,
-        (t_method) zerr_envelope_generator_tilde_set_masks,
-        gensym("masks"),
+        (t_method) zerr_envelope_generator_tilde_active_speakers,
+        gensym("active-speakers"),
+        A_GIMME,
+        A_NULL);
+
+    class_addmethod(zerr_envelope_generator_tilde_class,
+        (t_method) zerr_envelope_generator_tilde_trajectory,
+        gensym("trajectory"),
         A_GIMME,
         A_NULL);
 

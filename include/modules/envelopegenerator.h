@@ -2,8 +2,8 @@
  * @file envelopegenerator.h 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief Envelope Generator Class Implementation
- * @version 0.5
- * @date 2023-08-02
+ * @version 0.6
+ * @date 2023-08-09
  * 
  * @copyright Copyright (c) 2023
  */
@@ -22,8 +22,8 @@ namespace zerr {
 */
 class EnvelopeGenerator { 
 public:
-    const int numInlet = 3; /**< number of inlets: main(1)/spread(2)/valume(3) */
-    int numOutlet;          /**< number of outlets: assgined according to the speaker configuration*/
+    const int numInlet = 3;    /**< number of inlets: main(1)/spread(2)/valume(3) */
+    int       numOutlet;       /**< number of outlets: assgined according to the speaker configuration*/
     /**
     * @brief Constructor of EnvelopeGenerator setups the parameters for initializing this Class.
     * @param systemCfgs System configuration: sample rate, block size etc.
@@ -67,6 +67,12 @@ public:
     */
     void manage_unmasked_indexs(std::string action, t_indexs idxs);
     /**
+    * @brief TODO 
+    * @param idxs
+    * @param action
+    */
+    void setTrajectoryVector(t_indexs idxs);
+    /**
     * @brief TODO
     */
     void print_parameters(std::string name);
@@ -106,17 +112,13 @@ private:
     */
     void _set_index_channel_lookup(t_indexs indexs);
     /**
-    * @brief This function is obsolete. check _calculate_gain() instead
-    */
-    t_value _calculate_normal_distribution(t_value x, t_value alpha);
-    /**
     * @brief calculate the spread gain according the distance between main output speaker and spread speaker
     * @param x distance
     * @param theta control parameter between 0.0-1.0 
     *           0.0 means no spread at all. 
     *           1.0 means spead to all speakers equally
     */
-    t_value _calculate_gain(t_value x, t_value theta); 
+    t_value calculateGain(t_value x, t_value theta); 
 }; 
 
 } //namespace zerr
