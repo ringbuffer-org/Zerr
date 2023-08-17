@@ -2,7 +2,7 @@
 set -e
 
 kernel_name=$(uname -s)
-# pd_file_ext=
+
 case "$kernel_name" in
     Linux*)
         echo "Linux"
@@ -23,23 +23,16 @@ esac
 
 echo $pd_file_ext
 
-find $(pwd)/ -type f -name "*.o" -delete
-find $(pwd)/ -type f -name $pd_file_ext -delete
-
 mkdir -p builddir
 make
 
 echo "---- Build successful!"
 echo "---- Continuing with the rest of the script."
 
-find $(pwd)/ -type f -name "*.o" -delete
 
 cp $pd_file_ext ../../externals/
 cp *.pd         ../../externals/
 
-mv $pd_file_ext builddir 
-cp *.pd         builddir
-cp *.yaml       builddir
 
 pd_name="Pd"
 pd_pgid="$(pgrep ${pd_name})"
@@ -55,4 +48,4 @@ fi
 
 # open object test patch
 helpfile="zerr_envelopes~_helper.pd"
-open builddir/${helpfile}
+open ${helpfile}

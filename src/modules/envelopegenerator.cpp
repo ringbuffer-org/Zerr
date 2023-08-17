@@ -89,16 +89,21 @@ void EnvelopeGenerator::_process_trigger(){
     }
 
     std::vector<t_value> distances;
-    t_value maxVal;
+
+    t_samples& triggr =  inputBuffer[0];
+    t_samples& spread =  inputBuffer[1];
+    t_samples& volume =  inputBuffer[2];
+
+    // t_value maxVal;
     for (size_t i = 0; i < inputBuffer[0].size(); ++i){
         currIdx = speakerManager->get_indexs_by_trigger(inputBuffer[0][i], currIdx, triggerMode);
         channel = indexChannelLookup[currIdx];
-        outputBuffer[channel][i] = inputBuffer[2][i];
+        outputBuffer[channel][i] = volume[i];
 
         distances = speakerManager->get_distance_vector(currIdx);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channel) {continue;}
-            outputBuffer[chnl][i] += calculateGain(distances[chnl], inputBuffer[1][i]) * inputBuffer[2][i]; // current activated index
+            outputBuffer[chnl][i] = calculateGain(distances[chnl], spread[i]) * volume[i]; // current activated index
         }
     }
 }
@@ -111,19 +116,20 @@ void EnvelopeGenerator::_process_trajectory(){
     t_pair speakerPair;
     t_pair channelPair;
 
-    t_samples& volume =  inputBuffer[2];
+    t_samples& trjcty =  inputBuffer[0];
     t_samples& spread =  inputBuffer[1];
+    t_samples& volume =  inputBuffer[2];
 
     t_value panRatio;
     std::vector<t_value> distances;
-    for (size_t i = 0; i < inputBuffer[0].size(); ++i){
-        speakerPair = speakerManager->get_indexs_by_trajectory(inputBuffer[0][i]);
+    for (size_t i = 0; i < trjcty.size(); ++i){
+        speakerPair = speakerManager->get_indexs_by_trajectory(trjcty[i]);
         channelPair.first  = indexChannelLookup[speakerPair.first];
         channelPair.second = indexChannelLookup[speakerPair.second];
         if (speakerPair.first == speakerPair.second) {
             outputBuffer[channelPair.first][i] = volume[i];
         } else { // linear panning TODO: change to crossfade 
-            panRatio = speakerManager->get_panning_ratio(inputBuffer[0][i]);
+            panRatio = speakerManager->get_panning_ratio(trjcty[i]);
             outputBuffer[channelPair.first][i]  = volume[i] * (1 - panRatio);
             outputBuffer[channelPair.second][i] = volume[i] * panRatio;
         }
@@ -131,13 +137,13 @@ void EnvelopeGenerator::_process_trajectory(){
         distances = speakerManager->get_distance_vector(speakerPair.first);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channelPair.first) {continue;}
-            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i] * (1 - panRatio); // current activated index
+            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i]; //* (1 - panRatio); // current activated index
         }
         // process the spread of second speaker
         distances = speakerManager->get_distance_vector(speakerPair.second);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channelPair.second) {continue;}
-            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i] * panRatio; // current activated index
+            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i]; //* panRatio; // current activated index
         }
     }
 }
@@ -162,9 +168,15 @@ t_blockOuts EnvelopeGenerator::send(){
 t_value EnvelopeGenerator::calculateGain(t_value x, t_value theta) {
     x = x * DISTANCE_SCALE;
 
+    theta = theta<0.0?0:theta;
+    theta = theta>1.0?1:theta;
+
     t_value tmp = tan(theta*PI/2.0);
 
     t_value gain = isEqualTo0(tmp, VOLUME_THRESHOLD)?0.0:1.0 - x/tan(theta*PI/2.0);
 
-    return gain<0.0?0.0:gain;
+    gain = gain<0.0?0:gain;
+    gain = gain>1.0?1:gain;
+
+    return gain;
 }

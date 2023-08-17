@@ -2,7 +2,7 @@
 set -e
 
 kernel_name=$(uname -s)
-# pd_file_ext=
+
 case "$kernel_name" in
     Linux*)
         echo "Linux"
@@ -60,7 +60,3 @@ else
   kill -9 "-${pd_pgid}"
   echo "---- Closed ${pd_name} successfully."
 fi
-
-# open object test patch
-helpfile="externals/zerr~_helper.pd"
-open ${helpfile}
