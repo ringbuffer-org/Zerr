@@ -1,6 +1,6 @@
 # Zerr PureData Externals
 
-This branch contains PureData external wrappers for each Zerr module, as described in the paper ***Autogenous Spatialization for Arbitrary Loudspeaker Setups***. 
+This branch contains PureData external wrappers for each Zerr module, as described in the paper (Autogenous Spatialization for Arbitrary Loudspeaker Setups)[https://ieeexplore.ieee.org/abstract/document/10289141]. 
 
 Following externals can be built from scratch. Pre-built externals can be found in the release.
 
