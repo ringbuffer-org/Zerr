@@ -1,13 +1,19 @@
-#include "zerr_combinator.h"
+/**
+ * @file zerr_combinator.cpp
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief EnvelopeCombinator Class Puredata Wrapper
+ * @date 2024-01-29
+ * 
+ * @copyright Copyright (c) 2023-2024
+ */
+#include "./zerr_combinator.h"
 
 // this one was needed to compile on linux
 // (error: ‘strdup’ was not declared in this scope)
-char* strdup (const char* s)
-{
+char* strdup(const char* s) {
   size_t slen = strlen(s);
   char* result = (char*) malloc(slen + 1);
-  if(result == NULL)
-  {
+  if (result == NULL) {
     return NULL;
   }
 
@@ -15,37 +21,41 @@ char* strdup (const char* s)
   return result;
 }
 
-ZerrEnvelopeCombinator::ZerrEnvelopeCombinator(int numSource, int numChannel, zerr::t_systemConfigs systemCfgs, std::string combinationMode){
+ZerrCombinator::ZerrCombinator(int numSource, int numChannel, std::string combinationMode, zerr::t_systemConfigs systemCfgs) {
     envelopeCombinator = new zerr::EnvelopeCombinator(numSource, numChannel, systemCfgs, combinationMode);
     logger = new zerr::Logger();
     #ifdef TESTMODE
     logger->setLogLevel(zerr::LogLevel::INFO);
-    #endif //TESTMODE
+    #endif  // TESTMODE
 }
 
 
-bool ZerrEnvelopeCombinator::initialize(){
-    if (!envelopeCombinator->initialize()) {return false;};
+bool ZerrCombinator::initialize() {
+    if (!envelopeCombinator->initialize()) {return false;}
     numInlet  = envelopeCombinator->numInlet;
     numOutlet = envelopeCombinator->numOutlet;
 
-    inputBuffer.resize(numInlet,   zerr::t_samples(envelopeCombinator->get_block_size(), 0.0f));
-    outputBuffer.resize(numOutlet, zerr::t_samples(envelopeCombinator->get_block_size(), 0.0f));
+    inputBuffer.resize(numInlet,
+        zerr::t_samples(envelopeCombinator->get_block_size(), 0.0f));
+    outputBuffer.resize(numOutlet,
+        zerr::t_samples(envelopeCombinator->get_block_size(), 0.0f));
 
-    logger->logDebug(zerr::formatString("ZerrEnvelopeCombinator::initialize numInlet:%d numOutlet:%d blockSize %d", numInlet, numOutlet, envelopeCombinator->get_block_size()));
+    logger->logDebug(zerr::formatString(
+        "ZerrCombinator::initialize numInlet:%d numOutlet:%d blockSize %d",
+        numInlet, numOutlet, envelopeCombinator->get_block_size()));
 
     inPtr  = (float **) getbytes(numInlet * sizeof(float **));
     outPtr = (float **) getbytes(numOutlet * sizeof(float **));
 
-    logger->logInfo("ZerrEnvelopeCombinator::initialize initialized");
+    logger->logInfo("ZerrCombinator::initialize initialized");
     return true;
 }
 
 
-void ZerrEnvelopeCombinator::perform(float **ports, int blockSize){
+void ZerrCombinator::perform(float **ports, int blockSize) {
     inPtr  = (float **) &ports[0];
     outPtr = (float **) &ports[numInlet];
-    // length(outPtr);
+
     for (int i = 0; i < numInlet; i++) {
         for (int j = 0; j < blockSize; j++) {
             inputBuffer[i][j] = inPtr[i][j];
@@ -58,7 +68,6 @@ void ZerrEnvelopeCombinator::perform(float **ports, int blockSize){
         outputBuffer = envelopeCombinator->send();
     }
     catch (...) {
-        // logger->logError("ZerrEnvelopeCombinator::perform process failed...");
         return;
     }
 
@@ -70,7 +79,7 @@ void ZerrEnvelopeCombinator::perform(float **ports, int blockSize){
 }
 
 
-ZerrEnvelopeCombinator::~ZerrEnvelopeCombinator(){
+ZerrCombinator::~ZerrCombinator() {
     delete envelopeCombinator;
     delete logger;
 }

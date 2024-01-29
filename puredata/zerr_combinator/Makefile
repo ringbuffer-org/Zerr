@@ -23,7 +23,6 @@ zerr_combinator~.class.sources += ../../src/modules/envelopecombinator.cpp
 
 # zerr_combinator utils
 zerr_combinator~.class.sources += ../../src/utils/logger.cpp
-zerr_combinator~.class.sources += ../../src/utils/utils.cpp
 
 # zerr_combinator headers
 CC  += -I../../include/utils

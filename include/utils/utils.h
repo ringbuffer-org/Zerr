@@ -2,7 +2,6 @@
  * @file utils.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief  Utilities of Zerr* system
- * @version 0.1.1
  * @date 2023-08-09
  * 
  * @copyright Copyright (c) 2023

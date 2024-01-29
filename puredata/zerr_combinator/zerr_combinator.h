@@ -2,36 +2,35 @@
  * @file zerr_combinator.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief EnvelopeCombinator Class Puredata Wrapper
- * @version 0.4
- * @date 2023-08-04
+ * @date 2024-01-29
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #pragma once
-// standard 
 
-// utils
+#include <string>
+
 #include "types.h"
-#include "utils.h"
-// #include "ringbuffer.h"
+// #include "utils.h"
 #include "logger.h"
-// modules
-#include "envelopecombinator.h"
 
-class ZerrEnvelopeCombinator{
-public:
-    int numInlet;     /**< number of inlets: equal to the number of source multiple number of channel in each source*/
-    int numOutlet;    /**< number of outlets: assgined according to the speaker configuration*/
+#include "./envelopecombinator.h"
+
+class ZerrCombinator{
+ public:
+    int numInlet;     /**< number of inlets */
+    int numOutlet;    /**< number of outlets */
     /**
-    * @brief create a new ZerrEnvelopeCombinator instance 
+    * @brief create a new ZerrCombinator instance 
     * @param numSource the number of intput multi-channel envelope source
     * @param numChannel the number of channel of each source. 
     * @param systemCfgs puredata basic system configuration: sample_rate, block_size
     * @param combinationMode select the mode about how to combine the envelopes
     */
-    ZerrEnvelopeCombinator(int numSource, int numChannel, zerr::t_systemConfigs systemCfgs, std::string combinationMode);
+    ZerrCombinator(int numSource, int numChannel,
+        std::string combinationMode, zerr::t_systemConfigs systemCfgs);
     /**
-    * @brief initialize ZerrEnvelopeCombinator modules
+    * @brief initialize ZerrCombinator modules
     * @return bool status of initialized or not
     */
     bool initialize();
@@ -43,23 +42,22 @@ public:
     void perform(float **ports, int n_vec);
     /**
     * @brief return the total number of inlet plus outlet
-    * @return TODO
+    * @return int inlet and outlet number
     */
-    int get_port_count(); //TODO: remove if not needed
+    int get_port_count();  // TODO(Zeyu Yang): remove if not needed
     /**
-    * @brief free a zerr_envelope_generator instance
+    * @brief free the ZerrCombinator instance
     */
-    ~ZerrEnvelopeCombinator();
+    ~ZerrCombinator();
 
-private:
+ private:
     zerr::t_blockIns  inputBuffer;  /**< multi-channel input buffer  */
     zerr::t_blockOuts outputBuffer; /**< multi-channel output buffer */
     float **inPtr;                  /**< PD-style input data pointer  */
     float **outPtr;                 /**< PD-style output data pointer */
 
-    //module objects
-    zerr::EnvelopeCombinator  *envelopeCombinator;  /**< TODO */
-    zerr::Logger              *logger;              /**< TODO */
+    zerr::EnvelopeCombinator  *envelopeCombinator;  /**< Core AudioDisperser component */
+    zerr::Logger              *logger;              /**< Zerr logger for cross-platform logging*/
 };
 
 

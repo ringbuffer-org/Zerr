@@ -28,9 +28,9 @@ void *zerr_disperser_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     // check args
     if (argc < 1) return NULL;  // no enough args to initialize object
     if (argv[0].a_type != A_FLOAT) return NULL;  // input args must be float
+    int n_channel = (int)argv[0].a_w.w_float;
 
     // initialize ZerrDisperser object
-    int n_channel = (int)argv[0].a_w.w_float;
     x->z = new ZerrDisperser(n_channel, cfgs);
     if (!x->z) return NULL;
     if (!x->z->initialize()) return NULL;
@@ -111,7 +111,7 @@ void zerr_disperser_tilde_setup(void) {
         A_CANT,
         A_NULL);
 
-    class_sethelpsymbol(zerr_disperser_tilde_class, gensym("zerr_disperser~-help"));
+    class_sethelpsymbol(zerr_disperser_tilde_class, gensym("zerr_disperser~"));
     CLASS_MAINSIGNALIN(zerr_disperser_tilde_class, zerr_disperser_tilde, f);
 }
 

@@ -35,16 +35,16 @@ bool ZerrDisperser::initialize() {
         numInlet, numOutlet, audioDisperser->get_block_size()));
     #endif  // TESTMODE
 
-    inPtr  = reinterpret_cast<float **>(getbytes(numInlet * sizeof(float **)));
-    outPtr = reinterpret_cast<float **>(getbytes(numOutlet * sizeof(float **)));
+    inPtr  = (float **) getbytes(numInlet * sizeof(float **));
+    outPtr = (float **) getbytes(numOutlet * sizeof(float **));
 
     return true;
 }
 
 
 void ZerrDisperser::perform(float **ports, int blockSize) {
-    inPtr  = reinterpret_cast<float **>(&ports[0]);
-    outPtr = reinterpret_cast<float **>(&ports[numInlet]);
+    inPtr  = (float **) &ports[0];
+    outPtr = (float **) &ports[numInlet];
 
     for (int i = 0; i < numInlet; i++) {
         for (int j = 0; j < blockSize; j++) {

@@ -39,7 +39,7 @@ class ZerrDisperser{
     * @brief return the total number of inlet plus outlet
     * @return int inlet and outlet number
     */
-    int get_port_count();
+    int get_port_count();  //TODO(Zeyu Yang): remove if not needed
     /**
     * @brief free the ZerrDisperser instance
     */
@@ -51,8 +51,8 @@ class ZerrDisperser{
     float **inPtr;                  /**< PD-style input data pointer  */
     float **outPtr;                 /**< PD-style output data pointer */
 
-    zerr::AudioDisperser      *audioDisperser;  /**< zerr core AudioDisperser component */
-    zerr::Logger              *logger;          /**< zerr logger */
+    zerr::AudioDisperser      *audioDisperser;  /**< Core AudioDisperser component */
+    zerr::Logger              *logger;          /**< Zerr logger for cross-platform logging*/
 };
 
 

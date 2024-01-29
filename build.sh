@@ -28,19 +28,19 @@ find $(pwd)/ -type f -name $pd_file_ext -delete
 
 main_path=$(pwd)
 
-cd puredata/zerr_audio_disperser
+cd puredata/zerr_disperser
 make -f Makefile
 cd $main_path
 
-cd puredata/zerr_envelope_combinator
+cd puredata/zerr_combinator
 make -f Makefile
 cd $main_path
 
-cd puredata/zerr_envelope_generator
+cd puredata/zerr_envelopes
 make -f Makefile
 cd $main_path
 
-cd puredata/zerr_feature_tracker
+cd puredata/zerr_features
 make -f Makefile
 cd $main_path
 
