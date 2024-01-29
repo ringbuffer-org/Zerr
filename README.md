@@ -61,7 +61,7 @@ You can use the **build.sh** script to build all externals together.  The built 
 
 ## Usage
 
-### zerr_feature_tracker~
+### zerr_features~
 
 <img src="img/Snipaste_2023-08-07_00-37-16.png" alt="Snipaste_2023-08-07_00-37-16" style="zoom:50%;" />
 
@@ -79,19 +79,19 @@ You can use the **build.sh** script to build all externals together.  The built 
 - ZeroCrossings
 - ...
 
-### zerr_envelope_generator~
+### zerr_envelopes~
 
 ![Snipaste_2023-08-07_00-42-28](img/Snipaste_2023-08-07_00-42-28.png)
 
 **zerr_envelope_generator~** creates envelope according to the income control signal and the speaker configuration. The first argument assign the envelope generation mode (trajectory/trigger). The second argument is the path to the speaker array configuration file. Relative path is supported.
 
-### zerr_envelope_combinator~
+### zerr_combinator~
 
 ![Snipaste_2023-08-07_00-42-34](img/Snipaste_2023-08-07_00-42-34.png)
 
 **zerr_envelope_combinator~** combines the multi-channel envelopes from different generators. The first argument is the number of generator and the second is the channel number of every generator. It means that only generators with same channel number can be added together.  Inlet number equals to source number x channel number and the inlets are grouped by source. e.g in the demo graph there are 16 inlets. The first 8 inlets are the 1-8 channels of the first input source. Inlet 9-16 is the second.
 
-### zerr_audio_disperser~
+### zerr_disperser~
 
 ![Snipaste_2023-08-07_00-42-39](img/Snipaste_2023-08-07_00-42-39.png)
 

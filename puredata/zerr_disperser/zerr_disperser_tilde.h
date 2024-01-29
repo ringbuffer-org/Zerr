@@ -2,16 +2,14 @@
  * @file zerr_disperser_tilde.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief zerr_disperser~ Pure Data External
- * @version 0.1
- * @date 2023-08-06
+ * @date 2024-01-29
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #pragma once
 
-#include "m_pd.h" //PureData APIs
-
-#include "zerr_disperser.h" 
+#include "./m_pd.h"  // PureData APIs
+#include "./zerr_disperser.h"
 #include "configs.h"
 
 #ifdef __cplusplus
@@ -19,23 +17,25 @@ extern "C" {
 #endif
 
 /**
- * @struct zerrout
- * @brief zerr_disperser outlet structure
+ * @struct t_zerrout
+ * @brief zerr_disperser~ outlet structure
  * 
- * This is structure of zerr_disperser outlets for dynamic outlet creating
+ * This is structure of zerr_disperser~ outlets for dynamic outlet creating
  */
 typedef struct zerrout {
     t_outlet *u_outlet;
 } t_zerrout;
+
 /**
- * @struct zerrin
- * @brief zerr_disperser inlet structure
+ * @struct t_zerrin
+ * @brief zerr_disperser~ inlet structure
  * 
- * This is structure of zerr_disperser inlets for dynamic inlet creating
+ * This is structure of zerr_disperser~ inlets for dynamic inlet creating
  */
 typedef struct zerrin {
     t_inlet *u_inlet;
 } t_zerrin;
+
 /**
  * @struct zerr_disperser_tilde
  * @brief the structure of pure data external. This is the main pure data interface
@@ -50,7 +50,7 @@ typedef struct {
     t_int      n_outlet;    /**< number of the object outlets */
     t_zerrout  *x_out_vec;  /**< pointer to the outlets structure */
 
-    ZerrAudioDisperser *z;  /**< zerr_disperser object */
+    ZerrDisperser *z;  /**< zerr_disperser object */
 } zerr_disperser_tilde;
 
 /**

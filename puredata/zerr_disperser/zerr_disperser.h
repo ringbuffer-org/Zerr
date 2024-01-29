@@ -2,34 +2,30 @@
  * @file zerr_disperser.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief AudioDisperser Class Puredata Wrapper
- * @version 0.4
- * @date 2023-08-04
+ * @date 2024-01-29
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #pragma once
-// standard 
 
-// utils
 #include "types.h"
 #include "utils.h"
-// #include "ringbuffer.h"
 #include "logger.h"
-// modules
+
 #include "audiodisperser.h"
 
-class ZerrAudioDisperser{
-public:
+class ZerrDisperser{
+ public:
     int numInlet;     /**< number of inlets*/
     int numOutlet;    /**< number of outlets*/
     /**
-    * @brief create a new ZerrAudioDisperser instance 
+    * @brief create a new ZerrDisperser instance 
     * @param numChannel the number of channel of each source. 
     * @param systemCfgs puredata basic system configuration: sample_rate, block_size
     */
-    ZerrAudioDisperser(int numChannel, zerr::t_systemConfigs systemCfgs);
+    ZerrDisperser(int numChannel, zerr::t_systemConfigs systemCfgs);
     /**
-    * @brief initialize ZerrAudioDisperser modules
+    * @brief initialize ZerrDisperser modules
     * @return bool status of initialized or not
     */
     bool initialize();
@@ -41,23 +37,22 @@ public:
     void perform(float **ports, int n_vec);
     /**
     * @brief return the total number of inlet plus outlet
-    * @return TODO
+    * @return int inlet and outlet number
     */
-    int get_port_count(); //TODO: remove if not needed
+    int get_port_count();
     /**
-    * @brief free a ZerrAudioDisperser instance
+    * @brief free the ZerrDisperser instance
     */
-    ~ZerrAudioDisperser();
+    ~ZerrDisperser();
 
-private:
+ private:
     zerr::t_blockIns  inputBuffer;  /**< multi-channel input buffer  */
     zerr::t_blockOuts outputBuffer; /**< multi-channel output buffer */
     float **inPtr;                  /**< PD-style input data pointer  */
     float **outPtr;                 /**< PD-style output data pointer */
 
-    //module objects
-    zerr::AudioDisperser      *audioDisperser;  /**< TODO */
-    zerr::Logger              *logger;          /**< TODO */
+    zerr::AudioDisperser      *audioDisperser;  /**< zerr core AudioDisperser component */
+    zerr::Logger              *logger;          /**< zerr logger */
 };
 
 

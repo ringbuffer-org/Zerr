@@ -56,10 +56,10 @@ template bool isInVec<int>(int element, std::vector<int> vector);
 std::vector<double> applyMovingAverage(const std::vector<double>& segment, int windowSize) {
     std::vector<double> filteredSegment(segment.size(), 0.0);
 
-    for (int i = 0; i < segment.size(); ++i) {
+    for (size_t i = 0; i < segment.size(); ++i) {
         double sum = 0.0;
         int count = 0;
-        for (int j = i - windowSize + 1; j <= i; ++j) {
+        for (size_t j = i - windowSize + 1; j <= i; ++j) {
             if (j >= 0) {
                 sum += segment[j];
                 ++count;
