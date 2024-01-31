@@ -85,31 +85,30 @@ t_featureValueList FeatureBank::send(){
 
 // TODO: make this an external function
 void FeatureBank::_regist_all(){
-
-    _regist("RootMeanSquare", []() {
+    _regist("rms", []() {
         return fe_ptr(new RootMeanSquare());
-    }); 
-    _regist("ZeroCrossingRate", []() {
+    });  // Root Mean Square
+    _regist("zcr", []() {
         return fe_ptr(new ZeroCrossingRate());
-    }); 
-    _regist("Flux", []() {
+    });  // Zero Crossing Rate
+    _regist("flx", []() {
         return fe_ptr(new Flux());
-    }); 
-    _regist("Centroid", []() {
+    });  // Spectral Flux
+    _regist("ctd", []() {
         return fe_ptr(new Centroid());
-    });
-    _regist("Rolloff", []() {
+    });  // Spectral Centroid
+    _regist("rlf", []() {
         return fe_ptr(new Rolloff());
-    });
-    _regist("CrestFactor", []() {
+    });  // Spectral Rolloff
+    _regist("cf", []() {
         return fe_ptr(new CrestFactor());
-    });
-    _regist("Flatness", []() {
+    });  // Crest Factor
+    _regist("flt", []() {
         return fe_ptr(new Flatness());
-    });
-    _regist("ZeroCrossings", []() {
+    });  // Spectral Flatness
+    _regist("zc", []() {
         return fe_ptr(new ZeroCrossings());
-    });
+    });  // Zero Crossings
 }
 
 
