@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 
+#include "utils.h"
 #include "configs.h"
 #include "ringbuffer.h"
 #include "frequencytransformer.h"

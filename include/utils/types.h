@@ -51,8 +51,8 @@ typedef struct {
 
 typedef std::vector<t_value> t_values; /**< base type of all non-audio vector */
 
-typedef t_value t_featureValue;  /**< feature value calculated via block */
-typedef t_values t_featureBuf;   /**< feature value in sample level or after interpolation */
+typedef t_sample t_featureValue;  /**< feature value calculated via block */
+typedef t_samples t_featureBuf;   /**< feature value in sample level or after interpolation */
 typedef std::vector<t_featureBuf> t_featureValueList; /**< list of all extracted features */
 
 typedef t_value t_volume;
@@ -82,13 +82,12 @@ typedef struct {
     t_value yaw;
     t_value pitch;
 } t_orientation;
+
 // specific configs
 typedef std::vector<t_index> t_indexs;
 
 
 typedef std::pair<t_index, t_index> t_pair;
-// typedef std::pair<t_index, t_value> SpeakerVolStatus
-// typedef std::pair<SpeakerVolStatus, SpeakerVolStatus> SpeakerVolPair;
 
 // system config type
 typedef struct {

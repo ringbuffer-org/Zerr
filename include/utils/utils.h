@@ -95,7 +95,7 @@ bool isInKey(T element, std::map<T, U> map){
 * @param TODO
 * @return TODO
 */
-std::vector<double> applyMovingAverage(const std::vector<double>& segment, int windowSize);
+t_samples applyMovingAverage(const t_samples& segment, int windowSize);
 
 } // zerr
 #endif //UTILS_H

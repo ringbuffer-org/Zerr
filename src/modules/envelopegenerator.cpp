@@ -29,7 +29,7 @@ bool EnvelopeGenerator::initialize(){
     currIdx = speakerManager->get_random_index();
     #ifdef TESTMODE
     logger->logDebug(formatString("EnvelopeGenerator::initialize currIdx %d", currIdx));
-    #endif //TESTMODE
+    #endif  // TESTMODE
 
     if (selectionMode!="trigger" && selectionMode!="trajectory"){ 
         logger->logError("EnvelopeGenerator::initialize Unknown selection mode: " + selectionMode);

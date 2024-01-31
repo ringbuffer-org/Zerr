@@ -79,11 +79,24 @@ void FeatureBank::process(){
 
 
 t_featureValueList FeatureBank::send(){
+    for (size_t i = 0; i < y.size(); ++i){
+        y[i] = zerr::applyMovingAverage(y[i], 16);
+    }
+
     return y;
 }
 
 
-// TODO: make this an external function
+// t_blockOuts EnvelopeGenerator::send(){
+//     // TODO: make this optional
+//     for (size_t i = 0; i < outputBuffer.size(); ++i){
+//         outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
+//     }
+//     return outputBuffer;
+// }
+
+
+// TODO(Zeyu yang): make this an external function
 void FeatureBank::_regist_all(){
     _regist("rms", []() {
         return fe_ptr(new RootMeanSquare());
