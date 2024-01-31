@@ -2,7 +2,7 @@
 
 
 
-ZerrEnvelopeGenerator::ZerrEnvelopeGenerator(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile){
+ZerrEnvelopes::ZerrEnvelopes(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile){
     this->systemCfgs    = systemCfgs;
     this->spkrCfgFile   = spkrCfgFile;
     this->selectionMode = selectionMode;
@@ -15,7 +15,7 @@ ZerrEnvelopeGenerator::ZerrEnvelopeGenerator(zerr::t_systemConfigs systemCfgs, s
 }
  
 
-bool ZerrEnvelopeGenerator::initialize(){
+bool ZerrEnvelopes::initialize(){
     if (!envelopeGenerator->initialize()) {return false;};
     numOutlet = envelopeGenerator->get_n_speaker();
 
@@ -25,12 +25,11 @@ bool ZerrEnvelopeGenerator::initialize(){
     inPtr  = (float **) getbytes(numInlet * sizeof(float **));
     outPtr = (float **) getbytes(numOutlet * sizeof(float **));
 
-    logger->logInfo("ZerrEnvelopeGenerator::initialize initialized");
     return true;
 }
 
 
-void ZerrEnvelopeGenerator::perform(float **ports, int blockSize){
+void ZerrEnvelopes::perform(float **ports, int blockSize){
     inPtr  = (float **) &ports[0];
     outPtr = (float **) &ports[numInlet];
 
@@ -57,29 +56,29 @@ void ZerrEnvelopeGenerator::perform(float **ports, int blockSize){
 }
 
 
-int ZerrEnvelopeGenerator::get_port_count(){
+int ZerrEnvelopes::get_port_count(){
     return numInlet + numOutlet;
 }
 
 
-void ZerrEnvelopeGenerator::manage_unmasked_indexs(char* action, int* idxs, size_t size){
+void ZerrEnvelopes::manage_unmasked_indexs(char* action, int* idxs, size_t size){
     zerr::t_indexs indexVec(idxs, idxs + size);
     envelopeGenerator->manage_unmasked_indexs(action, indexVec);
 }
 
 
-void ZerrEnvelopeGenerator::setTrajectoryVector(int* idxs, size_t size){
+void ZerrEnvelopes::setTrajectoryVector(int* idxs, size_t size){
     zerr::t_indexs indexVec(idxs, idxs + size);
     envelopeGenerator->setTrajectoryVector(indexVec);
 }
 
 
-void ZerrEnvelopeGenerator::print_parameters(char* name){
+void ZerrEnvelopes::print_parameters(char* name){
     envelopeGenerator->print_parameters(name);
 }
 
 
-ZerrEnvelopeGenerator::~ZerrEnvelopeGenerator(){
+ZerrEnvelopes::~ZerrEnvelopes(){
     delete envelopeGenerator;
     delete logger;
 }

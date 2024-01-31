@@ -2,16 +2,15 @@
  * @file zerr_envelopes_tilde.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief zerr_envelopes~ Pure Data External
- * @version 0.5
- * @date 2023-08-02
+ * @date 2024-01-30
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #pragma once
 
-#include "m_pd.h" //PureData APIs
+#include "m_pd.h"
 
-#include "zerr_envelopes.h" 
+#include "./zerr_envelopes.h"
 #include "configs.h"
 
 #ifdef __cplusplus
@@ -30,20 +29,20 @@ typedef struct zerrout {
 
 /**
  * @struct zerr_envelopes_tilde
- * @brief the structure of pure data external. This is the main pure data interface
+ * @brief the structure of zerr_envelopes~ external. This is the main pure data interface
  */
 typedef struct {
-    t_object  x_obj; /**< parent Pure Data object */
-    t_float   *f;    /**< fallback field for the main signal inlet */
+    t_object  x_obj;  /**< parent Pure Data object */
+    t_float   *f;     /**< fallback field for the main signal inlet */
 
-    //t_inlet *main_inlet; /The main inlet is created by PD automatically
+    // The main inlet is created by PD automatically
     t_inlet *spread_inlet; /**< inlet to receive spread control signal */
     t_inlet *volume_inlet; /**< inlet to receive volume control signal */
 
     t_int      n_outlet; /**< number of the object outlets */
     t_zerrout  *x_vec;   /**< pointer to the outlets structure */
 
-    ZerrEnvelopeGenerator *z;       /**< zerr_envelopes object */
+    ZerrEnvelopes *z;       /**< ZerrEnvelopes object */
 } zerr_envelopes_tilde;
 
 /**
@@ -79,31 +78,21 @@ void zerr_envelopes_tilde_setup(void);
 
 /**
  * @memberof zerr_envelopes_tilde
- * @brief updates a parameter's value
- * 
- * @param x the zerr_envelopes object
- * @param paramname the name of the parameter to be updated
- * @param value the offset value to be updated
+ * @brief updates the active speaker list
  */
 void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x, t_symbol *s, int argc, t_atom *argv);
 
 /**
  * @memberof zerr_envelopes_tilde
- * @brief updates a parameter's value
- * 
- * @param x the zerr_envelopes object
- * @param paramname the name of the parameter to be updated
- * @param value the offset value to be updated
+ * @brief updates the trajectory list
  */
 void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x, t_symbol *s, int argc, t_atom *argv);
 
 /**
  * @memberof zerr_envelopes_tilde
- * @brief posts all parameters to the debug console
- * 
- * @param x the zerr_envelopes object
+ * @brief posts current statue to the debug console
  */
-void zerr_envelopes_tilde_print(zerr_envelopes_tilde *x, t_symbol *paramname);
+void zerr_envelopes_tilde_print(zerr_envelopes_tilde *x, t_symbol *s);
 
 /**
  * @memberof zerr_envelopes_tilde

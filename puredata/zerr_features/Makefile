@@ -11,7 +11,7 @@
 CC  = g++
 cflags = -std=c++11
 # ldflags += -L../../dependencies/lib/yaml-cpp -lyaml-cpp    # keep it for future
-ldflags += -L../../dependencies/lib/fftw3      # keep it for future
+ldflags += -L../../dependencies/lib/fftw3      
 ldlibs += -lfftw3
 
 lib.name = zerr_features~

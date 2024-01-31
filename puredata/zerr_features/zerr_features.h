@@ -1,35 +1,33 @@
 /**
  * @file zerr_features.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Zerr Feature Class Puredata Wrapper
- * @version 0.3
- * @date 2023-05-28
+ * @brief AudioFeatures Class Puredata Wrapper
+ * @date 2024-01-30
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 
 #pragma once
 
-// #include "zerr_config.h"
+#include <vector>
+#include <string>
 
-// dependencies
 #include "utils.h"
 #include "types.h"
 #include "ringbuffer.h"
 
-// modules
 #include "featurebank.h"
 
-class ZerrFeatureTracker{
-public:
-    int n_outlet;
-    int n_inlet=1;
+class ZerrFeatures{
+ public:
+    int n_outlet;  /**< number of outlets, dynamic assigned */
+    int n_inlet = 1;  /**< number of inlets, consant */
     /**
-    * create a new zerr instance 
+    * create a new ZerrFeatures instance 
     */
-    ZerrFeatureTracker(zerr::t_systemConfigs sys_cnfg, zerr::t_featureNames ft_names);
+    ZerrFeatures(zerr::t_systemConfigs sys_cnfg, zerr::t_featureNames ft_names);
     /**
-    * initialize all zerr modules
+    * initialize ZerrFeatures modules
     */
     int initialize();
     /**
@@ -38,22 +36,21 @@ public:
     void perform(float **ports, int n_vec);
     /**
     * return the total number of inlet plus outlet
-    * 
     */
     int get_port_count();
     /**
-    * free a zerr instance
+    * free a ZerrFeatures instance
     */
-    ~ZerrFeatureTracker();
+    ~ZerrFeatures();
 
-private:
-    //basic config
-    zerr::t_systemConfigs system_configs;
-    zerr::t_featureNameList feature_names;
+ private:
+    // basic config
+    zerr::t_systemConfigs systemConfigs;
+    zerr::t_featureNameList featureNames;
 
-    std::vector<std::vector<double>> input_buffer;
+    std::vector<std::vector<double>> input_buffer;  // TODO(Zeyu Yang): Fix datatypes
+    zerr::t_featureValueList output_buffer;  // TODO(Zeyu Yang): Fix datatypes
 
-    zerr::t_featureValueList output_buffer;
     float **in_ptr;
     float **out_ptr;
 
@@ -62,7 +59,7 @@ private:
     // config path
     std::string zerr_cfg;
 
-    //module objects
+    // module objects
     zerr::FeatureBank         *bank;
 };
 

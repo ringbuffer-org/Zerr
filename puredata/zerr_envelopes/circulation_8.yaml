@@ -1,47 +1,47 @@
 standard:
-  9:
+  1:
     position: 
       cartesian:
         x:         3.265
         y:        -1.065
         z:         0.410
-  10:
+  2:
     position: 
       cartesian:
         x:         0.995
         y:        -2.268
         z:         0.410
-  11:
+  3:
     position: 
       cartesian:
         x:        -1.269
         y:        -2.318
         z:         0.410
-  12:
+  4:
     position: 
       cartesian:
         x:        -3.124
         y:        -1.250
         z:         0.410
-  13:
+  5:
     position: 
       cartesian:
         x:        -3.249
         y:         1.433
         z:         0.410
-  14:
+  6:
     position: 
       cartesian:
         x:        -1.553
         y:         2.814
         z:         0.410
-  15:
+  7:
     position: 
       cartesian:
         x:         1.254
         y:         2.946
         z:         0.410
-  16:
+  8:
     position: 
       cartesian:
         x:         3.145

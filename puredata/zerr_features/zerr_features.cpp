@@ -1,31 +1,40 @@
-#include "zerr_features.h"
+/**
+ * @file zerr_features.cpp
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief AudioFeatures Class Puredata Wrapper
+ * @date 2024-01-30
+ * 
+ * @copyright Copyright (c) 2023-2024
+ */
+
+#include "./zerr_features.h"
 
 #include <stdlib.h>
 
-ZerrFeatureTracker::ZerrFeatureTracker(zerr::t_systemConfigs sys_cnfg, zerr::t_featureNames ft_names): input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)){
+ZerrFeatures::ZerrFeatures(zerr::t_systemConfigs sys_cnfg, zerr::t_featureNames ft_names):
+            input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)) {
+    bank = new zerr::FeatureBank();
 
-    bank   = new zerr::FeatureBank();
+    systemConfigs.sample_rate = sys_cnfg.sample_rate;
+    systemConfigs.block_size  = sys_cnfg.block_size;
 
-    system_configs.sample_rate = sys_cnfg.sample_rate;
-    system_configs.block_size  = sys_cnfg.block_size;
-
-    for (int i = 0; i < ft_names.num; ++i){
-        feature_names.push_back(ft_names.names[i]);
+    for (int i = 0; i < ft_names.num; ++i) {
+        featureNames.push_back(ft_names.names[i]);
     }
 }
 
 
-int ZerrFeatureTracker::initialize(){
-
-    try{
-        bank->initialize(feature_names, system_configs);
-    }catch (...) {
+int ZerrFeatures::initialize() {
+    try {
+        bank->initialize(featureNames, systemConfigs);
+    } catch (...) {
+        // send bank initialize failed
         return 0;
     }
-    
-    n_outlet = feature_names.size();
 
-    input_buffer.resize(n_inlet, std::vector<double>(system_configs.block_size, 0.0f));
+    n_outlet = featureNames.size();
+
+    input_buffer.resize(n_inlet, std::vector<double>(systemConfigs.block_size, 0.0f));
     output_buffer.resize(n_outlet);
 
     in_ptr  = (float **) malloc(n_inlet * sizeof(float **));
@@ -35,8 +44,7 @@ int ZerrFeatureTracker::initialize(){
 }
 
 
-void ZerrFeatureTracker::perform(float **ports, int n_vec){
-
+void ZerrFeatures::perform(float **ports, int n_vec) {
     in_ptr  = (float **) &ports[0];
     out_ptr = (float **) &ports[n_inlet];
 
@@ -55,15 +63,14 @@ void ZerrFeatureTracker::perform(float **ports, int n_vec){
             out_ptr[i][j] = output_buffer[i][j];
         }
     }
-
 }
 
 
-int ZerrFeatureTracker::get_port_count(){
+int ZerrFeatures::get_port_count() {
     return n_inlet+n_outlet;
 }
 
 
-ZerrFeatureTracker::~ZerrFeatureTracker(){
+ZerrFeatures::~ZerrFeatures() {
     delete bank;
 }

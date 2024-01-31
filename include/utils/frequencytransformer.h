@@ -2,10 +2,9 @@
  * @file frequencytransformer.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com) 
  * @brief FFT class dependent on fftw3 library
- * @version 0.3
  * @date 2023-06-10
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #ifndef FREQUENCYTRANSFORMER_H
 #define FREQUENCYTRANSFORMER_H
@@ -61,8 +60,6 @@ private:
     fftw_complex *fft_out;
 
     fftw_plan p_fft, p_ifft;
-
-    
 };
 
 } // namespace zerr

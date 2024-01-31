@@ -2,11 +2,10 @@
 #define CONFIGS_H
 
 #define PUREDATA       /**< Include Puredata specified functions  */
-// #define WINDOWS        /**< Define WINDOWS for platform related features  */
 
 #define TESTMODE       /**< Print log when TESTMODE Macro defined */
 
-#define SAMPLEMODE     /**< TODO */
+// #define SAMPLEMODE     /**< TODO */
 
 #define TRIGGER_THRESHOLD 1e-4  /**< TODO  */
 

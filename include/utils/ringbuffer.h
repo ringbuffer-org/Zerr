@@ -2,10 +2,9 @@
  * @file ringbuffer.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com) 
  * @brief ringbuffer util
- * @version 0.3
  * @date 2023-06-07
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H

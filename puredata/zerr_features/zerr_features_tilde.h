@@ -2,16 +2,15 @@
  * @file zerr_features_tilde.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief zerr_features~ Pure Data External
- * @version 0.4
- * @date 2023-06-27
+ * @date 2024-01-30
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #pragma once
 
-#include "m_pd.h" //PureData APIs
+#include "m_pd.h"
 
-#include "zerr_features.h" 
+#include "./zerr_features.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,9 +22,7 @@ extern "C" {
  * 
  * This is structure of zerr_features outlets for dynamic outlet creating
  */
-typedef struct zerrout
-{
-    // t_atomtype u_type;
+typedef struct zerrout {
     t_outlet *u_outlet;
 } t_zerrout;
 
@@ -34,12 +31,12 @@ typedef struct zerrout
  * @brief the structure of pure data external. This is the main pure data interface
  */
 typedef struct {
-    t_object            x_obj;    /**< parent Pure Data object */
-    t_float            *f;        /**< fallback field for the main signal inlet */
-    t_int               n_outlet; /**< number of zerr outlets */
-    t_zerrout          *x_vec;    /**< pointer to zerr outlets structure */
+    t_object      x_obj;    /**< parent Pure Data object */
+    t_float      *f;        /**< fallback field for the main signal inlet */
+    t_int         n_outlet; /**< number of zerr outlets */
+    t_zerrout    *x_vec;    /**< pointer to zerr outlets structure */
 
-    ZerrFeatureTracker *z;        /**< pointer to the zerr object */
+    ZerrFeatures *z;        /**< pointer to the ZerrFeatures object */
 } zerr_features_tilde;
 
 /**

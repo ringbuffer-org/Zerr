@@ -40,6 +40,9 @@ typedef struct {
 // feature types
 typedef std::string t_featureName; /**< Identification name of the feature */
 typedef std::vector<t_featureName> t_featureNameList; /**< The list of feature name to be activated */
+
+
+// TODO(Zeyu Yang): If this only use in PD wrapper, move it out
 typedef struct {
     char **names;  // Pointer to the list of strings
     int num;     // Number of strings in the list
