@@ -94,7 +94,6 @@ void EnvelopeGenerator::_process_trigger(){
     t_samples& spread =  inputBuffer[1];
     t_samples& volume =  inputBuffer[2];
 
-    // t_value maxVal;
     for (size_t i = 0; i < inputBuffer[0].size(); ++i){
         currIdx = speakerManager->get_indexs_by_trigger(inputBuffer[0][i], currIdx, triggerMode);
         channel = indexChannelLookup[currIdx];
@@ -158,9 +157,10 @@ void EnvelopeGenerator::_set_index_channel_lookup(t_indexs indexs){
 
 t_blockOuts EnvelopeGenerator::send(){
     // TODO: make this optional
-    for (size_t i = 0; i < outputBuffer.size(); ++i){
-        outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
-    }
+    // for (size_t i = 0; i < outputBuffer.size(); ++i){
+    //     outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
+    // }
+    
     return outputBuffer;
 }
 

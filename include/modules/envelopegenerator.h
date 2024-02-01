@@ -2,10 +2,9 @@
  * @file envelopegenerator.h 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief Envelope Generator Class Implementation
- * @version 0.6
- * @date 2023-08-09
+ * @date 2024-01-31
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #ifndef ENVELOPEGENERATOR_H
 #define ENVELOPEGENERATOR_H

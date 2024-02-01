@@ -305,7 +305,7 @@ void SpeakerManager::manageActiveSpeakerIndexs(std::string action, t_indexs idxs
     #endif //TESTMODE
 }
 
-                           
+
 void SpeakerManager::printActiveSpeakerIndexs(){
     logger->logInfo("Active Speakers: ");
     logger->logInfo("    " + formatVector<t_index>(actvSpkIdx));

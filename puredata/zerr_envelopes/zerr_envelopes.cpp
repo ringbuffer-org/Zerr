@@ -51,6 +51,7 @@ void ZerrEnvelopes::perform(float **ports, int blockSize){
     for (int i = 0; i < numOutlet; i++) {
         for (int j = 0; j < blockSize; j++) {
             outPtr[i][j] = outputBuffer[i][j];
+            // outPtr[i][j] = 0.1;
         }
     }
 }

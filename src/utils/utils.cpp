@@ -54,21 +54,37 @@ template bool isInVec<int>(int element, std::vector<int> vector);
 
 
 t_samples applyMovingAverage(const t_samples& segment, int windowSize) {
-    t_samples filteredSegment(segment.size(), 0.0);
-
-    for (size_t i = 0; i < segment.size(); ++i) {
-        double sum = 0.0;
-        int count = 0;
-        for (size_t j = i - windowSize + 1; j <= i; ++j) {
-            if (j >= 0) {
-                sum += segment[j];
-                ++count;
-            }
-        }
-        filteredSegment[i] = sum / count;
+    // Check if windowSize is valid
+    if (windowSize <= 0) {
+        throw std::invalid_argument("Window size must be greater than 0");
+    }
+    if (windowSize > segment.size()) {
+        windowSize = segment.size();
     }
 
-    return filteredSegment;
+    int segmentSize = segment.size();
+    t_samples averagedSegment(segmentSize, 0.0);
+    double windowSum = 0.0;
+    // int windowElements = 0;
+
+    // Initial windowSum and shortWindows
+    for (int i = 0; i < windowSize; ++i) {
+        windowSum += segment[i];
+        averagedSegment[i] = windowSum / (i + 1);
+    }
+
+    // Apply moving average
+    for (int i = windowSize; i < segmentSize; ++i) {
+        // Add new element to the window
+        if (i < segmentSize) {
+            windowSum += segment[i];
+            windowSum -= segment[i - windowSize];
+        }
+
+        averagedSegment[i] = windowSum / segmentSize;
+    }
+
+    return averagedSegment;
 }
 
 } // zerr

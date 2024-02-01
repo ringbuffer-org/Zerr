@@ -79,21 +79,12 @@ void FeatureBank::process(){
 
 
 t_featureValueList FeatureBank::send(){
-    for (size_t i = 0; i < y.size(); ++i){
-        y[i] = zerr::applyMovingAverage(y[i], 16);
-    }
+    // for (size_t i = 0; i < y.size(); ++i){
+    //     y[i] = zerr::applyMovingAverage(y[i], 16);
+    // }
 
     return y;
 }
-
-
-// t_blockOuts EnvelopeGenerator::send(){
-//     // TODO: make this optional
-//     for (size_t i = 0; i < outputBuffer.size(); ++i){
-//         outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
-//     }
-//     return outputBuffer;
-// }
 
 
 // TODO(Zeyu yang): make this an external function
