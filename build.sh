@@ -1,62 +1,48 @@
 #!/bin/bash
-set -e
 
-kernel_name=$(uname -s)
+build_puredata() {
+    echo "Building Zerr* for Pure Data..."
+    cd puredata
+    make
+    if [ "$install" = true ]; then
+        echo "Installing Pure Data build..."
+        make install
+    fi
+}
 
-case "$kernel_name" in
-    Linux*)
-        echo "Linux"
-        pd_file_ext="*.pd_linux"
+build_jack() {
+    echo "Building Zerr* for JACK...(placeholder)"
+}
+
+install=false
+
+while getopts ":i" opt; do
+  case ${opt} in
+    i )
+      install=true
+      ;;
+    \? )
+      echo "Invalid Option: -$OPTARG" 1>&2
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+if [ $# -eq 0 ]; then
+    echo "No arguments provided. Please specify a target to build."
+    exit 1
+fi
+
+case $1 in
+    puredata)
+        build_puredata
         ;;
-    Darwin*)
-        echo "macOS"
-        pd_file_ext="*.pd_darwin"
-        ;;
-    CYGWIN* | MINGW* | MSYS*)
-        echo "Windows"
-        pd_file_ext="*.pd_dll"
+    jack)
+        build_jack
         ;;
     *)
-        echo "Unknown"
+        echo "Invalid argument: $1. Please specify 'puredata' or 'jack'."
+        exit 1
         ;;
 esac
-
-echo $pd_file_ext
-
-find $(pwd)/ -type f -name "*.o" -delete
-find $(pwd)/ -type f -name $pd_file_ext -delete
-
-main_path=$(pwd)
-
-cd puredata/zerr_disperser
-make -f Makefile
-cd $main_path
-
-cd puredata/zerr_combinator
-make -f Makefile
-cd $main_path
-
-cd puredata/zerr_envelopes
-make -f Makefile
-cd $main_path
-
-cd puredata/zerr_features
-make -f Makefile
-cd $main_path
-
-echo "---- Build successful!"
-
-find $(pwd)/ -type f -name "*.o" -delete
-find $(pwd)/ -type f -name $pd_file_ext -exec mv {} externals/ \;
-
-pd_name="Pd"
-pd_pgid="$(pgrep ${pd_name})"
-
-# Check if the application is running
-if [ -z ${pd_pgid} ]; then
-  echo "---- ${pd_name} is not running."
-else
-  echo "---- ${pd_name} is running with PGID: ${pd_pgid}. Closing it..."
-  kill -9 "-${pd_pgid}"
-  echo "---- Closed ${pd_name} successfully."
-fi
