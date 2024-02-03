@@ -1,14 +1,21 @@
+/**
+ * @file envelopecombinator.cpp 
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Envelope Combinator Class Implementation
+ * @date 2024-02-03
+ * 
+ * @copyright Copyright (c) 2023-2024
+ */
 #include "envelopecombinator.h"
 using namespace zerr;
 
-
-EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, t_systemConfigs systemCfgs, std::string combinationMode){
+EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, t_systemConfigs systemCfgs, std::string combMode){
     this->numSource  = numSource;
     this->numChannel = numChannel;
     this->systemCfgs = systemCfgs;
-    this->combinationMode = combinationMode;
+    this->combMode = combMode;
 
-    numInlet = numSource*numChannel;
+    numInlet = numSource * numChannel;
     numOutlet = numChannel;
 
     logger = new Logger();
@@ -21,13 +28,17 @@ bool EnvelopeCombinator::initialize(){
     inputBuffer.resize(numInlet,   t_samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, t_samples(systemCfgs.block_size, 0.0f));
 
-    if (combinationMode!="add" && 
-        combinationMode!="root" && 
-        combinationMode!="max"){ //TODO: change to enumerate and add to type.h
-
-        logger->logError("EnvelopeCombinator::initialize Unknown combination mode: " + combinationMode);
+    if (combMode!="add" && 
+        combMode!="root" && 
+        combMode!="max"){ //TODO: change to enumerate and add to type.h
+        logger->logError(
+            "EnvelopeCombinator::initialize Unknown combination mode: " + combMode);
         return false;
     }
+
+    if (combMode == "add") processFunc = &EnvelopeCombinator::_process_add;
+    else if (combMode == "root") processFunc = &EnvelopeCombinator::_process_root;
+    else if (combMode == "max") processFunc = &EnvelopeCombinator::_process_max;
 
     return true;
 }
@@ -39,10 +50,9 @@ void EnvelopeCombinator::fetch(t_blockIns in){
 
 
 void EnvelopeCombinator::process(){
-    //TODO: use switch case
-    if (combinationMode=="add"){_process_add();return;}
-    if (combinationMode=="root"){_process_root();return;}
-    if (combinationMode=="max"){_process_max();return;}
+    if (processFunc) {
+        (this->*processFunc)();
+    }
 }
 
 
@@ -71,6 +81,7 @@ void EnvelopeCombinator::_process_root(){
     double exponent = 1.0 / (double) numSource;
     t_sample multi_tmp;
     for (int i = 0; i < numChannel; ++i) {
+        // TODO: use systemcfg.block_size could cause bug(sometimes smaller)
         for (size_t k = 0; k < systemCfgs.block_size; ++k) {
             multi_tmp = 1;
             for (int j = 0; j < numSource; ++j) {
@@ -102,7 +113,10 @@ void EnvelopeCombinator::_process_max(){
     }
 }
 
-
 t_blockOuts EnvelopeCombinator::send(){
     return outputBuffer;
+}
+
+EnvelopeCombinator::~EnvelopeCombinator() {
+    delete logger;
 }

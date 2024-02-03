@@ -2,10 +2,9 @@
  * @file envelopecombinator.h 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief Envelope Combinator Class Implementation
- * @version 0.2
- * @date 2023-08-05
+ * @date 2024-02-03
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #ifndef ENVELOPECOMBINATOR_H
 #define ENVELOPECOMBINATOR_H
@@ -64,11 +63,21 @@ public:
     * @param TODO
     */
     t_blockOuts send();
+    /**
+    * @brief TODO
+    * @param TODO
+    * @param TODO
+    * @param TODO
+    */
+    ~EnvelopeCombinator();
 private:
+    typedef void (EnvelopeCombinator::*ProcessFunction)();
+    ProcessFunction processFunc;
+
     int                    numSource;       /**< TODO */
     int                    numChannel;      /**< TODO */
     zerr::t_systemConfigs  systemCfgs;      /**< system configuration: sample_rate, block_size */
-    std::string            combinationMode; /**< TODO */
+    std::string            combMode;    /**< TODO */
 
     Logger                *logger;          /**< TODO */
 
