@@ -39,16 +39,22 @@ public:
     * @brief setup the inputBuffer with new audio block
     * @param in the audio block to be processed
     */
-    void fetch(t_blockIns in);
+    // void fetch(t_blockIns in);
     /**
     * @brief generate the envelope signal block to outputBuffer
     */
-    void process();
+    // void process();
     /**
     * @brief return the audio block in outputBuffer 
     * @return t_blockOuts
     */
-    t_blockOuts send();
+    // t_blockOuts send();
+    /**
+    * @brief TODO 
+    * @param TODO
+    * @param TODO
+    */
+    t_blockOuts perform(BlockIns in);
     /**
     * @brief get the number of active speaker of current speaker array setup
     * @return int number of active speakerss
@@ -64,13 +70,17 @@ public:
     * @param idxs
     * @param action
     */
-    void manage_unmasked_indexs(std::string action, t_indexs idxs);
+    void setActiveSpeakerIndexs(std::string action, t_indexs idxs);
     /**
     * @brief TODO 
     * @param idxs
     * @param action
     */
     void setTrajectoryVector(t_indexs idxs);
+    /**
+    * @brief TODO
+    */
+    void setTopoMatrix(TopoMatrix matrix);
     /**
     * @brief TODO
     */
@@ -89,7 +99,7 @@ private:
     std::string           selectionMode;   /**< The strategy for generating envelope: trigger | trajectory */
     int                   triggerMode;     /**< The strategy for choosing the next speaker to jump to using trigger with topology */
 
-    t_blockIns            inputBuffer;     /**< multi-channel input buffer in the shape of input channel number x block size */
+    BlockIns            inputBuffer;     /**< multi-channel input buffer in the shape of input channel number x block size */
     t_blockOuts           outputBuffer;    /**< multi-channel output buffer in the shape of output channel number x block size */
 
     SpeakerManager        *speakerManager; /**< SpeakerManger object to access the speaker array information */

@@ -285,15 +285,20 @@ std::vector<t_value> SpeakerManager::get_distance_vector(int spkr_idx){
 }
 
 
-void SpeakerManager::manageActiveSpeakerIndexs(std::string action, t_indexs idxs){
+void SpeakerManager::setTopoMatrix(TopoMatrix matrix) {
+
+}
+
+
+void SpeakerManager::setActiveSpeakers(std::string action, t_indexs idxs){
     if (action=="set"){
-        setActiveSpeakerIndexs(idxs);
+        _setActiveSpeakerIndexs(idxs);
     }
     else if (action=="add"){
-        addActiveSpeakerIndexs(idxs);
+        _addActiveSpeakerIndexs(idxs);
     }
     else if (action=="del"){
-        delActiveSpeakerIndexs(idxs);
+        _delActiveSpeakerIndexs(idxs);
     }
     else{
         logger->logWarning("SpeakerManager::set_actvSpkIdx_indexs unknow action" + action);
@@ -422,7 +427,7 @@ t_spherical SpeakerManager::_cartesian2spherical(t_cartesian cartesian){
 }
 
 
-void SpeakerManager::setActiveSpeakerIndexs(t_indexs idxs){
+void SpeakerManager::_setActiveSpeakerIndexs(t_indexs idxs){
     actvSpkIdx.clear();
     for (size_t i = 0; i < idxs.size(); ++i){
         auto it = speakers.find(idxs[i]);
@@ -455,7 +460,7 @@ void SpeakerManager::setActiveSpeakerIndexs(t_indexs idxs){
 }
 
 
-void SpeakerManager::addActiveSpeakerIndexs(t_indexs idxs){
+void SpeakerManager::_addActiveSpeakerIndexs(t_indexs idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
         // check if the input index is valid
         if(!isInKey<t_index, Speaker>(idxs[i], speakers)){
@@ -472,7 +477,7 @@ void SpeakerManager::addActiveSpeakerIndexs(t_indexs idxs){
 }
 
 
-void SpeakerManager::delActiveSpeakerIndexs(t_indexs idxs){
+void SpeakerManager::_delActiveSpeakerIndexs(t_indexs idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
         // check if the input index is valid
         if(!isInKey<t_index, Speaker>(idxs[i], speakers)){

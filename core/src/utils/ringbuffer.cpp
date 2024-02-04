@@ -18,7 +18,7 @@ void RingBuffer::enqueue(const t_blockIn& block) {
 
     assert(block.size() <= buffer.size() && "Block size must be smaller than buffer size.");
 
-    for (const t_sample& sample : block) {
+    for (const Sample& sample : block) {
         buffer[tail] = sample;
         tail = (tail + 1) % buffer.size();
 
@@ -31,7 +31,7 @@ void RingBuffer::enqueue(const t_blockIn& block) {
 }
 
 
-void RingBuffer::get_samples(t_sample* output_buffer, size_t buf_len) {
+void RingBuffer::get_samples(Sample* output_buffer, size_t buf_len) {
     // std::cout<<"get_samples:  "<<buf_len<<" | "<<buffer.size()<<std::endl;
 
     assert(buf_len == buffer.size() && "Output buffer size should be equal to ringbuffer size!");

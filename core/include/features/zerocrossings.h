@@ -28,9 +28,9 @@ public:
 
 private:
     void _reset_param();
-    bool _isZeroCrossing(t_sample first, t_sample second);
+    bool _isZeroCrossing(Sample first, Sample second);
 
-    t_sample last_sample;
+    Sample last_sample;
 };
 
 } //namespace feature

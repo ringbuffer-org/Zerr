@@ -46,7 +46,7 @@ class ZerrDisperser{
     ~ZerrDisperser();
 
  private:
-    zerr::t_blockIns  inputBuffer;  /**< multi-channel input buffer  */
+    zerr::BlockIns  inputBuffer;  /**< multi-channel input buffer  */
     zerr::t_blockOuts outputBuffer; /**< multi-channel output buffer */
     float **inPtr;                  /**< PD-style input data pointer  */
     float **outPtr;                 /**< PD-style output data pointer */

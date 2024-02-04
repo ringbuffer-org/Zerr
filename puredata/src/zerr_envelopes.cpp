@@ -1,6 +1,12 @@
+/**
+ * @file zerr_envelopes.cpp 
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Envelope Generator Class Puredata wrapper
+ * @date 2024-01-31
+ * 
+ * @copyright Copyright (c) 2023-2024
+ */
 #include "zerr_envelopes.h"
-
-
 
 ZerrEnvelopes::ZerrEnvelopes(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile){
     this->systemCfgs    = systemCfgs;
@@ -40,9 +46,7 @@ void ZerrEnvelopes::perform(float **ports, int blockSize){
     }
 
     try {
-        envelopeGenerator->fetch(inputBuffer); 
-        envelopeGenerator->process();
-        outputBuffer = envelopeGenerator->send();
+        outputBuffer = envelopeGenerator->perform(inputBuffer);
     }
     catch (...) {
         return;
@@ -62,9 +66,9 @@ int ZerrEnvelopes::get_port_count(){
 }
 
 
-void ZerrEnvelopes::manage_unmasked_indexs(char* action, int* idxs, size_t size){
+void ZerrEnvelopes::setActiveSpeakerIndexs(char* action, int* idxs, size_t size){
     zerr::t_indexs indexVec(idxs, idxs + size);
-    envelopeGenerator->manage_unmasked_indexs(action, indexVec);
+    envelopeGenerator->setActiveSpeakerIndexs(action, indexVec);
 }
 
 

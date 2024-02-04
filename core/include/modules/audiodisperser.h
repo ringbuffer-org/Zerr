@@ -42,7 +42,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    void fetch(t_blockIns in);
+    void fetch(BlockIns in);
     /**
     * @brief TODO
     * @param TODO
@@ -71,7 +71,7 @@ private:
 
     Logger                *logger;          /**< TODO */
 
-    t_blockIns             inputBuffer;      /**< TODO */
+    BlockIns             inputBuffer;      /**< TODO */
     t_blockOuts            outputBuffer;     /**< TODO */
 }; 
 

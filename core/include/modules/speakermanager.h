@@ -2,10 +2,9 @@
  * @file speakermanager.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief  Speaker & SpeakerManager Class Implementation
- * @version 0.5
  * @date 2023-08-05
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #ifndef SPEAKERMANAGER_H
 #define SPEAKERMANAGER_H
@@ -20,13 +19,12 @@
 #include "configs.h"
 #include "logger.h"
 
-
 namespace zerr {
 /**
 * Speaker Class to model the basic properties of a physical speaker
 */
 class Speaker {
-public:
+ public:
     /**
     * @brief assgining index and geometry configuration when creating speaker instance
     * @param index the uniqe identification index of Speaker
@@ -78,7 +76,7 @@ public:
     */
     void print_all();
 
-private:
+ private:
     Logger        *logger;      /**< logger  */
     t_index        index;       /**< TODO */
     t_position     position;    /**< TODO */
@@ -103,12 +101,16 @@ private:
 * and accessing & choosing speakers
 */
 class SpeakerManager {
-public:
+ public:
     SpeakerManager(std::string config_path);
     /**
     * @brief setup speaker array via the YAML config file and specified subgroup mode
     */
     bool initialize();
+    /**
+    * @brief TODO
+    */
+    void reset(std::string config_path);
     /**
     * @brief get the number of speakers in this speaker array setup
     */
@@ -154,7 +156,15 @@ public:
     /**
     * @brief TODO
     */
-    void manageActiveSpeakerIndexs(std::string action, t_indexs idxs);
+    void setTrajectoryVector(t_indexs idxs);
+    /**
+    * @brief TODO
+    */
+    void setTopoMatrix(TopoMatrix matrix);
+    /**
+    * @brief TODO
+    */
+    void setActiveSpeakers(std::string action, t_indexs idxs);
     /**
     * @brief TODO
     */
@@ -167,20 +177,7 @@ public:
     * @brief TODO
     */
     void printTrajectoryVector();
-    /**
-    * @brief TODO
-    */
-    void setTrajectoryVector(t_indexs idxs);
-    /**
-    * @brief TODO
-    */
-    void set_topology_matrix();
-    /**
-    * @brief TODO
-    */
-    void reset(std::string config_path);
-
-private:
+ private:
     Logger *logger;             /**< logger object for logging message in different environment */
 
     std::string config_path;    /**< file path of speaker array configuration */
@@ -188,12 +185,12 @@ private:
 
     std::map<t_index, Speaker> speakers;         /**< TODO  */
 
-    std::map<t_index, std::vector<t_value>> distance_matrix; /**< TODO */
+    std::map<t_index, t_values> distance_matrix; /**< TODO */
 
     // specific speaker configurations
     t_indexs                     actvSpkIdx;    /**< TODO */
     t_indexs                     trajVector;    /**< TODO */
-    std::map<t_index, t_indexs>  topoMatrix;    /**< TODO */
+    TopoMatrix                   topoMatrix;    /**< TODO */
     
     /**
     * @brief  
@@ -240,19 +237,19 @@ private:
     * @param  
     * @return  
     */
-    void setActiveSpeakerIndexs(t_indexs idxs);
+    void _setActiveSpeakerIndexs(t_indexs idxs);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    void addActiveSpeakerIndexs(t_indexs idxs);
+    void _addActiveSpeakerIndexs(t_indexs idxs);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    void delActiveSpeakerIndexs(t_indexs idxs);
+    void _delActiveSpeakerIndexs(t_indexs idxs);
 }; 
 
 #ifdef PUREDATA // explicit instantiation required for PD

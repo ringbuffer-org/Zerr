@@ -48,6 +48,6 @@ void ZeroCrossings::_reset_param(){
     last_sample = 0.0;
 }
 
-bool ZeroCrossings::_isZeroCrossing(t_sample first, t_sample second){
+bool ZeroCrossings::_isZeroCrossing(Sample first, Sample second){
     return ((first >= 0 && second < 0) || (first < 0 && second >= 0));
 }

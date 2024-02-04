@@ -54,8 +54,6 @@ private:
 
     t_specBuf power_spec;
 
-    // due to the limitation of fftw3 library
-    // type can only be double and fftw_complex
     double       *fft_in;
     fftw_complex *fft_out;
 

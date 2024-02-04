@@ -26,7 +26,7 @@ public:
 
     void enqueue(const t_blockIn& block);
     
-    void get_samples(t_sample* ptr_buffer, size_t buf_len);
+    void get_samples(Sample* ptr_buffer, size_t buf_len);
 
 private:
     t_samples buffer;

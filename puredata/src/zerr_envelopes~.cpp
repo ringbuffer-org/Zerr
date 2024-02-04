@@ -119,7 +119,7 @@ void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x,
         indexs_list[i] = (int)argv[i+1].a_w.w_float;
     }
 
-    x->z->manage_unmasked_indexs(action, indexs_list, argc-1);
+    x->z->setActiveSpeakerIndexs(action, indexs_list, argc-1);
 }
 
 

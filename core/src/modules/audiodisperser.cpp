@@ -23,7 +23,7 @@ bool AudioDisperser::initialize(){
 }
 
 
-void AudioDisperser::fetch(t_blockIns in){
+void AudioDisperser::fetch(BlockIns in){
     inputBuffer = in;
 }
 

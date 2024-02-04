@@ -2,34 +2,36 @@
 #define TYPES_H
 #include <vector>
 #include <string>
+#include <map>
 
 #include "configs.h"
 
+
 namespace zerr {
 // basic types
-typedef double t_sample; /**< base type of audio-related value */
+typedef double Sample; /**< base type of audio-related value */
 typedef float  t_value;  /**< base type of config value */
 typedef int    t_index;  /**< base type of index value */
 
 typedef struct {
-    t_sample real;
-    t_sample img;
-} t_complex; /**< complex number */
+    Sample real;
+    Sample img;
+} Complex; /**< complex number */
 
 // audio types
-typedef std::vector<t_sample> t_samples; /**< basic type of all kinds of audio vector */
+typedef std::vector<Sample> t_samples; /**< basic type of all kinds of audio vector */
 
 typedef t_samples t_blockIn;  /**< input audio block */
 typedef t_samples t_blockOut; /**< output audio block */
 typedef t_samples t_audioBuf; /**< buffered audio frame */
 
-typedef std::vector<t_blockIn>  t_blockIns;  /**< multi-channel input audio blocks: unused */
-typedef std::vector<t_blockOut> t_blockOuts; /**< multi-channel output audio blocks: unused */
-typedef std::vector<t_audioBuf> t_audioBufs; /**< multi-channel audio buffer: unused */
+typedef std::vector<t_blockIn>  BlockIns;  /**< multi-channel input audio blocks */
+typedef std::vector<t_blockOut> t_blockOuts; /**< multi-channel output audio blocks */
+typedef std::vector<t_audioBuf> t_audioBufs; /**< multi-channel audio buffer */
 
 // spectral types
-typedef std::vector<t_complex> t_fftBuf; /**< complex buffer for fft output */
-typedef std::vector<t_sample> t_specBuf; /**< spectral power buffer */
+typedef std::vector<Complex> t_fftBuf; /**< complex buffer for fft output */
+typedef std::vector<Sample> t_specBuf; /**< spectral power buffer */
 
 typedef struct {
     t_blockIn  blck; /**< single audio block */
@@ -51,7 +53,7 @@ typedef struct {
 
 typedef std::vector<t_value> t_values; /**< base type of all non-audio vector */
 
-typedef t_sample t_featureValue;  /**< feature value calculated via block */
+typedef Sample t_featureValue;  /**< feature value calculated via block */
 typedef t_samples t_featureBuf;   /**< feature value in sample level or after interpolation */
 typedef std::vector<t_featureBuf> t_featureValueList; /**< list of all extracted features */
 
@@ -85,7 +87,7 @@ typedef struct {
 
 // specific configs
 typedef std::vector<t_index> t_indexs;
-
+typedef std::map<t_index, t_indexs> TopoMatrix;
 
 typedef std::pair<t_index, t_index> t_pair;
 
@@ -99,6 +101,8 @@ enum SelectionMode {
     trigger,
     trajectory
 };
+
+
 
 } // namespace zerr
 #endif //TYPES_H

@@ -1,6 +1,17 @@
+/**
+ * @file envelopegenerator.cpp 
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief Envelope Generator Class Implementation
+ * @date 2024-01-31
+ * 
+ * @copyright Copyright (c) 2023-2024
+ */
 #include "envelopegenerator.h"
-using namespace zerr;
-
+// using namespace zerr;
+using zerr::EnvelopeGenerator;
+using zerr::BlockIns;
+using zerr::t_blockOuts;
+using zerr::t_value;
 
 EnvelopeGenerator::EnvelopeGenerator(t_systemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode){
     this->systemCfgs    = systemCfgs;
@@ -26,7 +37,7 @@ bool EnvelopeGenerator::initialize(){
 
     _set_index_channel_lookup(speakerManager->getActiveSpeakerIndexs());
 
-    currIdx = speakerManager->get_random_index();
+    currIdx = speakerManager->get_random_index(); // TODO(Zeyu Yang): gives option to set init
     #ifdef TESTMODE
     logger->logDebug(formatString("EnvelopeGenerator::initialize currIdx %d", currIdx));
     #endif  // TESTMODE
@@ -42,10 +53,22 @@ bool EnvelopeGenerator::initialize(){
 }
 
 
-void EnvelopeGenerator::fetch(t_blockIns in){
-    inputBuffer = in;
-}
 
+t_blockOuts EnvelopeGenerator::perform(BlockIns in) {
+    // fetch
+    inputBuffer = in;
+
+    // process
+    if (selectionMode=="trigger"){_process_trigger();}
+    if (selectionMode=="trajectory"){_process_trajectory();}
+
+    // send
+    // TODO: make this optional
+    // for (size_t i = 0; i < outputBuffer.size(); ++i){
+    //     outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
+    // }
+    return outputBuffer;
+}
 
 int EnvelopeGenerator::get_n_speaker(){
     return speakerManager->getNumActiveSpeakers();
@@ -57,13 +80,17 @@ void EnvelopeGenerator::set_current_speaker(t_index newIdx){
 }
 
 
-void EnvelopeGenerator::manage_unmasked_indexs(std::string action, t_indexs idxs){
-    speakerManager->manageActiveSpeakerIndexs(action, idxs);
+void EnvelopeGenerator::setActiveSpeakerIndexs(std::string action, t_indexs idxs){
+    speakerManager->setActiveSpeakers(action, idxs);
 }
 
 
 void EnvelopeGenerator::setTrajectoryVector(t_indexs idxs){
     speakerManager->setTrajectoryVector(idxs);
+}
+
+void EnvelopeGenerator::setTopoMatrix(TopoMatrix matrix){
+    speakerManager->setTopoMatrix(matrix);
 }
 
 
@@ -73,12 +100,6 @@ void EnvelopeGenerator::print_parameters(std::string name){
     }else{
         logger->logError("EnvelopeGenerator::print_parameters unknown parameter " + name);
     }
-}
-
-
-void EnvelopeGenerator::process(){
-    if (selectionMode=="trigger"){_process_trigger();}
-    if (selectionMode=="trajectory"){_process_trajectory();}
 }
 
 //TODO: Clean this up
@@ -127,7 +148,7 @@ void EnvelopeGenerator::_process_trajectory(){
         channelPair.second = indexChannelLookup[speakerPair.second];
         if (speakerPair.first == speakerPair.second) {
             outputBuffer[channelPair.first][i] = volume[i];
-        } else { // linear panning TODO: change to crossfade 
+        } else { // linear panning TODO: change to parameterized crossfade 
             panRatio = speakerManager->get_panning_ratio(trjcty[i]);
             outputBuffer[channelPair.first][i]  = volume[i] * (1 - panRatio);
             outputBuffer[channelPair.second][i] = volume[i] * panRatio;
@@ -155,19 +176,10 @@ void EnvelopeGenerator::_set_index_channel_lookup(t_indexs indexs){
 }
 
 
-t_blockOuts EnvelopeGenerator::send(){
-    // TODO: make this optional
-    // for (size_t i = 0; i < outputBuffer.size(); ++i){
-    //     outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
-    // }
-    
-    return outputBuffer;
-}
-
-
 t_value EnvelopeGenerator::calculateGain(t_value x, t_value theta) {
     x = x * DISTANCE_SCALE;
 
+    // clip the theta
     theta = theta<0.0?0:theta;
     theta = theta>1.0?1:theta;
 
@@ -175,6 +187,7 @@ t_value EnvelopeGenerator::calculateGain(t_value x, t_value theta) {
 
     t_value gain = isEqualTo0(tmp, VOLUME_THRESHOLD)?0.0:1.0 - x/tan(theta*PI/2.0);
 
+    // clip gain
     gain = gain<0.0?0:gain;
     gain = gain>1.0?1:gain;
 

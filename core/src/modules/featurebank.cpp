@@ -48,7 +48,7 @@ void FeatureBank::initialize(t_featureNameList feature_names, t_systemConfigs sy
 
 
 void FeatureBank::fetch(t_blockIn in){
-    t_sample* buf_ptr=nullptr;
+    Sample* buf_ptr=nullptr;
     size_t buf_len;
     ring_buffer.enqueue(in);
 

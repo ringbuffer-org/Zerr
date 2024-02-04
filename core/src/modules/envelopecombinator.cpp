@@ -44,7 +44,7 @@ bool EnvelopeCombinator::initialize(){
 }
 
 
-void EnvelopeCombinator::fetch(t_blockIns in){
+void EnvelopeCombinator::fetch(BlockIns in){
     inputBuffer = in;
 }
 
@@ -112,6 +112,7 @@ void EnvelopeCombinator::_process_max(){
         }
     }
 }
+
 
 t_blockOuts EnvelopeCombinator::send(){
     return outputBuffer;

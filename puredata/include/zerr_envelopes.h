@@ -49,7 +49,7 @@ class ZerrEnvelopes{
     /**
     * @brief TODO
     */
-    void manage_unmasked_indexs(char* action, int* idxs, size_t size);
+    void setActiveSpeakerIndexs(char* action, int* idxs, size_t size);
     /**
     * @brief set the trajectory list
     * @param idxs
@@ -67,7 +67,7 @@ class ZerrEnvelopes{
  private:
     zerr::t_systemConfigs systemCfgs;  /**< Pure data system configurations */
 
-    zerr::t_blockIns  inputBuffer;  /**< Zerr input buffer, C++ style */
+    zerr::BlockIns  inputBuffer;  /**< Zerr input buffer, C++ style */
     zerr::t_blockOuts outputBuffer; /**< Zerr output buffer, C++ style */
     float **inPtr;                  /**< PD input pointer, C style */
     float **outPtr;                 /**< PD output pointer, C style */
