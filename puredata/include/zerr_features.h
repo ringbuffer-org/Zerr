@@ -25,7 +25,7 @@ class ZerrFeatures{
     /**
     * create a new ZerrFeatures instance 
     */
-    ZerrFeatures(zerr::t_systemConfigs sys_cnfg, zerr::t_featureNames ft_names);
+    ZerrFeatures(zerr::SystemConfigs sys_cnfg, zerr::t_featureNames ft_names);
     /**
     * initialize ZerrFeatures modules
     */
@@ -45,10 +45,10 @@ class ZerrFeatures{
 
  private:
     // basic config
-    zerr::t_systemConfigs systemConfigs;
+    zerr::SystemConfigs systemConfigs;
     zerr::t_featureNameList featureNames;
 
-    std::vector<std::vector<double>> input_buffer;  // TODO(Zeyu Yang): Fix datatypes
+    zerr::Blocks input_buffer;  // TODO(Zeyu Yang): Fix datatypes
     zerr::t_featureValueList output_buffer;  // TODO(Zeyu Yang): Fix datatypes
 
     float **in_ptr;

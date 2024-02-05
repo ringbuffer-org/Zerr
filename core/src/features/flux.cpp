@@ -7,7 +7,7 @@ const std::string Flux::name        = "Spectral Flux";
 const std::string Flux::category    = "Frequency-Domain";
 const std::string Flux::description = "Spectral flux is a measure used in digital signal processing that quantifies how quickly the power spectrum of a signal changes. It is often used in audio analysis for onset detection and other applications.";
 
-void Flux::initialize(t_systemConfigs sys_cfg){
+void Flux::initialize(SystemConfigs sys_cfg){
     system_configs = sys_cfg;
 
     _reset_param();
@@ -19,8 +19,8 @@ void Flux::initialize(t_systemConfigs sys_cfg){
 
 void Flux::extract(){
 
-    t_value flux = 0.0;
-    t_value diff = 0.0;
+    Param flux = 0.0;
+    Param diff = 0.0;
 
     for (size_t i = 0; i < x.size(); ++i) {
         diff  = x[i] - prv_x[i];

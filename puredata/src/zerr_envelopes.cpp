@@ -8,7 +8,7 @@
  */
 #include "zerr_envelopes.h"
 
-ZerrEnvelopes::ZerrEnvelopes(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile){
+ZerrEnvelopes::ZerrEnvelopes(zerr::SystemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile){
     this->systemCfgs    = systemCfgs;
     this->spkrCfgFile   = spkrCfgFile;
     this->selectionMode = selectionMode;
@@ -25,8 +25,8 @@ bool ZerrEnvelopes::initialize(){
     if (!envelopeGenerator->initialize()) {return false;};
     numOutlet = envelopeGenerator->get_n_speaker();
 
-    inputBuffer.resize(numInlet,   zerr::t_samples(systemCfgs.block_size, 0.0f));
-    outputBuffer.resize(numOutlet, zerr::t_samples(systemCfgs.block_size, 0.0f));
+    inputBuffer.resize(numInlet,   zerr::Samples(systemCfgs.block_size, 0.0f));
+    outputBuffer.resize(numOutlet, zerr::Samples(systemCfgs.block_size, 0.0f));
 
     inPtr  = (float **) getbytes(numInlet * sizeof(float **));
     outPtr = (float **) getbytes(numOutlet * sizeof(float **));
@@ -67,19 +67,24 @@ int ZerrEnvelopes::get_port_count(){
 
 
 void ZerrEnvelopes::setActiveSpeakerIndexs(char* action, int* idxs, size_t size){
-    zerr::t_indexs indexVec(idxs, idxs + size);
+    zerr::Indexes indexVec(idxs, idxs + size);
     envelopeGenerator->setActiveSpeakerIndexs(action, indexVec);
+}
+
+void ZerrEnvelopes::setTopoMatrix(char* action, int* idxs, size_t size) {
+    zerr::Indexes indexVec(idxs, idxs + size);
+    envelopeGenerator->setTopoMatrix(action, indexVec);
 }
 
 
 void ZerrEnvelopes::setTrajectoryVector(int* idxs, size_t size){
-    zerr::t_indexs indexVec(idxs, idxs + size);
+    zerr::Indexes indexVec(idxs, idxs + size);
     envelopeGenerator->setTrajectoryVector(indexVec);
 }
 
 
-void ZerrEnvelopes::print_parameters(char* name){
-    envelopeGenerator->print_parameters(name);
+void ZerrEnvelopes::printParameters(){
+    envelopeGenerator->printParameters();
 }
 
 

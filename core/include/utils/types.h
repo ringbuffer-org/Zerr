@@ -1,3 +1,11 @@
+/**
+ * @file types.h
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief  Zerr* type definitions
+ * @date 2023-08-09
+ * 
+ * @copyright Copyright (c) 2023
+ */
 #ifndef TYPES_H
 #define TYPES_H
 #include <vector>
@@ -9,24 +17,22 @@
 
 namespace zerr {
 // basic types
-typedef double Sample; /**< base type of audio-related value */
-typedef float  t_value;  /**< base type of config value */
-typedef int    t_index;  /**< base type of index value */
+using Sample = double;  /**< base type of a sample value */
+using Param  = float;   /**< base type of a parameter value */
+using Index  = int;     /**< base type of an index value */
 
 typedef struct {
     Sample real;
     Sample img;
 } Complex; /**< complex number */
 
-// audio types
-typedef std::vector<Sample> t_samples; /**< basic type of all kinds of audio vector */
+using Samples = std::vector<Sample>; /**< basic type of all kinds of audio vector */
 
-typedef t_samples t_blockIn;  /**< input audio block */
-typedef t_samples t_blockOut; /**< output audio block */
-typedef t_samples t_audioBuf; /**< buffered audio frame */
+using Block = Samples;  /**< audio block */
 
-typedef std::vector<t_blockIn>  BlockIns;  /**< multi-channel input audio blocks */
-typedef std::vector<t_blockOut> t_blockOuts; /**< multi-channel output audio blocks */
+typedef Samples t_audioBuf; /**< buffered audio frame */
+
+typedef std::vector<Block>  Blocks;  /**< multi-channel audio blocks */
 typedef std::vector<t_audioBuf> t_audioBufs; /**< multi-channel audio buffer */
 
 // spectral types
@@ -34,14 +40,14 @@ typedef std::vector<Complex> t_fftBuf; /**< complex buffer for fft output */
 typedef std::vector<Sample> t_specBuf; /**< spectral power buffer */
 
 typedef struct {
-    t_blockIn  blck; /**< single audio block */
+    Block  block; /**< single audio block */
     t_audioBuf wave; /**< buffered audio frame */
     t_specBuf  spec; /**< spectral power */
 } t_featureInputs;   /**< structure for different feature extractor input data*/
 
 // feature types
-typedef std::string t_featureName; /**< Identification name of the feature */
-typedef std::vector<t_featureName> t_featureNameList; /**< The list of feature name to be activated */
+typedef std::string FeatureName; /**< Identification name of the feature */
+typedef std::vector<FeatureName> t_featureNameList; /**< The list of feature name to be activated */
 
 
 // TODO(Zeyu Yang): If this only use in PD wrapper, move it out
@@ -51,57 +57,52 @@ typedef struct {
 } t_featureNames;
 
 
-typedef std::vector<t_value> t_values; /**< base type of all non-audio vector */
+typedef std::vector<Param> t_values; /**< base type of all non-audio vector */
 
 typedef Sample t_featureValue;  /**< feature value calculated via block */
-typedef t_samples t_featureBuf;   /**< feature value in sample level or after interpolation */
+typedef Samples t_featureBuf;   /**< feature value in sample level or after interpolation */
 typedef std::vector<t_featureBuf> t_featureValueList; /**< list of all extracted features */
-
-typedef t_value t_volume;
-typedef std::vector<t_volume> t_volumes;
-
 
 // speaker configuration type
 // coordinates
 typedef struct {
-    t_value x;
-    t_value y;
-    t_value z;
-} t_cartesian;
+    Param x;
+    Param y;
+    Param z;
+} Cartesian;
 
 typedef struct {
-    t_value azimuth;
-    t_value elevation;
-    t_value distance;
-} t_spherical;
+    Param azimuth;
+    Param elevation;
+    Param distance;
+} Spherical;
 
 typedef struct {
-    t_cartesian cartesian;
-    t_spherical spherical;
+    Cartesian cartesian;
+    Spherical spherical;
 } t_position;
 
 typedef struct {
-    t_value yaw;
-    t_value pitch;
+    Param yaw;
+    Param pitch;
 } t_orientation;
 
 // specific configs
-typedef std::vector<t_index> t_indexs;
-typedef std::map<t_index, t_indexs> TopoMatrix;
+typedef std::vector<Index> Indexes;
+typedef std::map<Index, Indexes> TopoMatrix;
 
-typedef std::pair<t_index, t_index> t_pair;
+typedef std::pair<Index, Index> t_pair;
 
 // system config type
 typedef struct {
     size_t sample_rate;
     size_t block_size;
-}t_systemConfigs;
+}SystemConfigs;
 
 enum SelectionMode {
     trigger,
     trajectory
 };
-
 
 
 } // namespace zerr

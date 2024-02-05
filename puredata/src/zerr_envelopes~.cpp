@@ -19,7 +19,7 @@ void *zerr_envelopes_tilde_new(__attribute__((unused)) t_symbol *s, int argc, t_
                 pd_new(zerr_envelopes_tilde_class);
     if (!x) return NULL;
 
-    zerr::t_systemConfigs systemCfgs;
+    zerr::SystemConfigs systemCfgs;
     systemCfgs.sample_rate = (size_t) sys_getsr();
     systemCfgs.block_size  = (size_t) sys_getblksize();
 
@@ -122,11 +122,40 @@ void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x,
     x->z->setActiveSpeakerIndexs(action, indexs_list, argc-1);
 }
 
+void zerr_envelopes_tilde_topomatrix(zerr_envelopes_tilde *x,
+    __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
+
+    if (argc < 3) {
+        pd_error(x, "zerr_envelopes~: not enough args to parse");
+        return;
+    }
+
+    if (argv[0].a_type != A_SYMBOL) {
+        pd_error(x, "zerr_envelopes~: no action given");
+        return;
+    }
+
+    char* action = strdup(atom_getsymbol(argv)->s_name);
+
+    int idx_size = argc-1;
+    int *indexs_list = (int *)getbytes(idx_size* sizeof(int));
+
+    for (int i = 0; i < idx_size; ++i) {
+        if (argv[i+1].a_type != A_FLOAT) {
+            pd_error(x, "zerr_envelopes~: incorrect index number");
+            return;
+        }
+        indexs_list[i] = (int)argv[i+1].a_w.w_float;
+    }
+
+    x->z->setTopoMatrix(action, indexs_list, argc-1);
+}
+
 
 void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x,
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
     if (argc < 2) {
-        pd_error(x, "zerr_envelopes~: not enough args to parse");
+        pd_error(x, "zerr_envelopes~: not enough args");
         return;
     }
 
@@ -154,8 +183,8 @@ void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x,
 
 void zerr_envelopes_tilde_print(
     zerr_envelopes_tilde *x, t_symbol *s) {
-    // char* name = paramname->s_name;
-    // x->z->print_parameters(name);
+
+    x->z->printParameters();
 }
 
 void zerr_envelopes_tilde_dsp(zerr_envelopes_tilde *x, t_signal **sp) {
@@ -188,20 +217,26 @@ void zerr_envelopes_tilde_setup(void) {
 
     class_addmethod(zerr_envelopes_tilde_class,
         (t_method) zerr_envelopes_tilde_active_speakers,
-        gensym("active-speakers"),
+        gensym("active"),
+        A_GIMME,
+        A_NULL);
+
+    class_addmethod(zerr_envelopes_tilde_class,
+        (t_method) zerr_envelopes_tilde_topomatrix,
+        gensym("topo"),
         A_GIMME,
         A_NULL);
 
     class_addmethod(zerr_envelopes_tilde_class,
         (t_method) zerr_envelopes_tilde_trajectory,
-        gensym("trajectory"),
+        gensym("traj"),
         A_GIMME,
         A_NULL);
 
     class_addmethod(zerr_envelopes_tilde_class,
         (t_method) zerr_envelopes_tilde_print,
         gensym("print"),
-        A_SYMBOL,
+        A_GIMME,
         A_NULL);
 
     class_addmethod(zerr_envelopes_tilde_class,

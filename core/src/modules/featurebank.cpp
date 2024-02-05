@@ -32,7 +32,7 @@ void FeatureBank::print_active_features(){
 }
 
 
-void FeatureBank::initialize(t_featureNameList feature_names, t_systemConfigs system_configs){
+void FeatureBank::initialize(t_featureNameList feature_names, SystemConfigs system_configs){
     for (auto name : feature_names) {
         activated_features.push_back(_create(name));
     }
@@ -47,13 +47,13 @@ void FeatureBank::initialize(t_featureNameList feature_names, t_systemConfigs sy
 }
 
 
-void FeatureBank::fetch(t_blockIn in){
+void FeatureBank::fetch(Block in){
     Sample* buf_ptr=nullptr;
     size_t buf_len;
     ring_buffer.enqueue(in);
 
-    x.blck.clear();
-    x.blck = in;
+    x.block.clear();
+    x.block = in;
 
     buf_ptr = x.wave.data(); 
     buf_len = x.wave.size(); 

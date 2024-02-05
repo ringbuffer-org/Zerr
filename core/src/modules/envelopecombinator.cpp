@@ -9,7 +9,7 @@
 #include "envelopecombinator.h"
 using namespace zerr;
 
-EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, t_systemConfigs systemCfgs, std::string combMode){
+EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, SystemConfigs systemCfgs, std::string combMode){
     this->numSource  = numSource;
     this->numChannel = numChannel;
     this->systemCfgs = systemCfgs;
@@ -25,8 +25,8 @@ EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, t_systemCo
 }
 
 bool EnvelopeCombinator::initialize(){
-    inputBuffer.resize(numInlet,   t_samples(systemCfgs.block_size, 0.0f));
-    outputBuffer.resize(numOutlet, t_samples(systemCfgs.block_size, 0.0f));
+    inputBuffer.resize(numInlet,   Samples(systemCfgs.block_size, 0.0f));
+    outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
     if (combMode!="add" && 
         combMode!="root" && 
@@ -44,7 +44,7 @@ bool EnvelopeCombinator::initialize(){
 }
 
 
-void EnvelopeCombinator::fetch(BlockIns in){
+void EnvelopeCombinator::fetch(Blocks in){
     inputBuffer = in;
 }
 
@@ -114,7 +114,7 @@ void EnvelopeCombinator::_process_max(){
 }
 
 
-t_blockOuts EnvelopeCombinator::send(){
+Blocks EnvelopeCombinator::send(){
     return outputBuffer;
 }
 

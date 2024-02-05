@@ -8,7 +8,7 @@ const std::string ZeroCrossingRate::name        = "Zero crossing rate";
 const std::string ZeroCrossingRate::category    = "Time-Domain";
 const std::string ZeroCrossingRate::description = "The zero crossing rate (ZCR) is a measure of how frequently a signal changes its sign. It represents the rate at which the signal crosses the zero amplitude level over a given time period.";
 
-void ZeroCrossingRate::initialize(t_systemConfigs sys_cfg){
+void ZeroCrossingRate::initialize(SystemConfigs sys_cfg){
     system_configs = sys_cfg;
 
     _reset_param();
@@ -31,7 +31,7 @@ void ZeroCrossingRate::extract(){
         }
     }
 
-    crr_y = static_cast<t_value>(zero_crossings) / (x_size - 1);
+    crr_y = static_cast<Param>(zero_crossings) / (x_size - 1);
 }
 
 void ZeroCrossingRate::reset(){

@@ -14,7 +14,7 @@ size_t RingBuffer::get_capacity() const {
 }
 
 
-void RingBuffer::enqueue(const t_blockIn& block) {
+void RingBuffer::enqueue(const Block& block) {
 
     assert(block.size() <= buffer.size() && "Block size must be smaller than buffer size.");
 

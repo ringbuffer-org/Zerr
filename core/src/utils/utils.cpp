@@ -34,12 +34,12 @@ std::string formatString(const char* format, ...) {
 // }
 
 
-bool isEqualTo1(t_value value, t_value epsilon) {
+bool isEqualTo1(Param value, Param epsilon) {
     return std::abs(value - 1.0) < epsilon;
 }
 
 
-bool isEqualTo0(t_value value, t_value epsilon) {
+bool isEqualTo0(Param value, Param epsilon) {
     return std::abs(value) < epsilon;
 }
 
@@ -53,7 +53,7 @@ bool isInVec(T element, std::vector<T> vector){
 template bool isInVec<int>(int element, std::vector<int> vector);
 
 
-t_samples applyMovingAverage(const t_samples& segment, int windowSize) {
+Samples applyMovingAverage(const Samples& segment, int windowSize) {
     // Check if windowSize is valid
     if (windowSize <= 0) {
         throw std::invalid_argument("Window size must be greater than 0");
@@ -63,7 +63,7 @@ t_samples applyMovingAverage(const t_samples& segment, int windowSize) {
     }
 
     int segmentSize = segment.size();
-    t_samples averagedSegment(segmentSize, 0.0);
+    Samples averagedSegment(segmentSize, 0.0);
     double windowSum = 0.0;
     // int windowElements = 0;
 

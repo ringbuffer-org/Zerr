@@ -28,7 +28,7 @@ class ZerrCombinator{
     * @param combinationMode select the mode about how to combine the envelopes
     */
     ZerrCombinator(int numSource, int numChannel,
-        std::string combinationMode, zerr::t_systemConfigs systemCfgs);
+        std::string combinationMode, zerr::SystemConfigs systemCfgs);
     /**
     * @brief initialize ZerrCombinator modules
     * @return bool status of initialized or not
@@ -51,8 +51,8 @@ class ZerrCombinator{
     ~ZerrCombinator();
 
  private:
-    zerr::BlockIns  inputBuffer;  /**< multi-channel input buffer  */
-    zerr::t_blockOuts outputBuffer; /**< multi-channel output buffer */
+    zerr::Blocks  inputBuffer;  /**< multi-channel input buffer  */
+    zerr::Blocks outputBuffer; /**< multi-channel output buffer */
     float **inPtr;                  /**< PD-style input data pointer  */
     float **outPtr;                 /**< PD-style output data pointer */
 

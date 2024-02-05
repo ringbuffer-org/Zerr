@@ -2,7 +2,7 @@
 using namespace zerr;
 
 
-Speaker::Speaker(t_index index, t_position position, t_orientation orientation){
+Speaker::Speaker(Index index, t_position position, t_orientation orientation){
     logger = new Logger();
 
     #ifdef TESTMODE
@@ -83,25 +83,25 @@ bool SpeakerManager::initialize(){
 
         int index = key.as<int>(); // assign the key to speaker index
 
-        t_cartesian cartesian; // parse the position values in cartesian coordinate
-        t_spherical spherical; // parse the position values in spherical coordinate
+        Cartesian cartesian; // parse the position values in cartesian coordinate
+        Spherical spherical; // parse the position values in spherical coordinate
 
         bool is_zero_cartesian = true;
         bool is_zero_spherical = true;
 
         if (value["position"]["cartesian"] && 
                 !value["position"]["cartesian"].IsNull()) {
-            cartesian.x = value["position"]["cartesian"]["x"].as<t_value>();
-            cartesian.y = value["position"]["cartesian"]["y"].as<t_value>();
-            cartesian.z = value["position"]["cartesian"]["z"].as<t_value>();
+            cartesian.x = value["position"]["cartesian"]["x"].as<Param>();
+            cartesian.y = value["position"]["cartesian"]["y"].as<Param>();
+            cartesian.z = value["position"]["cartesian"]["z"].as<Param>();
             is_zero_cartesian = false;
         }
 
         if (value["position"]["spherical"] && 
                 !value["position"]["spherical"].IsNull()) {
-            spherical.azimuth   = value["position"]["spherical"]["azimuth"].as<t_value>();
-            spherical.elevation = value["position"]["spherical"]["elevation"].as<t_value>();
-            spherical.distance  = value["position"]["spherical"]["distance"].as<t_value>();
+            spherical.azimuth   = value["position"]["spherical"]["azimuth"].as<Param>();
+            spherical.elevation = value["position"]["spherical"]["elevation"].as<Param>();
+            spherical.distance  = value["position"]["spherical"]["distance"].as<Param>();
             is_zero_spherical = false;
         }
 
@@ -120,8 +120,8 @@ bool SpeakerManager::initialize(){
         t_orientation orientation;
         if (value["orientation"] && 
                 !value["orientation"].IsNull()) {
-            orientation.yaw   = value["orientation"]["yaw"].as<t_value>();
-            orientation.pitch = value["orientation"]["pitch"].as<t_value>();
+            orientation.yaw   = value["orientation"]["yaw"].as<Param>();
+            orientation.pitch = value["orientation"]["pitch"].as<Param>();
         }else { // TODO: keep the orientation structure
             orientation.yaw = 0.0;
             orientation.pitch = 0.0;
@@ -149,7 +149,7 @@ bool SpeakerManager::initialize(){
 
     // topoMatrix every speaker is connected
     for (size_t i = 0; i < actvSpkIdx.size(); ++i){
-        t_indexs tmp_idx = actvSpkIdx; // deepcopy
+        Indexes tmp_idx = actvSpkIdx; // deepcopy
         topoMatrix[actvSpkIdx[i]] = tmp_idx;
     }
 
@@ -167,17 +167,17 @@ size_t SpeakerManager::getNumActiveSpeakers() {
 }
 
 
-t_indexs SpeakerManager::getActiveSpeakerIndexs(){
+Indexes SpeakerManager::getActiveSpeakerIndexs(){
     return actvSpkIdx;
 }
 
 
-t_index SpeakerManager::get_random_index(){
+Index SpeakerManager::get_random_index(){
     return actvSpkIdx[_get_random_indexs(actvSpkIdx.size(), 1)[0]];
 }
 
 
-Speaker SpeakerManager::get_speaker_by_index(t_index spkr_idx){
+Speaker SpeakerManager::get_speaker_by_index(Index spkr_idx){
     auto it = speakers.find(spkr_idx);
 
     if (it == speakers.end()) {
@@ -187,39 +187,39 @@ Speaker SpeakerManager::get_speaker_by_index(t_index spkr_idx){
 }
 
 
-t_pair SpeakerManager::get_indexs_by_trajectory(t_value trajectory_val){
+t_pair SpeakerManager::get_indexs_by_trajectory(Param trajectory_val){
     // Clip the input trajectory to [0.0,1.0]
     trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
     trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
 
-    t_value scaled = trajectory_val * (trajVector.size() - 1);
+    Param scaled = trajectory_val * (trajVector.size() - 1);
 
-    t_index lower = trajVector[std::floor(scaled)];
-    t_index upper = trajVector[std::ceil(scaled)];
+    Index lower = trajVector[std::floor(scaled)];
+    Index upper = trajVector[std::ceil(scaled)];
 
     return std::make_pair(lower, upper);
 }
 
 
-t_value SpeakerManager::get_panning_ratio(t_value trajectory_val){
+Param SpeakerManager::get_panning_ratio(Param trajectory_val){
     trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
     trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
 
-    t_value scaled = trajectory_val * (trajVector.size() - 1);
+    Param scaled = trajectory_val * (trajVector.size() - 1);
 
     return (scaled - std::floor(scaled)) / (std::ceil(scaled) - std::floor(scaled));
 }
 
 
-t_pair SpeakerManager::get_indexs_by_geometry(std::vector<t_value> pos, std::vector<bool> mask, std::string coordinate){
-    std::vector<t_value> distance;
-    std::vector<t_index> indexs;
+t_pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask, std::string coordinate){
+    std::vector<Param> distance;
+    std::vector<Index> indexs;
 
     assert(mask.size() == 3 && "ERROR: The mask vector for geometry selection muss be in size 3.");
 
-    t_value tmp_distan;
+    Param tmp_distan;
     for (const auto& maps : speakers) {
-        t_index key  = maps.first;
+        Index key  = maps.first;
         Speaker spkr = maps.second;
         
         if (coordinate == "cartesian"){
@@ -248,22 +248,22 @@ t_pair SpeakerManager::get_indexs_by_geometry(std::vector<t_value> pos, std::vec
         }
     }
 
-    t_index smallest = get_speaker_by_index(indexs[first]).get_index();
-    t_index second_small = get_speaker_by_index(indexs[second]).get_index();
+    Index smallest = get_speaker_by_index(indexs[first]).get_index();
+    Index second_small = get_speaker_by_index(indexs[second]).get_index();
 
     return std::make_pair(smallest, second_small);
 }
 
 
-t_index SpeakerManager::get_indexs_by_trigger(t_value trigger, t_index curr_spkr, int mode){
+Index SpeakerManager::get_indexs_by_trigger(Param trigger, Index curr_spkr, int mode){
     // just return the original one when trigger doesn't close to 1.0
     if (!isEqualTo1(trigger, TRIGGER_THRESHOLD)) return curr_spkr;
     // load all connected speakers from the topology matrix
-    t_indexs candidates = topoMatrix[curr_spkr];
+    Indexes candidates = topoMatrix[curr_spkr];
     // if only one speaker connected to the current one, just return it
     if (candidates.size()==1) return candidates[0];
 
-    t_index selected;
+    Index selected;
     int n_candidates = candidates.size();
     switch(mode){
         case 0: // "Random"
@@ -280,17 +280,12 @@ t_index SpeakerManager::get_indexs_by_trigger(t_value trigger, t_index curr_spkr
 }
 
 
-std::vector<t_value> SpeakerManager::get_distance_vector(int spkr_idx){
+std::vector<Param> SpeakerManager::get_distance_vector(int spkr_idx){
     return distance_matrix[spkr_idx]; 
 }
 
 
-void SpeakerManager::setTopoMatrix(TopoMatrix matrix) {
-
-}
-
-
-void SpeakerManager::setActiveSpeakers(std::string action, t_indexs idxs){
+void SpeakerManager::setActiveSpeakers(std::string action, Indexes idxs){
     if (action=="set"){
         _setActiveSpeakerIndexs(idxs);
     }
@@ -301,41 +296,19 @@ void SpeakerManager::setActiveSpeakers(std::string action, t_indexs idxs){
         _delActiveSpeakerIndexs(idxs);
     }
     else{
-        logger->logWarning("SpeakerManager::set_actvSpkIdx_indexs unknow action" + action);
+        logger->logWarning("SpeakerManager::setActiveSpeakers unknown action " + action);
     }
 
     #ifdef TESTMODE
     printActiveSpeakerIndexs();
-    printTopoMatrix();
-    #endif //TESTMODE
+    #endif  // TESTMODE
 }
 
 
-void SpeakerManager::printActiveSpeakerIndexs(){
-    logger->logInfo("Active Speakers: ");
-    logger->logInfo("    " + formatVector<t_index>(actvSpkIdx));
-}
-
-
-void SpeakerManager::printTopoMatrix(){
-    logger->logInfo("Topological Matrix: ");
-    for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
-        logger->logInfo("    " + std::to_string(it->first) + " | " + formatVector<t_index>(it->second));
-    }
-}
-
-
-void SpeakerManager::printTrajectoryVector(){
-    logger->logInfo("Trajectory Vector: ");
-    logger->logInfo("    " + formatVector<t_index>(trajVector));
-}
-
-
-void SpeakerManager::setTrajectoryVector(t_indexs idxs){
-    t_indexs tmpTrajVector;
-    // trajVector.clear();
+void SpeakerManager::setTrajectoryVector(Indexes idxs){
+    Indexes tmpTrajVector;
     for (size_t i = 0; i < idxs.size(); ++i){
-        if(!isInVec<t_index>(idxs[i], actvSpkIdx)) {
+        if(!isInVec<Index>(idxs[i], actvSpkIdx)) {
             logger->logError(formatString("SpeakerManager: speaker %d is not activated!", idxs[i]));
             return;
         }else{
@@ -343,7 +316,97 @@ void SpeakerManager::setTrajectoryVector(t_indexs idxs){
         }
     }
     trajVector = tmpTrajVector;
+    #ifdef TESTMODE
     printTrajectoryVector();
+    #endif  // TESTMODE
+}
+
+void SpeakerManager::setTopoMatrix(std::string action, Indexes idxs) {
+    if (action=="set") {
+        _setTopoMatrixIndexes(idxs);
+    }
+    else if (action=="add"){
+        _addTopoMatrixIndexes(idxs);
+    }
+    else if (action=="del"){
+        _delTopoMatrixIndexes(idxs);
+    }
+    else{
+        logger->logWarning("SpeakerManager::setTopoMatrix unknown action " + action);
+    }
+    #ifdef TESTMODE
+    printTopoMatrix();
+    #endif //TESTMODE
+}
+
+bool SpeakerManager::_isActivated(Index idx) {
+    if(!isInVec<Index>(idx, actvSpkIdx)) {
+        logger->logError(formatString("Speaker %d is not activated!", idx));
+        return false;
+    }
+    return true;
+}
+
+
+void SpeakerManager::_setTopoMatrixIndexes(Indexes idxs) {
+    Index mainSpkr = idxs[0];
+    if (!_isActivated(mainSpkr)) return;
+
+    Indexes tmpTopoVector;
+    for (size_t i = 1; i < idxs.size(); ++i){
+        if (!_isActivated(idxs[i])) return;
+        tmpTopoVector.push_back(idxs[i]);
+    }
+    topoMatrix[mainSpkr] = tmpTopoVector;
+}
+
+void SpeakerManager::_addTopoMatrixIndexes(Indexes idxs) {
+    Index mainSpkr = idxs[0];
+    if (!_isActivated(mainSpkr)) return;
+
+    for (size_t i = 1; i < idxs.size(); ++i){
+        if (!_isActivated(idxs[i])) continue;
+        if (isInVec<Index>(idxs[i], topoMatrix[mainSpkr])) continue;
+        topoMatrix[mainSpkr].push_back(idxs[i]);
+    }
+}
+
+void SpeakerManager::_delTopoMatrixIndexes(Indexes idxs) {
+    Index mainSpkr = idxs[0];
+    Indexes& connected = topoMatrix[mainSpkr];
+
+    if (!_isActivated(mainSpkr)) return;
+    for (size_t i = 1; i < idxs.size(); ++i){
+        if (!_isActivated(idxs[i])) continue;
+        if (!isInVec<Index>(idxs[i], connected)) continue;
+
+        connected.erase(std::remove(connected.begin(), connected.end(), idxs[i]), connected.end());
+    }
+}
+
+void SpeakerManager::printParameters() {
+    printActiveSpeakerIndexs();
+    printTrajectoryVector();
+    printTopoMatrix();
+}
+
+void SpeakerManager::printActiveSpeakerIndexs(){
+    logger->logInfo("Active Speakers: ");
+    logger->logInfo("    " + formatVector<Index>(actvSpkIdx));
+}
+
+
+void SpeakerManager::printTopoMatrix(){
+    logger->logInfo("Topological Matrix: ");
+    for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
+        logger->logInfo("    " + std::to_string(it->first) + " | " + formatVector<Index>(it->second));
+    }
+}
+
+
+void SpeakerManager::printTrajectoryVector(){
+    logger->logInfo("Trajectory Vector: ");
+    logger->logInfo("    " + formatVector<Index>(trajVector));
 }
 
 
@@ -360,11 +423,11 @@ void SpeakerManager::_init_distance_matrix(){
 }
 
 
-t_index SpeakerManager::_find_nearest(t_index curr_spkr, t_indexs candidates){
+Index SpeakerManager::_find_nearest(Index curr_spkr, Indexes candidates){
     //TODO: seems incorrect
-    t_value min_distance = distance_matrix[curr_spkr][0];
-    t_index nearest = candidates[0];
-    t_value tmp_distance;
+    Param min_distance = distance_matrix[curr_spkr][0];
+    Index nearest = candidates[0];
+    Param tmp_distance;
     for (size_t i = 1; i < candidates.size(); ++i){
         tmp_distance = distance_matrix[curr_spkr][i];
         if (min_distance > tmp_distance){
@@ -406,9 +469,9 @@ std::vector<int> SpeakerManager::_get_random_indexs(int l, int n){
 }
 
 
-t_cartesian SpeakerManager::_spherical2cartesian(t_spherical spherical){
+Cartesian SpeakerManager::_spherical2cartesian(Spherical spherical){
     //test 
-    t_cartesian cartesian;
+    Cartesian cartesian;
     cartesian.x = spherical.distance * cos(spherical.elevation/180.0*PI) * cos(spherical.azimuth/180.0*PI);
     cartesian.y = spherical.distance * cos(spherical.elevation/180.0*PI) * sin(spherical.azimuth/180.0*PI);
     cartesian.z = spherical.distance * sin(spherical.elevation/180.0*PI);
@@ -417,8 +480,8 @@ t_cartesian SpeakerManager::_spherical2cartesian(t_spherical spherical){
 }
 
 
-t_spherical SpeakerManager::_cartesian2spherical(t_cartesian cartesian){
-    t_spherical spherical;
+Spherical SpeakerManager::_cartesian2spherical(Cartesian cartesian){
+    Spherical spherical;
     spherical.distance  = sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y + cartesian.z * cartesian.z);
     spherical.azimuth   = atan2(cartesian.y, cartesian.x) / PI * 180.0;
     spherical.elevation = asin(cartesian.z / spherical.distance) / PI * 180.0;
@@ -427,7 +490,7 @@ t_spherical SpeakerManager::_cartesian2spherical(t_cartesian cartesian){
 }
 
 
-void SpeakerManager::_setActiveSpeakerIndexs(t_indexs idxs){
+void SpeakerManager::_setActiveSpeakerIndexs(Indexes idxs){
     actvSpkIdx.clear();
     for (size_t i = 0; i < idxs.size(); ++i){
         auto it = speakers.find(idxs[i]);
@@ -436,7 +499,7 @@ void SpeakerManager::_setActiveSpeakerIndexs(t_indexs idxs){
             return;
         }        
         // add to actvSpkIdx
-        if(isInVec<t_index>(idxs[i], actvSpkIdx)) {
+        if(isInVec<Index>(idxs[i], actvSpkIdx)) {
             logger->logWarning(formatString("SpeakerManager: index %d already added, ignored", idxs[i]));
         }else{
             actvSpkIdx.push_back(idxs[i]);
@@ -454,21 +517,21 @@ void SpeakerManager::_setActiveSpeakerIndexs(t_indexs idxs){
 
     topoMatrix.clear();
     for (size_t i = 0; i < actvSpkIdx.size(); ++i){
-        t_indexs tmp_idx = actvSpkIdx;  
+        Indexes tmp_idx = actvSpkIdx;  
         topoMatrix[actvSpkIdx[i]] = tmp_idx;
     }
 }
 
 
-void SpeakerManager::_addActiveSpeakerIndexs(t_indexs idxs){
+void SpeakerManager::_addActiveSpeakerIndexs(Indexes idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
         // check if the input index is valid
-        if(!isInKey<t_index, Speaker>(idxs[i], speakers)){
+        if(!isInKey<Index, Speaker>(idxs[i], speakers)){
             logger->logError("SpeakerManager unknow speaker index!");
             return;
         }
         // add to actvSpkIdx
-        if(isInVec<t_index>(idxs[i], actvSpkIdx)) {
+        if(isInVec<Index>(idxs[i], actvSpkIdx)) {
             logger->logWarning(formatString("SpeakerManager: index %d already added, ignored", idxs[i]));
         }else{
             actvSpkIdx.push_back(idxs[i]);
@@ -477,62 +540,33 @@ void SpeakerManager::_addActiveSpeakerIndexs(t_indexs idxs){
 }
 
 
-void SpeakerManager::_delActiveSpeakerIndexs(t_indexs idxs){
+void SpeakerManager::_delActiveSpeakerIndexs(Indexes idxs){
     for (size_t i = 0; i < idxs.size(); ++i){
         // check if the input index is valid
-        if(!isInKey<t_index, Speaker>(idxs[i], speakers)){
+        if(!isInKey<Index, Speaker>(idxs[i], speakers)){
             logger->logError("SpeakerManager unknow speaker index!");
             return;
         }
         // remove from actvSpkIdx
-        if(!isInVec<t_index>(idxs[i], actvSpkIdx)) {
+        if(!isInVec<Index>(idxs[i], actvSpkIdx)) {
             logger->logWarning(formatString("SpeakerManager index %d already removed, ignored", idxs[i]));
         }else{
             actvSpkIdx.erase(std::remove(actvSpkIdx.begin(), actvSpkIdx.end(), idxs[i]), actvSpkIdx.end());
         }
         // remove from trajVector
-        if(!isInVec<t_index>(idxs[i], trajVector)) {
+        if(!isInVec<Index>(idxs[i], trajVector)) {
             logger->logWarning(formatString("SpeakerManager index %d already removed, ignored", idxs[i]));
         }else{
             trajVector.erase(std::remove(trajVector.begin(), trajVector.end(), idxs[i]), trajVector.end());
         }
         // remove from topology matrix
-        if (isInKey<t_index, t_indexs>(idxs[i], topoMatrix)) {
+        if (isInKey<Index, Indexes>(idxs[i], topoMatrix)) {
             topoMatrix.erase(idxs[i]);
         } 
         for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
-            if(isInVec<t_index>(idxs[i], it->second)) {
+            if(isInVec<Index>(idxs[i], it->second)) {
                 it->second.erase(std::remove(it->second.begin(), it->second.end(), idxs[i]), it->second.end());
             }
         }
     }
 }
-
-
-    //load specific configuration of the active sub speaker array
-    // YAML::Node specificNodes = speaker_config["specific"][mode];
-    // assert(specificNodes["actvSpkIdx"].IsSequence() && "SpeakerManager::initialize: actvSpkIdx property must be a list");
-    // assert(specificNodes["trajVector"].IsSequence() && "SpeakerManager::initialize: trajVector property must be a list");
-
-    // for (size_t i = 0; i < specificNodes["actvSpkIdx"].size(); ++i) {
-    //     actvSpkIdx.push_back(specificNodes["actvSpkIdx"][i].as<t_index>());
-    // }
-    // _init_distance_matrix();
-
-    // for (size_t i = 0; i < specificNodes["trajVector"].size(); ++i) {
-    //     trajVector.push_back(specificNodes["trajVector"][i].as<t_index>());
-    // }
-
-    // // topology_matrix
-    // YAML::Node topologyNode = specificNodes["topology"];
-    // for (auto it = topologyNode.begin(); it != topologyNode.end(); ++it){
-    //     YAML::Node key   = it->first;
-    //     YAML::Node value = it->second;
-
-    //     t_indexs tmp_idx;
-    //     assert(value.IsSequence() && "SpeakerManager::initialize: topology property must be a list");
-    //     for (size_t i = 0; i < value.size(); ++i) {
-    //         tmp_idx.push_back(value[i].as<t_index>());
-    //     } 
-    //     topology_matrix[key.as<t_index>()] = tmp_idx;
-    // }

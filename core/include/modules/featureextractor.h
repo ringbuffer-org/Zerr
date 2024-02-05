@@ -23,7 +23,7 @@ public:
     /**
     * initialize the feature extraction algorithm 
     */
-    virtual void initialize(t_systemConfigs sys_cfg) = 0;
+    virtual void initialize(SystemConfigs sys_cfg) = 0;
     /**
     * Run algorithm on the signal in the input buffer and update the output buffer
     */
@@ -47,10 +47,10 @@ public:
     void set_initialize_statue(bool s){initialized=s;}
 
 protected:
-    t_samples       x; /**< input data in t_samples type, the base type of t_blockIn, t_audioBuf, t_specBuf*/
+    Samples       x; /**< input data in t_samples type, the base type of t_blockIn, t_audioBuf, t_specBuf*/
     t_featureBuf    y; /**< output data */
 
-    t_systemConfigs system_configs;
+    SystemConfigs system_configs;
     bool initialized=false; // 
 }; // Class FeatureExtractor
 

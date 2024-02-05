@@ -9,7 +9,7 @@
 #include "zerr_disperser.h"
 
 
-ZerrDisperser::ZerrDisperser(int numChannel, zerr::t_systemConfigs systemCfgs) {
+ZerrDisperser::ZerrDisperser(int numChannel, zerr::SystemConfigs systemCfgs) {
     audioDisperser = new zerr::AudioDisperser(numChannel, systemCfgs);
     logger = new zerr::Logger();
 
@@ -25,9 +25,9 @@ bool ZerrDisperser::initialize() {
     numOutlet = audioDisperser->numOutlet;
 
     inputBuffer.resize(numInlet,
-        zerr::t_samples(audioDisperser->get_block_size(), 0.0f));
+        zerr::Samples(audioDisperser->get_block_size(), 0.0f));
     outputBuffer.resize(numOutlet,
-        zerr::t_samples(audioDisperser->get_block_size(), 0.0f));
+        zerr::Samples(audioDisperser->get_block_size(), 0.0f));
 
     #ifdef TESTMODE
     logger->logDebug(zerr::formatString(

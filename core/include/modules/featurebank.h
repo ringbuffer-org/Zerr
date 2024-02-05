@@ -43,13 +43,13 @@ public:
     /**
     * Print the name of active features
     */
-    void initialize(t_featureNameList feature_names, t_systemConfigs system_configs);
+    void initialize(t_featureNameList feature_names, SystemConfigs system_configs);
     /**
     * fetch: dsp callback function
     * fetch audio block and store in the buffer if needed
     * Warning: n_vec could be smaller than system block_size. Error occurs in this scenario
     */
-    void fetch(t_blockIn in);
+    void fetch(Block in);
     /**
     * process: dsp callback function
     * process the audio sample in the input buffer

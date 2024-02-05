@@ -44,12 +44,13 @@ void Logger::logDebug(const std::string& debugMessage) {
 void Logger::log(LogLevel level, const std::string& message) {
     if (level < logLevel) return;
 
-    std::time_t now = std::time(nullptr);
-    char timestamp[100];
-    std::strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
+    // std::time_t now = std::time(nullptr);
+    // char timestamp[100];
+    // std::strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
 
     std::ostringstream formattedStream;
-    formattedStream << "[" << timestamp << "] [" << logLevelToString(level) << "] " << message;
+    // formattedStream << "[" << timestamp << "] [" << logLevelToString(level) << "] " << message;
+    formattedStream << "[" << logLevelToString(level) << "] " << message;
     std::string formattedMessage = formattedStream.str();
 
     #ifdef PUREDATA

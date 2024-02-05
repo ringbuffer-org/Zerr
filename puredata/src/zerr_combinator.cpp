@@ -21,7 +21,7 @@ char* strdup(const char* s) {
   return result;
 }
 
-ZerrCombinator::ZerrCombinator(int numSource, int numChannel, std::string combinationMode, zerr::t_systemConfigs systemCfgs) {
+ZerrCombinator::ZerrCombinator(int numSource, int numChannel, std::string combinationMode, zerr::SystemConfigs systemCfgs) {
     envelopeCombinator = new zerr::EnvelopeCombinator(numSource, numChannel, systemCfgs, combinationMode);
     logger = new zerr::Logger();
     #ifdef TESTMODE
@@ -36,9 +36,9 @@ bool ZerrCombinator::initialize() {
     numOutlet = envelopeCombinator->numOutlet;
 
     inputBuffer.resize(numInlet,
-        zerr::t_samples(envelopeCombinator->get_block_size(), 0.0f));
+        zerr::Samples(envelopeCombinator->get_block_size(), 0.0f));
     outputBuffer.resize(numOutlet,
-        zerr::t_samples(envelopeCombinator->get_block_size(), 0.0f));
+        zerr::Samples(envelopeCombinator->get_block_size(), 0.0f));
 
     logger->logDebug(zerr::formatString(
         "ZerrCombinator::initialize numInlet:%d numOutlet:%d blockSize %d",

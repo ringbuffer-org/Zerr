@@ -29,7 +29,7 @@ class ZerrEnvelopes{
     * @param selectionMode the corresponding mode of the envelope generator to the control signal: trigger & trajectory
     * @param spkrCfgFile path of the speaker array configuration
     */
-    ZerrEnvelopes(zerr::t_systemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile);
+    ZerrEnvelopes(zerr::SystemConfigs systemCfgs, std::string selectionMode, std::string spkrCfgFile);
     /**
     * @brief initialize zerr_envelopes modules
     * @return bool status of initialized or not
@@ -51,6 +51,10 @@ class ZerrEnvelopes{
     */
     void setActiveSpeakerIndexs(char* action, int* idxs, size_t size);
     /**
+    * @brief TODO
+    */
+    void setTopoMatrix(char* action, int* idxs, size_t size);
+    /**
     * @brief set the trajectory list
     * @param idxs
     */
@@ -58,17 +62,17 @@ class ZerrEnvelopes{
     /**
     * @brief print current statue
     */
-    void print_parameters(char* name);
+    void printParameters();
     /**
     * @brief free a zerr_envelopes instance
     */
     ~ZerrEnvelopes();
 
  private:
-    zerr::t_systemConfigs systemCfgs;  /**< Pure data system configurations */
+    zerr::SystemConfigs systemCfgs;  /**< Pure data system configurations */
 
-    zerr::BlockIns  inputBuffer;  /**< Zerr input buffer, C++ style */
-    zerr::t_blockOuts outputBuffer; /**< Zerr output buffer, C++ style */
+    zerr::Blocks  inputBuffer;  /**< Zerr input buffer, C++ style */
+    zerr::Blocks outputBuffer; /**< Zerr output buffer, C++ style */
     float **inPtr;                  /**< PD input pointer, C style */
     float **outPtr;                 /**< PD output pointer, C style */
 

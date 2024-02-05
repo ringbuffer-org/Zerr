@@ -9,11 +9,10 @@
 #include "envelopegenerator.h"
 // using namespace zerr;
 using zerr::EnvelopeGenerator;
-using zerr::BlockIns;
-using zerr::t_blockOuts;
-using zerr::t_value;
+using zerr::Blocks;
+using zerr::Param;
 
-EnvelopeGenerator::EnvelopeGenerator(t_systemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode){
+EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode){
     this->systemCfgs    = systemCfgs;
     this->spkrCfgFile   = spkrCfgFile;
     this->selectionMode = selectionMode;
@@ -32,8 +31,8 @@ bool EnvelopeGenerator::initialize(){
 
     int numOutlet = get_n_speaker();
 
-    inputBuffer.resize(numInlet,   t_samples(systemCfgs.block_size, 0.0f));
-    outputBuffer.resize(numOutlet, t_samples(systemCfgs.block_size, 0.0f));
+    inputBuffer.resize(numInlet,   Samples(systemCfgs.block_size, 0.0f));
+    outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
     _set_index_channel_lookup(speakerManager->getActiveSpeakerIndexs());
 
@@ -54,7 +53,7 @@ bool EnvelopeGenerator::initialize(){
 
 
 
-t_blockOuts EnvelopeGenerator::perform(BlockIns in) {
+Blocks EnvelopeGenerator::perform(Blocks in) {
     // fetch
     inputBuffer = in;
 
@@ -75,31 +74,32 @@ int EnvelopeGenerator::get_n_speaker(){
 }
 
 
-void EnvelopeGenerator::set_current_speaker(t_index newIdx){
+void EnvelopeGenerator::set_current_speaker(Index newIdx){
     currIdx = newIdx;
 }
 
 
-void EnvelopeGenerator::setActiveSpeakerIndexs(std::string action, t_indexs idxs){
+void EnvelopeGenerator::setActiveSpeakerIndexs(std::string action, Indexes idxs){
     speakerManager->setActiveSpeakers(action, idxs);
 }
 
 
-void EnvelopeGenerator::setTrajectoryVector(t_indexs idxs){
+void EnvelopeGenerator::setTrajectoryVector(Indexes idxs){
     speakerManager->setTrajectoryVector(idxs);
 }
 
-void EnvelopeGenerator::setTopoMatrix(TopoMatrix matrix){
-    speakerManager->setTopoMatrix(matrix);
+void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs){
+    speakerManager->setTopoMatrix(action, idxs);
 }
 
 
-void EnvelopeGenerator::print_parameters(std::string name){
-    if (name=="masks"){
-        speakerManager->printActiveSpeakerIndexs();
-    }else{
-        logger->logError("EnvelopeGenerator::print_parameters unknown parameter " + name);
-    }
+void EnvelopeGenerator::printParameters(){
+    // if (name=="masks"){
+    //     speakerManager->printActiveSpeakerIndexs();
+    // }else{
+    //     logger->logError("EnvelopeGenerator::print_parameters unknown parameter " + name);
+    // }
+    speakerManager->printParameters();
 }
 
 //TODO: Clean this up
@@ -109,11 +109,11 @@ void EnvelopeGenerator::_process_trigger(){
         buffer.assign(buffer.size(), 0.0f);
     }
 
-    std::vector<t_value> distances;
+    std::vector<Param> distances;
 
-    t_samples& triggr =  inputBuffer[0];
-    t_samples& spread =  inputBuffer[1];
-    t_samples& volume =  inputBuffer[2];
+    Samples& triggr =  inputBuffer[0];
+    Samples& spread =  inputBuffer[1];
+    Samples& volume =  inputBuffer[2];
 
     for (size_t i = 0; i < inputBuffer[0].size(); ++i){
         currIdx = speakerManager->get_indexs_by_trigger(inputBuffer[0][i], currIdx, triggerMode);
@@ -136,12 +136,12 @@ void EnvelopeGenerator::_process_trajectory(){
     t_pair speakerPair;
     t_pair channelPair;
 
-    t_samples& trjcty =  inputBuffer[0];
-    t_samples& spread =  inputBuffer[1];
-    t_samples& volume =  inputBuffer[2];
+    Samples& trjcty =  inputBuffer[0];
+    Samples& spread =  inputBuffer[1];
+    Samples& volume =  inputBuffer[2];
 
-    t_value panRatio;
-    std::vector<t_value> distances;
+    Param panRatio;
+    std::vector<Param> distances;
     for (size_t i = 0; i < trjcty.size(); ++i){
         speakerPair = speakerManager->get_indexs_by_trajectory(trjcty[i]);
         channelPair.first  = indexChannelLookup[speakerPair.first];
@@ -169,23 +169,23 @@ void EnvelopeGenerator::_process_trajectory(){
 }
 
 
-void EnvelopeGenerator::_set_index_channel_lookup(t_indexs indexs){
+void EnvelopeGenerator::_set_index_channel_lookup(Indexes indexs){
     for (size_t i = 0; i < indexs.size(); ++i){
         indexChannelLookup[indexs[i]] = i;
     }
 }
 
 
-t_value EnvelopeGenerator::calculateGain(t_value x, t_value theta) {
+Param EnvelopeGenerator::calculateGain(Param x, Param theta) {
     x = x * DISTANCE_SCALE;
 
     // clip the theta
     theta = theta<0.0?0:theta;
     theta = theta>1.0?1:theta;
 
-    t_value tmp = tan(theta*PI/2.0);
+    Param tmp = tan(theta*PI/2.0);
 
-    t_value gain = isEqualTo0(tmp, VOLUME_THRESHOLD)?0.0:1.0 - x/tan(theta*PI/2.0);
+    Param gain = isEqualTo0(tmp, VOLUME_THRESHOLD)?0.0:1.0 - x/tan(theta*PI/2.0);
 
     // clip gain
     gain = gain<0.0?0:gain;

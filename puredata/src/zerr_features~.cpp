@@ -37,7 +37,7 @@ void *zerr_features_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     }
 
     // system config to initialize zerr: sample rate, block size
-    zerr::t_systemConfigs sys_cnfg;
+    zerr::SystemConfigs sys_cnfg;
     sys_cnfg.sample_rate = (size_t) sys_getsr();
     sys_cnfg.block_size  = (size_t) sys_getblksize();
 

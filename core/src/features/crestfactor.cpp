@@ -8,7 +8,7 @@ const std::string CrestFactor::name        = "Crest Factor";
 const std::string CrestFactor::category    = "Time-Domain";
 const std::string CrestFactor::description = "Crest Factor is a parameter used in signal processing and audio engineering to describe the characteristics of a waveform. It is defined as the ratio of the peak value of a waveform to its RMS (Root Mean Square) value. ";
 
-void CrestFactor::initialize(t_systemConfigs sys_cfg){
+void CrestFactor::initialize(SystemConfigs sys_cfg){
     system_configs = sys_cfg;
 
     _reset_param();

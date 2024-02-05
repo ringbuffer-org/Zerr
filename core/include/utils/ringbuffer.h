@@ -24,12 +24,12 @@ public:
     size_t get_size() const;
     size_t get_capacity() const;
 
-    void enqueue(const t_blockIn& block);
+    void enqueue(const Block& block);
     
     void get_samples(Sample* ptr_buffer, size_t buf_len);
 
 private:
-    t_samples buffer;
+    Samples buffer;
     size_t head;
     size_t tail;
     size_t size;

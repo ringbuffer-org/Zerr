@@ -9,7 +9,7 @@ const std::string RootMeanSquare::category    = "Time-Domain";
 const std::string RootMeanSquare::description = "The RMS is defined as the square root of the mean over time of the square of the vertical distance of the graph from the rest state";
 
 
-void RootMeanSquare::initialize(t_systemConfigs sys_cfg){
+void RootMeanSquare::initialize(SystemConfigs sys_cfg){
     system_configs = sys_cfg;
 
     _reset_param();

@@ -29,7 +29,7 @@ public:
     * @param spkrCfgFile Path to the speaker array setup configuration file to initialize the SpeakerManager 
     * @param selectionMode The strategy for generating envelope: trigger | trajectory
     */
-    EnvelopeGenerator(t_systemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode);
+    EnvelopeGenerator(SystemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode);
     /**
     * @brief initialize the EnvelopeGenerator. initialize SpeakerManager, set numOutlet, initialize I/O buffer
     * @return bool whether correctly initialized
@@ -54,7 +54,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    t_blockOuts perform(BlockIns in);
+    Blocks perform(Blocks in);
     /**
     * @brief get the number of active speaker of current speaker array setup
     * @return int number of active speakerss
@@ -64,48 +64,48 @@ public:
     * @brief set the current output speaker 
     * @param newIdx the index of next speaker
     */
-    void set_current_speaker(t_index newIdx);
+    void set_current_speaker(Index newIdx);
     /**
     * @brief TODO 
     * @param idxs
     * @param action
     */
-    void setActiveSpeakerIndexs(std::string action, t_indexs idxs);
+    void setActiveSpeakerIndexs(std::string action, Indexes idxs);
     /**
-    * @brief TODO 
+    * @brief TODO
     * @param idxs
     * @param action
     */
-    void setTrajectoryVector(t_indexs idxs);
+    void setTrajectoryVector(Indexes idxs);
     /**
     * @brief TODO
     */
-    void setTopoMatrix(TopoMatrix matrix);
+    void setTopoMatrix(std::string action, Indexes idxs);
     /**
     * @brief TODO
     */
-    void print_parameters(std::string name);
+    void printParameters();
     /**
     * @brief reset all parameters and reinitialize. emtpy for now
     */
     void reset();
 
 private:
-    t_index               currIdx;         /**< The index of current output speaker */
+    Index               currIdx;         /**< The index of current output speaker */
 
-    t_systemConfigs       systemCfgs;      /**< System configuration structure: sample rate, block size etc. */
+    SystemConfigs       systemCfgs;      /**< System configuration structure: sample rate, block size etc. */
 
     std::string           spkrCfgFile;     /**< Path to the speaker array setup configuration file */
     std::string           selectionMode;   /**< The strategy for generating envelope: trigger | trajectory */
     int                   triggerMode;     /**< The strategy for choosing the next speaker to jump to using trigger with topology */
 
-    BlockIns            inputBuffer;     /**< multi-channel input buffer in the shape of input channel number x block size */
-    t_blockOuts           outputBuffer;    /**< multi-channel output buffer in the shape of output channel number x block size */
+    Blocks            inputBuffer;     /**< multi-channel input buffer in the shape of input channel number x block size */
+    Blocks           outputBuffer;    /**< multi-channel output buffer in the shape of output channel number x block size */
 
     SpeakerManager        *speakerManager; /**< SpeakerManger object to access the speaker array information */
     Logger                *logger;         /**< Logger object for printing logs to all kinds of console */
 
-    std::map<t_index, int> indexChannelLookup;  /**< map between speaker index and channal index for N(1) access */
+    std::map<Index, int> indexChannelLookup;  /**< map between speaker index and channal index for N(1) access */
     /**
     * @brief trigger mode envelope generation process. 
     *           jump to a new output speaker when ever a trigger sample received (sample value:1.0)
@@ -119,7 +119,7 @@ private:
     * @brief setup the indexChannelLookup
     * @param the unmasked speaker indexs
     */
-    void _set_index_channel_lookup(t_indexs indexs);
+    void _set_index_channel_lookup(Indexes indexs);
     /**
     * @brief calculate the spread gain according the distance between main output speaker and spread speaker
     * @param x distance
@@ -127,7 +127,7 @@ private:
     *           0.0 means no spread at all. 
     *           1.0 means spead to all speakers equally
     */
-    t_value calculateGain(t_value x, t_value theta); 
+    Param calculateGain(Param x, Param theta); 
 }; 
 
 } //namespace zerr

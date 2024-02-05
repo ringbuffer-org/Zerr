@@ -8,14 +8,14 @@ namespace zerr{
 
 class LinearInterpolator{
 public:
-    void    set_value(t_value start, t_value stop, int len);
-    t_value get_value();
+    void    set_value(Param start, Param stop, int len);
+    Param get_value();
     void    next_step();
 
 private:
-    t_value inter_val;
-    t_value start_val;
-    t_value stop_val;
+    Param inter_val;
+    Param start_val;
+    Param stop_val;
 
     int n_steps;
     int position;

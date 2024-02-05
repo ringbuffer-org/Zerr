@@ -19,7 +19,6 @@
 #include <cassert>
 #include <algorithm>
 #include <vector>
-// #include <map>
 
 #include "types.h"
 
@@ -52,14 +51,14 @@ std::string formatVector(std::vector<T> vector){
 * @param epsilon the error threshold
 * @return bool is equal to 1 or not
 */
-bool isEqualTo1(t_value value, t_value epsilon = std::numeric_limits<t_value>::epsilon());
+bool isEqualTo1(Param value, Param epsilon = std::numeric_limits<Param>::epsilon());
 /**
 * @brief compare the float number with 0
 * @param value the float number to be compared with 0
 * @param epsilon the error threshold
 * @return bool is equal to 1 or not
 */
-bool isEqualTo0(t_value value, t_value epsilon = std::numeric_limits<t_value>::epsilon());
+bool isEqualTo0(Param value, Param epsilon = std::numeric_limits<Param>::epsilon());
 /**
 * @brief calculate the sample of hanning window on the fly
 * @param pos the position in hanning window
@@ -95,7 +94,7 @@ bool isInKey(T element, std::map<T, U> map){
 * @param TODO
 * @return TODO
 */
-t_samples applyMovingAverage(const t_samples& segment, int windowSize);
+Samples applyMovingAverage(const Samples& segment, int windowSize);
 
 } // zerr
 #endif //UTILS_H

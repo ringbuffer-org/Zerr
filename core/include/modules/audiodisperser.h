@@ -28,7 +28,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    AudioDisperser(int numChannel, zerr::t_systemConfigs systemCfgs);
+    AudioDisperser(int numChannel, zerr::SystemConfigs systemCfgs);
     /**
     * @brief TODO
     * @param TODO
@@ -42,7 +42,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    void fetch(BlockIns in);
+    void fetch(Blocks in);
     /**
     * @brief TODO
     * @param TODO
@@ -63,16 +63,16 @@ public:
     * @param TODO
     * @param TODO
     */
-    t_blockOuts send();
+    Blocks send();
 private:
     int                    numChannel;      /**< TODO */
-    zerr::t_systemConfigs  systemCfgs;      /**< system configuration: sample_rate, block_size */
+    zerr::SystemConfigs  systemCfgs;      /**< system configuration: sample_rate, block_size */
     std::string            combinationMode; /**< TODO */
 
     Logger                *logger;          /**< TODO */
 
-    BlockIns             inputBuffer;      /**< TODO */
-    t_blockOuts            outputBuffer;     /**< TODO */
+    Blocks             inputBuffer;      /**< TODO */
+    Blocks            outputBuffer;     /**< TODO */
 }; 
 
 } //namespace zerr

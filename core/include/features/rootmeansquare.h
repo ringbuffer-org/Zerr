@@ -34,7 +34,7 @@ public:
     std::string get_category(){return category;}
     std::string get_description(){return description;}
 
-    void initialize(t_systemConfigs sys_cfg);
+    void initialize(SystemConfigs sys_cfg);
     void extract();
     void reset();
     void fetch(t_featureInputs in);

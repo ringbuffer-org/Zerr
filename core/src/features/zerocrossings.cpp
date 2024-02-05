@@ -8,7 +8,7 @@ const std::string ZeroCrossings::name        = "ZeroCrossings";
 const std::string ZeroCrossings::category    = "Sample-Level";
 const std::string ZeroCrossings::description = "Zero crossing is used to describe the point at which a signal changes its sign from positive to negative or from negative to positive.";
 
-void ZeroCrossings::initialize(t_systemConfigs sys_cfg){
+void ZeroCrossings::initialize(SystemConfigs sys_cfg){
     system_configs = sys_cfg;
 
     _reset_param();
@@ -33,7 +33,7 @@ void ZeroCrossings::reset(){
 }
 
 void ZeroCrossings::fetch(t_featureInputs in){
-    x = in.blck;
+    x = in.block;
     y.clear();
     y.resize(x.size(), 0.0f);
 }

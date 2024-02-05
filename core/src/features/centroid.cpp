@@ -8,7 +8,7 @@ const std::string Centroid::name        = "Spectral Centroid";
 const std::string Centroid::category    = "Frequency-Domain";
 const std::string Centroid::description = "The spectral centroid is a measure used in digital signal processing to characterise a spectrum.";
 
-void Centroid::initialize(t_systemConfigs sys_cfg){
+void Centroid::initialize(SystemConfigs sys_cfg){
     system_configs = sys_cfg;
     freq_max = static_cast<double>(system_configs.sample_rate) / 2.0;
 

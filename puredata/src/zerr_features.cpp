@@ -11,7 +11,7 @@
 
 #include <stdlib.h>
 
-ZerrFeatures::ZerrFeatures(zerr::t_systemConfigs sys_cnfg, zerr::t_featureNames ft_names):
+ZerrFeatures::ZerrFeatures(zerr::SystemConfigs sys_cnfg, zerr::t_featureNames ft_names):
             input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)) {
     bank = new zerr::FeatureBank();
 

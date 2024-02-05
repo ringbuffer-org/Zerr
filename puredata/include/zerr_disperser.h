@@ -23,7 +23,7 @@ class ZerrDisperser{
     * @param numChannel the number of channel of each source. 
     * @param systemCfgs puredata basic system configuration: sample_rate, block_size
     */
-    ZerrDisperser(int numChannel, zerr::t_systemConfigs systemCfgs);
+    ZerrDisperser(int numChannel, zerr::SystemConfigs systemCfgs);
     /**
     * @brief initialize ZerrDisperser modules
     * @return bool status of initialized or not
@@ -46,8 +46,8 @@ class ZerrDisperser{
     ~ZerrDisperser();
 
  private:
-    zerr::BlockIns  inputBuffer;  /**< multi-channel input buffer  */
-    zerr::t_blockOuts outputBuffer; /**< multi-channel output buffer */
+    zerr::Blocks  inputBuffer;  /**< multi-channel input buffer  */
+    zerr::Blocks outputBuffer; /**< multi-channel output buffer */
     float **inPtr;                  /**< PD-style input data pointer  */
     float **outPtr;                 /**< PD-style output data pointer */
 

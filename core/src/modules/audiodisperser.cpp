@@ -2,7 +2,7 @@
 using namespace zerr;
 
 
-AudioDisperser::AudioDisperser(int numChannel, zerr::t_systemConfigs systemCfgs){
+AudioDisperser::AudioDisperser(int numChannel, zerr::SystemConfigs systemCfgs){
     this->numChannel = numChannel;
     this->systemCfgs = systemCfgs;
 
@@ -16,14 +16,14 @@ AudioDisperser::AudioDisperser(int numChannel, zerr::t_systemConfigs systemCfgs)
 }
 
 bool AudioDisperser::initialize(){
-    inputBuffer.resize(numInlet,   t_samples(systemCfgs.block_size, 0.0f));
-    outputBuffer.resize(numOutlet, t_samples(systemCfgs.block_size, 0.0f));
+    inputBuffer.resize(numInlet,   Samples(systemCfgs.block_size, 0.0f));
+    outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
     return true;
 }
 
 
-void AudioDisperser::fetch(BlockIns in){
+void AudioDisperser::fetch(Blocks in){
     inputBuffer = in;
 }
 
@@ -34,7 +34,7 @@ void AudioDisperser::process(){
         buffer.assign(buffer.size(), 0.0f);
     }
 
-    t_samples& source =  inputBuffer[0];
+    Samples& source =  inputBuffer[0];
 
     for (int i = 1; i < numInlet; ++i) {
         for (size_t j = 0; j < systemCfgs.block_size; ++j) {
@@ -45,7 +45,7 @@ void AudioDisperser::process(){
 }
 
 
-t_blockOuts AudioDisperser::send(){
+Blocks AudioDisperser::send(){
     return outputBuffer;
 }
 

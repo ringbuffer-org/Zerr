@@ -27,7 +27,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    EnvelopeCombinator(int numSource, int numChannel, zerr::t_systemConfigs systemCfgs, std::string combinationMode);
+    EnvelopeCombinator(int numSource, int numChannel, zerr::SystemConfigs systemCfgs, std::string combinationMode);
     /**
     * @brief TODO
     * @param TODO
@@ -41,7 +41,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    void fetch(BlockIns in);
+    void fetch(Blocks in);
     /**
     * @brief TODO
     * @param TODO
@@ -62,7 +62,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    t_blockOuts send();
+    Blocks send();
     /**
     * @brief TODO
     * @param TODO
@@ -76,13 +76,13 @@ private:
 
     int                    numSource;       /**< TODO */
     int                    numChannel;      /**< TODO */
-    zerr::t_systemConfigs  systemCfgs;      /**< system configuration: sample_rate, block_size */
+    zerr::SystemConfigs  systemCfgs;      /**< system configuration: sample_rate, block_size */
     std::string            combMode;    /**< TODO */
 
     Logger                *logger;          /**< TODO */
 
-    BlockIns             inputBuffer;      /**< TODO */
-    t_blockOuts            outputBuffer;     /**< TODO */
+    Blocks             inputBuffer;      /**< TODO */
+    Blocks            outputBuffer;     /**< TODO */
 
     /**
     * @brief TODO

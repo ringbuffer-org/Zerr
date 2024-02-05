@@ -21,7 +21,7 @@ void *zerr_combinator_tilde_new(t_symbol *s, int argc, t_atom *argv) {
     if (!x) return NULL;
 
     // get system config: sample rate, block size.
-    zerr::t_systemConfigs cfgs;
+    zerr::SystemConfigs cfgs;
     cfgs.sample_rate = (size_t) sys_getsr();
     cfgs.block_size  = (size_t) sys_getblksize();
 

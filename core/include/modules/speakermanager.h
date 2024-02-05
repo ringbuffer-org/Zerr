@@ -31,46 +31,46 @@ class Speaker {
     * @param position cartesian and spherical coordinates
     * @param orientation yaw & pitch orientation
     */
-    Speaker(t_index index, t_position position, t_orientation orientation);
+    Speaker(Index index, t_position position, t_orientation orientation);
     /**
     * @brief return the identification index of this speaker instance
     * @return t_index index number
     */
-    t_index get_index(){return index;}; 
+    Index get_index(){return index;}; 
     /**
     * @brief return the x in Cartesian coordinate of this speaker instance
     * @return x coordinate value
     */
-    t_value get_x(){return position.cartesian.x;};
+    Param get_x(){return position.cartesian.x;};
     /**
     * @brief return the y in Cartesian coordinate of this speaker instance
     * @return y coordinate value
     */
-    t_value get_y(){return position.cartesian.y;};
+    Param get_y(){return position.cartesian.y;};
     /**
     * @brief return the z in Cartesian coordinate of this speaker instance
     */
-    t_value get_z(){return position.cartesian.z;};
+    Param get_z(){return position.cartesian.z;};
     /**
     * @brief return the azimuth in spherical coordinate of this speaker instance
     */
-    t_value get_azimuth()  {return position.spherical.azimuth;};
+    Param get_azimuth()  {return position.spherical.azimuth;};
     /**
     * @brief return the elevation in spherical coordinate of this speaker instance
     */
-    t_value get_elevation(){return position.spherical.elevation;};
+    Param get_elevation(){return position.spherical.elevation;};
     /**
     * @brief return the distance in spherical coordinate of this speaker instance
     */
-    t_value get_distance() {return position.spherical.distance;};
+    Param get_distance() {return position.spherical.distance;};
     /**
     * @brief return the yaw in orientation of this speaker instance
     */
-    t_value get_yaw()  {return orientation.yaw;};
+    Param get_yaw()  {return orientation.yaw;};
     /**
     * @brief return the pitch in orientation of this speaker instance
     */
-    t_value get_pitch(){return orientation.pitch;};
+    Param get_pitch(){return orientation.pitch;};
     /**
     * @brief pring all configuration: index, position, orientation
     */
@@ -78,7 +78,7 @@ class Speaker {
 
  private:
     Logger        *logger;      /**< logger  */
-    t_index        index;       /**< TODO */
+    Index          index;       /**< TODO */
     t_position     position;    /**< TODO */
     t_orientation  orientation; /**< TODO */
     /**
@@ -122,33 +122,33 @@ class SpeakerManager {
     /**
     * @brief TODO
     */
-    t_indexs getActiveSpeakerIndexs();
+    Indexes getActiveSpeakerIndexs();
     /**
     * @brief TODO
     */
-    t_index get_random_index();
+    Index get_random_index();
     /**
     * @brief return the speaker class acoording to speaker index
     */
-    Speaker get_speaker_by_index(t_index spkr_idx);
+    Speaker get_speaker_by_index(Index spkr_idx);
     /**
     * @brief get the pair of speaker indexs in sorted list acoording to the trajectory input
     */
-    t_pair get_indexs_by_trajectory(t_value trajectory_val);
+    t_pair get_indexs_by_trajectory(Param trajectory_val);
     /**
     * @brief TODO
     */
-    t_value get_panning_ratio(t_value trajectory_val);
+    Param get_panning_ratio(Param trajectory_val);
     /**
     * @brief get the index of speaker that is geometrially close to the input. 
     *        This method is obsolete and will be removed in the future.
     */
-    t_pair get_indexs_by_geometry(std::vector<t_value> pos, std::vector<bool> mask, std::string coordinate);
+    t_pair get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask, std::string coordinate);
     /**
     * @brief jump between different speakers using trigger signal
     * the 
     */
-    t_index get_indexs_by_trigger(t_value trigger, t_index curr_spkr, int mode);
+    Index get_indexs_by_trigger(Param trigger, Index curr_spkr, int mode);
     /**
     * @brief TODO
     */
@@ -156,15 +156,19 @@ class SpeakerManager {
     /**
     * @brief TODO
     */
-    void setTrajectoryVector(t_indexs idxs);
+    void setTrajectoryVector(Indexes idxs);
     /**
     * @brief TODO
     */
-    void setTopoMatrix(TopoMatrix matrix);
+    void setTopoMatrix(std::string action, Indexes idxs);
     /**
     * @brief TODO
     */
-    void setActiveSpeakers(std::string action, t_indexs idxs);
+    void setActiveSpeakers(std::string action, Indexes idxs);
+    /**
+    * @brief TODO
+    */
+    void printParameters();
     /**
     * @brief TODO
     */
@@ -183,14 +187,14 @@ class SpeakerManager {
     std::string config_path;    /**< file path of speaker array configuration */
     YAML::Node speaker_config;  /**< loaded YAML Node structure of speaker array configuration */
 
-    std::map<t_index, Speaker> speakers;         /**< TODO  */
+    std::map<Index, Speaker> speakers;         /**< TODO  */
 
-    std::map<t_index, t_values> distance_matrix; /**< TODO */
+    std::map<Index, t_values> distance_matrix; /**< TODO */
 
     // specific speaker configurations
-    t_indexs                     actvSpkIdx;    /**< TODO */
-    t_indexs                     trajVector;    /**< TODO */
-    TopoMatrix                   topoMatrix;    /**< TODO */
+    Indexes                     actvSpkIdx;    /**< TODO */
+    Indexes                     trajVector;    /**< TODO */
+    TopoMatrix                  topoMatrix;    /**< TODO */
     
     /**
     * @brief  
@@ -207,54 +211,60 @@ class SpeakerManager {
     * @param  
     * @return  
     */
-    t_value _calculate_distance(Speaker s1, Speaker s2);
+    Param _calculate_distance(Speaker s1, Speaker s2);
     /**
     * @brief transform form the spherical coordinate to the Cartesian coordinate
     * @param spherical spherical coordinate data structure
     * @return t_cartesian the Cartesian coordinate data
     */
-    t_cartesian _spherical2cartesian(t_spherical spherical);
+    Cartesian _spherical2cartesian(Spherical spherical);
     /**
     * @brief transform form the Cartesian coordinate to the spherical coordinate
     * @param cartesian Cartesian coordinate data structure
     * @return t_spherical the spherical coordinate data
     */
-    t_spherical _cartesian2spherical(t_cartesian cartesian);
+    Spherical _cartesian2spherical(Cartesian cartesian);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    t_index _find_nearest(t_index curr_spkr, t_indexs candidates);
+    Index _find_nearest(Index curr_spkr, Indexes candidates);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    bool _check_index_exist(t_index idx);
+    bool _check_index_exist(Index idx);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    void _setActiveSpeakerIndexs(t_indexs idxs);
+    void _setActiveSpeakerIndexs(Indexes idxs);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    void _addActiveSpeakerIndexs(t_indexs idxs);
+    void _addActiveSpeakerIndexs(Indexes idxs);
     /**
     * @brief  
     * @param  
     * @return  
     */
-    void _delActiveSpeakerIndexs(t_indexs idxs);
+    void _delActiveSpeakerIndexs(Indexes idxs);
+
+    void _setTopoMatrixIndexes(Indexes idxs);
+    void _addTopoMatrixIndexes(Indexes idxs);
+    void _delTopoMatrixIndexes(Indexes idxs);
+
+    bool _isActivated(Index idx);
 }; 
 
 #ifdef PUREDATA // explicit instantiation required for PD
-template bool isInKey<int, Speaker>(int element, std::map<t_index, Speaker> map);
-template std::string formatVector<t_index>(std::vector<t_index> vector);
+template bool isInKey<int, Speaker>(int element, std::map<Index, Speaker> map);
+template std::string formatVector<Index>(std::vector<Index> vector);
 #endif //PUREDATA
 
 } //namespace zerr
