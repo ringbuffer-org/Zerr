@@ -35,11 +35,11 @@ public:
     /**
     * fetch samples from audio stream and load to the input buffer
     */
-    virtual void fetch(t_featureInputs x) = 0;
+    virtual void fetch(AudioInputs x) = 0;
     /**
     * send the process results back
     */
-    virtual t_featureBuf send() = 0;
+    virtual FeatureVals send() = 0;
     /**
     * statue polling about if the feature extractor is initialized
     */
@@ -48,7 +48,7 @@ public:
 
 protected:
     Samples       x; /**< input data in t_samples type, the base type of t_blockIn, t_audioBuf, t_specBuf*/
-    t_featureBuf    y; /**< output data */
+    FeatureVals    y; /**< output data */
 
     SystemConfigs system_configs;
     bool initialized=false; // 

@@ -42,7 +42,7 @@ public:
     * get the ifft result
     */
     fftw_complex* fft_output();
-    t_specBuf get_power_spectrum();
+    AudioBuffer get_power_spectrum();
 
     void windowing();
 
@@ -52,7 +52,7 @@ private:
     int frame_size;
     int fft_size;
 
-    t_specBuf power_spec;
+    AudioBuffer power_spec;
 
     double       *fft_in;
     fftw_complex *fft_out;

@@ -34,14 +34,14 @@ void Flux::reset(){
     _reset_param();
 }
 
-void Flux::fetch(t_featureInputs in){
+void Flux::fetch(AudioInputs in){
     prv_x = x;
     x = in.spec;
 
     prv_y = crr_y;
 }
 
-t_featureBuf Flux::send(){
+FeatureVals Flux::send(){
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
     for (size_t i = 0; i < system_configs.block_size; ++i){

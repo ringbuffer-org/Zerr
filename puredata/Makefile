@@ -73,7 +73,7 @@ CXX  += -I../core/include/features
 
 # Add Puredata wraper headers
 CC  += -Iinclude
-CXX  += -Iinclude
+CXX += -Iinclude
 
 # Add fftw3 dependency headers
 CC  += -I../dependencies/include/fftw3

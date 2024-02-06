@@ -2,7 +2,7 @@
 using namespace zerr;
 
 
-Speaker::Speaker(Index index, t_position position, t_orientation orientation){
+Speaker::Speaker(Index index, Position position, Orientation orientation){
     logger = new Logger();
 
     #ifdef TESTMODE
@@ -113,11 +113,11 @@ bool SpeakerManager::initialize(){
         cartesian = is_zero_cartesian?_spherical2cartesian(spherical):cartesian; // fill the cartesian if it's not assigned
         spherical = is_zero_spherical?_cartesian2spherical(cartesian):spherical; // fill the spherical if it's not assigned
 
-        t_position            position;
+        Position            position;
         position.cartesian = cartesian;
         position.spherical = spherical;
 
-        t_orientation orientation;
+        Orientation orientation;
         if (value["orientation"] && 
                 !value["orientation"].IsNull()) {
             orientation.yaw   = value["orientation"]["yaw"].as<Param>();
@@ -187,7 +187,7 @@ Speaker SpeakerManager::get_speaker_by_index(Index spkr_idx){
 }
 
 
-t_pair SpeakerManager::get_indexs_by_trajectory(Param trajectory_val){
+Pair SpeakerManager::get_indexs_by_trajectory(Param trajectory_val){
     // Clip the input trajectory to [0.0,1.0]
     trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
     trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
@@ -211,7 +211,7 @@ Param SpeakerManager::get_panning_ratio(Param trajectory_val){
 }
 
 
-t_pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask, std::string coordinate){
+Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask, std::string coordinate){
     std::vector<Param> distance;
     std::vector<Index> indexs;
 

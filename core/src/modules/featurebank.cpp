@@ -32,7 +32,7 @@ void FeatureBank::print_active_features(){
 }
 
 
-void FeatureBank::initialize(t_featureNameList feature_names, SystemConfigs system_configs){
+void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs system_configs){
     for (auto name : feature_names) {
         activated_features.push_back(_create(name));
     }
@@ -78,7 +78,7 @@ void FeatureBank::process(){
 }
 
 
-t_featureValueList FeatureBank::send(){
+FeaturesVals FeatureBank::send(){
     // for (size_t i = 0; i < y.size(); ++i){
     //     y[i] = zerr::applyMovingAverage(y[i], 16);
     // }

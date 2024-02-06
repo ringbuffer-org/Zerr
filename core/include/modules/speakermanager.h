@@ -31,7 +31,7 @@ class Speaker {
     * @param position cartesian and spherical coordinates
     * @param orientation yaw & pitch orientation
     */
-    Speaker(Index index, t_position position, t_orientation orientation);
+    Speaker(Index index, Position position, Orientation orientation);
     /**
     * @brief return the identification index of this speaker instance
     * @return t_index index number
@@ -79,8 +79,8 @@ class Speaker {
  private:
     Logger        *logger;      /**< logger  */
     Index          index;       /**< TODO */
-    t_position     position;    /**< TODO */
-    t_orientation  orientation; /**< TODO */
+    Position       position;    /**< TODO */
+    Orientation  orientation; /**< TODO */
     /**
     * @brief 
     */
@@ -134,7 +134,7 @@ class SpeakerManager {
     /**
     * @brief get the pair of speaker indexs in sorted list acoording to the trajectory input
     */
-    t_pair get_indexs_by_trajectory(Param trajectory_val);
+    Pair get_indexs_by_trajectory(Param trajectory_val);
     /**
     * @brief TODO
     */
@@ -143,7 +143,7 @@ class SpeakerManager {
     * @brief get the index of speaker that is geometrially close to the input. 
     *        This method is obsolete and will be removed in the future.
     */
-    t_pair get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask, std::string coordinate);
+    Pair get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask, std::string coordinate);
     /**
     * @brief jump between different speakers using trigger signal
     * the 
@@ -189,7 +189,7 @@ class SpeakerManager {
 
     std::map<Index, Speaker> speakers;         /**< TODO  */
 
-    std::map<Index, t_values> distance_matrix; /**< TODO */
+    std::map<Index, Params> distance_matrix; /**< TODO */
 
     // specific speaker configurations
     Indexes                     actvSpkIdx;    /**< TODO */

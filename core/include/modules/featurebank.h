@@ -43,7 +43,7 @@ public:
     /**
     * Print the name of active features
     */
-    void initialize(t_featureNameList feature_names, SystemConfigs system_configs);
+    void initialize(FeatureNames feature_names, SystemConfigs system_configs);
     /**
     * fetch: dsp callback function
     * fetch audio block and store in the buffer if needed
@@ -60,11 +60,11 @@ public:
     * send: dsp callback function
     * send results in output buffer to other module
     */
-    t_featureValueList send();
+    FeaturesVals send();
     /**
     * Reset the featurebank parameters and load new features
     */
-    void reset(t_featureNameList feature_names);
+    void reset(FeatureNames feature_names);
 
 private:
 
@@ -76,9 +76,9 @@ private:
 
     FrequencyTransformer freq_transformer; /**< fftw3 warper to perform fft on audio signal input*/
 
-    t_featureInputs x;    /**< the structure to hold different type of feature inputs */
+    AudioInputs x;    /**< the structure to hold different type of feature inputs */
 
-    t_featureValueList y; /**< The map between all feature names and feature constructors */
+    FeaturesVals y; /**< The map between all feature names and feature constructors */
 
     int n_features; /**< The number of activated features */
 

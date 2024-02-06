@@ -46,10 +46,10 @@ class ZerrFeatures{
  private:
     // basic config
     zerr::SystemConfigs systemConfigs;
-    zerr::t_featureNameList featureNames;
+    zerr::FeatureNames featureNames;
 
     zerr::Blocks input_buffer;  // TODO(Zeyu Yang): Fix datatypes
-    zerr::t_featureValueList output_buffer;  // TODO(Zeyu Yang): Fix datatypes
+    zerr::FeaturesVals output_buffer;  // TODO(Zeyu Yang): Fix datatypes
 
     float **in_ptr;
     float **out_ptr;

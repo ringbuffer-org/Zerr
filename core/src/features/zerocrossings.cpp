@@ -32,13 +32,13 @@ void ZeroCrossings::reset(){
     _reset_param();
 }
 
-void ZeroCrossings::fetch(t_featureInputs in){
+void ZeroCrossings::fetch(AudioInputs in){
     x = in.block;
     y.clear();
     y.resize(x.size(), 0.0f);
 }
 
-t_featureBuf ZeroCrossings::send(){
+FeatureVals ZeroCrossings::send(){
     return y;
 }
 

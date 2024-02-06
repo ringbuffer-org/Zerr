@@ -42,12 +42,12 @@ void Centroid::reset(){
     _reset_param();
 }
 
-void Centroid::fetch(t_featureInputs in){
+void Centroid::fetch(AudioInputs in){
     x = in.spec;
     prv_y = crr_y;
 }
 
-t_featureBuf Centroid::send(){
+FeatureVals Centroid::send(){
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
     for (size_t i = 0; i < system_configs.block_size; ++i){

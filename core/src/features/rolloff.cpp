@@ -47,13 +47,13 @@ void Rolloff::reset(){
 }
 
 
-void Rolloff::fetch(t_featureInputs in){
+void Rolloff::fetch(AudioInputs in){
     x = in.spec;
     prv_y = crr_y;
 }
 
 
-t_featureBuf Rolloff::send(){
+FeatureVals Rolloff::send(){
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
     for (size_t i = 0; i < system_configs.block_size; ++i){

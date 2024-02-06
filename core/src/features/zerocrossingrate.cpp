@@ -38,12 +38,12 @@ void ZeroCrossingRate::reset(){
     _reset_param();
 }
 
-void ZeroCrossingRate::fetch(t_featureInputs in){
+void ZeroCrossingRate::fetch(AudioInputs in){
     x = in.wave;
     prv_y = crr_y;
 }
 
-t_featureBuf ZeroCrossingRate::send(){
+FeatureVals ZeroCrossingRate::send(){
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
     for (size_t i = 0; i < system_configs.block_size; ++i){

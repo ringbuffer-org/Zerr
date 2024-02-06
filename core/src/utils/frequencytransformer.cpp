@@ -46,7 +46,7 @@ fftw_complex* FrequencyTransformer::fft_output()
     return fft_out;
 }
 
-t_specBuf FrequencyTransformer::get_power_spectrum()
+AudioBuffer FrequencyTransformer::get_power_spectrum()
 {
     return  power_spec;
 }

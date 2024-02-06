@@ -24,14 +24,14 @@ public:
     void initialize(SystemConfigs sys_cfg);
     void extract();
     void reset();
-    void fetch(t_featureInputs in);
-    t_featureBuf send();
+    void fetch(AudioInputs in);
+    FeatureVals send();
 
 private:
     void _reset_param();
 
-    t_featureValue prv_y;
-    t_featureValue crr_y;
+    FeatureVal prv_y;
+    FeatureVal crr_y;
     // params
     // int zero_crossings;
 

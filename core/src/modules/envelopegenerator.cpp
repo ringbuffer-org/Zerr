@@ -133,8 +133,8 @@ void EnvelopeGenerator::_process_trajectory(){
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
     }
-    t_pair speakerPair;
-    t_pair channelPair;
+    Pair speakerPair;
+    Pair channelPair;
 
     Samples& trjcty =  inputBuffer[0];
     Samples& spread =  inputBuffer[1];

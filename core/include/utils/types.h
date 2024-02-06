@@ -1,10 +1,10 @@
 /**
  * @file types.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief  Zerr* type definitions
- * @date 2023-08-09
+ * @brief  Zerr* types definitions
+ * @date 2024-02-06
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #ifndef TYPES_H
 #define TYPES_H
@@ -14,41 +14,37 @@
 
 #include "configs.h"
 
-
 namespace zerr {
 // basic types
-using Sample = double;  /**< base type of a sample value */
-using Param  = float;   /**< base type of a parameter value */
-using Index  = int;     /**< base type of an index value */
+using Sample = double;      /**< base type of a sample value */
+using Param  = float;       /**< base type of a parameter value */
+using Index  = int;         /**< base type of an index value */
+using Name   = std::string; /**< base type of an name identifiers */
 
-typedef struct {
+struct Complex{
     Sample real;
     Sample img;
-} Complex; /**< complex number */
+}; /**< complex number */
 
 using Samples = std::vector<Sample>; /**< basic type of all kinds of audio vector */
 
 using Block = Samples;  /**< audio block */
+using Blocks = std::vector<Block>;  /**< multi-channel audio blocks */
 
-typedef Samples t_audioBuf; /**< buffered audio frame */
+using AudioBuffer = Samples;  /**< buffered audio frame */
+using AudioBuffers = std::vector<AudioBuffer>;  /**< multi-channel audio buffer */
 
-typedef std::vector<Block>  Blocks;  /**< multi-channel audio blocks */
-typedef std::vector<t_audioBuf> t_audioBufs; /**< multi-channel audio buffer */
+using FFTBuffer = std::vector<Complex>;  /**< complex buffer for fft output */
+using SpecBuffer = std::vector<Sample>;  /**< spectral power buffer */
 
-// spectral types
-typedef std::vector<Complex> t_fftBuf; /**< complex buffer for fft output */
-typedef std::vector<Sample> t_specBuf; /**< spectral power buffer */
+struct AudioInputs{
+    Block      block; /**< single audio block */
+    AudioBuffer wave; /**< buffered audio frame */
+    SpecBuffer  spec; /**< spectral power */
+};  /**< structure for different feature extractor input data*/
 
-typedef struct {
-    Block  block; /**< single audio block */
-    t_audioBuf wave; /**< buffered audio frame */
-    t_specBuf  spec; /**< spectral power */
-} t_featureInputs;   /**< structure for different feature extractor input data*/
-
-// feature types
-typedef std::string FeatureName; /**< Identification name of the feature */
-typedef std::vector<FeatureName> t_featureNameList; /**< The list of feature name to be activated */
-
+using FeatureName = Name; /**< Identification name of the feature */
+using FeatureNames = std::vector<FeatureName>; /**< The list of feature name to be activated */
 
 // TODO(Zeyu Yang): If this only use in PD wrapper, move it out
 typedef struct {
@@ -56,54 +52,46 @@ typedef struct {
     int num;     // Number of strings in the list
 } t_featureNames;
 
+using Params = std::vector<Param>; /**< base type of all non-audio vector */
 
-typedef std::vector<Param> t_values; /**< base type of all non-audio vector */
-
-typedef Sample t_featureValue;  /**< feature value calculated via block */
-typedef Samples t_featureBuf;   /**< feature value in sample level or after interpolation */
-typedef std::vector<t_featureBuf> t_featureValueList; /**< list of all extracted features */
+using FeatureVal  = Param;  /**< feature value calculated via block */
+using FeatureVals = Params; /**< feature value in sample level or after interpolation */
+using FeaturesVals = std::vector<FeatureVals>; /**< list of all extracted features */
 
 // speaker configuration type
 // coordinates
-typedef struct {
+struct Cartesian{
     Param x;
     Param y;
     Param z;
-} Cartesian;
+};
 
-typedef struct {
+struct Spherical{
     Param azimuth;
     Param elevation;
     Param distance;
-} Spherical;
+};
 
-typedef struct {
+struct Position{
     Cartesian cartesian;
     Spherical spherical;
-} t_position;
+};
 
-typedef struct {
+struct Orientation{
     Param yaw;
     Param pitch;
-} t_orientation;
+};
 
 // specific configs
-typedef std::vector<Index> Indexes;
-typedef std::map<Index, Indexes> TopoMatrix;
+using Indexes = std::vector<Index>;
+using TopoMatrix = std::map<Index, Indexes>;
+using Pair = std::pair<Index, Index>;
 
-typedef std::pair<Index, Index> t_pair;
-
-// system config type
+// system config
 typedef struct {
     size_t sample_rate;
     size_t block_size;
-}SystemConfigs;
-
-enum SelectionMode {
-    trigger,
-    trajectory
-};
-
+} SystemConfigs;
 
 } // namespace zerr
 #endif //TYPES_H
