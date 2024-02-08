@@ -28,17 +28,20 @@ bool EnvelopeCombinator::initialize(){
     inputBuffer.resize(numInlet,   Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
-    if (combMode!="add" && 
-        combMode!="root" && 
-        combMode!="max"){ //TODO: change to enumerate and add to type.h
+    if (combMode == "add") {
+        processFunc = &EnvelopeCombinator::_process_add;
+    }
+    else if (combMode == "root"){
+        processFunc = &EnvelopeCombinator::_process_root;
+    } 
+    else if (combMode == "max") {
+        processFunc = &EnvelopeCombinator::_process_max;
+    }
+    else {
         logger->logError(
             "EnvelopeCombinator::initialize Unknown combination mode: " + combMode);
         return false;
     }
-
-    if (combMode == "add") processFunc = &EnvelopeCombinator::_process_add;
-    else if (combMode == "root") processFunc = &EnvelopeCombinator::_process_root;
-    else if (combMode == "max") processFunc = &EnvelopeCombinator::_process_max;
 
     return true;
 }

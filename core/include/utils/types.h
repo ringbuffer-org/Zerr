@@ -19,7 +19,7 @@ namespace zerr {
 using Sample = double;      /**< base type of a sample value */
 using Param  = float;       /**< base type of a parameter value */
 using Index  = int;         /**< base type of an index value */
-using Name   = std::string; /**< base type of an name identifiers */
+// using zString   = std::string; /**< base type of an name identifiers */
 
 struct Complex{
     Sample real;
@@ -43,8 +43,11 @@ struct AudioInputs{
     SpecBuffer  spec; /**< spectral power */
 };  /**< structure for different feature extractor input data*/
 
-using FeatureName = Name; /**< Identification name of the feature */
+using FeatureName = std::string; /**< Identification name of the feature */
 using FeatureNames = std::vector<FeatureName>; /**< The list of feature name to be activated */
+
+using Mode = std::string;
+using ConfigPath = std::string;
 
 // TODO(Zeyu Yang): If this only use in PD wrapper, move it out
 typedef struct {

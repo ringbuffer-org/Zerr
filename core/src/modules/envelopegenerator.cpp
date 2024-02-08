@@ -12,43 +12,63 @@ using zerr::EnvelopeGenerator;
 using zerr::Blocks;
 using zerr::Param;
 
-EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string spkrCfgFile, std::string selectionMode){
-    this->systemCfgs    = systemCfgs;
-    this->spkrCfgFile   = spkrCfgFile;
-    this->selectionMode = selectionMode;
+EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speakerCfgs, Mode genMode){
+    this->systemCfgs = systemCfgs;
+    this->speakerCfgs = speakerCfgs;
+    this->genMode = genMode;
 
-    speakerManager = new SpeakerManager(this->spkrCfgFile);
+    speakerManager = new SpeakerManager(this->speakerCfgs);
 
     logger = new Logger();
 
     #ifdef TESTMODE
     logger->setLogLevel(LogLevel::INFO);
-    #endif //TESTMODE
+    #endif  // TESTMODE
 }
 
 
 bool EnvelopeGenerator::initialize(){
+    // initialize speaker manager
     if (!speakerManager->initialize()) return false;
 
-    int numOutlet = getNumSpeakers();
+    // check the generator mode and bind process func
+    if (genMode == "trigger") {
+        processFunc = &EnvelopeGenerator::_process_trigger;
+    }
+    else if (genMode == "trajectory"){
+        processFunc = &EnvelopeGenerator::_process_trajectory;
+    } 
+    else {
+        logger->logError(
+            "EnvelopeGenerator::initialize Unknown selection mode: " + genMode);
+        return false;
+    }
 
+    // get the number of speakers
+    int numOutlet = speakerManager->getNumAllSpeakers();;
+
+    // initialize the inputbuffer and outputbuffer size.
     inputBuffer.resize(numInlet,   Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
-    _set_index_channel_lookup(speakerManager->getActiveSpeakerIndexs());
+    // setup index to channel reverse lookup table
+    Indexes indexes = speakerManager->getActiveSpeakerIndexs();
+    for (size_t i = 0; i < indexes.size(); ++i){
+        indexChannelLookup[indexes[i]] = i;
+    }
 
-    currIdx = speakerManager->get_random_index(); // TODO(Zeyu Yang): gives option to set init
+    // initialize  trigger mode specified parameters
+    if (genMode == "trigger") {
+        currIdx = speakerManager->get_random_index(); // TODO(Zeyu Yang): gives option to set init
+        logger->logInfo(formatString("Current Speaker ID: %d", currIdx));
+        triggerMode = "random"; 
+    }
+
     #ifdef TESTMODE
     logger->logDebug(formatString("EnvelopeGenerator::initialize currIdx %d", currIdx));
     #endif  // TESTMODE
 
-    if (selectionMode!="trigger" && selectionMode!="trajectory"){ 
-        logger->logError("EnvelopeGenerator::initialize Unknown selection mode: " + selectionMode);
-        return false;
-    }
-
-    triggerMode = 0; // Random
-
+    // initialized
     return true;
 }
 
@@ -58,20 +78,17 @@ Blocks EnvelopeGenerator::perform(Blocks in) {
     inputBuffer = in;
 
     // process
-    if (selectionMode=="trigger"){_process_trigger();}
-    if (selectionMode=="trajectory"){_process_trajectory();}
+    if (processFunc) {
+        (this->*processFunc)();
+    }
 
     // send
-    // TODO: make this optional
-    // for (size_t i = 0; i < outputBuffer.size(); ++i){
-    //     outputBuffer[i] = applyMovingAverage(outputBuffer[i], 16);
-    // }
     return outputBuffer;
 }
 
 
 int EnvelopeGenerator::getNumSpeakers(){
-    return speakerManager->getNumActiveSpeakers();
+    return speakerManager->getNumAllSpeakers();
 }
 
 
@@ -99,9 +116,14 @@ void EnvelopeGenerator::printParameters(){
 }
 
 
-//TODO: Clean this up
+EnvelopeGenerator::~EnvelopeGenerator() {
+    delete speakerManager;
+    delete logger;
+}
+
+
 void EnvelopeGenerator::_process_trigger(){
-    int channel;
+    size_t channel;
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
     }
@@ -120,12 +142,12 @@ void EnvelopeGenerator::_process_trigger(){
         distances = speakerManager->get_distance_vector(currIdx);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channel) {continue;}
-            outputBuffer[chnl][i] = calculateGain(distances[chnl], spread[i]) * volume[i]; // current activated index
+            outputBuffer[chnl][i] = _calculateGain(distances[chnl], spread[i]) * volume[i]; // current activated index
         }
     }
 }
 
-//TODO: Clean this up
+
 void EnvelopeGenerator::_process_trajectory(){
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
@@ -154,27 +176,20 @@ void EnvelopeGenerator::_process_trajectory(){
         distances = speakerManager->get_distance_vector(speakerPair.first);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channelPair.first) {continue;}
-            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i]; //* (1 - panRatio); // current activated index
+            outputBuffer[chnl][i] += _calculateGain(distances[chnl], spread[i]) * volume[i]; //* (1 - panRatio); // current activated index
         }
         // process the spread of second speaker
         distances = speakerManager->get_distance_vector(speakerPair.second);
         for (size_t chnl = 0; chnl < outputBuffer.size(); ++chnl){
             if (chnl == channelPair.second) {continue;}
-            outputBuffer[chnl][i] += calculateGain(distances[chnl], spread[i]) * volume[i]; //* panRatio; // current activated index
+            outputBuffer[chnl][i] += _calculateGain(distances[chnl], spread[i]) * volume[i]; //* panRatio; // current activated index
         }
     }
 }
 
 
-void EnvelopeGenerator::_set_index_channel_lookup(Indexes indexs){
-    for (size_t i = 0; i < indexs.size(); ++i){
-        indexChannelLookup[indexs[i]] = i;
-    }
-}
-
-
-Param EnvelopeGenerator::calculateGain(Param x, Param theta) {
-    x = x * DISTANCE_SCALE;
+Param EnvelopeGenerator::_calculateGain(Param x, Param theta) {
+    x = x * DISTANCE_SCALE; // TODO: remove this distance scale or make it more versitle
 
     // clip the theta
     theta = theta<0.0?0:theta;

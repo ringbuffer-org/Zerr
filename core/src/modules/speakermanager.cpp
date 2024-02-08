@@ -257,7 +257,7 @@ Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<
 }
 
 
-Index SpeakerManager::get_indexs_by_trigger(Param trigger, Index curr_spkr, int mode){
+Index SpeakerManager::get_indexs_by_trigger(Param trigger, Index curr_spkr, Mode mode){
     // just return the original one when trigger doesn't close to 1.0
     if (!isEqualTo1(trigger, TRIGGER_THRESHOLD)) return curr_spkr;
     // load all connected speakers from the topology matrix
@@ -267,16 +267,18 @@ Index SpeakerManager::get_indexs_by_trigger(Param trigger, Index curr_spkr, int 
 
     Index selected;
     int n_candidates = candidates.size();
-    switch(mode){
-        case 0: // "Random"
-            selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
-            break;
-        case 1: // "Nearest"
-            selected = _find_nearest(curr_spkr, candidates);
-            break;
-        default:
-            throw std::invalid_argument( "Unknow trigger mode.");
-    }
+
+    selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
+    // switch(mode){
+    //     case 0: // "Random"
+    //         selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
+    //         break;
+    //     case 1: // "Nearest"
+    //         selected = _find_nearest(curr_spkr, candidates);
+    //         break;
+    //     default:
+    //         throw std::invalid_argument( "Unknow trigger mode.");
+    // }
 
     return selected;
 }

@@ -148,7 +148,7 @@ class SpeakerManager {
     * @brief jump between different speakers using trigger signal
     * the 
     */
-    Index get_indexs_by_trigger(Param trigger, Index curr_spkr, int mode);
+    Index get_indexs_by_trigger(Param trigger, Index curr_spkr, Mode mode);
     /**
     * @brief TODO
     */
