@@ -44,15 +44,14 @@ bool EnvelopeCombinator::initialize(){
 }
 
 
-void EnvelopeCombinator::fetch(Blocks in){
+Blocks EnvelopeCombinator::perform(Blocks in) {
     inputBuffer = in;
-}
 
-
-void EnvelopeCombinator::process(){
     if (processFunc) {
         (this->*processFunc)();
     }
+
+    return outputBuffer;
 }
 
 
@@ -114,9 +113,6 @@ void EnvelopeCombinator::_process_max(){
 }
 
 
-Blocks EnvelopeCombinator::send(){
-    return outputBuffer;
-}
 
 EnvelopeCombinator::~EnvelopeCombinator() {
     delete logger;

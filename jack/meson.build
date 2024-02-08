@@ -1,7 +1,5 @@
 project('zerr', 'cpp')
 
-# build_machine.system()
-
 main_src = [
   'main.cpp',
   'src/zerr.cpp',

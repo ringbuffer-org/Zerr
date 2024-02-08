@@ -205,6 +205,8 @@ Param SpeakerManager::get_panning_ratio(Param trajectory_val){
     trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
     trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
 
+    // trajectory_val = trajectory_val;
+
     Param scaled = trajectory_val * (trajVector.size() - 1);
 
     return (scaled - std::floor(scaled)) / (std::ceil(scaled) - std::floor(scaled));

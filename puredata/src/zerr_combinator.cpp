@@ -63,9 +63,10 @@ void ZerrCombinator::perform(float **ports, int blockSize) {
     }
 
     try {
-        envelopeCombinator->fetch(inputBuffer);
-        envelopeCombinator->process();
-        outputBuffer = envelopeCombinator->send();
+        // envelopeCombinator->fetch(inputBuffer);
+        // envelopeCombinator->process();
+        // outputBuffer = envelopeCombinator->send();
+        outputBuffer = envelopeCombinator->perform(inputBuffer);
     }
     catch (...) {
         return;

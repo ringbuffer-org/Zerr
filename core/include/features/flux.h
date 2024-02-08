@@ -26,6 +26,7 @@ public:
     void reset();
     void fetch(AudioInputs in);
     FeatureVals send();
+    // FeatureVals perform(AudioInputs x);
 
 private:
     void _reset_param();

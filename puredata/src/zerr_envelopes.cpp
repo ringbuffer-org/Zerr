@@ -23,7 +23,7 @@ ZerrEnvelopes::ZerrEnvelopes(zerr::SystemConfigs systemCfgs, std::string selecti
 
 bool ZerrEnvelopes::initialize(){
     if (!envelopeGenerator->initialize()) {return false;};
-    numOutlet = envelopeGenerator->get_n_speaker();
+    numOutlet = envelopeGenerator->getNumSpeakers();
 
     inputBuffer.resize(numInlet,   zerr::Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, zerr::Samples(systemCfgs.block_size, 0.0f));

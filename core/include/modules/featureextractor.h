@@ -41,6 +41,10 @@ public:
     */
     virtual FeatureVals send() = 0;
     /**
+    * send the process results back
+    */
+    // virtual FeatureVals perform(AudioInputs x) = 0;
+    /**
     * statue polling about if the feature extractor is initialized
     */
     bool is_initialized(){return initialized;}

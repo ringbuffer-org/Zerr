@@ -1,3 +1,12 @@
+/**
+ * @file audiodisperser.cpp
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief AudioDisperser Class Implementation
+ * @date 2024-02-06
+ * 
+ * @copyright Copyright (c) 2023-2024
+ */
+
 #include "audiodisperser.h"
 using namespace zerr;
 
@@ -15,6 +24,7 @@ AudioDisperser::AudioDisperser(int numChannel, zerr::SystemConfigs systemCfgs){
     #endif //TESTMODE
 }
 
+
 bool AudioDisperser::initialize(){
     inputBuffer.resize(numInlet,   Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
@@ -23,12 +33,9 @@ bool AudioDisperser::initialize(){
 }
 
 
-void AudioDisperser::fetch(Blocks in){
+Blocks AudioDisperser::perfrom(Blocks in) {
     inputBuffer = in;
-}
 
-
-void AudioDisperser::process(){
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
@@ -42,10 +49,5 @@ void AudioDisperser::process(){
         }
     }
 
-}
-
-
-Blocks AudioDisperser::send(){
     return outputBuffer;
 }
-

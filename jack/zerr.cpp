@@ -162,7 +162,6 @@ int Zerr::process(jack_nframes_t nframes){
     router.process();
 
     output_buffer = router.send();
-    // std::cout<<"output_buffer size: "<<output_buffer.size()<<"|"<<output_buffer[0].size()<<std::endl;
 
     for(int chanCNT=0; chanCNT<nOutputs; chanCNT++){
         for(int sampCNT=0; sampCNT<nframes; sampCNT++){

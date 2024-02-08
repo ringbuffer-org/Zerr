@@ -46,8 +46,8 @@ void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs system_co
     x.wave.resize(AUDIO_BUFFER_SIZE);
 }
 
-
-void FeatureBank::fetch(Block in){
+FeaturesVals FeatureBank::perform(Block in){
+    // fetch
     Sample* buf_ptr=nullptr;
     size_t buf_len;
     ring_buffer.enqueue(in);
@@ -66,23 +66,15 @@ void FeatureBank::fetch(Block in){
     freq_transformer.fft();
     freq_transformer.power_spectrum();
     x.spec = freq_transformer.get_power_spectrum();
-}
 
-
-void FeatureBank::process(){
+    // process
     for (size_t i = 0; i < activated_features.size(); ++i){
         activated_features[i]->fetch(x);
         activated_features[i]->extract();
         y[i] = activated_features[i]->send();
     }
-}
 
-
-FeaturesVals FeatureBank::send(){
-    // for (size_t i = 0; i < y.size(); ++i){
-    //     y[i] = zerr::applyMovingAverage(y[i], 16);
-    // }
-
+    // send
     return y;
 }
 
@@ -118,7 +110,7 @@ void FeatureBank::_regist_all(){
 
 void FeatureBank::_regist(const std::string& className, CreateFunc createFunc) {
         registed_features[className] = createFunc;
-    }
+}
 
 
 std::unique_ptr<FeatureExtractor> FeatureBank::_create(const std::string& className) {

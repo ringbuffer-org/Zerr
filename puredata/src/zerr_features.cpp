@@ -54,9 +54,7 @@ void ZerrFeatures::perform(float **ports, int n_vec) {
         }
     }
 
-    bank->fetch(input_buffer[0]);
-    bank->process();
-    output_buffer = bank->send();
+    output_buffer = bank->perform(input_buffer[0]);
 
     for (int i = 0; i < n_outlet; i++) {
         for (int j = 0; j < n_vec; j++) {

@@ -1,11 +1,10 @@
 /**
  * @file audiodisperser.h 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief AudioDisperser Class Implementation
- * @version 0.2
- * @date 2023-08-06
+ * @brief AudioDisperser Class Header
+ * @date 2024-02-06
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #ifndef AUDIODISPERSER_H
 #define AUDIODISPERSER_H
@@ -42,7 +41,7 @@ public:
     * @param TODO
     * @param TODO
     */
-    void fetch(Blocks in);
+    Blocks perfrom(Blocks in);
     /**
     * @brief TODO
     * @param TODO
@@ -50,23 +49,10 @@ public:
     * @param TODO
     */
     int get_block_size(){return systemCfgs.block_size;}
-    /**
-    * @brief TODO
-    * @param TODO
-    * @param TODO
-    * @param TODO
-    */
-    void process();
-    /**
-    * @brief TODO
-    * @param TODO
-    * @param TODO
-    * @param TODO
-    */
-    Blocks send();
+
 private:
     int                    numChannel;      /**< TODO */
-    zerr::SystemConfigs  systemCfgs;      /**< system configuration: sample_rate, block_size */
+    SystemConfigs      systemCfgs;      /**< system configuration: sample_rate, block_size */
     std::string            combinationMode; /**< TODO */
 
     Logger                *logger;          /**< TODO */

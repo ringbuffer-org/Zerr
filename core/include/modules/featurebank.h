@@ -10,6 +10,7 @@
 #include "ringbuffer.h"
 #include "frequencytransformer.h"
 
+// #include "audio_features.h"
 #include "audio_features.h"
 #include "featureextractor.h"
 
@@ -20,7 +21,7 @@ namespace zerr {
 * then distributes the results to all activated feature extraction algorithms
 */
 class FeatureBank {
-public:   
+ public:   
     using CreateFunc = std::unique_ptr<FeatureExtractor> (*)(); /**< Function pointer type for creating FeatureExtractor objects  */
     typedef std::unique_ptr<FeatureExtractor> fe_ptr; /**< The unique_ptr of type virtual class FeatureExtractor  */
     /**
@@ -45,28 +46,14 @@ public:
     */
     void initialize(FeatureNames feature_names, SystemConfigs system_configs);
     /**
-    * fetch: dsp callback function
-    * fetch audio block and store in the buffer if needed
-    * Warning: n_vec could be smaller than system block_size. Error occurs in this scenario
+    * TODO
     */
-    void fetch(Block in);
-    /**
-    * process: dsp callback function
-    * process the audio sample in the input buffer
-    * and save process results to the output buffer
-    */
-    void process();
-    /**
-    * send: dsp callback function
-    * send results in output buffer to other module
-    */
-    FeaturesVals send();
+    FeaturesVals perform(Block in);
     /**
     * Reset the featurebank parameters and load new features
     */
     void reset(FeatureNames feature_names);
-
-private:
+ private:
 
     std::map<std::string, CreateFunc> registed_features; /**< The map between all feature names and feature constructors*/
 

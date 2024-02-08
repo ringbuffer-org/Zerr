@@ -2,12 +2,12 @@
  * @file envelopegenerator.cpp 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief Envelope Generator Class Implementation
- * @date 2024-01-31
+ * @date 2024-02-07
  * 
  * @copyright Copyright (c) 2023-2024
  */
 #include "envelopegenerator.h"
-// using namespace zerr;
+
 using zerr::EnvelopeGenerator;
 using zerr::Blocks;
 using zerr::Param;
@@ -20,6 +20,7 @@ EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string spkrC
     speakerManager = new SpeakerManager(this->spkrCfgFile);
 
     logger = new Logger();
+
     #ifdef TESTMODE
     logger->setLogLevel(LogLevel::INFO);
     #endif //TESTMODE
@@ -29,7 +30,7 @@ EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string spkrC
 bool EnvelopeGenerator::initialize(){
     if (!speakerManager->initialize()) return false;
 
-    int numOutlet = get_n_speaker();
+    int numOutlet = getNumSpeakers();
 
     inputBuffer.resize(numInlet,   Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
@@ -52,7 +53,6 @@ bool EnvelopeGenerator::initialize(){
 }
 
 
-
 Blocks EnvelopeGenerator::perform(Blocks in) {
     // fetch
     inputBuffer = in;
@@ -69,12 +69,13 @@ Blocks EnvelopeGenerator::perform(Blocks in) {
     return outputBuffer;
 }
 
-int EnvelopeGenerator::get_n_speaker(){
+
+int EnvelopeGenerator::getNumSpeakers(){
     return speakerManager->getNumActiveSpeakers();
 }
 
 
-void EnvelopeGenerator::set_current_speaker(Index newIdx){
+void EnvelopeGenerator::setCurrSpeaker(Index newIdx){
     currIdx = newIdx;
 }
 
@@ -94,13 +95,9 @@ void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs){
 
 
 void EnvelopeGenerator::printParameters(){
-    // if (name=="masks"){
-    //     speakerManager->printActiveSpeakerIndexs();
-    // }else{
-    //     logger->logError("EnvelopeGenerator::print_parameters unknown parameter " + name);
-    // }
     speakerManager->printParameters();
 }
+
 
 //TODO: Clean this up
 void EnvelopeGenerator::_process_trigger(){

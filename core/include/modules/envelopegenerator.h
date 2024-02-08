@@ -1,13 +1,13 @@
 /**
  * @file envelopegenerator.h 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Envelope Generator Class Implementation
- * @date 2024-01-31
+ * @brief Zerr* Envelope Generator Class Header
+ * @date 2024-02-07
  * 
  * @copyright Copyright (c) 2023-2024
  */
-#ifndef ENVELOPEGENERATOR_H
-#define ENVELOPEGENERATOR_H
+#ifndef CORE_ENVELOPEGENERATOR_H
+#define CORE_ENVELOPEGENERATOR_H
 
 #include "utils.h"
 #include "types.h"
@@ -17,10 +17,11 @@
 
 namespace zerr {
 /**
-* @brief EnvelopeGenerator generates evelope stream according to input control signal and the speaker array setups
+* @brief EnvelopeGenerator generates evelopes according to the input control signals
+*  and the speaker array setups. 
 */
 class EnvelopeGenerator { 
-public:
+ public:
     const int numInlet = 3;    /**< number of inlets: main(1)/spread(2)/valume(3) */
     int       numOutlet;       /**< number of outlets: assgined according to the speaker configuration*/
     /**
@@ -36,20 +37,6 @@ public:
     */
     bool initialize();
     /**
-    * @brief setup the inputBuffer with new audio block
-    * @param in the audio block to be processed
-    */
-    // void fetch(t_blockIns in);
-    /**
-    * @brief generate the envelope signal block to outputBuffer
-    */
-    // void process();
-    /**
-    * @brief return the audio block in outputBuffer 
-    * @return t_blockOuts
-    */
-    // t_blockOuts send();
-    /**
     * @brief TODO 
     * @param TODO
     * @param TODO
@@ -59,12 +46,12 @@ public:
     * @brief get the number of active speaker of current speaker array setup
     * @return int number of active speakerss
     */
-    int get_n_speaker();
+    int getNumSpeakers();
     /**
     * @brief set the current output speaker 
     * @param newIdx the index of next speaker
     */
-    void set_current_speaker(Index newIdx);
+    void setCurrSpeaker(Index newIdx);
     /**
     * @brief TODO 
     * @param idxs
@@ -131,4 +118,4 @@ private:
 }; 
 
 } //namespace zerr
-#endif // ENVELOPEGENERATOR_H
+#endif // CORE_ENVELOPEGENERATOR_H
