@@ -134,11 +134,11 @@ class SpeakerManager {
     /**
     * @brief get the pair of speaker indexs in sorted list acoording to the trajectory input
     */
-    Pair get_indexs_by_trajectory(Param trajectory_val);
+    Pair getIndexesByTrajectory(Param trajVal);
     /**
     * @brief TODO
     */
-    Param get_panning_ratio(Param trajectory_val);
+    Param getPanningRatio(Param trajVal);
     /**
     * @brief get the index of speaker that is geometrially close to the input. 
     *        This method is obsolete and will be removed in the future.

@@ -187,29 +187,32 @@ Speaker SpeakerManager::get_speaker_by_index(Index spkr_idx){
 }
 
 
-Pair SpeakerManager::get_indexs_by_trajectory(Param trajectory_val){
-    // Clip the input trajectory to [0.0,1.0]
-    trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
-    trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
+Pair SpeakerManager::getIndexesByTrajectory(Param trajVal){
+    trajVal = trajVal<0.0?0.0:trajVal;
 
-    Param scaled = trajectory_val * (trajVector.size() - 1);
+    trajVal = trajVal - std::floor(trajVal);
 
-    Index lower = trajVector[std::floor(scaled)];
-    Index upper = trajVector[std::ceil(scaled)];
+    Index scaleUp = std::ceil(trajVal * trajVector.size());
+    Index scaleDown = std::floor(trajVal * trajVector.size());
+
+    // wrap the index back to 0
+    scaleUp = scaleUp % trajVector.size();
+
+    Index lower = trajVector[scaleDown];
+    Index upper = trajVector[scaleUp];
 
     return std::make_pair(lower, upper);
 }
 
 
-Param SpeakerManager::get_panning_ratio(Param trajectory_val){
-    trajectory_val = trajectory_val>1.0?1.0:trajectory_val;
-    trajectory_val = trajectory_val<0.0?0.0:trajectory_val;
+Param SpeakerManager::getPanningRatio(Param trajVal){
+    trajVal = trajVal<0.0?0.0:trajVal;
 
-    // trajectory_val = trajectory_val;
+    trajVal = trajVal - std::floor(trajVal);
 
-    Param scaled = trajectory_val * (trajVector.size() - 1);
+    Param scaled = trajVal * trajVector.size();
 
-    return (scaled - std::floor(scaled)) / (std::ceil(scaled) - std::floor(scaled));
+    return (scaled - std::floor(scaled));
 }
 
 
@@ -260,15 +263,21 @@ Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<
 Index SpeakerManager::getIndexesByTrigger(Param trigger, Mode mode){
     // just return the original one when trigger doesn't close to 1.0
     if (!isEqualTo1(trigger, TRIGGER_THRESHOLD)) return currIdx;
+    Index selected;
     // load all connected speakers from the topology matrix
     Indexes candidates = topoMatrix[currIdx];
+    int numCandidates = candidates.size();
     // if only one speaker connected to the current one, just return it
-    if (candidates.size()==1) return candidates[0];
+    if (numCandidates==1) {
+        selected = candidates[0];
+    }
+    else {
+        selected = candidates[_get_random_indexs(numCandidates, 1)[0]];
+    }
 
-    Index selected;
-    int n_candidates = candidates.size();
+    // int n_candidates = candidates.size();
 
-    selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
+    // selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
     // switch(mode){
     //     case 0: // "Random"
     //         selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
@@ -281,7 +290,7 @@ Index SpeakerManager::getIndexesByTrigger(Param trigger, Mode mode){
     // }
     currIdx = selected;
 
-    return selected;
+    return currIdx;
 }
 
 
@@ -445,27 +454,26 @@ void SpeakerManager::_init_distance_matrix(){
 
 Index SpeakerManager::_find_nearest(Index curr_spkr, Indexes candidates){
     //TODO: seems incorrect
-    Param min_distance = distance_matrix[curr_spkr][0];
+    Param minDistance = distance_matrix[curr_spkr][0];
     Index nearest = candidates[0];
-    Param tmp_distance;
+    Param tmpDistance;
     for (size_t i = 1; i < candidates.size(); ++i){
-        tmp_distance = distance_matrix[curr_spkr][i];
-        if (min_distance > tmp_distance){
+        tmpDistance = distance_matrix[curr_spkr][i];
+        if (minDistance > tmpDistance){
             nearest = candidates[i];
-            min_distance = tmp_distance;
+            minDistance = tmpDistance;
         }
     }
-
     return nearest;
 }
 
 
-float SpeakerManager::_calculate_distance(Speaker s1, Speaker s2){
-    float dx = s1.get_x() - s2.get_x();
-    float dy = s1.get_y() - s2.get_y();
-    float dz = s1.get_z() - s2.get_z();
+Param SpeakerManager::_calculate_distance(Speaker s1, Speaker s2){
+    Param dx = s1.get_x() - s2.get_x();
+    Param dy = s1.get_y() - s2.get_y();
+    Param dz = s1.get_z() - s2.get_z();
 
-    float distance = std::sqrt(dx * dx + dy * dy + dz * dz);
+    Param distance = std::sqrt(dx * dx + dy * dy + dz * dz);
 
     return distance;
 }

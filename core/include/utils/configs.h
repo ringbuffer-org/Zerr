@@ -7,9 +7,8 @@
 
 #define TRIGGER_THRESHOLD 1e-4  /**< TODO  */
 
-#define PI 3.14159265           /**< TODO  */
+#define PI 3.14159265           /**< Macro definition for Pi  */
 
-// #define AUDIO_BUFFER_SIZE 1024  /**< TODO  */
 #define AUDIO_BUFFER_SIZE 2048  /**< TODO  */
 
 #define VOLUME_THRESHOLD  1e-4  /**< TODO  */

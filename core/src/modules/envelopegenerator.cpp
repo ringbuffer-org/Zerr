@@ -12,8 +12,6 @@ using zerr::EnvelopeGenerator;
 using zerr::Blocks;
 using zerr::Param;
 
-// using std::sqrt;
-
 EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speakerCfgs, Mode genMode){
     this->systemCfgs = systemCfgs;
     this->speakerCfgs = speakerCfgs;
@@ -22,6 +20,8 @@ EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speak
     speakerManager = new SpeakerManager(this->speakerCfgs);
 
     logger = new Logger();
+
+    onsetDetector = new OnsetDetector(50);
 
     #ifdef TESTMODE
     logger->setLogLevel(LogLevel::INFO);
@@ -59,19 +59,11 @@ bool EnvelopeGenerator::initialize(){
         indexChannelLookup[indexes[i]] = i;
     }
 
-    // initialize  trigger mode specified parameters
+    // initialize trigger mode specified parameters
     if (genMode == "trigger") {
-        // currIdx = speakerManager->get_random_index(); // TODO(Zeyu Yang): gives option to set init
         speakerManager->setCurrentSpeaker(speakerManager->get_random_index());
-        // logger->logInfo(formatString("Current Speaker ID: %d", currIdx));
         triggerMode = "random"; 
     }
-
-    // initialize  trigger mode specified parameters
-    // if (genMode == "trajectory") {
-    //     firstSpkrGains.resize(numOutlet, 0.0f);
-    //     secondSpkrGains.resize(numOutlet, 0.0f);
-    // }
 
     // initialized
     return true;
@@ -125,16 +117,16 @@ void EnvelopeGenerator::printParameters(){
 EnvelopeGenerator::~EnvelopeGenerator() {
     delete speakerManager;
     delete logger;
+    delete onsetDetector;
 }
 
 
 void EnvelopeGenerator::_processTrigger(){
     size_t channel;
     Params distances;  // distances between speakers
-    Samples onsets;
     Param powerSum; // the overall power
     Param gain;
-    int currIdx;
+    Index currIdx;
 
     // empty the outputBuffers
     for (auto& buffer : outputBuffers) {
@@ -147,12 +139,12 @@ void EnvelopeGenerator::_processTrigger(){
     Samples& volume = inputBuffers[2];
 
     // process trigger blocks: detect onsets
-    // detector.detectOnsetInBlock(triggr)
+    onsetDetector->detectOnsetInBlock(triggr);
 
     // calculate the envelopes TODO: add interpolator
     for (size_t cnt = 0; cnt < inputBuffers[0].size(); ++cnt){
         // find main speaker
-        currIdx = speakerManager->getIndexesByTrigger(inputBuffers[0][cnt], triggerMode);
+        currIdx = speakerManager->getIndexesByTrigger(triggr[cnt], triggerMode);
         channel = indexChannelLookup[currIdx];  // get the channel of the current speaker
         outputBuffers[channel][cnt] = 1.0;
         powerSum = 1.0;
@@ -180,9 +172,6 @@ void EnvelopeGenerator::_processTrajectory(){
 
     Param panRatio;
 
-    // Param powerTmp;
-    // Param powerSum;
-
     Params distances;
 
     for (auto& buffer : outputBuffers) {
@@ -194,7 +183,7 @@ void EnvelopeGenerator::_processTrajectory(){
     Samples& volume =  inputBuffers[2];
 
     for (size_t cnt = 0; cnt < trjcty.size(); ++cnt) {
-        speakerPair = speakerManager->get_indexs_by_trajectory(trjcty[cnt]);
+        speakerPair = speakerManager->getIndexesByTrajectory(trjcty[cnt]);
 
         channelPair.first  = indexChannelLookup[speakerPair.first];
         channelPair.second = indexChannelLookup[speakerPair.second];
@@ -203,76 +192,10 @@ void EnvelopeGenerator::_processTrajectory(){
             outputBuffers[channelPair.first][cnt] = volume[cnt];
         } 
         else { // linear panning TODO: change to parameterized crossfade 
-            panRatio = speakerManager->get_panning_ratio(trjcty[cnt]);
+            panRatio = speakerManager->getPanningRatio(trjcty[cnt]);
             outputBuffers[channelPair.first][cnt]  = volume[cnt] * (1 - panRatio);
             outputBuffers[channelPair.second][cnt] = volume[cnt] * panRatio;
         }
-
-
-        // distances = speakerManager->get_distance_vector(channelPair.first);
-        // for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl) {
-        //     if (chnl == channelPair.first) {
-        //         firstSpkrGains[chnl] = 1.0;
-        //     }
-        //     powerTmp = _calculateGain(distances[chnl], spread[cnt]);
-        //     // firstSpkrGains[chnl] = powerTmp * powerTmp;
-        //     firstSpkrGains[chnl] = powerTmp;
-        //     // powerSum += powerTmp * powerTmp;
-        // }
-        // normalize the first overall power
-        // for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl){
-        //     firstSpkrGains[chnl] = sqrt(firstSpkrGains[chnl] / powerSum);
-        // }
-
-        // calculate second spread gains
-        // powerSum = 1.0;
-        // distances = speakerManager->get_distance_vector(channelPair.second);
-        // for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl){
-        //     if (chnl == channelPair.second) {
-        //         secondSpkrGains[chnl] = 1.0;
-        //     }
-        //     power = pow(_calculateGain(distances[chnl], spread[cnt]),2);
-        //     secondSpkrGains[chnl] = power;
-        //     powerSum += power;
-        // }
-        // // normalize the second overall power
-        // for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl){
-        //     secondSpkrGains[chnl] = sqrt(secondSpkrGains[chnl] / powerSum);
-        // }
-
-        // panRatio = speakerManager->get_panning_ratio(trjcty[cnt]);
-
-
-        // // normalize the overall power
-        // for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl){
-        //     outputBuffers[chnl][cnt] = (firstSpkrGains[chnl] * (1 - panRatio)
-        //                 + secondSpkrGains[chnl] * panRatio) * volume[cnt];
-        // }
-
-
-
-        // if (speakerPair.first == speakerPair.second) {
-        //     outputBuffers[channelPair.first][cnt] = volume[cnt];
-        // } 
-        // else { // linear panning TODO: change to parameterized crossfade 
-        //     panRatio = speakerManager->get_panning_ratio(trjcty[cnt]);
-        //     outputBuffers[channelPair.first][cnt]  = volume[cnt] * (1 - panRatio);
-        //     outputBuffers[channelPair.second][cnt] = volume[cnt] * panRatio;
-        // }
-
-        // // process the spread of the first speaker
-        // distances = speakerManager->get_distance_vector(speakerPair.first);
-        // for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl){
-        //     if (chnl == channelPair.first) {continue;}
-        //     outputBuffers[chnl][cnt] += _calculateGain(distances[chnl], spread[cnt]) * volume[chnl]; //* (1 - panRatio);
-        // }
-
-        // // process the spread of the second speaker
-        // distances = speakerManager->get_distance_vector(speakerPair.second);
-        // for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl){
-        //     if (chnl == channelPair.second) {continue;}
-        //     outputBuffers[chnl][cnt] += _calculateGain(distances[chnl], spread[cnt]) * volume[chnl]; //* panRatio;
-        // }
     }
 }
 

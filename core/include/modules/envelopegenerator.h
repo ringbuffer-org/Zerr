@@ -14,6 +14,7 @@
 
 #include "logger.h"
 #include "speakermanager.h"
+#include "onsetdetector.h"
 
 namespace zerr {
 /**
@@ -85,11 +86,6 @@ class EnvelopeGenerator {
     typedef void (EnvelopeGenerator::*ProcessFunction)();
     ProcessFunction processFunc;
 
-    // Index currIdx;  /**< The index of current output speaker. This is only used for trigger mode. */
-    
-    // Samples firstSpkrGains;
-    // Samples secondSpkrGains;
-
     SystemConfigs systemCfgs;  /**< System configurations: sample rate, block size etc. */
 
     ConfigPath    speakerCfgs;     /**< Path to the speaker array setup configuration file */
@@ -101,6 +97,7 @@ class EnvelopeGenerator {
 
     SpeakerManager        *speakerManager; /**< SpeakerManger object to access the speaker array information */
     Logger                *logger;         /**< Logger object for printing logs to all kinds of console */
+    OnsetDetector         *onsetDetector;
 
     std::map<Index, size_t> indexChannelLookup;  /**< index to channel reverse lookup table */
     /**

@@ -32,6 +32,8 @@ zerr_disperser~.class.sources += ../core/src/modules/audiodisperser.cpp
 zerr_envelopes~.class.sources += src/zerr_envelopes.cpp
 zerr_envelopes~.class.sources += ../core/src/modules/envelopegenerator.cpp
 zerr_envelopes~.class.sources += ../core/src/modules/speakermanager.cpp
+zerr_envelopes~.class.sources += ../core/src/utils/onsetdetector.cpp
+
 
 zerr_features~.class.sources += src/zerr_features.cpp
 zerr_features~.class.sources += ../core/src/modules/featurebank.cpp
