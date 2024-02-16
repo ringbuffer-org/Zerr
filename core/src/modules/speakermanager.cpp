@@ -257,11 +257,11 @@ Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<
 }
 
 
-Index SpeakerManager::get_indexs_by_trigger(Param trigger, Index curr_spkr, Mode mode){
+Index SpeakerManager::getIndexesByTrigger(Param trigger, Mode mode){
     // just return the original one when trigger doesn't close to 1.0
-    if (!isEqualTo1(trigger, TRIGGER_THRESHOLD)) return curr_spkr;
+    if (!isEqualTo1(trigger, TRIGGER_THRESHOLD)) return currIdx;
     // load all connected speakers from the topology matrix
-    Indexes candidates = topoMatrix[curr_spkr];
+    Indexes candidates = topoMatrix[currIdx];
     // if only one speaker connected to the current one, just return it
     if (candidates.size()==1) return candidates[0];
 
@@ -274,11 +274,12 @@ Index SpeakerManager::get_indexs_by_trigger(Param trigger, Index curr_spkr, Mode
     //         selected = candidates[_get_random_indexs(n_candidates, 1)[0]];
     //         break;
     //     case 1: // "Nearest"
-    //         selected = _find_nearest(curr_spkr, candidates);
+    //         selected = _find_nearest(currIdx, candidates);
     //         break;
     //     default:
     //         throw std::invalid_argument( "Unknow trigger mode.");
     // }
+    currIdx = selected;
 
     return selected;
 }
@@ -308,6 +309,20 @@ void SpeakerManager::setActiveSpeakers(std::string action, Indexes idxs){
     #endif  // TESTMODE
 }
 
+void SpeakerManager::setCurrentSpeaker(Index newIdx) {
+    if(!isInVec<Index>(newIdx, actvSpkIdx)) {
+        logger->logError(formatString("SpeakerManager: speaker %d is not activated!", newIdx));
+        return;
+    }
+    else {
+        currIdx = newIdx;
+    }
+
+    #ifdef TESTMODE
+    logger->logDebug(formatString("EnvelopeGenerator::initialize currIdx %d", currIdx));
+    #endif  // TESTMODE
+}
+
 
 void SpeakerManager::setTrajectoryVector(Indexes idxs){
     Indexes tmpTrajVector;
@@ -315,7 +330,8 @@ void SpeakerManager::setTrajectoryVector(Indexes idxs){
         if(!isInVec<Index>(idxs[i], actvSpkIdx)) {
             logger->logError(formatString("SpeakerManager: speaker %d is not activated!", idxs[i]));
             return;
-        }else{
+        }
+        else {
             tmpTrajVector.push_back(idxs[i]);
         }
     }

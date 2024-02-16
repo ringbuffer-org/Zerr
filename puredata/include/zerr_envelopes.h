@@ -2,18 +2,17 @@
  * @file zerr_envelopes.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief EnvelopeGenerator Class Puredata Wrapper
- * @version 0.4
  * @date 2023-08-04
  * 
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023-2024
  */
 #pragma once
 
-#include <stdlib.h>
-#include <string>
+// #include <stdlib.h>
+// #include <string>
 
 #include "types.h"
-#include "utils.h"
+// #include "utils.h"
 #include "ringbuffer.h"
 #include "logger.h"
 
@@ -50,6 +49,10 @@ class ZerrEnvelopes{
     * @brief TODO
     */
     void setActiveSpeakerIndexs(char* action, int* idxs, size_t size);
+    /**
+    * @brief TODO
+    */
+    void setCurrentSpeaker(int idx);
     /**
     * @brief TODO
     */

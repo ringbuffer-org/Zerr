@@ -71,6 +71,11 @@ void ZerrEnvelopes::setActiveSpeakerIndexs(char* action, int* idxs, size_t size)
     envelopeGenerator->setActiveSpeakerIndexs(action, indexVec);
 }
 
+void ZerrEnvelopes::setCurrentSpeaker(int idx){
+    zerr::Index newIdx = idx;
+    envelopeGenerator->setCurrentSpeaker(newIdx);
+}
+
 void ZerrEnvelopes::setTopoMatrix(char* action, int* idxs, size_t size) {
     zerr::Indexes indexVec(idxs, idxs + size);
     envelopeGenerator->setTopoMatrix(action, indexVec);

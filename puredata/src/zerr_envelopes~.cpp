@@ -122,6 +122,21 @@ void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x,
     x->z->setActiveSpeakerIndexs(action, indexs_list, argc-1);
 }
 
+
+void zerr_envelopes_tilde_current_speaker(zerr_envelopes_tilde *x,
+    __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
+
+    if (argc < 1) {
+        pd_error(x, "zerr_envelopes~: not enough args to parse");
+        return;
+    }
+
+    int speaker_index = (int)argv[0].a_w.w_float;
+
+    x->z->setCurrentSpeaker(speaker_index);
+}
+
+
 void zerr_envelopes_tilde_topomatrix(zerr_envelopes_tilde *x,
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
 
@@ -148,7 +163,7 @@ void zerr_envelopes_tilde_topomatrix(zerr_envelopes_tilde *x,
         indexs_list[i] = (int)argv[i+1].a_w.w_float;
     }
 
-    x->z->setTopoMatrix(action, indexs_list, argc-1);
+    x->z->setTopoMatrix(action, indexs_list, idx_size);
 }
 
 
@@ -159,25 +174,18 @@ void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x,
         return;
     }
 
-    if (argv[0].a_type != A_SYMBOL) {
-        pd_error(x, "zerr_envelopes~: no action given");
-        return;
-    }
-
-    char* action = strdup(atom_getsymbol(argv)->s_name);
-
-    int idx_size = argc-1;
+    int idx_size = argc;
     int *indexs_list = (int *)getbytes(idx_size* sizeof(int));
 
     for (int i = 0; i < idx_size; ++i) {
-        if (argv[i+1].a_type != A_FLOAT) {
+        if (argv[i].a_type != A_FLOAT) {
             pd_error(x, "zerr_envelopes~: incorrect index number");
             return;
         }
-        indexs_list[i] = (int)argv[i+1].a_w.w_float;
+        indexs_list[i] = (int)argv[i].a_w.w_float;
     }
 
-    x->z->setTrajectoryVector(indexs_list, argc-1);
+    x->z->setTrajectoryVector(indexs_list, idx_size);
 }
 
 
@@ -218,6 +226,12 @@ void zerr_envelopes_tilde_setup(void) {
     class_addmethod(zerr_envelopes_tilde_class,
         (t_method) zerr_envelopes_tilde_active_speakers,
         gensym("active"),
+        A_GIMME,
+        A_NULL);
+
+    class_addmethod(zerr_envelopes_tilde_class,
+        (t_method) zerr_envelopes_tilde_current_speaker,
+        gensym("curr"),
         A_GIMME,
         A_NULL);
 

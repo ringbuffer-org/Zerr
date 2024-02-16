@@ -148,7 +148,7 @@ class SpeakerManager {
     * @brief jump between different speakers using trigger signal
     * the 
     */
-    Index get_indexs_by_trigger(Param trigger, Index curr_spkr, Mode mode);
+    Index getIndexesByTrigger(Param trigger, Mode mode);
     /**
     * @brief TODO
     */
@@ -165,6 +165,10 @@ class SpeakerManager {
     * @brief TODO
     */
     void setActiveSpeakers(std::string action, Indexes idxs);
+    /**
+    * @brief TODO
+    */
+    void setCurrentSpeaker(Index newIdx);
     /**
     * @brief TODO
     */
@@ -192,6 +196,7 @@ class SpeakerManager {
     std::map<Index, Params> distance_matrix; /**< TODO */
 
     // specific speaker configurations
+    Index                       currIdx;
     Indexes                     actvSpkIdx;    /**< TODO */
     Indexes                     trajVector;    /**< TODO */
     TopoMatrix                  topoMatrix;    /**< TODO */

@@ -9,10 +9,10 @@
 #ifndef CORE_ENVELOPEGENERATOR_H
 #define CORE_ENVELOPEGENERATOR_H
 
-#include "utils.h"
+// #include "utils.h"
 #include "types.h"
-#include "logger.h"
 
+#include "logger.h"
 #include "speakermanager.h"
 
 namespace zerr {
@@ -51,7 +51,7 @@ class EnvelopeGenerator {
     * @brief Set the current output speaker. Only used in trigger mode.
     * @param newIdx the index of the next speaker
     */
-    void setCurrSpeaker(Index newIdx);
+    void setCurrentSpeaker(Index newIdx);
     /**
     * @brief Add/Set/Delete the active speakers
     * @param idxs 
@@ -85,7 +85,10 @@ class EnvelopeGenerator {
     typedef void (EnvelopeGenerator::*ProcessFunction)();
     ProcessFunction processFunc;
 
-    Index currIdx;  /**< The index of current output speaker. This is only used for trigger mode. */
+    // Index currIdx;  /**< The index of current output speaker. This is only used for trigger mode. */
+    
+    // Samples firstSpkrGains;
+    // Samples secondSpkrGains;
 
     SystemConfigs systemCfgs;  /**< System configurations: sample rate, block size etc. */
 
@@ -93,8 +96,8 @@ class EnvelopeGenerator {
     Mode          genMode;   /**< The strategy for generating envelope: trigger | trajectory */
     Mode          triggerMode;     /**< The strategy for choosing the next speaker to jump to using trigger with topology */
 
-    AudioBuffers            inputBuffer;    /**< multi-channel input buffer in the shape of input channel number x block size */
-    AudioBuffers           outputBuffer;    /**< multi-channel output buffer in the shape of output channel number x block size */
+    AudioBuffers            inputBuffers;    /**< multi-channel input buffer in the shape of input channel number x block size */
+    AudioBuffers           outputBuffers;    /**< multi-channel output buffer in the shape of output channel number x block size */
 
     SpeakerManager        *speakerManager; /**< SpeakerManger object to access the speaker array information */
     Logger                *logger;         /**< Logger object for printing logs to all kinds of console */
@@ -104,11 +107,11 @@ class EnvelopeGenerator {
     * @brief trigger mode envelope generation process. 
     *           jump to a new output speaker when ever a trigger received
     */
-    void _process_trigger();
+    void _processTrigger();
     /**
     * @brief trajectory mode envelope generation process.
     */
-    void _process_trajectory();
+    void _processTrajectory();
     /**
     * @brief setup the indexChannelLookup
     * @param the unmasked speaker indexs
