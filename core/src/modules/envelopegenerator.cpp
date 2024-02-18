@@ -54,14 +54,14 @@ bool EnvelopeGenerator::initialize(){
     outputBuffers.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
     // setup index to channel reverse lookup table
-    Indexes indexes = speakerManager->getActiveSpeakerIndexs();
+    Indexes indexes = speakerManager->getActiveSpeakerIndexes();
     for (size_t i = 0; i < indexes.size(); ++i){
         indexChannelLookup[indexes[i]] = i;
     }
 
     // initialize trigger mode specified parameters
     if (genMode == "trigger") {
-        speakerManager->setCurrentSpeaker(speakerManager->get_random_index());
+        speakerManager->setCurrentSpeaker(speakerManager->getRandomIndex());
         triggerMode = "random"; 
     }
 
@@ -150,7 +150,7 @@ void EnvelopeGenerator::_processTrigger(){
         powerSum = 1.0;
 
         // calculate spread gains
-        distances = speakerManager->get_distance_vector(currIdx);
+        distances = speakerManager->getDistanceVector(currIdx);
         for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl){
             if (chnl == channel) {continue;}
             gain = _calculateGain(distances[chnl], spread[cnt]);
