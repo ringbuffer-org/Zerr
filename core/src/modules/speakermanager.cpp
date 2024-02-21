@@ -1,3 +1,12 @@
+/**
+ * @file speakermanager.cpp
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief  Speaker & SpeakerManager Classes Implementation
+ * @date 2024-02-18
+ * 
+ * @copyright Copyright (c) 2023-2024
+ * 
+ */
 #include "speakermanager.h"
 using namespace zerr;
 

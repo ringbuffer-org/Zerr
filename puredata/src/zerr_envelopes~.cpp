@@ -1,19 +1,33 @@
 /**
  * @file zerr_envelopes~.cpp
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief zerr_envelopes~ Pure Data External
+ * @brief Implementation of the zerr_envelopes~ object for Pure Data.
+ *        This external allows for dynamic spatial audio manipulation within Pure Data,
+ *        providing functionalities such as speaker activation, trajectory following, and more.
  * @date 2024-01-30
  * 
  * @copyright Copyright (c) 2023-2024
  */
+
 #include "./zerr_envelopes_tilde.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+// Declaration of the class for the zerr_envelopes~ object
 static t_class *zerr_envelopes_tilde_class;
 
+
+/**
+ * @brief Constructor for the zerr_envelopes~ object.
+ *        Initializes the object with system configuration, analysis arguments,
+ *        and sets up inlets and outlets based on provided attributes.
+ * @param s Unused symbol parameter, typical in Pd externals.
+ * @param argc Count of additional arguments passed during object creation.
+ * @param argv Array of t_atom representing the additional arguments.
+ * @return void* Pointer to the newly created zerr_envelopes_tilde object.
+ */
 void *zerr_envelopes_tilde_new(__attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
     zerr_envelopes_tilde *x = (zerr_envelopes_tilde *)
                 pd_new(zerr_envelopes_tilde_class);
@@ -74,12 +88,23 @@ void *zerr_envelopes_tilde_new(__attribute__((unused)) t_symbol *s, int argc, t_
 }
 
 
+/**
+ * @brief Destructor for the zerr_envelopes~ object.
+ *        Cleans up resources allocated during object creation.
+ * @param x Pointer to the zerr_envelopes_tilde object to be freed.
+ */
 void zerr_envelopes_tilde_free(zerr_envelopes_tilde *x) {
     freebytes(x->x_vec, x->n_outlet * sizeof(*x->x_vec));
     delete x->z;
 }
 
 
+/**
+ * @brief The perform method for the zerr_envelopes~ object.
+ *        This is where the audio processing happens.
+ * @param w Pointer to an array containing the object instance and audio vectors.
+ * @return t_int* Pointer to the next element in the DSP chain.
+ */
 static t_int *zerr_envelopes_tilde_perform(t_int *w) {
     zerr_envelopes_tilde *x = (zerr_envelopes_tilde *) w[1];
     int n_vec     = (int) w[2];
@@ -93,6 +118,14 @@ static t_int *zerr_envelopes_tilde_perform(t_int *w) {
 }
 
 
+
+/**
+ * @brief Method to dynamically adjust active speakers.
+ * @param x Pointer to the zerr_envelopes_tilde object.
+ * @param s Unused symbol parameter.
+ * @param argc Count of arguments passed.
+ * @param argv Array of t_atom representing the arguments.
+ */
 void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x,
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
 
@@ -123,6 +156,13 @@ void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x,
 }
 
 
+/**
+ * @brief Method to set the current active speaker.
+ * @param x Pointer to the zerr_envelopes_tilde object.
+ * @param s Unused symbol parameter.
+ * @param argc Count of arguments passed.
+ * @param argv Array of t_atom representing the arguments.
+ */
 void zerr_envelopes_tilde_current_speaker(zerr_envelopes_tilde *x,
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
 
@@ -137,6 +177,13 @@ void zerr_envelopes_tilde_current_speaker(zerr_envelopes_tilde *x,
 }
 
 
+/**
+ * @brief Method to adjust the topological matrix of speakers.
+ * @param x Pointer to the zerr_envelopes_tilde object.
+ * @param s Unused symbol parameter.
+ * @param argc Count of arguments passed.
+ * @param argv Array of t_atom representing the arguments.
+ */
 void zerr_envelopes_tilde_topomatrix(zerr_envelopes_tilde *x,
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
 
@@ -167,6 +214,13 @@ void zerr_envelopes_tilde_topomatrix(zerr_envelopes_tilde *x,
 }
 
 
+/**
+ * @brief Method to set the trajectory of sound movement among speakers.
+ * @param x Pointer to the zerr_envelopes_tilde object.
+ * @param s Unused symbol parameter.
+ * @param argc Count of arguments passed.
+ * @param argv Array of t_atom representing the arguments.
+ */
 void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x,
     __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
     if (argc < 2) {
@@ -189,12 +243,45 @@ void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x,
 }
 
 
+/**
+ * @brief TODO
+ * @param x Pointer to the zerr_envelopes_tilde object.
+ * @param s Unused symbol parameter.
+ * @param argc Count of arguments passed.
+ * @param argv Array of t_atom representing the arguments.
+ */
+void zerr_envelopes_tilde_trigger_interval(zerr_envelopes_tilde *x, 
+    __attribute__((unused)) t_symbol *s, int argc, t_atom *argv) {
+
+    if (argc < 1) {
+        pd_error(x, "zerr_envelopes~: not enough args to parse");
+        return;
+    }
+
+    float interval = argv[0].a_w.w_float;  // ms
+
+    x->z->setTriggerInterval(interval);
+}
+
+
+
+/**
+ * @brief Method to print the current configuration parameters of the object.
+ * @param x Pointer to the zerr_envelopes_tilde object.
+ * @param s Unused symbol parameter.
+ */
 void zerr_envelopes_tilde_print(
     zerr_envelopes_tilde *x, t_symbol *s) {
 
     x->z->printParameters();
 }
 
+
+/**
+ * @brief Adds the zerr_envelopes~ object to the DSP chain.
+ * @param x Pointer to the zerr_envelopes_tilde object.
+ * @param sp Array of t_signal pointers representing the incoming signals.
+ */
 void zerr_envelopes_tilde_dsp(zerr_envelopes_tilde *x, t_signal **sp) {
     int n_rest = 3;  // size of [x, n_vec, n_args]
 
@@ -215,6 +302,10 @@ void zerr_envelopes_tilde_dsp(zerr_envelopes_tilde *x, t_signal **sp) {
 }
 
 
+/**
+ * @brief Setup function for the zerr_envelopes~ object.
+ *        Registers the object with Pure Data, defining its constructor, destructor, and DSP method.
+ */
 void zerr_envelopes_tilde_setup(void) {
     zerr_envelopes_tilde_class = class_new(gensym("zerr_envelopes~"),
         (t_newmethod) zerr_envelopes_tilde_new,
@@ -244,6 +335,12 @@ void zerr_envelopes_tilde_setup(void) {
     class_addmethod(zerr_envelopes_tilde_class,
         (t_method) zerr_envelopes_tilde_trajectory,
         gensym("traj"),
+        A_GIMME,
+        A_NULL);
+
+    class_addmethod(zerr_envelopes_tilde_class,
+        (t_method) zerr_envelopes_tilde_trigger_interval,
+        gensym("interval"),
         A_GIMME,
         A_NULL);
 

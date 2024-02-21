@@ -109,6 +109,13 @@ void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs){
 }
 
 
+void EnvelopeGenerator::setTriggerInterval(Param newInterval){
+    newInterval = newInterval<0?0:newInterval;
+    int newThreshold = (int)(newInterval / 1000.0 * systemCfgs.sample_rate); 
+    onsetDetector->setDebounceThreshold(newThreshold);
+}
+
+
 void EnvelopeGenerator::printParameters(){
     speakerManager->printParameters();
 }

@@ -2,6 +2,9 @@
  * @file envelopegenerator.h 
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief Zerr* Envelope Generator Class Header
+ *        The EnvelopeGenerator class is designed for generating audio envelopes based on input control signals
+ *        and speaker array configurations. It supports various generation modes and can manipulate speaker activation
+ *        and trajectory for dynamic spatial audio experiences.
  * @date 2024-02-07
  * 
  * @copyright Copyright (c) 2023-2024
@@ -9,7 +12,6 @@
 #ifndef CORE_ENVELOPEGENERATOR_H
 #define CORE_ENVELOPEGENERATOR_H
 
-// #include "utils.h"
 #include "types.h"
 
 #include "logger.h"
@@ -17,36 +19,46 @@
 #include "onsetdetector.h"
 
 namespace zerr {
+
 /**
-* @brief EnvelopeGenerator generates evelopes according to the input control signals
-*  and the speaker array setups. 
-*/
+ * @class EnvelopeGenerator
+ * @brief Generates envelopes according to input control signals and speaker array setups.
+ * 
+ * This class provides functionalities for envelope generation in a spatial audio context, 
+ * allowing dynamic interaction with a configured speaker array. It supports multiple generation
+ * modes including trigger and trajectory-based envelope shaping.
+ */
 class EnvelopeGenerator { 
  public:
-    const int numInlet = 3;    /**< number of inlets: main(1)/spread(2)/valume(3) */
-    int       numOutlet;       /**< number of outlets: assgined according to the speaker configuration*/
+    const int numInlet = 3;    ///< Number of inlets: main(1), spread(2), volume(3).
+    int       numOutlet;       ///< Number of outlets, assigned according to the speaker configuration.
     /**
     * @brief Constructor of EnvelopeGenerator setups the parameters for initializing this Class.
+    * 
     * @param systemCfgs System configuration: sample rate, block size etc.
     * @param spkrCfgFile Path to the speaker array setup configuration file to initialize the SpeakerManager 
     * @param selectionMode The strategy for generating envelope: trigger | trajectory
     */
     EnvelopeGenerator(SystemConfigs systemCfgs, ConfigPath speakerCfgs, Mode genMode);
     /**
-    * @brief Initialize the EnvelopeGenerator. initialize SpeakerManager, set numOutlet, initialize I/O buffer
+    * @brief Initialize the EnvelopeGenerator. 
+    * 
+    * Initialize SpeakerManager, set numOutlet, initialize I/O buffer
     * @return bool whether correctly initialized
     */
     bool initialize();
     /**
-    * @brief Main callback function of EnvelopeGenerator class.  
+    * @brief Main callback function of EnvelopeGenerator class.
+    * 
     * @param in input multi-channel audio blocks
-    * @return the generated multi-channel envelopes
+    * @return Blocks The generated multi-channel envelopes.
     */
     Blocks perform(Blocks in);
     /**
-    * @brief Get the number of active speaker of current speaker array setup
-    * @return int number of active speakers
-    */
+     * @brief Gets the number of active speakers in the current speaker array setup.
+     * 
+     * @return int Number of active speakers.
+     */
     int getNumSpeakers();
     /**
     * @brief Set the current output speaker. Only used in trigger mode.
@@ -69,6 +81,10 @@ class EnvelopeGenerator {
     * @brief TODO
     */
     void setTopoMatrix(std::string action, Indexes idxs);
+    /**
+    * @brief TODO
+    */
+    void setTriggerInterval(Param newInterval);
     /**
     * @brief TODO
     */

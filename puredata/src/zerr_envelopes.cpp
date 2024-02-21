@@ -88,6 +88,12 @@ void ZerrEnvelopes::setTrajectoryVector(int* idxs, size_t size){
 }
 
 
+void ZerrEnvelopes::setTriggerInterval(float interval) {
+    zerr::Param newInterval = interval;
+    envelopeGenerator->setTriggerInterval(newInterval);
+}
+
+
 void ZerrEnvelopes::printParameters(){
     envelopeGenerator->printParameters();
 }

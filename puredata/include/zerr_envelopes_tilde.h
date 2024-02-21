@@ -90,6 +90,12 @@ void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x, t_symbol *s, int a
 
 /**
  * @memberof zerr_envelopes_tilde
+ * @brief TODO
+ */
+void zerr_envelopes_tilde_trigger_interval(zerr_envelopes_tilde *x, t_symbol *s, int argc, t_atom *argv);
+
+/**
+ * @memberof zerr_envelopes_tilde
  * @brief posts current statue to the debug console
  */
 void zerr_envelopes_tilde_print(zerr_envelopes_tilde *x, t_symbol *s);

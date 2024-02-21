@@ -63,6 +63,10 @@ class ZerrEnvelopes{
     */
     void setTrajectoryVector(int* idxs, size_t size);
     /**
+    * @brief TODO
+    */
+    void setTriggerInterval(float interval);
+    /**
     * @brief print current statue
     */
     void printParameters();
