@@ -22,16 +22,3 @@ The main branch contains only the source code and configuration files of Zerr* s
 
 **Tests** branch  is used for unit testing and debugging of each Zerr* module. This means you don't need to care about this branch :)
 
-<!---
-      ___           ___           ___           ___
-     /  /\         /  /\         /  /\         /  /\
-    /  /::|       /  /:/_       /  /::\       /  /::\
-   /  /:/:|      /  /:/ /\     /  /:/\:\     /  /:/\:\
-  /  /:/|:|__   /  /:/ /:/_   /  /:/~/:/    /  /:/~/:/
- /__/:/ |:| /\ /__/:/ /:/ /\ /__/:/ /:/___ /__/:/ /:/___
- \__\/  |:|/:/ \  \:\/:/ /:/ \  \:\/:::::/ \  \:\/:::::/
-     |  |:/:/   \  \::/ /:/   \  \::/~~~~   \  \::/~~~~
-     |  |::/     \  \:\/:/     \  \:\        \  \:\
-     |  |:/       \  \::/       \  \:\        \  \:\
-     |__|/         \__\/         \__\/         \__\/
--->

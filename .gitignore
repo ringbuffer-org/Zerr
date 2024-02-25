@@ -1,1 +1,13 @@
 .DS_Store
+*.o
+*.pd_linux
+*.pd_darwin
+*.pd_dll
+*.ipynb
+
+builddir/
+fftw3/
+yaml-cpp/
+html/
+latex/
+
