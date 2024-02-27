@@ -1,5 +1,0 @@
-#N canvas 488 204 1367 778 12;
-#X obj 150 143 noise~;
-#X obj 220 143 osc~ 110;
-#X obj 310 143 phasor~ 30;
-#X obj 148 226 zerr_disperser~ 3, f 62;
