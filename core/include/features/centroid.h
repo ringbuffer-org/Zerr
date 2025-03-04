@@ -1,25 +1,25 @@
 #ifndef CENTROID_H
 #define CENTROID_H
 
-#include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
 #include "linearinterpolator.h"
+#include "utils.h"
 
 namespace zerr {
-namespace feature{
+namespace feature {
 /**
-* Spectral Centroid algorithm
-*/
-class Centroid : public FeatureExtractor { 
-public:
-    static const std::string name; 
+ * Spectral Centroid algorithm
+ */
+class Centroid : public FeatureExtractor {
+  public:
+    static const std::string name;
     static const std::string category;
-    static const std::string description; 
+    static const std::string description;
 
-    std::string get_name(){return name;}
-    std::string get_category(){return category;}
-    std::string get_description(){return description;}
+    std::string get_name() { return name; }
+    std::string get_category() { return category; }
+    std::string get_description() { return description; }
 
     void initialize(SystemConfigs sys_cfg);
     void extract();
@@ -27,7 +27,7 @@ public:
     void fetch(AudioInputs in);
     FeatureVals send();
     // FeatureVals perform(AudioInputs x);
-private:
+  private:
     void _reset_param();
 
     FeatureVal prv_y;
@@ -38,6 +38,6 @@ private:
     LinearInterpolator linear_interpolator;
 };
 
-} //namespace feature
-} //namespace zerr
-#endif // CENTROID_H
+}  // namespace feature
+}  // namespace zerr
+#endif  // CENTROID_H

@@ -1,9 +1,9 @@
 /**
  * @file audio_features.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief Include all feature head files 
+ * @brief Include all feature head files
  * @date 2023-07-27
- * 
+ *
  * @copyright Copyright (c) 2023
  */
 
@@ -11,17 +11,17 @@
 #define FEATURES_H
 
 // time-domain features
+#include "crestfactor.h"
 #include "rootmeansquare.h"
 #include "zerocrossingrate.h"
-#include "crestfactor.h"
 
 // spectral-domain features
-#include "flux.h"
 #include "centroid.h"
-#include "rolloff.h"
 #include "flatness.h"
+#include "flux.h"
+#include "rolloff.h"
 
 // sample-level features
 #include "zerocrossings.h"
 
-#endif // FEATURES_H
+#endif  // FEATURES_H

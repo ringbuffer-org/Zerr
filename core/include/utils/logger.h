@@ -1,23 +1,23 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <iostream>
-#include <string>
 #include <ctime>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 #include "configs.h"
 
 #ifdef PUREDATA
 #include "m_pd.h"
-#endif //PUREDATA
+#endif  // PUREDATA
 
-namespace zerr{
+namespace zerr {
 
 enum class LogLevel { INFO, WARNING, ERROR, DEBUG };
 
 class Logger {
-public:
+  public:
     Logger();
 
     void setLogLevel(LogLevel level);
@@ -30,13 +30,11 @@ public:
 
     void logDebug(const std::string& debugMessage);
 
-
-private:
+  private:
     LogLevel logLevel;
 
     void log(LogLevel level, const std::string& message);
 };
 
-
-} // zerr
-#endif // LOGGER_H
+}  // namespace zerr
+#endif  // LOGGER_H

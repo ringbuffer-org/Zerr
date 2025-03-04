@@ -3,49 +3,48 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Flux::name        = "Spectral Flux";
-const std::string Flux::category    = "Frequency-Domain";
-const std::string Flux::description = "Spectral flux is a measure used in digital signal processing that quantifies how quickly the power spectrum of a signal changes. It is often used in audio analysis for onset detection and other applications.";
+const std::string Flux::name = "Spectral Flux";
+const std::string Flux::category = "Frequency-Domain";
+const std::string Flux::description =
+    "Spectral flux is a measure used in digital signal processing that "
+    "quantifies how quickly the power spectrum of a signal changes. It is "
+    "often used in audio analysis for onset detection and other applications.";
 
-void Flux::initialize(SystemConfigs sys_cfg){
+void Flux::initialize(SystemConfigs sys_cfg) {
     system_configs = sys_cfg;
 
     _reset_param();
 
-    if (is_initialized()==false){
+    if (is_initialized() == false) {
         set_initialize_statue(true);
     }
 }
 
-void Flux::extract(){
-
+void Flux::extract() {
     Param flux = 0.0;
     Param diff = 0.0;
 
     for (size_t i = 0; i < x.size(); ++i) {
-        diff  = x[i] - prv_x[i];
+        diff = x[i] - prv_x[i];
         flux += diff * diff;
     }
 
     crr_y = std::sqrt(flux);
 }
 
-void Flux::reset(){
-    _reset_param();
-}
+void Flux::reset() { _reset_param(); }
 
-void Flux::fetch(AudioInputs in){
+void Flux::fetch(AudioInputs in) {
     prv_x = x;
     x = in.spec;
 
     prv_y = crr_y;
 }
 
-FeatureVals Flux::send(){
+FeatureVals Flux::send() {
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
-    for (size_t i = 0; i < system_configs.block_size; ++i){
-
+    for (size_t i = 0; i < system_configs.block_size; ++i) {
         y[i] = linear_interpolator.get_value();
 
         linear_interpolator.next_step();
@@ -54,7 +53,7 @@ FeatureVals Flux::send(){
     return y;
 }
 
-void Flux::_reset_param(){
+void Flux::_reset_param() {
     prv_x.resize(AUDIO_BUFFER_SIZE, 0.0f);
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
 

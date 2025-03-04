@@ -4,15 +4,15 @@
 #include "configs.h"
 #include "utils.h"
 
-namespace zerr{
+namespace zerr {
 
-class LinearInterpolator{
-public:
-    void    set_value(Param start, Param stop, int len);
+class LinearInterpolator {
+  public:
+    void set_value(Param start, Param stop, int len);
     Param get_value();
-    void    next_step();
+    void next_step();
 
-private:
+  private:
     Param inter_val;
     Param start_val;
     Param stop_val;
@@ -21,6 +21,6 @@ private:
     int position;
 };
 
-} // zerr
+}  // namespace zerr
 
-#endif // LINEARINTERPOLATOR_H
+#endif  // LINEARINTERPOLATOR_H
