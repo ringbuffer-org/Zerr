@@ -1,22 +1,33 @@
 # Makefile to build Zerr* library for Pure Data.
 # Needs Makefile.pdlibbuilder as helper makefile for platform-dependent build
 # settings and rules.
-CC  = g++
-cflags = -std=c++11
-ldflags += -static # to ensure static linking(didn't test if really works)
 
-ldflags += -L../dependencies/lib/yaml-cpp 
-ldlibs += -lyaml-cpp
+CC  = g++
+cflags = -std=c++11 -Wall 
+# ldflags += -static # to ensure static linking(didn't test if really works)
+# CXXFLAGS += -I$(CONAN_INCLUDE_DIRS)
+
+include ../build/conandeps.mk
+
+ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
+ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
+# $(info    CONAN_LIB_DIRS_YAML_CPP is $(CONAN_LIB_DIRS_YAML_CPP))
+# $(info    CONAN_LIBS_YAML_CPP is $(CONAN_LIBS_YAML_CPP))
 
 # Library directory name: zerr
 lib.name = zerr
 
 # All class sources files
 # class name == source file basename.
-class.sources += src/zerr_combinator~.cpp
-class.sources += src/zerr_features~.cpp
-class.sources += src/zerr_envelopes~.cpp 
-class.sources += src/zerr_disperser~.cpp
+# class.sources += src/zerr_combinator~.cpp
+# class.sources += src/zerr_features~.cpp
+# class.sources += src/zerr_envelopes~.cpp 
+# class.sources += src/zerr_disperser~.cpp
+
+class.sources = src/zerr_combinator~.cpp \
+                src/zerr_features~.cpp   \
+                src/zerr_envelopes~.cpp  \
+                src/zerr_disperser~.cpp
 
 # Source files which must be statically linked to each class in the library.
 common.sources += ../core/src/utils/logger.cpp
@@ -50,7 +61,7 @@ zerr_features~.class.sources += ../core/src/utils/frequencytransformer.cpp
 zerr_features~.class.sources += ../core/src/utils/linearinterpolator.cpp
 
 # class specific depencencies
-zerr_features~.class.ldflags += -L../dependencies/lib/fftw3
+zerr_features~.class.ldflags += -L$(CONAN_LIB_DIRS_FFTW)
 zerr_features~.class.ldlibs += -lfftw3
 
 # add library data files
@@ -77,13 +88,15 @@ CXX  += -I../core/include/features
 CC  += -Iinclude
 CXX += -Iinclude
 
+
 # Add fftw3 dependency headers
-CC  += -I../dependencies/include/fftw3
-CXX += -I../dependencies/include/fftw3
+CC  += -I$(CONAN_INCLUDE_DIRS_FFTW)
+CXX += -I$(CONAN_INCLUDE_DIRS_FFTW)
 
 # Add yaml-cpp dependency headers
-CC  += -I../dependencies/include/yaml-cpp
-CXX += -I../dependencies/include/yaml-cpp
+CC  += -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
+CXX += -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
+
 
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 include pd-lib-builder/Makefile.pdlibbuilder
