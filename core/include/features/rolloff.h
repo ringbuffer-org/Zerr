@@ -15,43 +15,88 @@
 #include "linearinterpolator.h"
 #include "utils.h"
 
-namespace zerr {
-namespace feature {
-/**
- * The spectral rolloff is a measure used in signal processing to determine the
- * frequency below which a specified percentage of the total spectral energy
- * lies. It is often used to distinguish between harmonic and non-harmonic
- * content in an audio signal.
- */
-class Rolloff : public FeatureExtractor {
-  public:
-    static const std::string name;
-    static const std::string category;
-    static const std::string description;
+namespace zerr
+{
+    namespace feature
+    {
+        /**
+         * @brief Spectral Rolloff algorithm - Calculates frequency threshold containing N% of spectral energy
+         *
+         * The spectral rolloff is a measure used in signal processing to determine the
+         * frequency below which a specified percentage of the total spectral energy
+         * lies. It is often used to distinguish between harmonic and non-harmonic
+         * content in an audio signal. Higher rolloff frequencies indicate more high-frequency
+         * content, while lower values suggest more energy concentrated in lower frequencies.
+         */
+        class Rolloff : public FeatureExtractor
+        {
+        public:
+            static const std::string name;        ///< Name identifier for this feature
+            static const std::string category;    ///< Category this feature belongs to
+            static const std::string description; ///< Description of what this feature measures
 
-    std::string get_name() { return name; }
-    std::string get_category() { return category; }
-    std::string get_description() { return description; }
+            /**
+             * @brief Get the name identifier of this feature
+             * @return std::string The feature name
+             */
+            std::string get_name() { return name; }
 
-    void initialize(SystemConfigs sys_cfg);
-    void extract();
-    void reset();
-    void fetch(AudioInputs in);
-    FeatureVals send();
-    // FeatureVals perform(AudioInputs x);
+            /**
+             * @brief Get the category this feature belongs to
+             * @return std::string The feature category
+             */
+            std::string get_category() { return category; }
 
-  private:
-    void _reset_param();
+            /**
+             * @brief Get the description of what this feature measures
+             * @return std::string The feature description
+             */
+            std::string get_description() { return description; }
 
-    FeatureVal prv_y;
-    FeatureVal crr_y;
+            /**
+             * @brief Initialize the rolloff extractor with system configurations
+             * @param sys_cfg System configuration parameters
+             */
+            void initialize(SystemConfigs sys_cfg);
 
-    double freq_max;
-    double rolloffPercent = 0.85;  // todo: add function to set this
+            /**
+             * @brief Extract the spectral rolloff from the current audio frame
+             */
+            void extract();
 
-    LinearInterpolator linear_interpolator;
-};
+            /**
+             * @brief Reset the rolloff extractor state
+             */
+            void reset();
 
-}  // namespace feature
-}  // namespace zerr
-#endif  // ROLLOFF_H
+            /**
+             * @brief Load new audio input data for processing
+             * @param in Audio input data
+             */
+            void fetch(AudioInputs in);
+
+            /**
+             * @brief Get the calculated rolloff values
+             * @return FeatureVals The extracted rolloff values
+             */
+            FeatureVals send();
+            // FeatureVals perform(AudioInputs x);
+
+        private:
+            /**
+             * @brief Reset internal parameters to initial state
+             */
+            void _reset_param();
+
+            FeatureVal prv_y; ///< Previous rolloff value
+            FeatureVal crr_y; ///< Current rolloff value
+
+            double freq_max;              ///< Maximum frequency considered for rolloff calculation
+            double rolloffPercent = 0.85; ///< Percentage threshold for spectral energy accumulation
+
+            LinearInterpolator linear_interpolator; ///< Interpolator for smoothing rolloff values
+        };
+
+    } // namespace feature
+} // namespace zerr
+#endif // ROLLOFF_H

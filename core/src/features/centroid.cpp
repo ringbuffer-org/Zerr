@@ -10,28 +10,33 @@ const std::string Centroid::description =
     "The spectral centroid is a measure used in digital signal processing to "
     "characterise a spectrum.";
 
-void Centroid::initialize(SystemConfigs sys_cfg) {
+void Centroid::initialize(SystemConfigs sys_cfg)
+{
     system_configs = sys_cfg;
     freq_max = static_cast<double>(system_configs.sample_rate) / 2.0;
 
     _reset_param();
 
-    if (is_initialized() == false) {
+    if (is_initialized() == false)
+    {
         set_initialize_statue(true);
     }
 }
 
-void Centroid::extract() {
+void Centroid::extract()
+{
     double centroid = 0.0;
     double totalMagnitude = 0.0;
 
     int fft_size = x.size();
-    for (int i = 0; i < fft_size; ++i) {
+    for (int i = 0; i < fft_size; ++i)
+    {
         centroid += (i * freq_max / fft_size) * x[i];
         totalMagnitude += x[i];
     }
 
-    if (totalMagnitude > 0.0) {
+    if (totalMagnitude > 0.0)
+    {
         centroid /= totalMagnitude;
     }
 
@@ -40,15 +45,18 @@ void Centroid::extract() {
 
 void Centroid::reset() { _reset_param(); }
 
-void Centroid::fetch(AudioInputs in) {
+void Centroid::fetch(AudioInputs in)
+{
     x = in.spec;
     prv_y = crr_y;
 }
 
-FeatureVals Centroid::send() {
+FeatureVals Centroid::send()
+{
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
-    for (size_t i = 0; i < system_configs.block_size; ++i) {
+    for (size_t i = 0; i < system_configs.block_size; ++i)
+    {
         y[i] = linear_interpolator.get_value();
         linear_interpolator.next_step();
     }
@@ -56,7 +64,8 @@ FeatureVals Centroid::send() {
     return y;
 }
 
-void Centroid::_reset_param() {
+void Centroid::_reset_param()
+{
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
 
     prv_y = 0.0;
