@@ -4,7 +4,7 @@
  * @brief Envelope Generator Class Puredata wrapper
  * @date 2024-01-31
  * 
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  */
 #include "zerr_envelopes.h"
 
