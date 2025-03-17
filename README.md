@@ -41,7 +41,7 @@ Otherwise, you can also build it for your own machine.
 
 #### Dependencies
 
-- Zerr* uses [Conan][https://docs.conan.io/2/tutorial.html] for dependency management, please refer to its documentation for details
+- Zerr* uses [Conan](https://docs.conan.io/2/tutorial.html) for dependency management, please refer to its documentation for details
 - Zerr* depends only on [yaml-cpp](https://github.com/jbeder/yaml-cpp) and [fftw3](https://www.fftw.org/). Use the following Conan command to install them
 
 ```bash
