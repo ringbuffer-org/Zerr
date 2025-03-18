@@ -1,32 +1,36 @@
 // #include "utils.h"
 #include <numeric>
+
 #include "rolloff.h"
 
 using namespace zerr;
 using namespace feature;
 
-const std::string Rolloff::name        = "Spectral Rolloff";
-const std::string Rolloff::category    = "Frequency-Domain";
-const std::string Rolloff::description = "The spectral rolloff is a measure used in signal processing to determine the frequency below which a specified percentage of the total spectral energy lies. It is often used to distinguish between harmonic and non-harmonic content in an audio signal.";
+const std::string Rolloff::name = "Spectral Rolloff";
+const std::string Rolloff::category = "Frequency-Domain";
+const std::string Rolloff::description =
+    "The spectral rolloff is a measure used in signal processing to determine "
+    "the frequency below which a specified percentage of the total spectral "
+    "energy lies. It is often used to distinguish between harmonic and "
+    "non-harmonic content in an audio signal.";
 
-void Rolloff::initialize(SystemConfigs sys_cfg){
+void Rolloff::initialize(SystemConfigs sys_cfg) {
     system_configs = sys_cfg;
     freq_max = static_cast<double>(system_configs.sample_rate) / 2.0;
 
     _reset_param();
-    if (is_initialized()==false){
+    if (is_initialized() == false) {
         set_initialize_statue(true);
     }
 }
 
-
-void Rolloff::extract(){
+void Rolloff::extract() {
     // Calculate the total energy in the spectrum
     double totalEnergy = std::accumulate(x.begin(), x.end(), 0.0);
-    
+
     // Calculate the energy threshold for the rolloff
     double rolloffThreshold = totalEnergy * rolloffPercent;
-    
+
     // Find the rolloff frequency
     double sumEnergy = 0.0;
     for (size_t i = 0; i < x.size(); ++i) {
@@ -41,22 +45,17 @@ void Rolloff::extract(){
     crr_y = freq_max;
 }
 
+void Rolloff::reset() { _reset_param(); }
 
-void Rolloff::reset(){
-    _reset_param();
-}
-
-
-void Rolloff::fetch(AudioInputs in){
+void Rolloff::fetch(AudioInputs in) {
     x = in.spec;
     prv_y = crr_y;
 }
 
-
-FeatureVals Rolloff::send(){
+FeatureVals Rolloff::send() {
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
-    for (size_t i = 0; i < system_configs.block_size; ++i){
+    for (size_t i = 0; i < system_configs.block_size; ++i) {
         y[i] = linear_interpolator.get_value();
         linear_interpolator.next_step();
     }
@@ -64,8 +63,7 @@ FeatureVals Rolloff::send(){
     return y;
 }
 
-
-void Rolloff::_reset_param(){
+void Rolloff::_reset_param() {
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
 
     prv_y = 0.0;

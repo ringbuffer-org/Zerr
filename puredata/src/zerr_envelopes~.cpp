@@ -6,7 +6,7 @@
  *        providing functionalities such as speaker activation, trajectory following, and more.
  * @date 2024-01-30
  * 
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  */
 
 #include "./zerr_envelopes_tilde.h"

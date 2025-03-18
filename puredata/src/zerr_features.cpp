@@ -4,7 +4,7 @@
  * @brief AudioFeatures Class Puredata Wrapper
  * @date 2024-01-30
  * 
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  */
 
 #include "./zerr_features.h"

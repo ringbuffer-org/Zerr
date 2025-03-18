@@ -1,9 +1,9 @@
 /**
  * @file zerr_combinator.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief EnvelopeCombinator Class Puredata Wrapper
+ * @brief EnvelopeCombinator Class Puredata Wrapper - Provides interface between Pure Data and the core envelope combination functionality
  * @date 2024-01-29
- * 
+ *
  * @copyright Copyright (c) 2023-2024
  */
 #pragma once
@@ -12,55 +12,57 @@
 
 #include "types.h"
 // #include "utils.h"
+#include "./envelopecombinator.h"
 #include "logger.h"
 
-#include "./envelopecombinator.h"
-
-class ZerrCombinator{
- public:
-    int numInlet;     /**< number of inlets */
-    int numOutlet;    /**< number of outlets */
+/**
+ * @class ZerrCombinator
+ * @brief Main wrapper class that interfaces between Pure Data and the core envelope combination functionality
+ * 
+ * This class handles the initialization, audio processing, and cleanup of envelope combination operations.
+ * It manages the data flow between Pure Data's audio system and the internal envelope processing chain.
+ */
+class ZerrCombinator {
+  public:
+    int numInlet;  /**< Number of signal inlets for receiving audio input */
+    int numOutlet; /**< Number of signal outlets for sending processed audio output */
     /**
-    * @brief create a new ZerrCombinator instance 
-    * @param numSource the number of intput multi-channel envelope source
-    * @param numChannel the number of channel of each source. 
-    * @param systemCfgs puredata basic system configuration: sample_rate, block_size
-    * @param combinationMode select the mode about how to combine the envelopes
-    */
-    ZerrCombinator(int numSource, int numChannel,
-        std::string combinationMode, zerr::SystemConfigs systemCfgs);
+     * @brief Creates a new ZerrCombinator instance
+     * @param numSource The number of input multi-channel envelope sources to process
+     * @param numChannel The number of channels per source to handle
+     * @param combinationMode The algorithm/mode to use for combining the envelopes (e.g. "multiply", "add", etc.)
+     * @param systemCfgs Pure Data system configuration containing sample rate and block size settings
+     */
+    ZerrCombinator(int numSource, int numChannel, std::string combinationMode,
+                   zerr::SystemConfigs systemCfgs);
     /**
-    * @brief initialize ZerrCombinator modules
-    * @return bool status of initialized or not
-    */
+     * @brief Initializes all internal components and prepares the object for processing
+     * @return true if initialization was successful, false otherwise
+     */
     bool initialize();
     /**
-    * @brief main callback function to perform process on buffer.
-    * @param ports pointers to the in/out ports(in/out share the same memory)
-    * @param n_vec actual audio vector size. Could be smaller than system block size
-    */
+     * @brief Main DSP callback function that processes audio buffers
+     * @param ports Array of pointers to input/output audio buffers (shared memory between in/out)
+     * @param n_vec The actual size of audio vectors to process (may be smaller than system block size)
+     */
     void perform(float **ports, int n_vec);
     /**
-    * @brief return the total number of inlet plus outlet
-    * @return int inlet and outlet number
-    */
+     * @brief Gets the total number of ports (inlets + outlets)
+     * @return Total count of all audio ports
+     */
     int get_port_count();  // TODO(Zeyu Yang): remove if not needed
     /**
-    * @brief free the ZerrCombinator instance
-    */
+     * @brief Destructor that cleans up and frees all allocated resources
+     */
     ~ZerrCombinator();
 
- private:
-    zerr::Blocks  inputBuffer;  /**< multi-channel input buffer  */
-    zerr::Blocks outputBuffer; /**< multi-channel output buffer */
-    float **inPtr;                  /**< PD-style input data pointer  */
-    float **outPtr;                 /**< PD-style output data pointer */
+  private:
+    zerr::Blocks inputBuffer;  /**< Multi-channel buffer for storing incoming audio samples */
+    zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing processed audio samples */
+    float **inPtr;            /**< Array of pointers to Pure Data input signal vectors */
+    float **outPtr;           /**< Array of pointers to Pure Data output signal vectors */
 
-    zerr::EnvelopeCombinator  *envelopeCombinator;  /**< Core AudioDisperser component */
-    zerr::Logger              *logger;              /**< Zerr logger for cross-platform logging*/
+    zerr::EnvelopeCombinator
+        *envelopeCombinator; /**< Core component that implements the envelope combination algorithms */
+    zerr::Logger *logger;    /**< Logging utility for debug and error messages across platforms */
 };
-
-
-
-
-

@@ -4,7 +4,7 @@
  * @brief zerr_combinator~ Pure Data External
  * @date 2024-01-29
  * 
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  */
 #include "./zerr_combinator_tilde.h"
 
