@@ -101,7 +101,7 @@ jobs:
 
       - name: List Build Files
         run: |
-          dir build\Release /s
+          dir build /s
 
       - name: Copy Lib File
         working-directory: core
