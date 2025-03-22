@@ -40,7 +40,7 @@ jobs:
           path: core/lib
           retention-days: 1
 
-  Linux:
+  linux:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

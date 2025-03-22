@@ -29,7 +29,7 @@ jobs:
       - name: Download zerr-core library
         uses: actions/download-artifact@v4
         with:
-          name: zerr-core
+          name: zerr-core-macos
           path: core/lib/
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
@@ -60,4 +60,47 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zerr-pd-macos
+          path: puredata/build/zerr
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Download zerr-core library
+        uses: actions/download-artifact@v4
+        with:
+          name: zerr-core-linux
+          path: core/lib/
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Display structure of downloaded files
+        run: ls -R core/lib/
+
+      - name: Install Pure Data
+        run: sudo apt update && sudo apt install puredata-dev
+
+      - name: Set up Conan
+        run: |
+          pip install conan
+          conan profile detect
+
+      - name: Configure Conan
+        working-directory: puredata
+        run: |
+          conan install . --output-folder=build --build=missing
+
+      - name: Build & Install
+        working-directory: puredata
+        run: |
+          make 
+          make install PDLIBDIR=build
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-pd-linux
           path: puredata/build/zerr
