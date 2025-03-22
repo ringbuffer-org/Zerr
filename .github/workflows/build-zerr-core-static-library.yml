@@ -14,11 +14,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Set up Conan
-        working-directory: core
-        uses: conan-io/actions/setup-conan@v2
-        with:
-          conan_version: latest
+      - name: Install Conan
+        run: pip install conan
 
       - name: Install Dependencies
         working-directory: core
