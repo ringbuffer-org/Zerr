@@ -20,6 +20,7 @@ jobs:
       - name: Install Dependencies
         working-directory: core
         run: |
+          conan profile detect
           conan install . --output-folder=build --build=missing
 
       - name: Build Static Library
