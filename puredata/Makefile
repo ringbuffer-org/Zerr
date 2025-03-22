@@ -12,7 +12,7 @@ ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
 # $(info    CONAN_LIB_DIRS_YAML_CPP is $(CONAN_LIB_DIRS_YAML_CPP))
 # $(info    CONAN_LIBS_YAML_CPP is $(CONAN_LIBS_YAML_CPP))
 
-ldflags += -L../core/usr/lib
+ldflags += -L../core/lib
 ldlibs += -lzerr_core
 
 # Library directory name: zerr
@@ -48,13 +48,13 @@ datafiles += help/zerr_disperser~-help.pd
 datafiles += help/circulation_8.yaml
 
 # Add Zerr* core headers
-CC  += -I../core/usr/include/utils
-CC  += -I../core/usr/include/modules
-CC  += -I../core/usr/include/features
+CC  += -I../core/include/utils
+CC  += -I../core/include/modules
+CC  += -I../core/include/features
 
-CXX  += -I../core/usr/include/utils
-CXX  += -I../core/usr/include/modules
-CXX  += -I../core/usr/include/features
+CXX  += -I../core/include/utils
+CXX  += -I../core/include/modules
+CXX  += -I../core/include/features
 
 # Add Puredata wraper headers
 CC  += -Iinclude

@@ -5,6 +5,8 @@
 *.pd_dll
 *.ipynb
 
+CMakeUserPresets.json
+
 builddir/
 fftw3/
 yaml-cpp/
