@@ -16,15 +16,16 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
-      - name: Configure Conan
-        run: |
-          conan profile detect
-          conan install . --output-folder=build --build=missing
-
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
           submodules: true
+
+      - name: Configure Conan
+        working-directory: puredata
+        run: |
+          conan profile detect
+          conan install . --output-folder=build --build=missing
 
       - name: Build
         working-directory: puredata
@@ -109,16 +110,17 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
-      - name: Configure Conan
-        run: |
-          conan profile detect
-          conan install . --output-folder=build --build=missing
-
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
           submodules: true
-          
+        
+      - name: Configure Conan
+        working-directory: puredata
+        run: |
+          conan profile detect
+          conan install . --output-folder=build --build=missing
+
       - name: Build
         working-directory: puredata
         run: make
