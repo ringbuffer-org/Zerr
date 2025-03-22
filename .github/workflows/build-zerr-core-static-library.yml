@@ -71,3 +71,34 @@ jobs:
           name: zerr-core-linux
           path: core/lib
           retention-days: 1
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Conan
+        run: |
+          pip install conan
+          conan profile detect
+
+      - name: Install Dependencies
+        working-directory: core
+        run: |
+          conan install . --output-folder=build --build=missing
+
+      - name: Build Static Library
+        working-directory: core
+        run: |
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release
+          cmake --install . --config Release
+
+      - name: Upload zerr-core library
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-core-windows
+          path: core/lib
+          retention-days: 1
