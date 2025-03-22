@@ -12,8 +12,8 @@ ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
 # $(info    CONAN_LIB_DIRS_YAML_CPP is $(CONAN_LIB_DIRS_YAML_CPP))
 # $(info    CONAN_LIBS_YAML_CPP is $(CONAN_LIBS_YAML_CPP))
 
-ldflags += -L../core/usr/lib 
-ldlibs += -lzerr_core   
+ldflags += -L../core/usr/lib
+ldlibs += -lzerr_core
 
 # Library directory name: zerr
 lib.name = zerr
