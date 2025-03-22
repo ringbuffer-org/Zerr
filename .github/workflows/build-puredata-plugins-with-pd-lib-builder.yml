@@ -16,98 +16,6 @@ on:
       - completed
 
 jobs:
-  # Ubuntu:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Install dependencies
-  #       run: sudo apt update && sudo apt install puredata-dev
-        
-  #     - name: Install Conan
-  #       run: pip install conan
-
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v2
-  #       with:
-  #         submodules: true
-
-  #     - name: Configure Conan
-  #       working-directory: puredata
-  #       run: |
-  #         conan profile detect
-  #         conan install . --output-folder=build --build=missing
-
-  #     - name: Build
-  #       working-directory: puredata
-  #       run: make
-        
-  #     - name: Install
-  #       run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/ubuntu-latest
-
-  #     - name: Upload Ubuntu artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ubuntu-externals
-  #         path: .github/extra/*
-
-  # Windows:
-  #   runs-on: windows-latest
-  #   defaults:
-  #     run:
-  #       shell: msys2 {0}
-  #   steps:
-  #     - name: Install MSYS2
-  #       uses: msys2/setup-msys2@v2
-  #       with:
-  #         release: false
-  #         path-type: inherit
-  #         install: >-
-  #           mingw-w64-x86_64-ntldd-git
-  #     - name: Find usable compiler
-  #       id: compiler
-  #       run: |
-  #         for cc in cc gcc clang; do echo "testing compiler $cc"; "${cc}" -dumpmachine && export CC=${CC:-$cc} || true; done
-  #         echo "CC=${CC}" | tee "$GITHUB_OUTPUT"
-  #     - name: Install Pd
-  #       id: pd
-  #       run: |
-  #         wget -q -O Pd.zip http://msp.ucsd.edu/Software/pd-0.51-3.msw.zip
-  #         rm -rf "${PROGRAMFILES}/pd" && mkdir -p "${PROGRAMFILES}/pd"
-  #         unzip -q Pd.zip -d "${PROGRAMFILES}/pd"
-  #         mv -v "${PROGRAMFILES}/pd"/*/* "${PROGRAMFILES}/pd"
-  #         rm -f Pd.zip
-  #         export PD="${PROGRAMFILES}/pd/bin/pd.com"
-  #         echo "PD=${PD}" | tee "$GITHUB_OUTPUT"
-
-  #     - name: Install Conan
-  #       run: pip install conan
-          
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v2
-  #       with:
-  #         submodules: true
-
-  #     - name: Build
-  #       env:
-  #         CC: ${{ steps.compiler.outputs.CC }}
-  #         PD: ${{ steps.pd.outputs.PD }}
-  #       run: make
-  #     - name: Install
-  #       env:
-  #         CC: ${{ steps.compiler.outputs.CC }}
-  #         PD: ${{ steps.pd.outputs.PD }}
-  #         MSYS2_ARG_CONV_EXCL: /.github;PDLIBDIR=
-  #       run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra
-
-  #     - name: DLL dependencies
-  #       run: |
-  #         test -e .git-ci/localdeps.win.sh || (wget -q -O .git-ci/localdeps.win.sh "https://git.iem.at/pd/iem-ci/raw/main/localdeps/localdeps.win.sh" && chmod +x .git-ci/localdeps.win.sh) || true
-  #         if [ -x .git-ci/localdeps.win.sh ]; then find .github/extra -type f "(" -name "*.${pd_extension:-m_*}" -o -name "*.dll" -o -name "*.exe" -o -name "*.com" ")" -exec .git-ci/localdeps.win.sh {} +; fi
-  #     - name: Upload Windows artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: windows-externals
-  #         path: .github/extra/*
-
   macOS:
     runs-on: macos-latest
     env:
@@ -123,8 +31,9 @@ jobs:
         with:
           name: zerr-core
           path: core/lib/
-          workflow: core-compile.yml
-          run_id: ${{ github.event.workflow_run.id }}
+          # workflow: core-compile.yml
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
 
       - name: Display structure of downloaded files
         run: ls -R core/lib/

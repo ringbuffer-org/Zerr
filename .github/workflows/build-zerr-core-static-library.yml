@@ -1,7 +1,6 @@
 name: build zerr-core static library
 
 on:
-  workflow_call:
   workflow_dispatch:
   push:
     branches:
