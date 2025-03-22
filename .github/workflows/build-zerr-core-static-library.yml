@@ -32,13 +32,8 @@ jobs:
           cmake --build .
           make install
 
-      - name: Create Conan Package
-        run: |
-          conan create . user/channel
-
-      - name: Publish Package to GitHub Packages
-        run: |
-          conan upload "zerr-core/1.0.0@user/channel" --all --remote=github
-        env:
-          CONAN_USER: ${{ secrets.GITHUB_ACTOR }}
-          CONAN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload zerr-core library
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-core
+          path: core/usr
