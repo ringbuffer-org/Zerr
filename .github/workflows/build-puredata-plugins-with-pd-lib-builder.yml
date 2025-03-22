@@ -4,11 +4,11 @@ name: build pd-lib-builder based pure data externals
 on: 
   workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'puredata/**'  # Trigger when Pure Data related code changes
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'puredata/**'  # Trigger when Pure Data related code changes
 
   workflow_run:
     workflows: ["build zerr-core static library"]

@@ -5,6 +5,8 @@
 CC  = g++
 cflags = -std=c++11 -Wall
 
+cflags += -fPIC
+
 include build/conandeps.mk
 
 ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
