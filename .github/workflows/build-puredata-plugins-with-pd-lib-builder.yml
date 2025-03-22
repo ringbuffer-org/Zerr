@@ -4,6 +4,16 @@ name: build pd-lib-builder based externals
 on: 
   workflow_call:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'puredata/**'  # Trigger when Pure Data related code changes
+
+  workflow_run:
+    workflows: ["Build Static Library and Publish to GitHub Packages"]
+    types:
+      - completed
 
 jobs:
 
@@ -104,7 +114,21 @@ jobs:
     env:
       cflags: -mmacosx-version-min=10.9
     steps:
-      - name: Install macOS packages
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: download zerr-core library
+        uses: actions/download-artifact@v4
+        with:
+          name: zerr-core
+          path: core/usr
+
+      - name: Display structure of downloaded files
+        run: ls -R core/usr
+
+      - name: Install Pure Data
         run: brew install --cask pd
 
       - name: Set up Conan
@@ -112,33 +136,20 @@ jobs:
           pip install conan
           conan profile detect
 
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-        
       - name: Configure Conan
         working-directory: puredata
         run: |
           conan install . --output-folder=build --build=missing
 
-      - name: download zerr-core library
-        uses: actions/download-artifact@v4
-        with:
-          name: zerr-core
-          path: core/usr
-      - name: Display structure of downloaded files
-        run: ls -R core/usr
-
       - name: Build
         working-directory: puredata
         run: make
         
-      - name: Install
-        run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/macos-latest
+      # - name: Install
+      #   run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/macos-latest
 
-      - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-externals
-          path: .github/extra/*
+      # - name: Upload macOS artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: macos-externals
+      #     path: .github/extra/*
