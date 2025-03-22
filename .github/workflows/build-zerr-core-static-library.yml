@@ -1,11 +1,11 @@
 name: Build Static Library and Publish to GitHub Packages
 
 on:
-  # workflow_call:
+  workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   build-library:

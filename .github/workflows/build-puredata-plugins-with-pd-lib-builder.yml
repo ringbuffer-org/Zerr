@@ -7,38 +7,38 @@ on:
 
 jobs:
 
-  Ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install dependencies
-        run: sudo apt update && sudo apt install puredata-dev
+  # Ubuntu:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Install dependencies
+  #       run: sudo apt update && sudo apt install puredata-dev
         
-      - name: Install Conan
-        run: pip install conan
+  #     - name: Install Conan
+  #       run: pip install conan
 
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: true
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v2
+  #       with:
+  #         submodules: true
 
-      - name: Configure Conan
-        working-directory: puredata
-        run: |
-          conan profile detect
-          conan install . --output-folder=build --build=missing
+  #     - name: Configure Conan
+  #       working-directory: puredata
+  #       run: |
+  #         conan profile detect
+  #         conan install . --output-folder=build --build=missing
 
-      - name: Build
-        working-directory: puredata
-        run: make
+  #     - name: Build
+  #       working-directory: puredata
+  #       run: make
         
-      - name: Install
-        run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/ubuntu-latest
+  #     - name: Install
+  #       run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/ubuntu-latest
 
-      - name: Upload Ubuntu artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ubuntu-externals
-          path: .github/extra/*
+  #     - name: Upload Ubuntu artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ubuntu-externals
+  #         path: .github/extra/*
 
   # Windows:
   #   runs-on: windows-latest
@@ -107,8 +107,10 @@ jobs:
       - name: Install macOS packages
         run: brew install --cask pd
 
-      - name: Install Conan
-        run: pip install conan
+      - name: Set up Conan
+        run: |
+          pip install conan
+          conan profile detect
 
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -118,8 +120,15 @@ jobs:
       - name: Configure Conan
         working-directory: puredata
         run: |
-          conan profile detect
           conan install . --output-folder=build --build=missing
+
+      - name: download zerr-core library
+        uses: actions/download-artifact@v4
+        with:
+          name: zerr-core
+          path: core/usr
+      - name: Display structure of downloaded files
+        run: ls -R core/usr
 
       - name: Build
         working-directory: puredata
@@ -128,11 +137,6 @@ jobs:
       - name: Install
         run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/macos-latest
 
-      # - name: Dylib dependencies
-      #   run: |
-      #     test -e .git-ci/localdeps.macos.sh || (wget -q -O .git-ci/localdeps.macos.sh "https://git.iem.at/pd/iem-ci/raw/main/localdeps/localdeps.macos.sh" && chmod +x .git-ci/localdeps.macos.sh) || true
-      #     if [ -x .git-ci/localdeps.macos.sh ]; then find .github/extra -type f "(" -name "*.${pd_extension:-pd_*}" -o -name "*.so" -o -name "*.d_*" ")" -exec .git-ci/localdeps.macos.sh {} +; fi
-      
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
