@@ -119,11 +119,17 @@ jobs:
         with:
           submodules: true
 
+      - name: List Available Artifacts
+        run: ls -R
+
+      - name: Ensure Path Exists
+        run: mkdir -p core/usr/
+
       - name: Download zerr-core library
         uses: actions/download-artifact@v4
         with:
           name: zerr-core
-          path: core/usr
+          path: core/usr/
 
       - name: Install Pure Data
         run: brew install --cask pd
