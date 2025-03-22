@@ -16,15 +16,22 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
+      - name: Configure Conan
+        run: |
+          conan profile detect
+          conan install . --output-folder=build --build=missing
+
       - name: Checkout Code
         uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Build
         working-directory: puredata
         run: make
         
       - name: Install
-        run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra
+        run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/ubuntu-latest
 
       - name: Upload Ubuntu artifacts
         uses: actions/upload-artifact@v4
@@ -98,30 +105,32 @@ jobs:
     steps:
       - name: Install macOS packages
         run: brew install --cask pd
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-          
+
       - name: Install Conan
         run: pip install conan
 
       - name: Configure Conan
         run: |
           conan profile detect
-          conan install . --build=missing
+          conan install . --output-folder=build --build=missing
 
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          
       - name: Build
         working-directory: puredata
         run: make
         
       - name: Install
-        run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra
+        run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/macos-latest
 
-      - name: Dylib dependencies
-        run: |
-          test -e .git-ci/localdeps.macos.sh || (wget -q -O .git-ci/localdeps.macos.sh "https://git.iem.at/pd/iem-ci/raw/main/localdeps/localdeps.macos.sh" && chmod +x .git-ci/localdeps.macos.sh) || true
-          if [ -x .git-ci/localdeps.macos.sh ]; then find .github/extra -type f "(" -name "*.${pd_extension:-pd_*}" -o -name "*.so" -o -name "*.d_*" ")" -exec .git-ci/localdeps.macos.sh {} +; fi
+      # - name: Dylib dependencies
+      #   run: |
+      #     test -e .git-ci/localdeps.macos.sh || (wget -q -O .git-ci/localdeps.macos.sh "https://git.iem.at/pd/iem-ci/raw/main/localdeps/localdeps.macos.sh" && chmod +x .git-ci/localdeps.macos.sh) || true
+      #     if [ -x .git-ci/localdeps.macos.sh ]; then find .github/extra -type f "(" -name "*.${pd_extension:-pd_*}" -o -name "*.so" -o -name "*.d_*" ")" -exec .git-ci/localdeps.macos.sh {} +; fi
+      
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
