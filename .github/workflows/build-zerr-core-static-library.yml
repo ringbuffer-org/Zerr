@@ -105,8 +105,9 @@ jobs:
 
       - name: Copy Lib File
         working-directory: core
-        mkdir lib
-        copy build\Release\*.lib ..\lib\
+        run: |
+          mkdir lib
+          copy build\Release\*.lib ..\lib\
 
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4
