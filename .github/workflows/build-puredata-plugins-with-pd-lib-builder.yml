@@ -1,5 +1,5 @@
 ---
-name: build pd-lib-builder based externals
+name: build pd-lib-builder based pure data externals
 
 on: 
   workflow_call:

@@ -9,7 +9,7 @@ on:
       - 'core/**'
 
 jobs:
-  build-library:
+  macOS:
     runs-on: macos-latest
     steps:
       - name: Checkout Code
@@ -36,6 +36,37 @@ jobs:
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4
         with:
-          name: zerr-core
-          path: core/lib/
+          name: zerr-core-macos
+          path: core/lib/macos
+          retention-days: 1
+
+  Linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Conan
+        run: |
+          pip install conan
+          conan profile detect
+
+      - name: Install Dependencies
+        working-directory: core
+        run: |
+          conan install . --output-folder=build --build=missing
+
+      - name: Build Static Library
+        working-directory: core
+        run: |
+          cd build/
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build .
+          make install
+
+      - name: Upload zerr-core library
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-core-linux
+          path: core/lib/linux
           retention-days: 1
