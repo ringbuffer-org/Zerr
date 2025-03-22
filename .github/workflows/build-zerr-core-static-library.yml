@@ -104,14 +104,14 @@ jobs:
       #   run: |
       #     dir build /s
 
-      - name: List Build Files
-        run: Get-ChildItem -Path build -Recurse
-        # shell: pwsh
+      # - name: List lib Files
+      #   run: Get-ChildItem -Path lib -Recurse
+      #   shell: pwsh
 
       - name: Copy Lib File
         working-directory: core
         run: |
-          mkdir lib
+          mkdir lib -Force
           copy build\Release\*.lib  lib\
 
       - name: Upload zerr-core library
