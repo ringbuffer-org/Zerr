@@ -57,8 +57,7 @@ jobs:
           make install PDLIBDIR=build
 
       - name: Upload macOS artifacts
-        working-directory: puredata
         uses: actions/upload-artifact@v4
         with:
           name: zerr-pd-macos
-          path: build/zerr
+          path: puredata/build/zerr
