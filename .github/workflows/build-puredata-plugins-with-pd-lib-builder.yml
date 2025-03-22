@@ -16,7 +16,6 @@ on:
       - completed
 
 jobs:
-
   # Ubuntu:
   #   runs-on: ubuntu-latest
   #   steps:
@@ -122,9 +121,6 @@ jobs:
       - name: List Available Artifacts
         run: ls -R
 
-      - name: Ensure Path Exists
-        run: mkdir -p core/usr/
-
       - name: Download zerr-core library
         uses: actions/download-artifact@v4
         with:
@@ -146,17 +142,14 @@ jobs:
 
       - name: Build
         working-directory: puredata
-        env:
-          CFLAGS: "${{ env.cflags }}"
-          ZERR_CORE_PATH: "${{ github.workspace }}/core/usr"
         run: |
-          make ADDITIONAL_CFLAGS="-I${ZERR_CORE_PATH}/include" ADDITIONAL_LDFLAGS="-L${ZERR_CORE_PATH}/lib -lzerr_core"
+          make 
 
-      - name: Install
-        run: make install DESTDIR=$(pwd) PDLIBDIR=/.github/extra/macos-latest
+      # - name: Install
+      #   run: make install 
 
-      - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-externals
-          path: .github/extra/*
+      # - name: Upload macOS artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: macos-externals
+      #     path: .github/extra/*
