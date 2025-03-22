@@ -14,7 +14,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Conan
         run: |
@@ -34,22 +34,9 @@ jobs:
           cmake --build .
           make install
 
-      # - name: Upload zerr-core library
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: zerr-core
-      #     path: core/usr
-
-      - name: Export Conan Package
-        working-directory: core
-        run: |
-          conan export usr zerr-core/stable
-
-      - name: Upload to GitHub Packages
-        working-directory: core
-        run: |
-          conan remote add github "https://conan.pkg.github.com/${{ github.repository_owner }}"
-          conan upload "*" --all -r=github --confirm
-        env:
-          CONAN_LOGIN_USERNAME: ${{ github.actor }}
-          CONAN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload zerr-core library
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-core
+          path: core/usr
+          retention-days: 1
