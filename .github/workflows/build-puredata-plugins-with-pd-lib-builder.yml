@@ -10,10 +10,10 @@ on:
     paths:
       - 'puredata/**'  # Trigger when Pure Data related code changes
 
-  workflow_run:
-    workflows: ["build zerr-core static library"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["build zerr-core static library"]
+  #   types:
+  #     - completed
 
 jobs:
   # Ubuntu:

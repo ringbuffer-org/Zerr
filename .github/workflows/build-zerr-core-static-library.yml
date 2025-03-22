@@ -40,3 +40,41 @@ jobs:
           name: zerr-core
           path: core/lib/libzerr_core.a
           retention-days: 1
+
+  macOS:
+    runs-on: macos-latest
+    env:
+      cflags: -mmacosx-version-min=10.9
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Download zerr-core library
+        uses: actions/download-artifact@v4
+        with:
+          name: zerr-core
+          path: core/lib/
+          # github-token: ${{ secrets.GH_PAT }} # token with actions:read permissions on target repo
+
+      - name: Display structure of downloaded files
+        run: ls -R core/lib/
+
+      - name: Install Pure Data
+        run: brew install --cask pd
+
+      - name: Set up Conan
+        run: |
+          pip install conan
+          conan profile detect
+
+      - name: Configure Conan
+        working-directory: puredata
+        run: |
+          conan install . --output-folder=build --build=missing
+
+      - name: Build
+        working-directory: puredata
+        run: |
+          make 
