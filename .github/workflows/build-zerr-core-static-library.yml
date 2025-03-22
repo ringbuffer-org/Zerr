@@ -1,0 +1,44 @@
+name: Build Static Library and Publish to GitHub Packages
+
+on:
+  # workflow_call:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-library:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Conan
+        working-directory: core
+        uses: conan-io/actions/setup-conan@v2
+        with:
+          conan_version: latest
+
+      - name: Install Dependencies
+        working-directory: core
+        run: |
+          conan install . --output-folder=build --build=missing
+
+      - name: Build Static Library
+        run: |
+          cd build/
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build .
+          make install
+
+      - name: Create Conan Package
+        run: |
+          conan create . user/channel
+
+      - name: Publish Package to GitHub Packages
+        run: |
+          conan upload "zerr-core/1.0.0@user/channel" --all --remote=github
+        env:
+          CONAN_USER: ${{ secrets.GITHUB_ACTOR }}
+          CONAN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}

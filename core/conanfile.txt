@@ -5,6 +5,3 @@ yaml-cpp/0.8.0
 [generators]
 CMakeDeps
 CMakeToolchain
-
-[layout]
-cmake_layout
