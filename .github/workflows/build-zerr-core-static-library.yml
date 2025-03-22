@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zerr-core-macos
-          path: core/lib/macos
+          path: core/lib
           retention-days: 1
 
   Linux:
@@ -68,5 +68,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zerr-core-linux
-          path: core/lib/linux
+          path: core/lib
           retention-days: 1
