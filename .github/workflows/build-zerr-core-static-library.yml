@@ -99,10 +99,14 @@ jobs:
           cmake --build build --config Release
           # cmake --install . --config Release
 
+      # - name: List Build Files
+      #   working-directory: core
+      #   run: |
+      #     dir build /s
+
       - name: List Build Files
-        working-directory: core
-        run: |
-          dir build /s
+        run: Get-ChildItem -Path build -Recurse
+        # shell: pwsh
 
       - name: Copy Lib File
         working-directory: core
