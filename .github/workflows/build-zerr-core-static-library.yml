@@ -14,16 +14,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Install Conan
-        run: pip install conan
+      - name: Set up Conan
+        run: |
+          pip install conan
+          conan profile detect
 
       - name: Install Dependencies
         working-directory: core
         run: |
-          conan profile detect
           conan install . --output-folder=build --build=missing
 
       - name: Build Static Library
+        working-directory: core
         run: |
           cd build/
           cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
