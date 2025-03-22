@@ -105,5 +105,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zerr-core-windows
-          path: core/lib
+          path: core/lib/zerr_core.lib
           retention-days: 1
