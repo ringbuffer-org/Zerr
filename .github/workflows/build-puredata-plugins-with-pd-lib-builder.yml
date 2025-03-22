@@ -11,7 +11,7 @@ on:
       - 'puredata/**'  # Trigger when Pure Data related code changes
 
   workflow_run:
-    workflows: ["Build Static Library and Publish to GitHub Packages"]
+    workflows: ["build zerr-core static library"]
     types:
       - completed
 
@@ -119,7 +119,7 @@ jobs:
         with:
           submodules: true
 
-      - name: download zerr-core library
+      - name: Download zerr-core library
         uses: actions/download-artifact@v4
         with:
           name: zerr-core
