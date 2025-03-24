@@ -72,9 +72,59 @@ jobs:
           path: core/lib
           retention-days: 1
 
+  # windows:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up Conan
+  #       run: |
+  #         pip install conan
+  #         conan profile detect
+
+  #     - name: Install Dependencies
+  #       working-directory: core
+  #       run: |
+  #         mkdir build
+  #         conan install . --output-folder=build --build=missing
+
+  #     - name: Build Static Library
+  #       working-directory: core
+  #       run: |
+  #         cmake --preset conan-default
+  #         cmake --build build --config Release
+
+  #     - name: Copy Lib File
+  #       working-directory: core
+  #       run: |
+  #         mkdir lib -Force
+  #         copy build\Release\zerr_core.lib  lib\
+
+  #     - name: Upload zerr-core library
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: zerr-core-windows
+  #         path: core/lib
+  #         retention-days: 1
+
   windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          release: false
+          path-type: inherit
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+            make
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -86,25 +136,25 @@ jobs:
       - name: Install Dependencies
         working-directory: core
         run: |
-          mkdir build
+          mkdir -p build
           conan install . --output-folder=build --build=missing
 
       - name: Build Static Library
         working-directory: core
         run: |
-          cmake --preset conan-default
-          cmake --build build --config Release
+          cd build
+          cmake .. -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          make
+          make install
 
-      - name: Copy Lib File
+      - name: Display lib directory contents
         working-directory: core
         run: |
-          mkdir lib -Force
-          copy build\Release\zerr_core.lib  lib\
+          ls -la lib/
 
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4
         with:
           name: zerr-core-windows
-          # path: core/lib/zerr_core.lib
           path: core/lib
           retention-days: 1
