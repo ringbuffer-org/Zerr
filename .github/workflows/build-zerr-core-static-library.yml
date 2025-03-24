@@ -124,15 +124,14 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-make
             mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-yaml-cpp
-            mingw-w64-x86_64-fftw
             make
 
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Create MinGW Conan profile
+      - name: Set up Conan with MinGW
         run: |
+          pip install conan
           mkdir -p ~/.conan2/profiles/
           echo "[settings]" > ~/.conan2/profiles/mingw
           echo "os=Windows" >> ~/.conan2/profiles/mingw
@@ -141,22 +140,24 @@ jobs:
           echo "compiler.version=12" >> ~/.conan2/profiles/mingw
           echo "compiler.libcxx=libstdc++11" >> ~/.conan2/profiles/mingw
           echo "build_type=Release" >> ~/.conan2/profiles/mingw
-          echo "[buildenv]" >> ~/.conan2/profiles/mingw
-          echo "CC=gcc" >> ~/.conan2/profiles/mingw
-          echo "CXX=g++" >> ~/.conan2/profiles/mingw
+          
+          # Display the created profile
+          cat ~/.conan2/profiles/mingw
 
-      - name: Setup MinGW build
+      - name: Install Dependencies with Conan
         working-directory: core
         run: |
           mkdir -p build
-          cd build
-          # Build without Conan for simplicity
-          cmake .. -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release
+          # Use the MinGW profile we created
+          conan install . --output-folder=build --build=missing -pr=mingw
 
       - name: Build Static Library
-        working-directory: core/build
+        working-directory: core
         run: |
-          make VERBOSE=1
+          cd build
+          # Use MSYS Makefiles with Conan toolchain
+          cmake .. -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          make
           make install
 
       - name: Display lib directory contents
