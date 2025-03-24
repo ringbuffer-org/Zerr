@@ -221,7 +221,7 @@ jobs:
       #   working-directory: puredata
       #   run: make
         
-      - name: Install & Install
+      - name: Build & Install
         working-directory: puredata
         run: |
           make 
