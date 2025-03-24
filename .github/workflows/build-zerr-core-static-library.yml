@@ -72,98 +72,34 @@ jobs:
           path: core/lib
           retention-days: 1
 
-  # windows:
-  #   runs-on: windows-latest
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
-
-  #     - name: Set up Conan
-  #       run: |
-  #         pip install conan
-  #         conan profile detect
-
-  #     - name: Install Dependencies
-  #       working-directory: core
-  #       run: |
-  #         mkdir build
-  #         conan install . --output-folder=build --build=missing
-
-  #     - name: Build Static Library
-  #       working-directory: core
-  #       run: |
-  #         cmake --preset conan-default
-  #         cmake --build build --config Release
-
-  #     - name: Copy Lib File
-  #       working-directory: core
-  #       run: |
-  #         mkdir lib -Force
-  #         copy build\Release\zerr_core.lib  lib\
-
-  #     - name: Upload zerr-core library
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: zerr-core-windows
-  #         path: core/lib
-  #         retention-days: 1
-
   windows:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
     steps:
-      - name: Install MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-make
-            mingw-w64-x86_64-pkg-config
-            make
-
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Conan with MinGW
+      - name: Set up Conan
         run: |
           pip install conan
-          mkdir -p ~/.conan2/profiles/
-          echo "[settings]" > ~/.conan2/profiles/mingw
-          echo "os=Windows" >> ~/.conan2/profiles/mingw
-          echo "arch=x86_64" >> ~/.conan2/profiles/mingw
-          echo "compiler=gcc" >> ~/.conan2/profiles/mingw
-          echo "compiler.version=12" >> ~/.conan2/profiles/mingw
-          echo "compiler.libcxx=libstdc++11" >> ~/.conan2/profiles/mingw
-          echo "build_type=Release" >> ~/.conan2/profiles/mingw
-          
-          # Display the created profile
-          cat ~/.conan2/profiles/mingw
+          conan profile detect
 
-      - name: Install Dependencies with Conan
+      - name: Install Dependencies
         working-directory: core
         run: |
-          mkdir -p build
-          # Use the MinGW profile we created
-          conan install . --output-folder=build --build=missing -pr=mingw
+          mkdir build
+          conan install . --output-folder=build --build=missing
 
       - name: Build Static Library
         working-directory: core
         run: |
-          cd build
-          # Use MSYS Makefiles with Conan toolchain
-          cmake .. -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          make
-          make install
+          cmake --preset conan-default
+          cmake --build build --config Release
 
-      - name: Display lib directory contents
+      - name: Copy Lib File
         working-directory: core
         run: |
-          ls -la lib/
+          mkdir lib -Force
+          copy build\Release\zerr_core.lib  lib\
 
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4
