@@ -217,10 +217,6 @@ jobs:
           mkdir -p build
           conan install . --output-folder=build --build=missing
           
-      # - name: Build
-      #   working-directory: puredata
-      #   run: make
-        
       - name: Build & Install
         working-directory: puredata
         run: |

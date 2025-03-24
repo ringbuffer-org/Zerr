@@ -117,34 +117,46 @@ jobs:
       - name: Install MSYS2
         uses: msys2/setup-msys2@v2
         with:
-          release: false
-          path-type: inherit
+          msystem: MINGW64
+          update: true
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-make
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-yaml-cpp
+            mingw-w64-x86_64-fftw
             make
 
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Conan
+      - name: Create MinGW Conan profile
         run: |
-          pip install conan
-          conan profile detect
+          mkdir -p ~/.conan2/profiles/
+          echo "[settings]" > ~/.conan2/profiles/mingw
+          echo "os=Windows" >> ~/.conan2/profiles/mingw
+          echo "arch=x86_64" >> ~/.conan2/profiles/mingw
+          echo "compiler=gcc" >> ~/.conan2/profiles/mingw
+          echo "compiler.version=12" >> ~/.conan2/profiles/mingw
+          echo "compiler.libcxx=libstdc++11" >> ~/.conan2/profiles/mingw
+          echo "build_type=Release" >> ~/.conan2/profiles/mingw
+          echo "[buildenv]" >> ~/.conan2/profiles/mingw
+          echo "CC=gcc" >> ~/.conan2/profiles/mingw
+          echo "CXX=g++" >> ~/.conan2/profiles/mingw
 
-      - name: Install Dependencies
+      - name: Setup MinGW build
         working-directory: core
         run: |
           mkdir -p build
-          conan install . --output-folder=build --build=missing
+          cd build
+          # Build without Conan for simplicity
+          cmake .. -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release
 
       - name: Build Static Library
-        working-directory: core
+        working-directory: core/build
         run: |
-          cd build
-          cmake .. -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          make
+          make VERBOSE=1
           make install
 
       - name: Display lib directory contents
