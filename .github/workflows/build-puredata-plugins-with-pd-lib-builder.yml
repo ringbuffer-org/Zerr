@@ -106,58 +106,142 @@ jobs:
           path: puredata/build/zerr
 
 
+  # windows:
+  #     runs-on: windows-latest
+  #     steps:
+  #       - name: Checkout Code
+  #         uses: actions/checkout@v3
+  #         with:
+  #           submodules: true
+
+  #       - name: Download zerr-core library
+  #         uses: actions/download-artifact@v4
+  #         with:
+  #           name: zerr-core-windows
+  #           path: core/lib/
+  #           run-id: ${{ github.event.workflow_run.id }}
+  #           github-token: ${{ github.token }}
+
+  #       - name: Display structure of downloaded files
+  #         run: dir core\lib\
+
+  #       - name: Install Pure Data
+  #         run: |
+  #           Invoke-WebRequest -Uri "https://msp.ucsd.edu/Software/pd-0.53-2.msw.zip" -OutFile "pd.zip"
+  #           Expand-Archive -Path "pd.zip" -DestinationPath "C:\"
+  #           echo "C:\pd\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+  #       - name: Set up Conan
+  #         run: |
+  #           pip install conan
+  #           conan profile detect
+
+  #       - name: Configure Conan
+  #         working-directory: puredata
+  #         run: |
+  #           mkdir build -Force
+  #           conan install . --output-folder=build --build=missing
+
+  #       - name: Build Pure Data Externals
+  #         working-directory: puredata
+  #         run: |
+  #           $env:PATH += ";C:\pd\bin"
+  #           make PDINCLUDEDIR=C:\pd\src
+
+  #       - name: Install Pure Data Externals
+  #         working-directory: puredata
+  #         run: |
+  #           make install PDLIBDIR=build
+
+  #       - name: Upload Windows artifacts
+  #         uses: actions/upload-artifact@v4
+  #         with:
+  #           name: zerr-pd-windows
+  #           path: puredata/build/zerr
+
   windows:
-      runs-on: windows-latest
-      steps:
-        - name: Checkout Code
-          uses: actions/checkout@v3
-          with:
-            submodules: true
-
-        - name: Download zerr-core library
-          uses: actions/download-artifact@v4
-          with:
-            name: zerr-core-windows
-            path: core/lib/
-            run-id: ${{ github.event.workflow_run.id }}
-            github-token: ${{ github.token }}
-
-        - name: Display structure of downloaded files
-          run: dir core\lib\
-
-        - name: Install Pure Data
-          run: |
-            Invoke-WebRequest -Uri "https://msp.ucsd.edu/Software/pd-0.53-2.msw.zip" -OutFile "pd.zip"
-            Expand-Archive -Path "pd.zip" -DestinationPath "C:\"
-            echo "C:\pd\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
-
-        - name: Set up Conan
-          run: |
-            pip install conan
-            conan profile detect
-
-        - name: Configure Conan
-          working-directory: puredata
-          run: |
-            mkdir build -Force
-            conan install . --output-folder=build --build=missing
-
-        - name: Build Pure Data Externals
-          working-directory: puredata
-          run: |
-            $env:PATH += ";C:\pd\bin"
-            make PDINCLUDEDIR=C:\pd\src
-
-        - name: Install Pure Data Externals
-          working-directory: puredata
-          run: |
-            make install PDLIBDIR=build
-
-        - name: Upload Windows artifacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: zerr-pd-windows
-            path: puredata/build/zerr
-
-
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          release: false
+          path-type: inherit
+          install: >-
+            mingw-w64-x86_64-ntldd-git
+            
+      - name: Find usable compiler
+        id: compiler
+        run: |
+          for cc in cc gcc clang; do echo "testing compiler $cc"; "${cc}" -dumpmachine && export CC=${CC:-$cc} || true; done
+          echo "CC=${CC}" | tee "$GITHUB_OUTPUT"
+          
+      - name: Install Pd
+        id: pd
+        run: |
+          wget -q -O Pd.zip http://msp.ucsd.edu/Software/pd-0.53-2.msw.zip
+          rm -rf "${PROGRAMFILES}/pd" && mkdir -p "${PROGRAMFILES}/pd"
+          unzip -q Pd.zip -d "${PROGRAMFILES}/pd"
+          mv -v "${PROGRAMFILES}/pd"/*/* "${PROGRAMFILES}/pd"
+          rm -f Pd.zip
+          export PD="${PROGRAMFILES}/pd/bin/pd.com"
+          echo "PD=${PD}" | tee "$GITHUB_OUTPUT"
+          
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          
+      - name: Download zerr-core library
+        uses: actions/download-artifact@v4
+        with:
+          name: zerr-core-windows
+          path: core/lib/
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          
+      - name: Display structure of downloaded files
+        run: ls -la core/lib/
+        
+      - name: Set up Conan
+        run: |
+          pip install conan
+          conan profile detect
+          
+      - name: Configure Conan
+        working-directory: puredata
+        run: |
+          mkdir -p build
+          conan install . --output-folder=build --build=missing
+          
+      - name: Build
+        env:
+          CC: ${{ steps.compiler.outputs.CC }}
+          PD: ${{ steps.pd.outputs.PD }}
+        working-directory: puredata
+        run: make
+        
+      - name: Install
+        env:
+          CC: ${{ steps.compiler.outputs.CC }}
+          PD: ${{ steps.pd.outputs.PD }}
+          MSYS2_ARG_CONV_EXCL: PDLIBDIR=
+        working-directory: puredata
+        run: make install PDLIBDIR=build
+        
+      # - name: DLL dependencies
+      #   working-directory: puredata
+      #   run: |
+      #     mkdir -p .git-ci
+      #     test -e .git-ci/localdeps.win.sh || (wget -q -O .git-ci/localdeps.win.sh "https://git.iem.at/pd/iem-ci/raw/main/localdeps/localdeps.win.sh" && chmod +x .git-ci/localdeps.win.sh) || true
+      #     if [ -x .git-ci/localdeps.win.sh ]; then find build/zerr -type f "(" -name "*.pd_*" -o -name "*.dll" -o -name "*.exe" -o -name "*.com" ")" -exec .git-ci/localdeps.win.sh {} +; fi
+          
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-pd-windows
+          path: puredata/build/zerr
 
