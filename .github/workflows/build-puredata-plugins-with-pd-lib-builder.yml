@@ -217,28 +217,17 @@ jobs:
           mkdir -p build
           conan install . --output-folder=build --build=missing
           
-      - name: Build
-        env:
-          CC: ${{ steps.compiler.outputs.CC }}
-          PD: ${{ steps.pd.outputs.PD }}
-        working-directory: puredata
-        run: make
-        
-      - name: Install
-        env:
-          CC: ${{ steps.compiler.outputs.CC }}
-          PD: ${{ steps.pd.outputs.PD }}
-          MSYS2_ARG_CONV_EXCL: PDLIBDIR=
-        working-directory: puredata
-        run: make install PDLIBDIR=build
-        
-      # - name: DLL dependencies
+      # - name: Build
       #   working-directory: puredata
-      #   run: |
-      #     mkdir -p .git-ci
-      #     test -e .git-ci/localdeps.win.sh || (wget -q -O .git-ci/localdeps.win.sh "https://git.iem.at/pd/iem-ci/raw/main/localdeps/localdeps.win.sh" && chmod +x .git-ci/localdeps.win.sh) || true
-      #     if [ -x .git-ci/localdeps.win.sh ]; then find build/zerr -type f "(" -name "*.pd_*" -o -name "*.dll" -o -name "*.exe" -o -name "*.com" ")" -exec .git-ci/localdeps.win.sh {} +; fi
-          
+      #   run: make
+        
+      - name: Install & Install
+        working-directory: puredata
+        run: |
+          make 
+          make install PDLIBDIR=build
+        
+
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
