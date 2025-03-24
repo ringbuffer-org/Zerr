@@ -99,7 +99,7 @@ jobs:
           make 
           make install PDLIBDIR=build
 
-      - name: Upload macOS artifacts
+      - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
         with:
           name: zerr-pd-linux
