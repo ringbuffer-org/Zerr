@@ -24,7 +24,7 @@ Logger::Logger(PrintStrategy printer)
 }
 
 Logger::Logger()
-    : logLevel(LogLevel::ERROR)
+    : logLevel(LogLevel::WARNING)
     , printer_([](const std::string) { }) // dummy lambda that does nothing
 {
 }
@@ -73,7 +73,4 @@ std::string Logger::formatLog_(LogLevel level, const std::string& message)
     std::string formattedMessage = formattedStream.str();
 
     return formattedMessage;
-
-    // std::cout << formattedMessage << std::endl;
-    // post(formattedMessage.c_str());
 }

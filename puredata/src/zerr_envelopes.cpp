@@ -15,16 +15,6 @@ ZerrEnvelopes::ZerrEnvelopes(zerr::SystemConfigs systemCfgs, std::string selecti
     this->selectionMode = selectionMode;
 
     envelopeGenerator = new zerr::EnvelopeGenerator(systemCfgs, spkrCfgFile, selectionMode);
-
-    // auto printFunc = [](const std::string& formattedMessage) {
-    //     post(formattedMessage.c_str());
-    // };
-
-    // logger = new zerr::Logger(printFunc);
-
-    // #ifdef TESTMODE
-    // logger->setLogLevel(zerr::LogLevel::DEBUG);
-    // #endif // TESTMODE
 }
 
 bool ZerrEnvelopes::initialize()
@@ -36,10 +26,14 @@ bool ZerrEnvelopes::initialize()
 
     // assgin Pure Data print method the the logger function
     // Because we want to see logs in the PD log window
-    auto printFunc = [](const std::string& formattedMessage) {
-        post(formattedMessage.c_str());
+    auto printFunc = [](const std::string& msg) {
+        post(msg.c_str());
     };
-    envelopeGenerator->logger->setPrinter(printFunc);
+    envelopeGenerator->setPrinter(printFunc);
+
+    // post("1. About to call setPrinter");
+    // envelopeGenerator->logger->logInfo("2. About to call setPrinter");
+    // envelopeGenerator->speakerManager->logger->logInfo("3. About to call setPrinter");
 
     numOutlet = envelopeGenerator->getNumSpeakers();
 
@@ -63,11 +57,6 @@ void ZerrEnvelopes::perform(float** ports, int blockSize)
         }
     }
 
-    // try {
-    //     outputBuffer = envelopeGenerator->perform(inputBuffer);
-    // } catch (...) {
-    //     return;
-    // }
     outputBuffer = envelopeGenerator->perform(inputBuffer);
 
     for (int i = 0; i < numOutlet; i++) {
@@ -120,5 +109,4 @@ void ZerrEnvelopes::printParameters()
 ZerrEnvelopes::~ZerrEnvelopes()
 {
     delete envelopeGenerator;
-    delete logger;
 }

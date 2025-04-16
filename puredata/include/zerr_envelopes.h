@@ -4,13 +4,12 @@
  * @brief EnvelopeGenerator Class Puredata Wrapper - Provides interface between Pure Data and the core envelope generation functionality
  * @date 2023-08-04
  *
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  */
 #pragma once
 #include "m_pd.h"
 
 #include "types.h"
-// #include "utils.h"
 #include "envelopegenerator.h"
 #include "logger.h"
 #include "ringbuffer.h"
@@ -101,5 +100,4 @@ class ZerrEnvelopes {
     std::string selectionMode; /**< Mode for selecting output speaker routing */
 
     zerr::EnvelopeGenerator* envelopeGenerator; /**< Core component that implements the envelope generation algorithms */
-    // zerr::Logger* logger; /**< Logging utility for debug and error messages across platforms */
 };

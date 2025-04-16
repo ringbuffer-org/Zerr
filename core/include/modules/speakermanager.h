@@ -4,7 +4,7 @@
  * @brief  Speaker & SpeakerManager Classes Header - Contains class definitions for managing speaker configurations and behaviors
  * @date 2024-02-18
  *
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  *
  * This header file defines the Speaker and SpeakerManager classes used to
  * manage speaker configurations and behaviors in the zerr namespace. It
@@ -284,16 +284,21 @@ class SpeakerManager {
      */
     void printTrajectoryVector();
 
- private:
+    void setPrinter(Logger::PrintStrategy newPrinter)
+    {
+        // The logger of SpeakerManger
+        logger->setPrinter(newPrinter);
+    }
+
     Logger* logger; ///< Pointer to a Logger object for logging messages and errors
                     ///< in different environments.
-    ConfigPath
-        speakerArrayPath; ///< Path to the YAML speaker array configuration file.
+
+ private:
+    ConfigPath speakerArrayPath; ///< Path to the YAML speaker array configuration file.
     YAML::Node speakerArrayNode; ///< YAML Node containing the parsed speaker
                                  ///< array configuration data.
 
-    std::map<Index, Speaker>
-        speakers; ///< Map associating speaker indexes with their Speaker objects.
+    std::map<Index, Speaker> speakers; ///< Map associating speaker indexes with their Speaker objects.
     std::map<Index, Params> distanceMatrix; ///< Matrix storing pre-calculated
                                             ///< distances between all speaker pairs.
 

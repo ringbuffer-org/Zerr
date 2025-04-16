@@ -4,7 +4,7 @@
  * @brief Envelope Generator Class Implementation
  * @date 2024-02-07
  *
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  */
 #include "envelopegenerator.h"
 
@@ -13,7 +13,8 @@ using zerr::EnvelopeGenerator;
 using zerr::Param;
 
 EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs,
-                                     std::string speakerCfgs, Mode genMode) {
+    std::string speakerCfgs, Mode genMode)
+{
     this->systemCfgs = systemCfgs;
     this->speakerCfgs = speakerCfgs;
     this->genMode = genMode;
@@ -26,12 +27,15 @@ EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs,
 
 #ifdef TESTMODE
     logger->setLogLevel(LogLevel::INFO);
-#endif  // TESTMODE
+#endif // TESTMODE
 }
 
-bool EnvelopeGenerator::initialize() {
+bool EnvelopeGenerator::initialize()
+{
+    logger->logDebug("EnvelopeGenerator::initialize start!");
     // initialize speaker manager
-    if (!speakerManager->initialize()) return false;
+    if (!speakerManager->initialize())
+        return false;
 
     // check the generator mode and bind process func
     if (genMode == "trigger") {
@@ -68,7 +72,8 @@ bool EnvelopeGenerator::initialize() {
     return true;
 }
 
-Blocks EnvelopeGenerator::perform(Blocks in) {
+Blocks EnvelopeGenerator::perform(Blocks in)
+{
     // fetch
     inputBuffers = in;
 
@@ -81,28 +86,34 @@ Blocks EnvelopeGenerator::perform(Blocks in) {
     return outputBuffers;
 }
 
-int EnvelopeGenerator::getNumSpeakers() {
+int EnvelopeGenerator::getNumSpeakers()
+{
     return speakerManager->getNumAllSpeakers();
 }
 
-void EnvelopeGenerator::setCurrentSpeaker(Index newIdx) {
+void EnvelopeGenerator::setCurrentSpeaker(Index newIdx)
+{
     speakerManager->setCurrentSpeaker(newIdx);
 }
 
 void EnvelopeGenerator::setActiveSpeakerIndexs(std::string action,
-                                               Indexes idxs) {
+    Indexes idxs)
+{
     speakerManager->setActiveSpeakers(action, idxs);
 }
 
-void EnvelopeGenerator::setTrajectoryVector(Indexes idxs) {
+void EnvelopeGenerator::setTrajectoryVector(Indexes idxs)
+{
     speakerManager->setTrajectoryVector(idxs);
 }
 
-void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs) {
+void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs)
+{
     speakerManager->setTopoMatrix(action, idxs);
 }
 
-void EnvelopeGenerator::setTriggerInterval(Param newInterval) {
+void EnvelopeGenerator::setTriggerInterval(Param newInterval)
+{
     newInterval = newInterval < 0 ? 0 : newInterval;
     int newThreshold = (int)(newInterval / 1000.0 * systemCfgs.sample_rate);
     onsetDetector->setDebounceThreshold(newThreshold);
@@ -110,16 +121,26 @@ void EnvelopeGenerator::setTriggerInterval(Param newInterval) {
 
 void EnvelopeGenerator::printParameters() { speakerManager->printParameters(); }
 
-EnvelopeGenerator::~EnvelopeGenerator() {
+EnvelopeGenerator::~EnvelopeGenerator()
+{
     delete speakerManager;
     delete logger;
     delete onsetDetector;
 }
 
-void EnvelopeGenerator::_processTrigger() {
+void EnvelopeGenerator::setPrinter(Logger::PrintStrategy newPrinter)
+{
+    // The logger of EnvelopeGenerator
+    logger->setPrinter(newPrinter);
+    // The logger of SpeakerManger
+    speakerManager->setPrinter(newPrinter);
+}
+
+void EnvelopeGenerator::_processTrigger()
+{
     size_t channel;
-    Params distances;  // distances between speakers
-    Param powerSum;    // the overall power
+    Params distances; // distances between speakers
+    Param powerSum; // the overall power
     Param gain;
     Index currIdx;
 
@@ -140,8 +161,8 @@ void EnvelopeGenerator::_processTrigger() {
     for (size_t cnt = 0; cnt < inputBuffers[0].size(); ++cnt) {
         // find main speaker
         currIdx = speakerManager->getIndexesByTrigger(triggr[cnt], triggerMode);
-        channel = indexChannelLookup[currIdx];  // get the channel of the
-                                                // current speaker
+        channel = indexChannelLookup[currIdx]; // get the channel of the
+                                               // current speaker
         outputBuffers[channel][cnt] = 1.0;
         powerSum = 1.0;
 
@@ -158,13 +179,13 @@ void EnvelopeGenerator::_processTrigger() {
 
         // normalize the overall power
         for (size_t chnl = 0; chnl < outputBuffers.size(); ++chnl) {
-            outputBuffers[chnl][cnt] =
-                sqrt(outputBuffers[chnl][cnt] / powerSum) * volume[cnt];
+            outputBuffers[chnl][cnt] = sqrt(outputBuffers[chnl][cnt] / powerSum) * volume[cnt];
         }
     }
 }
 
-void EnvelopeGenerator::_processTrajectory() {
+void EnvelopeGenerator::_processTrajectory()
+{
     Pair speakerPair;
     Pair channelPair;
 
@@ -188,18 +209,18 @@ void EnvelopeGenerator::_processTrajectory() {
 
         if (speakerPair.first == speakerPair.second) {
             outputBuffers[channelPair.first][cnt] = volume[cnt];
-        } else {  // linear panning TODO: change to parameterized crossfade
+        } else { // linear panning TODO: change to parameterized crossfade
             panRatio = speakerManager->getPanningRatio(trjcty[cnt]);
-            outputBuffers[channelPair.first][cnt] =
-                volume[cnt] * (1 - panRatio);
+            outputBuffers[channelPair.first][cnt] = volume[cnt] * (1 - panRatio);
             outputBuffers[channelPair.second][cnt] = volume[cnt] * panRatio;
         }
     }
 }
 
-Param EnvelopeGenerator::_calculateGain(Param x, Param theta) {
-    x = x * DISTANCE_SCALE;  // TODO: remove this distance scale or make it more
-                             // versitle
+Param EnvelopeGenerator::_calculateGain(Param x, Param theta)
+{
+    x = x * DISTANCE_SCALE; // TODO: remove this distance scale or make it more
+                            // versitle
 
     // clip the theta
     theta = theta < 0.0 ? 0 : theta;
@@ -208,8 +229,8 @@ Param EnvelopeGenerator::_calculateGain(Param x, Param theta) {
     Param tmp = tan(theta * PI / 2.0);
 
     Param gain = isEqualTo0(tmp, VOLUME_THRESHOLD)
-                     ? 0.0
-                     : 1.0 - x / tan(theta * PI / 2.0);
+        ? 0.0
+        : 1.0 - x / tan(theta * PI / 2.0);
 
     // clip gain
     gain = gain < 0.0 ? 0 : gain;

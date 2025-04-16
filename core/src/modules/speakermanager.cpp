@@ -4,7 +4,7 @@
  * @brief  Speaker & SpeakerManager Classes Implementation
  * @date 2024-02-18
  *
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  *
  */
 #include "speakermanager.h"

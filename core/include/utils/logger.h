@@ -20,6 +20,7 @@ enum class LogLevel {
     ERROR
 };
 
+
 /**
  * @brief A logging utility class for recording application events and messages
  *

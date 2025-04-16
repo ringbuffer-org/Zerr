@@ -1,8 +1,6 @@
 #ifndef CONFIGS_H
 #define CONFIGS_H
 
-// #define PUREDATA /**< Include Puredata specified functions  */
-
 #define TESTMODE /**< Print log when TESTMODE Macro defined */
 
 #define TRIGGER_THRESHOLD 1e-4 /**< Threshold value for triggering feature extraction */

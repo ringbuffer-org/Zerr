@@ -8,7 +8,7 @@
  * for dynamic spatial audio experiences.
  * @date 2024-02-07
  *
- * @copyright Copyright (c) 2023-2024
+ * @copyright Copyright (c) 2023-2025
  */
 #ifndef CORE_ENVELOPEGENERATOR_H
 #define CORE_ENVELOPEGENERATOR_H
@@ -35,9 +35,6 @@ class EnvelopeGenerator {
     const int numInlet = 3; ///< Number of inlets: main(1), spread(2), volume(3).
     int numOutlet; ///< Number of outlets, assigned according to the speaker
                    ///< configuration.
-
-    Logger* logger; /**< Logger object for printing logs to all kinds of console */
-
     /**
      * @brief Constructor of EnvelopeGenerator setups the parameters for
      * initializing this Class.
@@ -110,10 +107,15 @@ class EnvelopeGenerator {
      */
     ~EnvelopeGenerator();
 
+    /**
+     * @brief xxxxx
+     */
+    void setPrinter(Logger::PrintStrategy newPrinter);
 
+    Logger* logger; /**< Logger object for printing logs to all kinds of console */
+
+    SpeakerManager* speakerManager; /**< SpeakerManger object to access the speaker array information */
  private:
-
-
     typedef void (EnvelopeGenerator::*ProcessFunction)();
     ProcessFunction processFunc;
 
@@ -130,8 +132,7 @@ class EnvelopeGenerator {
     AudioBuffers outputBuffers; /**< multi-channel output buffer in the shape of
                                    output channel number x block size */
 
-    SpeakerManager* speakerManager; /**< SpeakerManger object to access the
-                                       speaker array information */
+    // SpeakerManager* speakerManager; /**< SpeakerManger object to access the speaker array information */
 
     OnsetDetector* onsetDetector; /**< Detector for identifying onset triggers in the input signal */
 
