@@ -1,7 +1,7 @@
 #ifndef CONFIGS_H
 #define CONFIGS_H
 
-#define PUREDATA /**< Include Puredata specified functions  */
+// #define PUREDATA /**< Include Puredata specified functions  */
 
 #define TESTMODE /**< Print log when TESTMODE Macro defined */
 

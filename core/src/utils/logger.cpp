@@ -1,58 +1,79 @@
 #include "logger.h"
 using namespace zerr;
 
-std::string logLevelToString(LogLevel level) {
+std::string logLevelToString(LogLevel level)
+{
     switch (level) {
-        case LogLevel::INFO:
-            return "INFO";
-        case LogLevel::WARNING:
-            return "WARNING";
-        case LogLevel::ERROR:
-            return "ERROR";
-        case LogLevel::DEBUG:
-            return "DEBUG";
-        default:
-            return "UNKNOWN";
+    case LogLevel::INFO:
+        return "INFO";
+    case LogLevel::WARNING:
+        return "WARNING";
+    case LogLevel::ERROR:
+        return "ERROR";
+    case LogLevel::DEBUG:
+        return "DEBUG";
+    default:
+        return "UNKNOWN";
     }
 }
 
-Logger::Logger() : logLevel(LogLevel::ERROR) {}
-
-void Logger::setLogLevel(LogLevel level) { logLevel = level; }
-
-void Logger::logError(const std::string& errorMessage) {
-    log(LogLevel::ERROR, errorMessage);
+Logger::Logger(PrintStrategy printer)
+    : logLevel(LogLevel::WARNING)
+    , printer_(std::move(printer))
+{
 }
 
-void Logger::logWarning(const std::string& warningMessage) {
-    log(LogLevel::WARNING, warningMessage);
+Logger::Logger()
+    : logLevel(LogLevel::ERROR)
+    , printer_([](const std::string) { }) // dummy lambda that does nothing
+{
 }
 
-void Logger::logInfo(const std::string& infoMessage) {
-    log(LogLevel::INFO, infoMessage);
+void Logger::logError(const std::string& errorMessage)
+{
+    if (logLevel > LogLevel::ERROR)
+        return;
+
+    auto logMessage = formatLog_(LogLevel::ERROR, errorMessage);
+    printer_(logMessage);
 }
 
-void Logger::logDebug(const std::string& debugMessage) {
-    log(LogLevel::DEBUG, debugMessage);
+void Logger::logWarning(const std::string& warningMessage)
+{
+    if (logLevel > LogLevel::WARNING)
+        return;
+
+    auto logMessage = formatLog_(LogLevel::WARNING, warningMessage);
+    printer_(logMessage);
 }
 
-void Logger::log(LogLevel level, const std::string& message) {
-    if (level < logLevel) return;
+void Logger::logInfo(const std::string& infoMessage)
+{
+    if (logLevel > LogLevel::INFO)
+        return;
 
-    // std::time_t now = std::time(nullptr);
-    // char timestamp[100];
-    // std::strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S",
-    // std::localtime(&now));
+    auto logMessage = formatLog_(LogLevel::INFO, infoMessage);
+    printer_(logMessage);
+}
 
+void Logger::logDebug(const std::string& debugMessage)
+{
+    if (logLevel > LogLevel::DEBUG)
+        return;
+
+    auto logMessage = formatLog_(LogLevel::DEBUG, debugMessage);
+    printer_(logMessage);
+}
+
+std::string Logger::formatLog_(LogLevel level, const std::string& message)
+{
     std::ostringstream formattedStream;
-    // formattedStream << "[" << timestamp << "] [" << logLevelToString(level)
-    // << "] " << message;
+
     formattedStream << "[" << logLevelToString(level) << "] " << message;
     std::string formattedMessage = formattedStream.str();
 
-#ifdef PUREDATA
-    post(formattedMessage.c_str());
-#else
-    std::cout << formattedMessage << std::endl;
-#endif  // PUREDATA
+    return formattedMessage;
+
+    // std::cout << formattedMessage << std::endl;
+    // post(formattedMessage.c_str());
 }

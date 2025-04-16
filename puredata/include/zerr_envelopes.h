@@ -7,9 +7,7 @@
  * @copyright Copyright (c) 2023-2024
  */
 #pragma once
-
-// #include <stdlib.h>
-// #include <string>
+#include "m_pd.h"
 
 #include "types.h"
 // #include "utils.h"
@@ -20,14 +18,13 @@
 /**
  * @class ZerrEnvelopes
  * @brief Main wrapper class that interfaces between Pure Data and the core envelope generation functionality
- * 
+ *
  * This class handles the initialization, audio processing, and cleanup of envelope generation operations.
  * It manages the data flow between Pure Data's audio system and the internal envelope processing chain.
  */
 class ZerrEnvelopes {
-  public:
-    const int numInlet =
-        3;         /**< Number of signal inlets: main(1)/spread(2)/volume(3) */
+ public:
+    const int numInlet = 3; /**< Number of signal inlets: main(1)/spread(2)/volume(3) */
     int numOutlet; /**< Number of signal outlets based on speaker configuration */
     /**
      * @brief Creates a new ZerrEnvelopes instance
@@ -36,7 +33,7 @@ class ZerrEnvelopes {
      * @param spkrCfgFile Path to the speaker array configuration file
      */
     ZerrEnvelopes(zerr::SystemConfigs systemCfgs, std::string selectionMode,
-                  std::string spkrCfgFile);
+        std::string spkrCfgFile);
     /**
      * @brief Initializes all internal components and prepares the object for processing
      * @return true if initialization was successful, false otherwise
@@ -92,18 +89,17 @@ class ZerrEnvelopes {
      */
     ~ZerrEnvelopes();
 
-  private:
+ private:
     zerr::SystemConfigs systemCfgs; /**< Pure Data system configuration settings */
 
-    zerr::Blocks inputBuffer;  /**< Multi-channel buffer for storing incoming audio samples */
+    zerr::Blocks inputBuffer; /**< Multi-channel buffer for storing incoming audio samples */
     zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing processed audio samples */
-    float** inPtr;            /**< Array of pointers to Pure Data input signal vectors */
-    float** outPtr;           /**< Array of pointers to Pure Data output signal vectors */
+    float** inPtr; /**< Array of pointers to Pure Data input signal vectors */
+    float** outPtr; /**< Array of pointers to Pure Data output signal vectors */
 
-    std::string spkrCfgFile;   /**< Path to speaker configuration file */
+    std::string spkrCfgFile; /**< Path to speaker configuration file */
     std::string selectionMode; /**< Mode for selecting output speaker routing */
 
-    zerr::EnvelopeGenerator*
-        envelopeGenerator; /**< Core component that implements the envelope generation algorithms */
-    zerr::Logger* logger;  /**< Logging utility for debug and error messages across platforms */
+    zerr::EnvelopeGenerator* envelopeGenerator; /**< Core component that implements the envelope generation algorithms */
+    // zerr::Logger* logger; /**< Logging utility for debug and error messages across platforms */
 };

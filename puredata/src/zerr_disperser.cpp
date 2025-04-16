@@ -11,6 +11,9 @@
 
 ZerrDisperser::ZerrDisperser(int numChannel, zerr::SystemConfigs systemCfgs) {
     audioDisperser = new zerr::AudioDisperser(numChannel, systemCfgs);
+
+    
+    
     logger = new zerr::Logger();
 
     #ifdef TESTMODE
