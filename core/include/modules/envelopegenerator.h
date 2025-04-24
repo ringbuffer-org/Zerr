@@ -112,10 +112,12 @@ class EnvelopeGenerator {
      */
     void setPrinter(Logger::PrintStrategy newPrinter);
 
+
+ private:
     Logger* logger; /**< Logger object for printing logs to all kinds of console */
 
     SpeakerManager* speakerManager; /**< SpeakerManger object to access the speaker array information */
- private:
+
     typedef void (EnvelopeGenerator::*ProcessFunction)();
     ProcessFunction processFunc;
 

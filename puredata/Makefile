@@ -3,7 +3,7 @@
 # settings and rules.
 
 CC  = g++
-cflags = -std=c++11 -Wall
+cflags = -std=c++17 -Wall
 
 include build/conandeps.mk
 

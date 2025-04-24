@@ -32,7 +32,6 @@ EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs,
 
 bool EnvelopeGenerator::initialize()
 {
-    logger->logDebug("EnvelopeGenerator::initialize start!");
     // initialize speaker manager
     if (!speakerManager->initialize())
         return false;

@@ -1,3 +1,13 @@
+/**
+ * @file logger.h
+ * @author Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief  xxxxx
+ * @date 2024-02-18
+ *
+ * @copyright Copyright (c) 2023-2025
+ *
+ * xxxxxx
+ */
 #ifndef LOGGER_H
 #define LOGGER_H
 

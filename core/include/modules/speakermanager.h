@@ -117,8 +117,7 @@ class Speaker {
     Index index; ///< Unique identification number of the speaker.
     Position position; ///< Position of the speaker in both Cartesian and
                        ///< spherical coordinates.
-    Orientation
-        orientation; ///< Orientation of the speaker in terms of yaw and pitch.
+    Orientation orientation; ///< Orientation of the speaker in terms of yaw and pitch.
 
     void _print_index(); ///< Internal method to print the speaker's index to console.
     void _print_position(); ///< Internal method to print the speaker's position coordinates.

@@ -31,10 +31,6 @@ bool ZerrEnvelopes::initialize()
     };
     envelopeGenerator->setPrinter(printFunc);
 
-    // post("1. About to call setPrinter");
-    // envelopeGenerator->logger->logInfo("2. About to call setPrinter");
-    // envelopeGenerator->speakerManager->logger->logInfo("3. About to call setPrinter");
-
     numOutlet = envelopeGenerator->getNumSpeakers();
 
     inputBuffer.resize(numInlet, zerr::Samples(systemCfgs.block_size, 0.0f));
