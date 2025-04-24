@@ -9,6 +9,7 @@
 [submodule "maxmsp/source/min-api"]
 	path = maxmsp/source/min-api
 	url = https://github.com/Cycling74/min-api.git
+	
 [submodule "maxmsp/source/min-lib"]
 	path = maxmsp/source/min-lib
 	url = https://github.com/Cycling74/min-lib.git
