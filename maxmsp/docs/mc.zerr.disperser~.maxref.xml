@@ -6,8 +6,8 @@
 
 <c74object name='mc.zerr.disperser~' category='dsp'>
 
-	<digest>Apply envelope signals to source signal[mc.zerr.disperser~] provides information about what is happening in the multi-channel signal with sample accuracy</digest>
-	<description>Apply envelope signals to source signal[mc.zerr.disperser~] provides information about what is happening in the multi-channel signal with sample accuracy. </description>
+	<digest>The <o>zerr_disperser~</o> is for simply multiply the source signal with the envelopes to achieve multichannel panning</digest>
+	<description>The <o>zerr_disperser~</o> is for simply multiply the source signal with the envelopes to achieve multichannel panning.[mc.zerr.disperser~] xxxxxxxxxxxxxxx </description>
 
 
 	<!--METADATA-->

@@ -1,5 +1,5 @@
 {
-	"author" : "Cycling '74",
+	"author" : "Zeyu Yang",
 	"description" : "Lightweight reference implementation of a package built using the Min-API.",
 	"homepatcher" : "C++ Object Development Kit.maxpat",
 	"max_version_min" : "8.0", "max_version_max" : "none",
