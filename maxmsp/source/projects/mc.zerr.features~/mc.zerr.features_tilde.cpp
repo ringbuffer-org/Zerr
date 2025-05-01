@@ -13,10 +13,12 @@
 #include "ext_obex.h"
 #include "z_dsp.h"
 
+#include "./mc_zerr_features.hpp"
+
 typedef struct _zerr_features {
     t_pxobject x_obj; // DSP object header
     long channel_count; // Channel count for output
-    // double* values; // Storage for audio processing (if needed)
+    // ZerrFeatures *z; 
 } t_zerr_features;
 
 void* zerr_features_new(t_symbol* s, long argc, t_atom* argv);
@@ -79,7 +81,6 @@ void* zerr_features_new(t_symbol* s, long argc, t_atom* argv)
         // Allocate memory if needed
         // x->values = (double*)sysmem_newptrclear(x->channel_count * sizeof(double));
 
-        // Set up DSP
         dsp_setup((t_pxobject*)x, 1); // One signal inlet
 
         // Mark as multichannel enabled
@@ -139,7 +140,6 @@ void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, 
 {
     for (long channel = 0; channel < numouts; channel++) {
         if (channel < x->channel_count) {
-            // Clear the output buffer
             memset(outs[channel], 0, sampleframes * sizeof(double));
         }
     }

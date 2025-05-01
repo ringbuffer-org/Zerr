@@ -36,7 +36,6 @@ class mc_zerr_features_tilde : public object<mc_zerr_features_tilde>, public mc_
     // ==========================
     mc_zerr_features_tilde(const atoms& args = {})
     {
-        // Override with constructor arguments if provided
         if (args.size() > 0) {
             channel = args[0];
         }
