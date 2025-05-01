@@ -19,32 +19,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "multichannelsignal" ],
-					"patching_rect" : [ 351.0, 198.0, 118.0, 22.0 ],
-					"text" : "mc.zerr.features~ 13"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"id" : "obj-23",
-					"maxclass" : "message",
-					"numinlets" : 2,
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 383.0, 102.0, 38.0, 22.0 ],
-					"text" : "ch 23"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"id" : "obj-18",
-					"maxclass" : "newobj",
-					"numinlets" : 1,
-					"numoutlets" : 1,
-					"outlettype" : [ "multichannelsignal" ],
-					"patching_rect" : [ 268.0, 591.0, 94.0, 22.0 ],
-					"text" : "mc.adc~ 1 2 3 4"
+					"patching_rect" : [ 351.0, 198.0, 170.0, 22.0 ],
+					"text" : "mc.zerr.features~ dd id sad da",
+					"varname" : "dasdf"
 				}
 
 			}
@@ -134,8 +111,8 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "multichannelsignal" ],
-					"patching_rect" : [ 92.0, 173.0, 118.0, 22.0 ],
-					"text" : "mc.zerr.features~ 13"
+					"patching_rect" : [ 92.0, 173.0, 150.0, 22.0 ],
+					"text" : "mc.zerr.features~ ft ds sdd"
 				}
 
 			}
@@ -457,6 +434,22 @@
 				"patchline" : 				{
 					"destination" : [ "obj-15", 0 ],
 					"source" : [ "obj-4", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-20", 0 ],
+					"order" : 1,
+					"source" : [ "obj-7", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-4", 0 ],
+					"order" : 0,
+					"source" : [ "obj-7", 0 ]
 				}
 
 			}
