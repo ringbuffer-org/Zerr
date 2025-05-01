@@ -1,7 +1,12 @@
-/// @file       mc.zerr.disperser_tilde.cpp
-/// @ingroup    zerr
-/// @copyright  Copyright 2023-2025
-/// @license    MIT license
+/**
+ * @file    mc.zerr.disperser_tilde.cpp
+ * @author  Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief   mc.zerr.disperser~ Max/MSP External
+ * @date    2025-04-29
+ *
+ * @copyright  Copyright (c) 2023-2025
+ * @license    MIT license
+ */
 
 #include "c74_min.h"
 
@@ -32,8 +37,8 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // ==========================
     mc_zerr_disperser_tilde(const atoms& args = {})
     {
-        n_envs = 1;
-        n_source = 1;
+        channelCountEnv = 1;
+        channelCountSrc = 1;
     }
 
     // ===================================
@@ -46,11 +51,11 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
         // The source signal must be 1-channel
         // Force the outlet to 1-channel when invalid source input connected
         // The output will be all zero according to the channel check in the operator
-        if (x->n_source != 1) {
+        if (x->channelCountSrc != 1) {
             return 1;
         }
 
-        return x->n_envs;
+        return x->channelCountEnv;
     }
 
     static long _input_changed(c74::max::t_object* obj, long inletindex, long count)
@@ -61,13 +66,13 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
         // Store the channel count of the source inlet
         // We don't react to the source inlet change
         if (inletindex == 0) {
-            x->n_source = count;
+            x->channelCountSrc = count;
             return false;
         }
 
         // Store the channel count of the envelope inlet
         if (inletindex == 1) {
-            x->n_envs = count;
+            x->channelCountEnv = count;
             return true;
         }
 
@@ -78,10 +83,9 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // Ref: https://sdk.cdn.cycling74.com/max-sdk-8.2.0/chapter_mc.html
     message<> maxclass_setup {
         this, "maxclass_setup",
-        // It is usually recommended to use the MIN_FUNCTION macro for proper lambda function prototype
-        // However, it can breack the linter(maybe), so boilerplate is used here
+        // It is usually recommended to use the MIN_FUNCTION macro for proper lambda prototype
+        // However, it can breack my linter(maybe), so boilerplate is used here
         [this](const atoms& args, const int inlet) -> atoms {
-            // using namespace c74::max;
             c74::max::t_class* c = args[0];
 
             class_addmethod(c, (c74::max::method)&_mc_outputs,
@@ -108,7 +112,7 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
         // get the pointer to the source signal (signal channel)
         auto source = input.samples(0);
 
-        // simply apply envelope signals to the source signal
+        // simply apply envelopes to the source signal
         for (auto i = 0; i < input.frame_count(); ++i) {
             for (auto channel = 1; channel < input.channel_count(); ++channel) {
                 output.samples(channel - 1)[i] = input.samples(channel)[i] * source[i];
@@ -138,8 +142,8 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // attribute<double> max { this, "maximum", 1.0 };
 
  private:
-    int n_source;
-    int n_envs;
+    int channelCountSrc;
+    int channelCountEnv;
 };
 
 MIN_EXTERNAL(mc_zerr_disperser_tilde);
