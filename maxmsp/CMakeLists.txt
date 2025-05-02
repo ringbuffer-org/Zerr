@@ -23,6 +23,12 @@ if (APPLE)
         endif()
         message("CMAKE_OSX_ARCHITECTURES set to ${CMAKE_OSX_ARCHITECTURES}")
     endif()
+    
+    # Set minimum macOS version to match the libraries
+    if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "macOS deployment target" FORCE)
+        message("CMAKE_OSX_DEPLOYMENT_TARGET set to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    endif()
 endif()
 
 
