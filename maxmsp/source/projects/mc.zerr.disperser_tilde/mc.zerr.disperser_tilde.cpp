@@ -36,9 +36,9 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // Constructor
     // ==========================
     mc_zerr_disperser_tilde(const atoms& args = {})
+        : channelCountEnv { 1 }
+        , channelCountSrc { 1 }
     {
-        channelCountEnv = 1;
-        channelCountSrc = 1;
     }
 
     // ===================================
@@ -124,16 +124,16 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // Messages
     // ==========================
     // Disable bang message
-    message<> bang { this, "bang", "Post something to the Max console.",
-        [this](const atoms& args, const int inlet) -> atoms {
-            return {};
-        } };
+    // message<> bang { this, "bang", "Ignored bang message.",
+    //     [this](const atoms& args, const int inlet) -> atoms {
+    //         return {};
+    //     } };
 
-    // Disable number message
-    message<> number { this, "number",
-        [this](const atoms& args, const int inlet) -> atoms {
-            return {};
-        } };
+    // // Disable number message
+    // message<> number { this, "Ignored number message.",
+    //     [this](const atoms& args, const int inlet) -> atoms {
+    //         return {};
+    //     } };
 
     // ==========================
     // Attributes
@@ -142,8 +142,8 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // attribute<double> max { this, "maximum", 1.0 };
 
  private:
-    int channelCountSrc;
-    int channelCountEnv;
+    int channelCountSrc { 1 };
+    int channelCountEnv { 1 };
 };
 
 MIN_EXTERNAL(mc_zerr_disperser_tilde);

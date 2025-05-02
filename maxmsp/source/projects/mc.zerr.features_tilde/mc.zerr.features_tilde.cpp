@@ -152,7 +152,7 @@ long zerr_features_multichanneloutputs(t_zerr_features* x, long outletindex)
 void zerr_features_dsp64(t_zerr_features* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags)
 {
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_features_perform64, 0, NULL);
-    post("zerr_features_dsp64: samplerate %f maxvectorsize %d", samplerate, maxvectorsize);
+    post("zerr_features_dsp64: samplerate %.0lf maxvectorsize %d", samplerate, maxvectorsize);
 }
 
 //--------------------------------------------------------------------------

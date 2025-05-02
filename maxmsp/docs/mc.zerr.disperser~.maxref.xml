@@ -29,16 +29,6 @@
 
 	<methodlist>
 
-		<method name='bang'>
-			<digest>Post something to the Max console</digest>
-			<description>Post something to the Max console. </description>
-		</method>
-
-		<method name='float'>
-			<digest></digest>
-			<description></description>
-		</method>
-
 	</methodlist>
 
 
