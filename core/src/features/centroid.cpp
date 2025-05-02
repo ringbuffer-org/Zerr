@@ -6,9 +6,7 @@ using namespace feature;
 
 const std::string Centroid::name = "Spectral Centroid";
 const std::string Centroid::category = "Frequency-Domain";
-const std::string Centroid::description =
-    "The spectral centroid is a measure used in digital signal processing to "
-    "characterise a spectrum.";
+const std::string Centroid::description = "The spectral centroid is a measure used in digital signal processing to characterise a spectrum.";
 
 void Centroid::initialize(SystemConfigs sys_cfg)
 {
@@ -17,8 +15,7 @@ void Centroid::initialize(SystemConfigs sys_cfg)
 
     _reset_param();
 
-    if (is_initialized() == false)
-    {
+    if (is_initialized() == false) {
         set_initialize_statue(true);
     }
 }
@@ -29,14 +26,12 @@ void Centroid::extract()
     double totalMagnitude = 0.0;
 
     int fft_size = x.size();
-    for (int i = 0; i < fft_size; ++i)
-    {
+    for (int i = 0; i < fft_size; ++i) {
         centroid += (i * freq_max / fft_size) * x[i];
         totalMagnitude += x[i];
     }
 
-    if (totalMagnitude > 0.0)
-    {
+    if (totalMagnitude > 0.0) {
         centroid /= totalMagnitude;
     }
 
@@ -55,8 +50,7 @@ FeatureVals Centroid::send()
 {
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
-    for (size_t i = 0; i < system_configs.block_size; ++i)
-    {
+    for (size_t i = 0; i < system_configs.block_size; ++i) {
         y[i] = linear_interpolator.get_value();
         linear_interpolator.next_step();
     }

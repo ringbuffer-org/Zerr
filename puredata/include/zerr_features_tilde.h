@@ -23,30 +23,30 @@ extern "C" {
  * of outlets that can output signal or control data from the zerr_features processing chain.
  */
 typedef struct zerrout {
-    t_outlet *u_outlet;  /**< Pure Data outlet pointer */
+    t_outlet* u_outlet; /**< Pure Data outlet pointer */
 } t_zerrout;
 
 /**
  * @struct zerr_features_tilde
  * @brief The main Pure Data external interface structure
- * 
+ *
  * This structure represents the complete state of a zerr_features~ object instance.
- * It contains all necessary components for audio processing, data routing, and 
+ * It contains all necessary components for audio processing, data routing, and
  * interaction with Pure Data's signal processing system.
  */
 typedef struct {
-    t_object x_obj;   /**< Parent Pure Data object - must be the first member */
-    t_float *f;       /**< Fallback field for the main signal inlet when no signal is connected */
-    t_int n_outlet;   /**< Number of outlets created for this instance */
-    t_zerrout *x_vec; /**< Dynamic array of outlet structures */
+    t_object x_obj; /**< Parent Pure Data object - must be the first member */
+    t_float* f; /**< Fallback field for the main signal inlet when no signal is connected */
+    t_int n_outlet; /**< Number of outlets created for this instance */
+    t_zerrout* x_vec; /**< Dynamic array of outlet structures */
 
-    ZerrFeatures *z;  /**< Pointer to the core zerr_features processing component */
+    ZerrFeatures* z; /**< Pointer to the core zerr_features processing component */
 } zerr_features_tilde;
 
 /**
  * @memberof zerr_features_tilde
  * @brief Creates a new zerr_features_tilde object instance
- * 
+ *
  * This function handles the instantiation of a new zerr_features~ object,
  * including memory allocation, initialization of inlets/outlets, and setup of
  * the core processing component.
@@ -56,7 +56,7 @@ typedef struct {
  * @param argv Array of creation arguments
  * @return void* Pointer to the new object or NULL if creation failed
  */
-void *zerr_features_tilde_new(t_symbol *s, int argc, t_atom *argv);
+void* zerr_features_tilde_new(t_symbol* s, int argc, t_atom* argv);
 
 /**
  * @memberof zerr_features_tilde
@@ -67,7 +67,7 @@ void *zerr_features_tilde_new(t_symbol *s, int argc, t_atom *argv);
  *
  * @param x Pointer to the zerr_features~ object to be freed (must not be NULL)
  */
-void zerr_features_tilde_free(zerr_features_tilde *x);
+void zerr_features_tilde_free(zerr_features_tilde* x);
 
 /**
  * @memberof zerr_features_tilde
@@ -80,12 +80,12 @@ void zerr_features_tilde_free(zerr_features_tilde *x);
  * @param x Pointer to the zerr_features~ object
  * @param sp Array of signal pointers provided by Pure Data
  */
-void zerr_features_tilde_dsp(zerr_features_tilde *x, t_signal **sp);
+void zerr_features_tilde_dsp(zerr_features_tilde* x, t_signal** sp);
 
 /**
  * @related zerr_features_tilde
  * @brief Initializes the zerr_features~ external in Pure Data
- * 
+ *
  * This setup function is called when the external is loaded into Pure Data.
  * It registers the class, methods, and properties of the zerr_features~ object
  * with Pure Data's runtime system.

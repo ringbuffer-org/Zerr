@@ -1,7 +1,7 @@
 /**
- * @file    mc.zerr.features_tilde.c
+ * @file    mc.zerr.features_tilde.cpp
  * @author  Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief   mc.zerr.features~ Max/MSP External
+ * @brief   mc.zerr.features~ Max/MSP External using Max API for better multi-channel support
  * @date    2025-05-01
  *
  * @copyright  Copyright (c) 2023-2025
@@ -13,12 +13,12 @@
 #include "ext_obex.h"
 #include "z_dsp.h"
 
-#include "./mc_zerr_features.hpp"
+#include "./zerr_features.hpp"
 
 typedef struct _zerr_features {
     t_pxobject x_obj; // DSP object header
     long channel_count; // Channel count for output
-    // ZerrFeatures *z; 
+    ZerrFeatures *zf; // Pointer to the zerr_features implementation from zerr_core
 } t_zerr_features;
 
 void* zerr_features_new(t_symbol* s, long argc, t_atom* argv);
@@ -33,7 +33,7 @@ static t_class* zerr_features_class = NULL;
 
 //--------------------------------------------------------------------------
 
-void ext_main(void* r)
+C74_EXPORT void ext_main(void* r)
 {
     t_class* c;
 
@@ -78,8 +78,32 @@ void* zerr_features_new(t_symbol* s, long argc, t_atom* argv)
         // Ensure channel count is within bounds
         x->channel_count = CLAMP(x->channel_count, 1, MC_MAX_CHANS);
 
+
+        // zerr data structure for saving feature names
+        zerr::t_featureNames ft_names;
+        ft_names.names = (char **)malloc(argc * sizeof(char *));
+        ft_names.num   = argc;
+
+        // copy arguments to ft_names structure
+        for (int i = 0; i < argc; i++) {
+            // if (argv[i].a_type == A_SYMBOL) {
+            //     ft_names.names[i] = strdup(atom_getsym(argv+i)->s_name);
+            // } else {
+            //     return NULL;
+            // }
+            ft_names.names[i] = strdup(atom_getsym(argv+i)->s_name);
+        }
+
+        // system config to initialize zerr: sample rate, block size
+        zerr::SystemConfigs sys_cnfg;
+        sys_cnfg.sample_rate = (size_t) sys_getsr();
+        sys_cnfg.block_size  = (size_t) sys_getblksize();
+
         // Allocate memory if needed
-        // x->values = (double*)sysmem_newptrclear(x->channel_count * sizeof(double));
+        // create & initialize ZerrFeatures instance
+        x->zf = new ZerrFeatures(sys_cnfg, ft_names);
+        if (!x->zf) return NULL;
+        if (!x->zf->initialize()) return NULL;
 
         dsp_setup((t_pxobject*)x, 1); // One signal inlet
 
@@ -102,11 +126,7 @@ void* zerr_features_new(t_symbol* s, long argc, t_atom* argv)
 void zerr_features_free(t_zerr_features* x)
 {
     dsp_free((t_pxobject*)x);
-
-    // if (x->values) {
-    //     sysmem_freeptr(x->values);
-    //     x->values = NULL;
-    // }
+    delete x->zf;
 }
 
 //--------------------------------------------------------------------------
@@ -132,17 +152,14 @@ long zerr_features_multichanneloutputs(t_zerr_features* x, long outletindex)
 void zerr_features_dsp64(t_zerr_features* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags)
 {
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_features_perform64, 0, NULL);
+    post("zerr_features_dsp64: samplerate %f maxvectorsize %d", samplerate, maxvectorsize);
 }
 
 //--------------------------------------------------------------------------
 
 void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam)
 {
-    for (long channel = 0; channel < numouts; channel++) {
-        if (channel < x->channel_count) {
-            memset(outs[channel], 0, sampleframes * sizeof(double));
-        }
-    }
+    x->zf->perform(ins, numins, outs, numouts, sampleframes);
 }
 
 //--------------------------------------------------------------------------

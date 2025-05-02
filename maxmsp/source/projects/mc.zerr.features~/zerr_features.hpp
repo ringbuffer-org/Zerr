@@ -18,15 +18,15 @@
  */
 class ZerrFeatures {
  public:
-    int n_outlet; /**< Number of signal outlets based on enabled feature extractors */
-    int n_inlet = 1; /**< Number of signal inlets for receiving audio input */
+    int outputCount; /**< Number of signal outlets based on enabled feature extractors */
+    int inputCount = 1; /**< Number of signal inlets for receiving audio input */
     /**
      * @brief Creates a new ZerrFeatures instance
      * @param sys_cnfg Pure Data system configuration containing sample rate and block size settings
      * @param ft_names List of audio features to extract from the input signal
      */
     ZerrFeatures(zerr::SystemConfigs sys_cnfg, zerr::t_featureNames ft_names)
-        : input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f))
+        : input_buffer(inputCount, std::vector<double>(sys_cnfg.block_size, 0.0f))
     {
         bank = new zerr::FeatureBank();
 
@@ -50,13 +50,13 @@ class ZerrFeatures {
             return 0;
         }
 
-        n_outlet = featureNames.size();
+        outputCount = featureNames.size();
 
-        input_buffer.resize(n_inlet, std::vector<double>(systemConfigs.block_size, 0.0f));
-        output_buffer.resize(n_outlet);
+        input_buffer.resize(inputCount, std::vector<double>(systemConfigs.block_size, 0.0f));
+        output_buffer.resize(outputCount);
 
-        in_ptr = (float**)malloc(n_inlet * sizeof(float**));
-        out_ptr = (float**)malloc(n_outlet * sizeof(float**));
+        in_ptr = (float**)malloc(inputCount * sizeof(float**));
+        out_ptr = (float**)malloc(outputCount * sizeof(float**));
 
         return 1;
     };
@@ -65,22 +65,22 @@ class ZerrFeatures {
      * @param ports Array of pointers to input/output audio buffers (shared memory between in/out)
      * @param n_vec The actual size of audio vectors to process (may be smaller than system block size)
      */
-    void perform(float** ports, int n_vec)
+    void perform(double** ins, long numins, double** outs, long numouts, long sampleframes)
     {
-        in_ptr = (float**)&ports[0];
-        out_ptr = (float**)&ports[n_inlet];
+        // in_ptr = (float**)&ports[0];
+        // out_ptr = (float**)&ports[inputCount];
 
-        for (int i = 0; i < n_inlet; i++) {
-            for (int j = 0; j < n_vec; j++) {
-                input_buffer[i][j] = in_ptr[i][j];
+        for (int i = 0; i < numins; i++) {
+            for (int j = 0; j < sampleframes; j++) {
+                input_buffer[i][j] = ins[i][j];
             }
         }
 
         output_buffer = bank->perform(input_buffer[0]);
 
-        for (int i = 0; i < n_outlet; i++) {
-            for (int j = 0; j < n_vec; j++) {
-                out_ptr[i][j] = output_buffer[i][j];
+        for (int i = 0; i < numouts; i++) {
+            for (int j = 0; j < sampleframes; j++) {
+                outs[i][j] = output_buffer[i][j];
             }
         }
     }
@@ -88,10 +88,10 @@ class ZerrFeatures {
      * @brief Gets the total number of ports (inlets + outlets)
      * @return Total count of all audio ports
      */
-    int get_port_count()
-    {
-        return n_inlet + n_outlet;
-    }
+    // int get_port_count()
+    // {
+    //     return inputCount + outputCount;
+    // }
     /**
      * @brief Destructor that cleans up and frees all allocated resources
      */
