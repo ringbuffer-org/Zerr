@@ -86,11 +86,6 @@ void* zerr_features_new(t_symbol* s, long argc, t_atom* argv)
 
         // copy arguments to ft_names structure
         for (int i = 0; i < argc; i++) {
-            // if (argv[i].a_type == A_SYMBOL) {
-            //     ft_names.names[i] = strdup(atom_getsym(argv+i)->s_name);
-            // } else {
-            //     return NULL;
-            // }
             ft_names.names[i] = strdup(atom_getsym(argv+i)->s_name);
         }
 
