@@ -24,7 +24,7 @@ bool ZerrEnvelopes::initialize()
         return false;
     };
 
-    // assgin Pure Data print method the the logger function
+    // assgin Max/MSP post method the the logger function
     // Because we want to see logs in the PD log window
     auto printFunc = [](const std::string& msg) {
         post(msg.c_str());

@@ -82,20 +82,16 @@ class ZerrEnvelopes {
      */
     void perform(double** ins, long numins, double** outs, long numouts, long sampleframes)
     {
-        // Validate input parameters
         if (!ins || !outs || numins < inputCount || numouts < outputCount) {
             throw std::invalid_argument("Invalid buffer pointers or sizes in perform()");
         }
 
-        // Use std::copy for better optimization possibilities
         for (int i = 0; i < numins; ++i) {
             std::copy_n(ins[i], sampleframes, inputBuffer[i].begin());
         }
 
-        // Process audio through the feature generator
         outputBuffer = generator->perform(inputBuffer);
 
-        // Copy output to destination buffers
         for (int i = 0; i < numouts; ++i) {
             std::copy_n(outputBuffer[i].begin(), sampleframes, outs[i]);
         }
@@ -120,6 +116,41 @@ class ZerrEnvelopes {
     [[nodiscard]] int getPortCount() const noexcept { return inputCount + outputCount; }
 
     ~ZerrEnvelopes() = default;
+
+    void setActiveSpeakerIndexs(char* action, int* idxs, size_t size)
+    {
+        zerr::Indexes indexVec(idxs, idxs + size);
+        generator->setActiveSpeakerIndexs(action, indexVec);
+    }
+
+    void setCurrentSpeaker(int idx)
+    {
+        zerr::Index newIdx = idx;
+        generator->setCurrentSpeaker(newIdx);
+    }
+
+    void setTopoMatrix(char* action, int* idxs, size_t size)
+    {
+        zerr::Indexes indexVec(idxs, idxs + size);
+        generator->setTopoMatrix(action, indexVec);
+    }
+
+    void setTrajectoryVector(int* idxs, size_t size)
+    {
+        zerr::Indexes indexVec(idxs, idxs + size);
+        generator->setTrajectoryVector(indexVec);
+    }
+
+    void setTriggerInterval(float interval)
+    {
+        zerr::Param newInterval = interval;
+        generator->setTriggerInterval(newInterval);
+    }
+
+    void printParameters()
+    {
+        generator->printParameters();
+    }
 
  private:
     static constexpr int inputCount = 3; /**< Number of signal inlets for receiving audio input */
