@@ -311,30 +311,6 @@ void zerr_envelopes_active(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom
     sysmem_freeptr(indices);
 }
 
-// void zerr_envelopes_curr(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* argv)
-// {
-//     post("zerr_envelopes_curr");
-// }
-
-// void zerr_envelopes_topo(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* argv)
-// {
-//     post("zerr_envelopes_topo");
-// }
-// void zerr_envelopes_traj(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* argv)
-// {
-//     post("zerr_envelopes_traj");
-// }
-
-// void zerr_envelopes_interval(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* argv)
-// {
-//     post("zerr_envelopes_interval");
-// }
-
-// void zerr_envelopes_print(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* argv)
-// {
-//     post("zerr_envelopes_print");
-// }
-
 /**
  * @brief Method to set the current active speaker.
  * @param x Pointer to the t_zerr_envelopes object.
