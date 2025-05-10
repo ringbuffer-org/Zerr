@@ -1,14 +1,20 @@
 .DS_Store
+
 *.o
+
 *.pd_linux
 *.pd_darwin
 *.pd_dll
+
 *.ipynb
 
+
 CMakeUserPresets.json
+
 libzerr_core.a
 
 builddir/
+
 fftw3/
 yaml-cpp/
 html/
@@ -17,3 +23,4 @@ build/
 usr/
 lib/
 
+externals/
