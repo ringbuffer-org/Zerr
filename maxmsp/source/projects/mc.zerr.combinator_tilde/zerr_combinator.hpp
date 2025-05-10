@@ -6,8 +6,8 @@
 #include <string_view>
 #include <vector>
 
-#include "types.h"
 #include "./envelopecombinator.h"
+#include "types.h"
 
 /**
  * @class ZerrFeatures
@@ -26,7 +26,7 @@ class ZerrCombinator {
     ZerrCombinator(const zerr::SystemConfigs& sys_config, int inputCount, std::string mode)
         : systemConfigs { sys_config }
         , inputBuffer(inputCount, std::vector<double>(sys_config.block_size, 0.0))
-        // , combinator { std::make_unique<zerr::EnvelopeCombinator>(sys_config, spkrCfgFile, selectionMode) }
+    // , combinator { std::make_unique<zerr::EnvelopeCombinator>(sys_config, spkrCfgFile, selectionMode) }
     {
     }
 
@@ -110,7 +110,6 @@ class ZerrCombinator {
 
     ~ZerrCombinator() = default;
 
-
  private:
     static constexpr int inputCount = 3; /**< Number of signal inlets for receiving audio input */
     int outputCount = 0; /**< Number of signal outlets based on enabled feature extractors */
@@ -121,9 +120,6 @@ class ZerrCombinator {
     zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing processed audio samples */
 
     std::unique_ptr<zerr::EnvelopeCombinator> combinator; /**< Core component that implements the feature extraction algorithms */
-
-    // std::string spkrCfgFile; /**< Path to speaker configuration file */
-    // std::string selectionMode; /**< Mode for selecting output speaker routing */
 
     std::string zerr_cfg; /**< Path to configuration file */
 };

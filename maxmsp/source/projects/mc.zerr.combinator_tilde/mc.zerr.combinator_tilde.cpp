@@ -186,8 +186,8 @@ void zerr_combinator_dsp64(t_zerr_combinator* x, t_object* dsp64, short* count, 
 
 void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam)
 {
+    // Zero out the output if the the input signals don't have equal channel count
     if (x->channel_muted) {
-        // Clear all outputs if we have an invalid state
         for (long i = 0; i < numouts; i++) {
             if (outs[i]) {
                 memset(outs[i], 0, sampleframes * sizeof(double));
@@ -211,7 +211,6 @@ void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64, double** i
                 max_val = (val > max_val) ? val : max_val;
             }
 
-            // Handle case where all inputs were NULL
             outs[channel][sample] = max_val;
         }
     }
