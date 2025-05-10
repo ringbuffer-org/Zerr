@@ -1,4 +1,4 @@
-#N canvas 1802 -424 749 963 12;
+#N canvas 2326 -377 749 963 12;
 #X floatatom 331 449 5 0 100 0 - - - 0;
 #X obj 331 471 / 100;
 #X floatatom 192 443 5 0 100 0 - - - 0;
@@ -27,7 +27,7 @@
 #X obj 9 855 cnv 1 520 1 empty empty empty 8 12 0 13 #000000 #000000 0;
 #X msg 422 440 \; pd dsp \$1;
 #X text 460 410 DSP on/off;
-#N canvas 2566 -231 499 459 set-dsp-tgl 0;
+#N canvas 2566 -231 499 459 set-dsp-tgl 1;
 #X msg 241 138 set 0;
 #X msg 182 109 set 1;
 #X obj 182 172 s \$0-set-tgl;
@@ -59,7 +59,7 @@
 #X obj 15 19 zerr_envelopes~ trajectory circulation_8;
 #X msg 85 547 active-speakers add 3;
 #X msg 85 495 trajectory set 1 8 2 7 3 6 4 5;
-#N canvas 101 63 1266 805 view 0;
+#N canvas 101 63 1266 805 view 1;
 #X obj 42 55 snapshot~;
 #X obj 252 4 metro 100;
 #X obj 327 122 tgl 19 0 empty empty empty 0 -10 0 12 #fcfcfc #000000 #000000 0 1;

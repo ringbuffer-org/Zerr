@@ -7,6 +7,7 @@
  * @copyright Copyright (c) 2023-2024
  */
 #pragma once
+#include "m_pd.h"
 
 #include "audiodisperser.h"
 #include "logger.h"

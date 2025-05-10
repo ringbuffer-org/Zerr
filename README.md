@@ -11,13 +11,15 @@
 | **Puredata**      | ✅     | ✅         | ✅            | 🛠️       |
 | **JACK**          | 🛠️     | ✅         | 🛠️            | 🛠️       |
 | **SuperCollider** | ⏳     | ⏳         | ⏳            | ⏳       |
-| **Max/MSP**       | ⏳     | ⏳         | ⏳            | ⏳       |
+| **Max/MSP**       | **➖** | 🛠️         | 🛠️            | 🛠️       |
 
 ✅: **Fully Supported**
 
 🛠️: **In Development**
 
 ⏳: **Planned**
+
+**➖**: **Not available**
 
 ## Installation
 
@@ -31,12 +33,10 @@ Otherwise, you can also build it for your own machine.
 
 #### Initialization
 
-- Clone this repo and initialize the [pd-lib-builder](https://github.com/pure-data/pd-lib-builder) submodule
+- Clone this repo and initialize the submodules( [pd-lib-builder](https://github.com/pure-data/pd-lib-builder), [min-devkit](https://cycling74.github.io/min-devkit/) )
 
   ```bash
-  git clone git@github.com:ringbuffer-org/Zerr.git
-  cd Zerr
-  git submodule update --init --recursive
+  git clone --recurse-submodules git@github.com:ringbuffer-org/Zerr.git && cd Zerr
   ```
 
 #### Dependencies

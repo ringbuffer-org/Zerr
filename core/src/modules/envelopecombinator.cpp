@@ -78,7 +78,7 @@ void EnvelopeCombinator::_process_root() {
     }
 
     double exponent = 1.0 / (double)numSource;
-    t_sample multi_tmp;
+    Sample multi_tmp;
     for (int i = 0; i < numChannel; ++i) {
         // TODO: use systemcfg.block_size could cause bug(sometimes smaller)
         for (size_t k = 0; k < systemCfgs.block_size; ++k) {
@@ -97,8 +97,8 @@ void EnvelopeCombinator::_process_max() {
         buffer.assign(buffer.size(), 0.0f);
     }
 
-    t_sample maxVal;
-    t_sample tmp;
+    Sample maxVal;
+    Sample tmp;
     for (int i = 0; i < numChannel; ++i) {
         for (size_t k = 0; k < systemCfgs.block_size; ++k) {
             maxVal = 0;
