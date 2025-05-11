@@ -179,7 +179,7 @@ void zerr_combinator_assist(t_zerr_combinator* x, void* b, long m, long a, char*
 
 void zerr_combinator_bang(t_zerr_combinator* x)
 {
-    object_post((t_object*)x, "current channel count = %ld", x->channel_count);
+    object_post((t_object*)x, "combination mode: %s \n channel count = %ld", "everything", x->channel_count);
 }
 
 //------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /**
  * @file    zerr.combinator.hpp
  * @author  Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief   mc.zerr.combinator~ Max/MSP External using Max API for better multi-channel support
+ * @brief   Header for the ZerrCombinator class used in mc.zerr.combinator~ Max/MSP External
  * @date    2025-05-03
  *
  * @copyright  Copyright (c) 2023-2025
@@ -19,18 +19,20 @@
 #include "types.h"
 
 /**
- * @class ZerrFeatures
- * @brief Main wrapper class that interfaces between Max/MSP and the core audio feature extraction functionality
- *
- * This class handles the initialization, audio processing, and cleanup of audio feature extraction operations.
- * It manages the data flow between Max/MSP's audio system and the internal feature processing chain.
+ * @class ZerrCombinator
+ * @brief Manages the combination of multiple envelope signals across channel groups
+ * 
+ * This class handles the processing of multiple multichannel envelope signals,
+ * combining them according to the specified mode. It provides a clean interface 
+ * between Max/MSP's audio system and the underlying envelope combination algorithms.
  */
 class ZerrCombinator {
  public:
     /**
      * @brief Creates a new ZerrCombinator instance
      * @param sys_config System configuration containing sample rate and block size settings
-     * @param ft_names List of audio features to extract from the input signal
+     * @param inputCount List of audio features to extract from the input signal
+     * @param mode       
      */
     ZerrCombinator(const zerr::SystemConfigs& sys_config, int inputCount, std::string mode)
         : systemConfigs { sys_config }
@@ -54,7 +56,6 @@ class ZerrCombinator {
     {
         // Initialize the Envelope Generator module
         if (!combinator->initialize()) {
-            post("ZerrCombinator::initialize failed to initialize combinator");
             return false;
         };
 
@@ -120,8 +121,8 @@ class ZerrCombinator {
     ~ZerrCombinator() = default;
 
  private:
-    static constexpr int inputCount = 3; /**< Number of signal inlets for receiving audio input */
-    int outputCount = 0; /**< Number of signal outlets based on enabled feature extractors */
+    int inputCount = 2; /**< Number of signal inlets for receiving audio input */
+    int outputCount = 1; /**< Number of signal outlets based on enabled feature extractors */
 
     zerr::SystemConfigs systemConfigs; /**< System configuration settings */
 
