@@ -75,7 +75,11 @@ build_maxmsp() {
     cmake --build .
 
     echo "Installing zerr_core library to local lib folder..."
-    make install
+
+    if [ "$install" = true ]; then
+        echo "Installing Max/MSP build..."
+        make install
+    fi
 
     cd ../.. || exit 1
 
