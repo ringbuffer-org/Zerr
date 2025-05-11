@@ -1,9 +1,9 @@
 {
 	"author" : "Zeyu Yang",
-	"description" : "Lightweight reference implementation of a package built using the Min-API.",
-	"homepatcher" : "C++ Object Development Kit.maxpat",
+	"description" : "Zerr~: Autogenous Spatialization Toolbox",
+	"homepatcher" : "Zerr_Overview.maxpat",
 	"max_version_min" : "8.0", "max_version_max" : "none",
-	"name" : "maxmsp",
+	"name" : "zerr",
 	"os" : {
 		"macintosh" : {
 			"platform" : [ "x64", "aarch64" ],
@@ -15,10 +15,10 @@
 		}
 	},
 	"package_extra" : {
-		"reverse_domain" : "com.cycling74",
-		"copyright" : "Copyright (c) 2018 Cycling '74"
+		"reverse_domain" : "com.absinthismus",
+		"copyright" : "Copyright (c) 2025 Zeyu Yang"
 	},
-	"tags" : [ ],
-	"version" : "0.2.0",
-	"website" : "http://www.github.com/Cycling74/min-devkit"
+	"tags" : [ "sound spatialization", "multi-channel", "spatiomorphology", "spatial sound synthesis", "panning" ],
+	"version" : "0.1.0",
+	"website" : "https://github.com/ringbuffer-org/Zerr"
 }
