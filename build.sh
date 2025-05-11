@@ -90,7 +90,7 @@ build_jack() {
 
 # -----------------------------------------------------------------------------
 if [ $# -eq 0 ]; then
-    echo "No targets provided. Usage: $0 [-i] <puredata|jack|...>"
+    echo "No targets provided. Usage: $0 [-i] <puredata|maxmsp|jack|...>"
     exit 1
 fi
 
