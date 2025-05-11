@@ -1,7 +1,5 @@
 # Zerr*
 
-<img src="./zerr_logo.png" alt="zerr_logo" style="zoom: 25%;" />
-
 ## Introduction
 
 **Zerr*** is a channel-based spatialization concept for an arbitrary audio source. It distributes audio signals to multiple loudspeakers, based only on the signals’ inherent features as well as the properties of the speaker array setup. Although various aspects of the algorithm can be tuned, also during runtime, the audio signal itself defines the spatial distribution. Depending on the parametrization, the approach can alter the original signal significantly, similar to modulation and distortion effects. Please check the [conference paper](https://ieeexplore.ieee.org/abstract/document/10289141), "Autogenous Spatialization for Arbitrary Loudspeaker Setups" for design details. 
@@ -73,3 +71,4 @@ conan install . --output-folder=build --build=missing
 ./build.sh jack
 ```
 
+<img src="./zerr_logo.png" alt="zerr_logo" />
