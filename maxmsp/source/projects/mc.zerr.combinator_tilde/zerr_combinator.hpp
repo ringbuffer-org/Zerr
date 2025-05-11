@@ -1,3 +1,12 @@
+/**
+ * @file    zerr.combinator.hpp
+ * @author  Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief   mc.zerr.combinator~ Max/MSP External using Max API for better multi-channel support
+ * @date    2025-05-03
+ *
+ * @copyright  Copyright (c) 2023-2025
+ * @license    MIT license
+ */
 #pragma once
 
 #include <memory>

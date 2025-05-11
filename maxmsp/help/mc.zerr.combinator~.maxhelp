@@ -10,9 +10,21 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 41.0, 82.0, 993.0, 769.0 ],
+		"rect" : [ 134.0, 100.0, 796.0, 755.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-12",
+					"maxclass" : "button",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "bang" ],
+					"parameter_enable" : 0,
+					"patching_rect" : [ 43.0, 359.0, 24.0, 24.0 ]
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"id" : "obj-9",
 					"maxclass" : "newobj",
@@ -149,8 +161,8 @@
 					"numinlets" : 3,
 					"numoutlets" : 1,
 					"outlettype" : [ "multichannelsignal" ],
-					"patching_rect" : [ 115.0, 479.0, 156.0, 22.0 ],
-					"text" : "mc.zerr.combinator~ 3 hello"
+					"patching_rect" : [ 115.0, 479.0, 151.0, 22.0 ],
+					"text" : "mc.zerr.combinator~ 3 ddd"
 				}
 
 			}
@@ -185,6 +197,13 @@
  ],
 		"lines" : [ 			{
 				"patchline" : 				{
+					"destination" : [ "obj-20", 0 ],
+					"source" : [ "obj-12", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-21", 0 ],
 					"order" : 1,
 					"source" : [ "obj-20", 0 ]
@@ -217,7 +236,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-1", 0 ],
-					"midpoints" : [ 124.5, 295.0, 60.18359375, 295.0, 60.18359375, -7.0, 151.5, -7.0 ],
+					"midpoints" : [ 124.5, 295.0, 60.18359375, 295.0, 60.18359375, 35.1875, 151.5, 35.1875 ],
 					"order" : 0,
 					"source" : [ "obj-3", 0 ]
 				}
