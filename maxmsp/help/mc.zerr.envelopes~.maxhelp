@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 78.0, 173.0, 764.0, 743.0 ],
+		"rect" : [ 34.0, 109.0, 764.0, 743.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
 				"box" : 				{
@@ -141,7 +141,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "multichannelsignal", "float", "int" ],
 					"patching_rect" : [ 148.0, 477.0, 81.0, 34.0 ],
-					"sig" : [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+					"sig" : 0.0
 				}
 
 			}
@@ -164,7 +164,7 @@
 					"numinlets" : 3,
 					"numoutlets" : 1,
 					"outlettype" : [ "multichannelsignal" ],
-					"patching_rect" : [ 115.0, 377.0, 236.0, 22.0 ],
+					"patching_rect" : [ 111.0, 366.0, 236.0, 22.0 ],
 					"text" : "mc.zerr.envelopes~ trajectory circulation_8"
 				}
 
@@ -232,7 +232,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-20", 0 ],
-					"midpoints" : [ 501.5, 307.5, 124.5, 307.5 ],
+					"midpoints" : [ 501.5, 307.5, 120.5, 307.5 ],
 					"source" : [ "obj-10", 0 ]
 				}
 
@@ -240,7 +240,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-20", 0 ],
-					"midpoints" : [ 376.800000000000068, 307.5, 124.5, 307.5 ],
+					"midpoints" : [ 376.800000000000068, 307.5, 120.5, 307.5 ],
 					"source" : [ "obj-11", 0 ]
 				}
 
@@ -248,7 +248,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-20", 0 ],
-					"midpoints" : [ 478.500000000000114, 307.5, 124.5, 307.5 ],
+					"midpoints" : [ 478.500000000000114, 307.5, 120.5, 307.5 ],
 					"source" : [ "obj-12", 0 ]
 				}
 
@@ -310,7 +310,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-20", 0 ],
-					"midpoints" : [ 237.5, 307.5, 124.5, 307.5 ],
+					"midpoints" : [ 237.5, 307.5, 120.5, 307.5 ],
 					"source" : [ "obj-6", 0 ]
 				}
 
@@ -325,7 +325,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-20", 0 ],
-					"midpoints" : [ 301.5, 307.5, 124.5, 307.5 ],
+					"midpoints" : [ 301.5, 307.5, 120.5, 307.5 ],
 					"source" : [ "obj-8", 0 ]
 				}
 
@@ -333,7 +333,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-20", 0 ],
-					"midpoints" : [ 360.5, 307.5, 124.5, 307.5 ],
+					"midpoints" : [ 360.5, 307.5, 120.5, 307.5 ],
 					"source" : [ "obj-9", 0 ]
 				}
 
