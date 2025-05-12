@@ -233,7 +233,9 @@ void zerr_envelopes_free(t_zerr_envelopes* x)
     }
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// UI and Info Methods
+//------------------------------------------------------------------------------
 
 void zerr_envelopes_assist(t_zerr_envelopes* x, void* b, long m, long a, char* s)
 {
@@ -244,28 +246,32 @@ void zerr_envelopes_assist(t_zerr_envelopes* x, void* b, long m, long a, char* s
     }
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Multichannel Methods
+//------------------------------------------------------------------------------
 
 long zerr_envelopes_multichanneloutputs(t_zerr_envelopes* x, long outletindex)
 {
     return x->channel_count;
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// DSP Methods
+//------------------------------------------------------------------------------
 
 void zerr_envelopes_dsp64(t_zerr_envelopes* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags)
 {
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_envelopes_perform64, 0, NULL);
 }
 
-//--------------------------------------------------------------------------
-
 void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam)
 {
     x->ze->perform(ins, numins, outs, numouts, sampleframes);
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Message Methods
+//------------------------------------------------------------------------------
 
 void zerr_envelopes_bang(t_zerr_envelopes* x)
 {

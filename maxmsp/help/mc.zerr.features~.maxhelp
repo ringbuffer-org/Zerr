@@ -10,9 +10,22 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 54.0, 100.0, 1088.0, 755.0 ],
+		"rect" : [ 83.0, 100.0, 813.0, 755.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-12",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "multichannelsignal" ],
+					"patching_rect" : [ 390.0, 536.0, 121.0, 22.0 ],
+					"text" : "mc.zerr.features~ ctd",
+					"varname" : "dasdf[1]"
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"fontface" : 0,
 					"fontname" : "Arial",
@@ -90,17 +103,6 @@
 			}
 , 			{
 				"box" : 				{
-					"id" : "obj-28",
-					"maxclass" : "newobj",
-					"numinlets" : 2,
-					"numoutlets" : 0,
-					"patching_rect" : [ 386.5, 448.0, 35.0, 22.0 ],
-					"text" : "dac~"
-				}
-
-			}
-, 			{
-				"box" : 				{
 					"id" : "obj-3",
 					"maxclass" : "newobj",
 					"numinlets" : 1,
@@ -151,7 +153,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "multichannelsignal", "float", "int" ],
 					"patching_rect" : [ 125.0, 277.0, 81.0, 34.0 ],
-					"sig" : [ 0.0, 0.0 ]
+					"sig" : [ 0.0, 0.0, 0.0 ]
 				}
 
 			}
@@ -202,8 +204,8 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "multichannelsignal" ],
-					"patching_rect" : [ 92.0, 173.0, 136.0, 22.0 ],
-					"text" : "mc.zerr.features~ zcr flx"
+					"patching_rect" : [ 92.0, 173.0, 146.0, 22.0 ],
+					"text" : "mc.zerr.features~ cf ctd flt"
 				}
 
 			}
@@ -397,24 +399,8 @@
 			}
 , 			{
 				"patchline" : 				{
-					"destination" : [ "obj-11", 0 ],
-					"order" : 0,
-					"source" : [ "obj-24", 1 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
 					"destination" : [ "obj-20", 0 ],
 					"source" : [ "obj-24", 0 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"destination" : [ "obj-4", 0 ],
-					"order" : 1,
-					"source" : [ "obj-24", 1 ]
 				}
 
 			}
@@ -441,8 +427,24 @@
 				}
 
 			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-11", 0 ],
+					"order" : 0,
+					"source" : [ "obj-9", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-4", 0 ],
+					"order" : 1,
+					"source" : [ "obj-9", 0 ]
+				}
+
+			}
  ],
-		"originid" : "pat-8",
+		"originid" : "pat-4",
 		"dependency_cache" : [ 			{
 				"name" : "mc.zerr.features~.mxo",
 				"type" : "iLaX"
