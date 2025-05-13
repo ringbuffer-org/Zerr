@@ -10,9 +10,21 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 83.0, 100.0, 813.0, 755.0 ],
+		"rect" : [ 83.0, 100.0, 988.0, 755.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
+				"box" : 				{
+					"id" : "obj-14",
+					"maxclass" : "button",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "bang" ],
+					"parameter_enable" : 0,
+					"patching_rect" : [ 489.0, 52.0, 24.0, 24.0 ]
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"id" : "obj-12",
 					"maxclass" : "newobj",
@@ -96,8 +108,8 @@
 					"numinlets" : 1,
 					"numoutlets" : 4,
 					"outlettype" : [ "signal", "signal", "signal", "signal" ],
-					"patching_rect" : [ 592.0, 195.0, 140.0, 22.0 ],
-					"text" : "zerr.features~ ctd cf flt cf"
+					"patching_rect" : [ 592.0, 195.0, 142.0, 22.0 ],
+					"text" : "zerr.features~ ctd cf flt flx"
 				}
 
 			}
@@ -114,6 +126,7 @@
 			}
 , 			{
 				"box" : 				{
+					"displaychan" : 4,
 					"fontface" : 0,
 					"fontname" : "Arial",
 					"fontsize" : 12.0,
@@ -135,8 +148,8 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "multichannelsignal" ],
-					"patching_rect" : [ 351.0, 198.0, 159.0, 22.0 ],
-					"text" : "mc.zerr.features~ ctd cf flt cf",
+					"patching_rect" : [ 351.0, 198.0, 162.0, 22.0 ],
+					"text" : "mc.zerr.features~ ctd cf flt flx",
 					"varname" : "dasdf"
 				}
 
@@ -332,7 +345,7 @@
 		"lines" : [ 			{
 				"patchline" : 				{
 					"destination" : [ "obj-1", 0 ],
-					"midpoints" : [ 682.166666666666629, 249.0, 728.5, 249.0 ],
+					"midpoints" : [ 683.5, 249.0, 728.5, 249.0 ],
 					"source" : [ "obj-11", 2 ]
 				}
 
@@ -354,8 +367,15 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-8", 0 ],
-					"midpoints" : [ 641.833333333333371, 249.0, 664.5, 249.0 ],
+					"midpoints" : [ 642.5, 249.0, 664.5, 249.0 ],
 					"source" : [ "obj-11", 1 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-11", 0 ],
+					"source" : [ "obj-14", 0 ]
 				}
 
 			}
@@ -444,7 +464,7 @@
 
 			}
  ],
-		"originid" : "pat-4",
+		"originid" : "pat-6",
 		"dependency_cache" : [ 			{
 				"name" : "mc.zerr.features~.mxo",
 				"type" : "iLaX"
