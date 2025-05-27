@@ -4,13 +4,13 @@
 		"appversion" : 		{
 			"major" : 9,
 			"minor" : 0,
-			"revision" : 0,
+			"revision" : 7,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 2442.0, -344.0, 1065.0, 1024.0 ],
+		"rect" : [ 2597.0, -349.0, 1065.0, 1024.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"boxes" : [ 			{
 				"box" : 				{
@@ -20,7 +20,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 125.5, 735.5, 218.0, 33.0 ],
-					"presentation_linecount" : 3,
 					"text" : "mc.unpack~ is requried to transfrom mc.signals to mono signals"
 				}
 
@@ -45,7 +44,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 109.400001406669617, 638.400009453296661, 148.000002205371857, 33.0 ],
-					"presentation_linecount" : 2,
 					"text" : "The overdive effects all three audio features"
 				}
 
@@ -123,7 +121,6 @@
 							"parameter_mmax" : 6.0,
 							"parameter_mmin" : -70.0,
 							"parameter_modmode" : 3,
-							"parameter_osc_name" : "<default>",
 							"parameter_shortname" : "gain",
 							"parameter_type" : 0,
 							"parameter_unitstyle" : 4
@@ -166,7 +163,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 93.900000810623169, 494.400007307529449, 219.200003266334534, 33.0 ],
-					"presentation_linecount" : 2,
 					"text" : "Change the Frequency of the oscillator to effect the Spectral Centroid"
 				}
 
@@ -330,7 +326,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 39.5, 439.800006330013275, 401.0, 38.0 ],
-					"presentation_linecount" : 2,
 					"text" : "In the help patch, the spectral centroid and root mean square amplitude of the input sinus signal are calculated."
 				}
 
@@ -365,7 +360,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 40.0, 36.0, 513.0, 78.0 ],
-					"presentation_linecount" : 2,
 					"text" : "mc.zerr.features~"
 				}
 
@@ -402,8 +396,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 40.0, 161.400002181529999, 450.0, 69.0 ],
-					"presentation_linecount" : 4,
+					"patching_rect" : [ 40.0, 161.400002181529999, 513.0, 69.0 ],
 					"text" : "The [mc.zerr_features~] calculates the audio features of input signal and output the feature signals in audio rate. The feature to be calculated is defined via arguments. The order of features in the multi-channel signal is the same as the order of arguments."
 				}
 
@@ -430,7 +423,6 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 354.699999392032623, 494.800007402896881, 40.0, 33.0 ],
-					"presentation_linecount" : 2,
 					"text" : "start audio",
 					"varname" : "autohelp_dac_text"
 				}
@@ -554,7 +546,6 @@
 
 			}
  ],
-		"originid" : "pat-522",
 		"parameters" : 		{
 			"obj-77" : [ "live.gain~", "gain", 0 ],
 			"parameterbanks" : 			{
