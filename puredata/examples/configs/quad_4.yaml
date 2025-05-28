@@ -1,0 +1,26 @@
+standard:
+  1:
+    position: 
+      cartesian:
+        x:         3.265
+        y:        -1.065
+        z:         0.410
+  2:
+    position: 
+      cartesian:
+        x:        -1.269
+        y:        -2.318
+        z:         0.410
+  3:
+    position: 
+      cartesian:
+        x:        -3.249
+        y:         1.433
+        z:         0.410
+  4:
+    position: 
+      cartesian:
+        x:         1.254
+        y:         2.946
+        z:         0.410
+

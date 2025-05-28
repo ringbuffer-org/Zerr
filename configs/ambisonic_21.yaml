@@ -5,165 +5,123 @@ standard:
         x:         2.977
         y:         0.326
         z:        -0.450
-      spherical: null
-    orientation: null
   2:
     position: 
       cartesian:
         x:         1.768
         y:        -1.950
         z:        -0.450
-      spherical: null
-    orientation: null
   3:
     position: 
       cartesian:
         x:         0.071
         y:        -2.034
         z:        -0.450
-      spherical: null
-    orientation: null
   4:
     position: 
       cartesian:
         x:        -1.790
         y:        -1.900
         z:        -0.450
-      spherical: null
-    orientation: null
   5:
     position: 
       cartesian:
         x:        -2.937
         y:         0.010
         z:        -0.450
-      spherical: null
-    orientation: null
   6:
     position: 
       cartesian:
         x:        -1.699
         y:         2.607
         z:        -0.450
-      spherical: null
-    orientation: null
   7:
     position: 
       cartesian:
         x:         0.013
         y:         2.673
         z:        -0.450 
-      spherical: null
-    orientation: null
   8:
     position: 
       cartesian:
         x:         1.663
         y:         2.650
         z:        -0.450
-      spherical: null
-    orientation: null
   9:
     position: 
       cartesian:
         x:         3.265
         y:        -1.065
         z:         0.410
-      spherical: null
-    orientation: null
   10:
     position: 
       cartesian:
         x:         0.995
         y:        -2.268
         z:         0.410
-      spherical: null
-    orientation: null
   11:
     position: 
       cartesian:
         x:        -1.269
         y:        -2.318
         z:         0.410
-      spherical: null
-    orientation: null
   12:
     position: 
       cartesian:
         x:        -3.124
         y:        -1.250
         z:         0.410
-      spherical: null
-    orientation: null
   13:
     position: 
       cartesian:
         x:        -3.249
         y:         1.433
         z:         0.410
-      spherical: null
-    orientation: null
   14:
     position: 
       cartesian:
         x:        -1.553
         y:         2.814
         z:         0.410
-      spherical: null
-    orientation: null
   15:
     position: 
       cartesian:
         x:         1.254
         y:         2.946
         z:         0.410
-      spherical: null
-    orientation: null
   16:
     position: 
       cartesian:
         x:         3.145
         y:         1.474
         z:         0.410
-      spherical: null
-    orientation: null
   17:
     position: 
       cartesian:
         x:         0.973
         y:        -0.922
         z:         0.865
-      spherical: null
-    orientation: null
   18:
     position: 
       cartesian:
         x:        -0.955
         y:        -0.941
         z:         0.862
-      spherical: null
-    orientation: null
   19:
     position: 
       cartesian:
         x:        -0.998
         y:         0.886
         z:         0.853
-      spherical: null
-    orientation: null
   20:
     position: 
       cartesian:
         x:         0.959
         y:         0.991
         z:         0.887
-      spherical: null
-    orientation: null
   21:
     position: 
       cartesian:
         x:         0.000
         y:         0.000
         z:         1.296
-      spherical: null
-    orientation: null
