@@ -9,6 +9,7 @@
 #ifndef ENVELOPECOMBINATOR_H
 #define ENVELOPECOMBINATOR_H
 
+#include <functional>
 #include "logger.h"
 #include "types.h"
 #include "utils.h"
