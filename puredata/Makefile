@@ -35,6 +35,7 @@ zerr_features~.class.sources   += src/zerr_features.cpp
 # class specific depencencies
 zerr_features~.class.ldflags += -L$(CONAN_LIB_DIRS_FFTW)
 zerr_features~.class.ldlibs += -lfftw3
+zerr_envelopes~.class.ldlibs += -lyaml-cpp
 
 # add library data files
 datafiles += LICENSE
