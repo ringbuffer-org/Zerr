@@ -10,6 +10,7 @@
 #define AUDIODISPERSER_H
 
 // #include "utils.h"
+#include <functional>
 #include "logger.h"
 #include "types.h"
 
