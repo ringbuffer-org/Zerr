@@ -2,17 +2,14 @@
 using namespace zerr;
 using namespace feature;
 
-FeatureBank::FeatureBank()
-    : ring_buffer(AUDIO_BUFFER_SIZE)
-    , freq_transformer(AUDIO_BUFFER_SIZE)
+FeatureBank::FeatureBank() : ring_buffer(AUDIO_BUFFER_SIZE), freq_transformer(AUDIO_BUFFER_SIZE)
 {
     _regist_all();
 }
 
 void FeatureBank::print_info(std::string name)
 {
-    std::cout << "print_info:\n"
-              << name << std::endl;
+    std::cout << "print_info:\n" << name << std::endl;
 }
 
 void FeatureBank::print_all_features()
@@ -27,18 +24,14 @@ void FeatureBank::print_active_features()
 {
     std::cout << "All activated features: " << std::endl;
     for (size_t i = 0; i < activated_features.size(); ++i) {
-        std::cout << "  -Name: " << activated_features[i]->get_name()
-                  << std::endl;
-        std::cout << "  -Category: " << activated_features[i]->get_category()
-                  << std::endl;
-        std::cout << "  -Description: "
-                  << activated_features[i]->get_description() << std::endl;
+        std::cout << "  -Name: " << activated_features[i]->get_name() << std::endl;
+        std::cout << "  -Category: " << activated_features[i]->get_category() << std::endl;
+        std::cout << "  -Description: " << activated_features[i]->get_description() << std::endl;
         std::cout << std::endl;
     }
 }
 
-void FeatureBank::initialize(FeatureNames feature_names,
-    SystemConfigs system_configs)
+void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs system_configs)
 {
     for (auto name : feature_names) {
         activated_features.push_back(_create(name));
@@ -90,14 +83,14 @@ FeaturesVals FeatureBank::perform(Block in)
 // TODO(Zeyu yang): make this an external function
 void FeatureBank::_regist_all()
 {
-    _regist("rms", []() { return fe_ptr(new RootMeanSquare()); }); // Root Mean Square
+    _regist("rms", []() { return fe_ptr(new RootMeanSquare()); });   // Root Mean Square
     _regist("zcr", []() { return fe_ptr(new ZeroCrossingRate()); }); // Zero Crossing Rate
-    _regist("flx", []() { return fe_ptr(new Flux()); }); // Spectral Flux
-    _regist("ctd", []() { return fe_ptr(new Centroid()); }); // Spectral Centroid
-    _regist("rlf", []() { return fe_ptr(new Rolloff()); }); // Spectral Rolloff
-    _regist("cf", []() { return fe_ptr(new CrestFactor()); }); // Crest Factor
-    _regist("flt", []() { return fe_ptr(new Flatness()); }); // Spectral Flatness
-    _regist("zc", []() { return fe_ptr(new ZeroCrossings()); }); // Zero Crossings
+    _regist("flx", []() { return fe_ptr(new Flux()); });             // Spectral Flux
+    _regist("ctd", []() { return fe_ptr(new Centroid()); });         // Spectral Centroid
+    _regist("rlf", []() { return fe_ptr(new Rolloff()); });          // Spectral Rolloff
+    _regist("cf", []() { return fe_ptr(new CrestFactor()); });       // Crest Factor
+    _regist("flt", []() { return fe_ptr(new Flatness()); });         // Spectral Flatness
+    _regist("zc", []() { return fe_ptr(new ZeroCrossings()); });     // Zero Crossings
 }
 
 void FeatureBank::_regist(const std::string& className, CreateFunc createFunc)
@@ -105,8 +98,7 @@ void FeatureBank::_regist(const std::string& className, CreateFunc createFunc)
     registed_features[className] = createFunc;
 }
 
-std::unique_ptr<FeatureExtractor> FeatureBank::_create(
-    const std::string& className)
+std::unique_ptr<FeatureExtractor> FeatureBank::_create(const std::string& className)
 {
     auto it = registed_features.find(className);
     if (it != registed_features.end()) {

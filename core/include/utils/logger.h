@@ -1,12 +1,13 @@
 /**
  * @file logger.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief  xxxxx
+ * @brief A logging utility class for recording application events at different severity levels
  * @date 2024-02-18
  *
  * @copyright Copyright (c) 2023-2025
  *
- * xxxxxx
+ * This header file defines the Logger class and LogLevel enum for managing
+ * application logging with configurable severity levels and custom output strategies.
  */
 #ifndef LOGGER_H
 #define LOGGER_H
@@ -15,6 +16,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <functional>
 
 #include "configs.h"
 

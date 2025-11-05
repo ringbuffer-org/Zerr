@@ -59,11 +59,11 @@ class RingBuffer {
     void get_samples(Sample* ptr_buffer, size_t buf_len);
 
   private:
-    Samples buffer;    ///< Storage for audio samples
-    size_t head;       ///< Index where next sample will be written
-    size_t tail;       ///< Index where next sample will be read
-    size_t size;       ///< Current number of samples in buffer
+    Samples buffer; ///< Storage for audio samples
+    size_t head;    ///< Index where next sample will be written
+    size_t tail;    ///< Index where next sample will be read
+    size_t size;    ///< Current number of samples in buffer
 };
 
-}  // namespace zerr
-#endif  // RINGBUFFER_H
+} // namespace zerr
+#endif // RINGBUFFER_H

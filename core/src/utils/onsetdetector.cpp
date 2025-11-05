@@ -12,20 +12,23 @@ using zerr::Block;
 using zerr::Index;
 using zerr::OnsetDetector;
 
-void OnsetDetector::setDebounceThreshold(int newThreshold) {
+void OnsetDetector::setDebounceThreshold(int newThreshold)
+{
     debounceThreshold = newThreshold;
-    lastOnsetPosition =
-        -debounceThreshold;  // Reset lastOnsetPosition based on new threshold
+    lastOnsetPosition = -debounceThreshold; // Reset lastOnsetPosition based on new threshold
 }
 
-void OnsetDetector::detectOnsetInBlock(Block& block) {
-    if (block.empty()) return;
+void OnsetDetector::detectOnsetInBlock(Block& block)
+{
+    if (block.empty())
+        return;
 
     for (size_t cnt = 0; cnt < block.size(); ++cnt) {
         if (block[cnt] == 1) {
             if (cnt - lastOnsetPosition >= debounceThreshold) {
                 lastOnsetPosition = cnt;
-            } else {
+            }
+            else {
                 block[cnt] = 0;
             }
         }

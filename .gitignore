@@ -38,7 +38,7 @@ CMakeUserPresets.json
 # System files
 .DS_Store
 
-
+.cache/
 
 
 

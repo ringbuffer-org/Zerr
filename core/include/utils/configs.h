@@ -1,7 +1,7 @@
 #ifndef CONFIGS_H
 #define CONFIGS_H
 
-#define TESTMODE /**< Print log when TESTMODE Macro defined */
+// #define TESTMODE /**< Print log when TESTMODE Macro defined */
 
 #define TRIGGER_THRESHOLD 1e-4 /**< Threshold value for triggering feature extraction */
 

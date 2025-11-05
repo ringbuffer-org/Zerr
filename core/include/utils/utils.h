@@ -9,15 +9,15 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <iostream>
-#include <math.h>
-#include <limits>
-#include <string>
-#include <sstream>
+#include <algorithm>
+#include <cassert>
 #include <cstdarg>
 #include <cstring>
-#include <cassert>
-#include <algorithm>
+#include <iostream>
+#include <limits>
+#include <math.h>
+#include <sstream>
+#include <string>
 #include <vector>
 
 #include "types.h"
@@ -37,8 +37,8 @@ std::string formatString(const char* format, ...);
  */
 // template<typename T>
 // std::string formatVector(std::vector<T> vector);
-template <typename T>
-std::string formatVector(std::vector<T> vector) {
+template <typename T> std::string formatVector(std::vector<T> vector)
+{
     std::string formated = "";
     for (size_t i = 0; i < vector.size(); ++i) {
         formated = formated + "  " + std::to_string(vector[i]);
@@ -51,23 +51,22 @@ std::string formatVector(std::vector<T> vector) {
  * @param epsilon Maximum allowed difference from 1 (defaults to machine epsilon)
  * @return bool True if the value is within epsilon of 1, false otherwise
  */
-bool isEqualTo1(Param value,
-                Param epsilon = std::numeric_limits<Param>::epsilon());
+bool isEqualTo1(Param value, Param epsilon = std::numeric_limits<Param>::epsilon());
 /**
  * @brief Compare a floating point number with 0 within a specified epsilon
  * @param value The floating point number to compare with 0
  * @param epsilon Maximum allowed difference from 0 (defaults to machine epsilon)
  * @return bool True if the value is within epsilon of 0, false otherwise
  */
-bool isEqualTo0(Param value,
-                Param epsilon = std::numeric_limits<Param>::epsilon());
+bool isEqualTo0(Param value, Param epsilon = std::numeric_limits<Param>::epsilon());
 /**
  * @brief Calculate a sample value of a Hanning window function
  * @param pos Position within the window (0 to L-1)
  * @param L Total length of the Hanning window
  * @return float The Hanning window coefficient at the specified position
  */
-inline float get_hann_sample(int pos, int L) {
+inline float get_hann_sample(int pos, int L)
+{
     float val = 0.5 * (1.0 - cos((2.0 * PI * (float)pos) / (float)L));
     return val;
 }
@@ -77,16 +76,15 @@ inline float get_hann_sample(int pos, int L) {
  * @param vector The vector to search within
  * @return bool True if the element is found in the vector, false otherwise
  */
-template <typename T>
-bool isInVec(T element, std::vector<T> vector);
+template <typename T> bool isInVec(T element, std::vector<T> vector);
 /**
  * @brief Check if a key exists in a map
  * @param element The key to search for
  * @param map The map to search within
  * @return bool True if the key exists in the map, false otherwise
  */
-template <typename T, typename U>
-bool isInKey(T element, std::map<T, U> map) {
+template <typename T, typename U> bool isInKey(T element, std::map<T, U> map)
+{
     auto it = map.find(element);
     return it == map.end() ? false : true;
 }
@@ -98,5 +96,5 @@ bool isInKey(T element, std::map<T, U> map) {
  */
 Samples applyMovingAverage(const Samples& segment, int windowSize);
 
-}  // namespace zerr
-#endif  // UTILS_H
+} // namespace zerr
+#endif // UTILS_H
