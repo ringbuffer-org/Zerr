@@ -1,2 +1,2 @@
-*.maxpat linguist-generated=true
-*.maxhelp linguist-generated=true
+*.maxpat linguist-documentation
+*.maxhelp linguist-documentation
