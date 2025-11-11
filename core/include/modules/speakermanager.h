@@ -22,6 +22,7 @@
 #include <cmath>
 #include <iostream>
 #include <random>
+#include <functional>
 
 #include "configs.h"
 #include "logger.h"

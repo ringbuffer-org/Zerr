@@ -13,6 +13,7 @@
 #ifndef CORE_ENVELOPEGENERATOR_H
 #define CORE_ENVELOPEGENERATOR_H
 
+#include <functional>
 #include "logger.h"
 #include "onsetdetector.h"
 #include "speakermanager.h"
