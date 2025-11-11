@@ -48,7 +48,7 @@ typedef struct zerrin {
  */
 typedef struct {
     t_object x_obj;     /**< Parent Pure Data object - must be the first member */
-    t_float *f;         /**< Fallback field for the main signal inlet when no signal is connected */
+    t_float f;          /**< Fallback field for the main signal inlet when no signal is connected */
 
     t_int n_inlet;      /**< Number of inlets created for this instance */
     t_zerrin *x_in_vec; /**< Dynamic array of inlet structures */

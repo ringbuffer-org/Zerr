@@ -37,7 +37,7 @@ typedef struct zerrout {
  */
 typedef struct {
     t_object x_obj; /**< Parent Pure Data object - must be the first member */
-    t_float *f;     /**< Fallback field for the main signal inlet when no signal is connected */
+    t_float f;      /**< Fallback field for the main signal inlet when no signal is connected */
 
     // The main inlet is created by PD automatically
     t_inlet *spread_inlet; /**< Inlet for receiving spread control signals to adjust envelope spread */

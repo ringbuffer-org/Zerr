@@ -36,7 +36,7 @@ typedef struct zerrout {
  */
 typedef struct {
     t_object x_obj; /**< Parent Pure Data object - must be the first member */
-    t_float* f; /**< Fallback field for the main signal inlet when no signal is connected */
+    t_float f; /**< Fallback field for the main signal inlet when no signal is connected */
     t_int n_outlet; /**< Number of outlets created for this instance */
     t_zerrout* x_vec; /**< Dynamic array of outlet structures */
 

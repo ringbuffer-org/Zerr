@@ -3,7 +3,7 @@
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief AudioDisperser Class Puredata Wrapper
  * @date 2024-01-29
- * 
+ *
  * @copyright Copyright (c) 2023-2025
  */
 #include "zerr_disperser.h"
@@ -12,8 +12,8 @@
 ZerrDisperser::ZerrDisperser(int numChannel, zerr::SystemConfigs systemCfgs) {
     audioDisperser = new zerr::AudioDisperser(numChannel, systemCfgs);
 
-    
-    
+
+
     logger = new zerr::Logger();
 
     #ifdef TESTMODE
