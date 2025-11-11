@@ -19,7 +19,7 @@ endif()
 
 message(STATUS "Found libzerr_core.a: ${ZERR_LIBRARY}")
 
-# Add include path for zerr headers
+# Add include path for zerr headers: This is sooo ugly...
 set(ZERR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../core/include)
 if(NOT EXISTS ${ZERR_INCLUDE_DIR})
     message(FATAL_ERROR "ERROR: Zerr include directory not found at ${ZERR_INCLUDE_DIR}")

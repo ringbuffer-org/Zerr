@@ -1,0 +1,67 @@
+standard:
+  1:
+    position: 
+      cartesian:
+        x:         5.000
+        y:         3.000
+        z:         0.000
+  2:
+    position: 
+      cartesian:
+        x:         4.000
+        y:         3.000
+        z:         0.000
+  3:
+    position: 
+      cartesian:
+        x:         3.000
+        y:         3.000
+        z:         0.000
+  4:
+    position: 
+      cartesian:
+        x:         2.000
+        y:         3.000
+        z:         0.000
+  5:
+    position: 
+      cartesian:
+        x:         1.000
+        y:         3.000
+        z:         0.000
+  6:
+    position: 
+      cartesian:
+        x:         0.000
+        y:         3.000
+        z:         0.000
+  7:
+    position: 
+      cartesian:
+        x:        -1.000
+        y:         3.000
+        z:         0.000
+  8:
+    position: 
+      cartesian:
+        x:        -2.000
+        y:         3.000
+        z:         0.000
+  9:
+    position: 
+      cartesian:
+        x:        -3.000
+        y:         3.000
+        z:         0.000
+  10:
+    position: 
+      cartesian:
+        x:        -4.000
+        y:         3.000
+        z:         0.000
+  11:
+    position: 
+      cartesian:
+        x:        -5.000
+        y:         3.000
+        z:         0.000

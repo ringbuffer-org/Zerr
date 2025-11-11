@@ -17,19 +17,16 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // ==========================
     // Basic informations
     // ==========================
-    MIN_DESCRIPTION { "The [zerr_disperser~] is for simply multiply the source signal with the envelopes to achieve multichannel panning."
-                      "[mc.zerr.disperser~] xxxx"
-                      "xxxxxxxxxxx" };
-    MIN_TAGS { "DSP" };
+    MIN_DESCRIPTION { "The [zerr_disperser~] is for simply multiply the source signal with the envelopes to achieve multichannel panning." };
+    MIN_TAGS { "zerr" };
     MIN_AUTHOR { "Zeyu Yang" };
-    MIN_RELATED { "zerr.disperser~, zerr.combinator~" };
+    MIN_RELATED { "zerr.disperser~, zerr.combinator~, mc.zerr.combinator~, mc.disperser~" };
 
     // ==========================
     // Inlets & Outlets
     // ==========================
     inlet<> m_inlet_src { this, "(signal) input source signal", "signal" };
-    inlet<> m_inlet_envs { this, "(signal) input envelopes from the generator/combinator", "signal" };
-
+    inlet<> m_inlet_envs { this, "(multichannelsignal) input envelopes from the generator/combinator", "signal" };
     outlet<> m_outlet { this, "(multichannelsignal) output signals for each loudspeaker", "multichannelsignal" };
 
     // ==========================
@@ -128,18 +125,6 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     //     [this](const atoms& args, const int inlet) -> atoms {
     //         return {};
     //     } };
-
-    // // Disable number message
-    // message<> number { this, "Ignored number message.",
-    //     [this](const atoms& args, const int inlet) -> atoms {
-    //         return {};
-    //     } };
-
-    // ==========================
-    // Attributes
-    // ==========================
-    // attribute<double> min { this, "minimum", 0.0 };
-    // attribute<double> max { this, "maximum", 1.0 };
 
  private:
     int channelCountSrc { 1 };

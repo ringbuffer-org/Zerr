@@ -75,7 +75,11 @@ build_maxmsp() {
     cmake --build .
 
     echo "Installing zerr_core library to local lib folder..."
-    make install
+
+    if [ "$install" = true ]; then
+        echo "Installing Max/MSP build..."
+        make install
+    fi
 
     cd ../.. || exit 1
 
@@ -90,7 +94,7 @@ build_jack() {
 
 # -----------------------------------------------------------------------------
 if [ $# -eq 0 ]; then
-    echo "No targets provided. Usage: $0 [-i] <puredata|jack|...>"
+    echo "No targets provided. Usage: $0 [-i] <puredata|maxmsp|jack|...>"
     exit 1
 fi
 

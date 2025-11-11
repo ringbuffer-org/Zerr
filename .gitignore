@@ -1,26 +1,54 @@
-.DS_Store
+# Build outputs and directories
+build/
+builddir/
+externals/
+usr/
+lib/
 
-*.o
+# Max/MSP specific
+*.mxo
+*.mxe
+*.mxe64
 
+# PureData specific
 *.pd_linux
 *.pd_darwin
 *.pd_dll
 
-*.ipynb
-
-
-CMakeUserPresets.json
-
+# Compiled libraries
 libzerr_core.a
 
-builddir/
+# C/C++ build artifacts
+*.o
 
+# Dependencies/third-party libs
 fftw3/
 yaml-cpp/
+
+# Documentation output
 html/
 latex/
-build/
-usr/
-lib/
 
-externals/
+# Project files
+CMakeUserPresets.json
+
+# Jupyter notebooks
+*.ipynb
+
+# System files
+.DS_Store
+
+.cache/
+
+
+
+
+
+
+
+
+
+
+
+
+

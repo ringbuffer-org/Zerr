@@ -2,7 +2,8 @@
 
 namespace zerr {
 
-std::string formatString(const char* format, ...) {
+std::string formatString(const char* format, ...)
+{
     va_list args;
     va_start(args, format);
 
@@ -16,7 +17,7 @@ std::string formatString(const char* format, ...) {
     }
 
     // Allocate memory for the formatted string
-    std::vector<char> buffer(size + 1);  // +1 for null-terminator
+    std::vector<char> buffer(size + 1); // +1 for null-terminator
 
     va_start(args, format);
     vsnprintf(buffer.data(), size + 1, format, args);
@@ -33,23 +34,20 @@ std::string formatString(const char* format, ...) {
 //     }
 // }
 
-bool isEqualTo1(Param value, Param epsilon) {
-    return std::abs(value - 1.0) < epsilon;
-}
+bool isEqualTo1(Param value, Param epsilon) { return std::abs(value - 1.0) < epsilon; }
 
-bool isEqualTo0(Param value, Param epsilon) {
-    return std::abs(value) < epsilon;
-}
+bool isEqualTo0(Param value, Param epsilon) { return std::abs(value) < epsilon; }
 
-template <typename T>
-bool isInVec(T element, std::vector<T> vector) {
+template <typename T> bool isInVec(T element, std::vector<T> vector)
+{
     auto it = std::find(vector.begin(), vector.end(), element);
     return it == vector.end() ? false : true;
 }
 // explicit instantiation required for PD
 template bool isInVec<int>(int element, std::vector<int> vector);
 
-Samples applyMovingAverage(const Samples& segment, int windowSize) {
+Samples applyMovingAverage(const Samples& segment, int windowSize)
+{
     // Check if windowSize is valid
     if (windowSize <= 0) {
         throw std::invalid_argument("Window size must be greater than 0");
@@ -83,4 +81,4 @@ Samples applyMovingAverage(const Samples& segment, int windowSize) {
     return averagedSegment;
 }
 
-}  // namespace zerr
+} // namespace zerr

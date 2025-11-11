@@ -4,7 +4,7 @@
  * @brief   mc.zerr.features~ Max/MSP External using Max API for better multi-channel support
  * @date    2025-05-01
  *
- * @copyright  Copyright (c) 2023-2025
+ * @copyright  Copyright (c) 2023-2025 Zeyu Yang
  * @license    MIT license
  */
 
@@ -15,11 +15,23 @@
 
 #include "./zerr_features.hpp"
 
+//------------------------------------------------------------------------------
+// Type Definitions
+//------------------------------------------------------------------------------
+
+/**
+ * @struct t_zerr_features
+ * @brief Main data structure for the mc.zerr.features~ object
+ */
 typedef struct _zerr_features {
-    t_pxobject x_obj; // DSP object header
-    long channel_count; // Channel count for output
-    ZerrFeatures *zf; // Pointer to the zerr_features implementation from zerr_core
+    t_pxobject x_obj; ///< DSP object header (must be first)
+    long channel_count; ///< Channel count of multichannel signal
+    ZerrFeatures* zf; ///< Pointer to the zerr_features implementation
 } t_zerr_features;
+
+//------------------------------------------------------------------------------
+// Function Prototypes
+//------------------------------------------------------------------------------
 
 void* zerr_features_new(t_symbol* s, long argc, t_atom* argv);
 void zerr_features_free(t_zerr_features* x);
@@ -29,9 +41,12 @@ void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, 
 long zerr_features_multichanneloutputs(t_zerr_features* x, long outletindex);
 void zerr_features_bang(t_zerr_features* x);
 
+// Class pointer
 static t_class* zerr_features_class = NULL;
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Main Entry Point
+//------------------------------------------------------------------------------
 
 C74_EXPORT void ext_main(void* r)
 {
@@ -50,81 +65,88 @@ C74_EXPORT void ext_main(void* r)
     class_addmethod(c, (method)zerr_features_multichanneloutputs, "multichanneloutputs", A_CANT, 0);
     class_addmethod(c, (method)zerr_features_bang, "bang", 0);
 
-    CLASS_ATTR_LONG(c, "chans", 0, t_zerr_features, channel_count);
-    CLASS_ATTR_LABEL(c, "chans", 0, "Output Channels");
-    CLASS_ATTR_FILTER_CLIP(c, "chans", 1, MC_MAX_CHANS);
-    CLASS_ATTR_BASIC(c, "chans", 0);
+    // CLASS_ATTR_LONG(c, "chans", 0, t_zerr_features, channel_count);
+    // CLASS_ATTR_LABEL(c, "chans", 0, "Output Channels");
+    // CLASS_ATTR_FILTER_CLIP(c, "chans", 1, MC_MAX_CHANS);
+    // CLASS_ATTR_BASIC(c, "chans", 0);
 
+    // Initialize DSP and register the class
     class_dspinit(c);
     class_register(CLASS_BOX, c);
+
     zerr_features_class = c;
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Object Creation/Destruction
+//------------------------------------------------------------------------------
 
 void* zerr_features_new(t_symbol* s, long argc, t_atom* argv)
 {
+    // Initialize t_zerr_features structure ------------------------------------
     t_zerr_features* x = (t_zerr_features*)object_alloc(zerr_features_class);
-    long offset;
+    if (!x)
+        return NULL;
 
-    if (x) {
-        x->channel_count = 1; // Default 1 channel
+    // Initialize default values -----------------------------------------------
+    x->zf = NULL;
+    x->channel_count = 1; // Default 1 channel output for the multichannel outlet
 
-        offset = attr_args_offset(argc, argv);
-        if (offset >= 1) {
-            x->channel_count = offset; // the number of argument defines the channel
-        }
-
-        // Ensure channel count is within bounds
-        x->channel_count = CLAMP(x->channel_count, 1, MC_MAX_CHANS);
-
-
-        // zerr data structure for saving feature names
-        zerr::t_featureNames ft_names;
-        ft_names.names = (char **)malloc(argc * sizeof(char *));
-        ft_names.num   = argc;
-
-        // copy arguments to ft_names structure
-        for (int i = 0; i < argc; i++) {
-            ft_names.names[i] = strdup(atom_getsym(argv+i)->s_name);
-        }
-
-        // system config to initialize zerr: sample rate, block size
-        zerr::SystemConfigs sys_cnfg;
-        sys_cnfg.sample_rate = (size_t) sys_getsr();
-        sys_cnfg.block_size  = (size_t) sys_getblksize();
-
-        // Allocate memory if needed
-        // create & initialize ZerrFeatures instance
-        x->zf = new ZerrFeatures(sys_cnfg, ft_names);
-        if (!x->zf) return NULL;
-        if (!x->zf->initialize()) return NULL;
-
-        dsp_setup((t_pxobject*)x, 1); // One signal inlet
-
-        // Mark as multichannel enabled
-        // x->x_obj.z_misc = Z_NO_INPLACE | Z_MC_INLETS;
-
-        // Create multichannel outlet
-        outlet_new((t_object*)x, "multichannelsignal");
-
-        // Process attribute args
-        attr_args_process(x, argc, argv);
-
+    // Parsing arguments -------------------------------------------------------
+    long offset = attr_args_offset(argc, argv);
+    if (offset < 1) {
+        object_error((t_object*)x, "at least one feature should be assgined!");
+        return NULL;
     }
+
+    x->channel_count = offset; // the number of argument defines the channel
+
+    // Ensure channel count is within bounds
+    // Which is basically not possible (1024 channel)
+    x->channel_count = CLAMP(x->channel_count, 1, MC_MAX_CHANS);
+
+    zerr::FeatureNames featureNames;
+    featureNames.reserve(argc);
+
+    // Copy arguments to feature names vector
+    for (int i = 0; i < argc; i++) {
+        featureNames.push_back(atom_getsym(argv + i)->s_name);
+    }
+
+    // create & initialize ZerrFeatures instance ------------------------------
+    x->zf = new ZerrFeatures(sys_getsr(), sys_getblksize(), featureNames);
+    if (!x->zf)
+        return NULL;
+    if (!x->zf->initialize()) {
+        delete x->zf;
+        return NULL;
+    }
+
+    // Further instance setups -------------------------------------------------
+    attr_args_process(x, argc, argv);
+
+    dsp_setup((t_pxobject*)x, 1);
+
+    // Mark as multichannel inlet enabled
+    // x->x_obj.z_misc = Z_MC_INLETS;
+
+    outlet_new((t_object*)x, "multichannelsignal");
 
     return x;
 }
 
-//--------------------------------------------------------------------------
-
 void zerr_features_free(t_zerr_features* x)
 {
     dsp_free((t_pxobject*)x);
-    delete x->zf;
+    if (x->zf) {
+        delete x->zf;
+        x->zf = NULL;
+    }
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// UI and Info Methods
+//------------------------------------------------------------------------------
 
 void zerr_features_assist(t_zerr_features* x, void* b, long m, long a, char* s)
 {
@@ -135,22 +157,23 @@ void zerr_features_assist(t_zerr_features* x, void* b, long m, long a, char* s)
     }
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Multichannel Methods
+//------------------------------------------------------------------------------
 
 long zerr_features_multichanneloutputs(t_zerr_features* x, long outletindex)
 {
     return x->channel_count;
 }
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// DSP Methods
+//------------------------------------------------------------------------------
 
 void zerr_features_dsp64(t_zerr_features* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags)
 {
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_features_perform64, 0, NULL);
-    post("zerr_features_dsp64: samplerate %.0lf maxvectorsize %d", samplerate, maxvectorsize);
 }
-
-//--------------------------------------------------------------------------
 
 void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam)
 {
@@ -161,5 +184,6 @@ void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, 
 
 void zerr_features_bang(t_zerr_features* x)
 {
-    post("mc.zerr.features~: current channel count = %ld", x->channel_count);
+    // change to output current activate feature info
+    object_post((t_object*)x, "current channel count = %ld", x->channel_count);
 }

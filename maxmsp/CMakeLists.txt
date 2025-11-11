@@ -45,8 +45,6 @@ endif ()
 #############################################################
 # Dependencies SETUP
 #############################################################
-# Set FFTW3_DIR to the directory containing FFTWConfig.cmake
-# You might need to adjust this path to match your system
 find_package(FFTW3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
 

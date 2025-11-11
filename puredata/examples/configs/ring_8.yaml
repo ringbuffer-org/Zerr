@@ -1,0 +1,50 @@
+standard:
+  1:
+    position: 
+      spherical:
+        azimuth:        0.0
+        elevation:      0.0
+        distance:       1.0
+  2:
+    position: 
+      spherical:
+        azimuth:        45.0
+        elevation:      0.0
+        distance:       1.0
+  3:
+    position: 
+      spherical:
+        azimuth:         90.0
+        elevation:       0.0
+        distance:        1.0
+  4:
+    position: 
+      spherical:
+        azimuth:         135.0
+        elevation:       0.0
+        distance:        1.0
+  5:
+    position: 
+      spherical:
+        azimuth:         180.0
+        elevation:       0.0
+        distance:        1.0
+  6:
+    position: 
+      spherical:
+        azimuth:         225.0
+        elevation:       0.0
+        distance:        1.0
+  7:
+    position: 
+      spherical:
+        azimuth:         270.0
+        elevation:       0.0
+        distance:        1.0
+  8:
+    position: 
+      spherical:
+        azimuth:         315.0
+        elevation:       0.0
+        distance:        1.0
+

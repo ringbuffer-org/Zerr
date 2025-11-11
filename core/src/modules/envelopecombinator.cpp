@@ -9,44 +9,47 @@
 #include "envelopecombinator.h"
 using namespace zerr;
 
-EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel,
-                                       SystemConfigs systemCfgs,
-                                       std::string combMode) {
-    this->numSource = numSource;
+EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, SystemConfigs systemCfgs,
+                                       std::string combMode)
+{
+    this->numSource  = numSource;
     this->numChannel = numChannel;
     this->systemCfgs = systemCfgs;
-    this->combMode = combMode;
+    this->combMode   = combMode;
 
-    numInlet = numSource * numChannel;
+    numInlet  = numSource * numChannel;
     numOutlet = numChannel;
 
     logger = new Logger();
 #ifdef TESTMODE
     logger->setLogLevel(LogLevel::INFO);
-#endif  // TESTMODE
+#endif // TESTMODE
 }
 
-bool EnvelopeCombinator::initialize() {
+bool EnvelopeCombinator::initialize()
+{
     inputBuffer.resize(numInlet, Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
     if (combMode == "add") {
         processFunc = &EnvelopeCombinator::_process_add;
-    } else if (combMode == "root") {
+    }
+    else if (combMode == "root") {
         processFunc = &EnvelopeCombinator::_process_root;
-    } else if (combMode == "max") {
+    }
+    else if (combMode == "max") {
         processFunc = &EnvelopeCombinator::_process_max;
-    } else {
-        logger->logError(
-            "EnvelopeCombinator::initialize Unknown combination mode: " +
-            combMode);
+    }
+    else {
+        logger->logError("EnvelopeCombinator::initialize Unknown combination mode: " + combMode);
         return false;
     }
 
     return true;
 }
 
-Blocks EnvelopeCombinator::perform(Blocks in) {
+Blocks EnvelopeCombinator::perform(Blocks in)
+{
     inputBuffer = in;
 
     if (processFunc) {
@@ -56,7 +59,8 @@ Blocks EnvelopeCombinator::perform(Blocks in) {
     return outputBuffer;
 }
 
-void EnvelopeCombinator::_process_add() {
+void EnvelopeCombinator::_process_add()
+{
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
@@ -71,7 +75,8 @@ void EnvelopeCombinator::_process_add() {
     }
 }
 
-void EnvelopeCombinator::_process_root() {
+void EnvelopeCombinator::_process_root()
+{
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
@@ -91,7 +96,8 @@ void EnvelopeCombinator::_process_root() {
     }
 }
 
-void EnvelopeCombinator::_process_max() {
+void EnvelopeCombinator::_process_max()
+{
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
         buffer.assign(buffer.size(), 0.0f);
@@ -103,7 +109,7 @@ void EnvelopeCombinator::_process_max() {
         for (size_t k = 0; k < systemCfgs.block_size; ++k) {
             maxVal = 0;
             for (int j = 0; j < numSource; ++j) {
-                tmp = inputBuffer[i + j * numChannel][k];
+                tmp    = inputBuffer[i + j * numChannel][k];
                 maxVal = tmp > maxVal ? tmp : maxVal;
             }
             outputBuffer[i][k] = maxVal;

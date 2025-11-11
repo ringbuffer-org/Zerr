@@ -31,6 +31,6 @@ message(STATUS "This is the zerr_core_static OUTPUT_NAME: " ${OUTPUT_VALUE})
 # Set installation path relative to the project directory
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 
-# Install the static library into the local "lib" folder 
+# Install the static library into the local "lib" folder
 install(TARGETS zerr_core_static ARCHIVE DESTINATION lib)
 # install(DIRECTORY include/ DESTINATION usr/include)

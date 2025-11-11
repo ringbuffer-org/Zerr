@@ -4,14 +4,14 @@
 
 **Zerr*** is a channel-based spatialization concept for an arbitrary audio source. It distributes audio signals to multiple loudspeakers, based only on the signals’ inherent features as well as the properties of the speaker array setup. Although various aspects of the algorithm can be tuned, also during runtime, the audio signal itself defines the spatial distribution. Depending on the parametrization, the approach can alter the original signal significantly, similar to modulation and distortion effects. Please check the [conference paper](https://ieeexplore.ieee.org/abstract/document/10289141), "Autogenous Spatialization for Arbitrary Loudspeaker Setups" for design details. 
 
-**Zerr*** was was intended to be available in various creative coding environments. The currently supported environments are listed below:
+**Zerr*** is intended to be available in various creative coding environments. The currently supported environments are listed below:
 
 |                   | Linux | MacOS(M1) | MacOS(Intel) | Windows |
 | ----------------- | ----- | --------- | ------------ | ------- |
 | **Puredata**      | ✅     | ✅         | ✅            | 🛠️       |
-| **JACK**          | 🛠️     | ✅         | 🛠️            | 🛠️       |
+| **JACK**          | 🛠️     | 🛠️         | 🛠️            | 🛠️       |
 | **SuperCollider** | ⏳     | ⏳         | ⏳            | ⏳       |
-| **Max/MSP**       | **➖** | 🛠️         | 🛠️            | 🛠️       |
+| **Max/MSP**       | **➖** | ✅         | ✅            | 🛠️       |
 
 ✅: **Fully Supported**
 
@@ -42,7 +42,7 @@ Otherwise, you can also build it for your own machine.
 #### Dependencies
 
 - Zerr* uses [Conan](https://docs.conan.io/2/tutorial.html) for dependency management, please refer to its documentation for details
-- Zerr* depends only on [yaml-cpp](https://github.com/jbeder/yaml-cpp) and [fftw3](https://www.fftw.org/). Use the following Conan command to install them
+- The core library of Zerr* depends only on [yaml-cpp](https://github.com/jbeder/yaml-cpp) and [fftw3](https://www.fftw.org/). Use the following Conan command to install them
 
 ```bash
 conan install . --output-folder=build --build=missing
@@ -71,3 +71,4 @@ conan install . --output-folder=build --build=missing
 ./build.sh jack
 ```
 
+<img src="./zerr_logo.png" alt="zerr_logo" />

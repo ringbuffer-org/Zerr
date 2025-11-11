@@ -12,12 +12,12 @@ using zerr::Blocks;
 using zerr::EnvelopeGenerator;
 using zerr::Param;
 
-EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs,
-    std::string speakerCfgs, Mode genMode)
+EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speakerCfgs,
+                                     Mode genMode)
 {
-    this->systemCfgs = systemCfgs;
+    this->systemCfgs  = systemCfgs;
     this->speakerCfgs = speakerCfgs;
-    this->genMode = genMode;
+    this->genMode     = genMode;
 
     speakerManager = new SpeakerManager(this->speakerCfgs);
 
@@ -39,11 +39,12 @@ bool EnvelopeGenerator::initialize()
     // check the generator mode and bind process func
     if (genMode == "trigger") {
         processFunc = &EnvelopeGenerator::_processTrigger;
-    } else if (genMode == "trajectory") {
+    }
+    else if (genMode == "trajectory") {
         processFunc = &EnvelopeGenerator::_processTrajectory;
-    } else {
-        logger->logError(
-            "EnvelopeGenerator::initialize Unknown selection mode: " + genMode);
+    }
+    else {
+        logger->logError("EnvelopeGenerator::initialize Unknown selection mode: " + genMode);
         return false;
     }
 
@@ -85,18 +86,14 @@ Blocks EnvelopeGenerator::perform(Blocks in)
     return outputBuffers;
 }
 
-int EnvelopeGenerator::getNumSpeakers()
-{
-    return speakerManager->getNumAllSpeakers();
-}
+int EnvelopeGenerator::getNumSpeakers() { return speakerManager->getNumAllSpeakers(); }
 
 void EnvelopeGenerator::setCurrentSpeaker(Index newIdx)
 {
     speakerManager->setCurrentSpeaker(newIdx);
 }
 
-void EnvelopeGenerator::setActiveSpeakerIndexs(std::string action,
-    Indexes idxs)
+void EnvelopeGenerator::setActiveSpeakerIndexs(std::string action, Indexes idxs)
 {
     speakerManager->setActiveSpeakers(action, idxs);
 }
@@ -113,7 +110,7 @@ void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs)
 
 void EnvelopeGenerator::setTriggerInterval(Param newInterval)
 {
-    newInterval = newInterval < 0 ? 0 : newInterval;
+    newInterval      = newInterval < 0 ? 0 : newInterval;
     int newThreshold = (int)(newInterval / 1000.0 * systemCfgs.sample_rate);
     onsetDetector->setDebounceThreshold(newThreshold);
 }
@@ -139,7 +136,7 @@ void EnvelopeGenerator::_processTrigger()
 {
     size_t channel;
     Params distances; // distances between speakers
-    Param powerSum; // the overall power
+    Param powerSum;   // the overall power
     Param gain;
     Index currIdx;
 
@@ -163,7 +160,7 @@ void EnvelopeGenerator::_processTrigger()
         channel = indexChannelLookup[currIdx]; // get the channel of the
                                                // current speaker
         outputBuffers[channel][cnt] = 1.0;
-        powerSum = 1.0;
+        powerSum                    = 1.0;
 
         // calculate spread gains
         distances = speakerManager->getDistanceVector(currIdx);
@@ -171,7 +168,7 @@ void EnvelopeGenerator::_processTrigger()
             if (chnl == channel) {
                 continue;
             }
-            gain = _calculateGain(distances[chnl], spread[cnt]);
+            gain                     = _calculateGain(distances[chnl], spread[cnt]);
             outputBuffers[chnl][cnt] = gain * gain;
             powerSum += gain * gain;
         }
@@ -203,14 +200,15 @@ void EnvelopeGenerator::_processTrajectory()
     for (size_t cnt = 0; cnt < trjcty.size(); ++cnt) {
         speakerPair = speakerManager->getIndexesByTrajectory(trjcty[cnt]);
 
-        channelPair.first = indexChannelLookup[speakerPair.first];
+        channelPair.first  = indexChannelLookup[speakerPair.first];
         channelPair.second = indexChannelLookup[speakerPair.second];
 
         if (speakerPair.first == speakerPair.second) {
             outputBuffers[channelPair.first][cnt] = volume[cnt];
-        } else { // linear panning TODO: change to parameterized crossfade
-            panRatio = speakerManager->getPanningRatio(trjcty[cnt]);
-            outputBuffers[channelPair.first][cnt] = volume[cnt] * (1 - panRatio);
+        }
+        else { // linear panning TODO: change to parameterized crossfade
+            panRatio                               = speakerManager->getPanningRatio(trjcty[cnt]);
+            outputBuffers[channelPair.first][cnt]  = volume[cnt] * (1 - panRatio);
             outputBuffers[channelPair.second][cnt] = volume[cnt] * panRatio;
         }
     }
@@ -227,9 +225,7 @@ Param EnvelopeGenerator::_calculateGain(Param x, Param theta)
 
     Param tmp = tan(theta * PI / 2.0);
 
-    Param gain = isEqualTo0(tmp, VOLUME_THRESHOLD)
-        ? 0.0
-        : 1.0 - x / tan(theta * PI / 2.0);
+    Param gain = isEqualTo0(tmp, VOLUME_THRESHOLD) ? 0.0 : 1.0 - x / tan(theta * PI / 2.0);
 
     // clip gain
     gain = gain < 0.0 ? 0 : gain;
