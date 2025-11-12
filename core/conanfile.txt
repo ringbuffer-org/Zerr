@@ -1,7 +1,0 @@
-[requires]
-fftw/3.3.10
-yaml-cpp/0.8.0
-
-[generators]
-CMakeDeps
-CMakeToolchain
