@@ -114,9 +114,4 @@ endif()
 
 set_target_properties(zerr_core_static PROPERTIES
     OUTPUT_NAME "zerr_core"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
 )
-
-# Installation
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
-install(TARGETS zerr_core_static ARCHIVE DESTINATION lib)

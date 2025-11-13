@@ -4,7 +4,7 @@ project(zerr_puredata)
 
 # Custom target that calls the Makefile
 add_custom_target(zerr_puredata ALL
-    COMMAND make
+    COMMAND make ZERR_CORE_LIBDIR=$<TARGET_FILE_DIR:zerr_core_static>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Building Zerr* for Pure Data"
 )

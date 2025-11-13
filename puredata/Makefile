@@ -7,10 +7,18 @@ cflags = -std=c++17 -Wall
 
 include ../build/conandeps.mk
 
-ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
-ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
+# Assign conan path to the generic paths
+LIB_DIRS_YAML_CPP = $(CONAN_LIB_DIRS_YAML_CPP)
+LIBS_YAML_CPP = $(CONAN_LIBS_YAML_CPP)
+LIB_DIRS_FFTW = $(CONAN_LIB_DIRS_FFTW)
+INCLUDE_DIRS_FFTW = $(CONAN_INCLUDE_DIRS_FFTW)
+INCLUDE_DIRS_YAML_CPP = $(CONAN_INCLUDE_DIRS_YAML_CPP)
 
-ldflags += -L../core/lib
+ldflags = -L$(LIB_DIRS_YAML_CPP)  # Add library directories
+ldlibs = -l$(LIBS_YAML_CPP)       # Link the yaml-cpp library
+
+ZERR_CORE_LIBDIR ?= ../core/lib
+ldflags += -L$(ZERR_CORE_LIBDIR)
 ldlibs += -lzerr_core
 
 # Library directory name: zerr
@@ -31,7 +39,7 @@ zerr_envelopes~.class.sources  += src/zerr_envelopes.cpp
 zerr_features~.class.sources   += src/zerr_features.cpp
 
 # class specific depencencies
-zerr_features~.class.ldflags += -L$(CONAN_LIB_DIRS_FFTW)
+zerr_features~.class.ldflags += -L$(LIB_DIRS_FFTW)
 zerr_features~.class.ldlibs += -lfftw3
 zerr_envelopes~.class.ldlibs += -lyaml-cpp
 
@@ -60,12 +68,12 @@ CXX += -Iinclude
 
 
 # Add fftw3 dependency headers
-CC  += -I$(CONAN_INCLUDE_DIRS_FFTW)
-CXX += -I$(CONAN_INCLUDE_DIRS_FFTW)
+CC  += -I$(INCLUDE_DIRS_FFTW)
+CXX += -I$(INCLUDE_DIRS_FFTW)
 
 # Add yaml-cpp dependency headers
-CC  += -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
-CXX += -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
+CC  += -I$(INCLUDE_DIRS_YAML_CPP)
+CXX += -I$(INCLUDE_DIRS_YAML_CPP)
 
 
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
