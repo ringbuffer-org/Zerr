@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
+
 project(Min-DevKit)
 
 enable_testing()
@@ -7,12 +8,12 @@ string(REGEX REPLACE "(.*)/" "" THIS_PACKAGE_NAME "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (APPLE)
     if (${CMAKE_GENERATOR} MATCHES "Xcode")
-            if (${XCODE_VERSION} VERSION_LESS 10)
-                message(STATUS "Xcode 10 or higher is required. Please install from the Mac App Store.")
-                return ()
-            elseif(${XCODE_VERSION} VERSION_GREATER_EQUAL 12)
-                set(C74_BUILD_FAT YES)
-            endif ()
+        if (${XCODE_VERSION} VERSION_LESS 10)
+            message(STATUS "Xcode 10 or higher is required. Please install from the Mac App Store.")
+            return ()
+        elseif(${XCODE_VERSION} VERSION_GREATER_EQUAL 12)
+            set(C74_BUILD_FAT YES)
+        endif ()
     endif ()
 
     if (NOT CMAKE_OSX_ARCHITECTURES)
@@ -23,7 +24,7 @@ if (APPLE)
         endif()
         message("CMAKE_OSX_ARCHITECTURES set to ${CMAKE_OSX_ARCHITECTURES}")
     endif()
-    
+
     # Set minimum macOS version to match the libraries
     if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
         set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "macOS deployment target" FORCE)

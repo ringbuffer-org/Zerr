@@ -5,12 +5,10 @@
 CC  = g++
 cflags = -std=c++17 -Wall
 
-include build/conandeps.mk
+include ../build/conandeps.mk
 
 ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
 ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
-# $(info    CONAN_LIB_DIRS_YAML_CPP is $(CONAN_LIB_DIRS_YAML_CPP))
-# $(info    CONAN_LIBS_YAML_CPP is $(CONAN_LIBS_YAML_CPP))
 
 ldflags += -L../core/lib
 ldlibs += -lzerr_core
@@ -27,7 +25,7 @@ class.sources = src/zerr_combinator~.cpp \
 # Source files which must be statically linked to each class in the library.
 
 # Class specific source files
-zerr_combinator~.class.sources += src/zerr_combinator.cpp 
+zerr_combinator~.class.sources += src/zerr_combinator.cpp
 zerr_disperser~.class.sources  += src/zerr_disperser.cpp
 zerr_envelopes~.class.sources  += src/zerr_envelopes.cpp
 zerr_features~.class.sources   += src/zerr_features.cpp
@@ -40,7 +38,6 @@ zerr_envelopes~.class.ldlibs += -lyaml-cpp
 # add library data files
 datafiles += LICENSE
 datafiles += README.md
-# datadirs  += img
 
 datafiles += help/zerr_combinator~-help.pd
 datafiles += help/zerr_envelopes~-help.pd

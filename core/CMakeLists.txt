@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 
 project(zerr_core VERSION 0.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+# set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -111,8 +112,11 @@ else()
     message(FATAL_ERROR "Could not find FFTW3 target or variables")
 endif()
 
-set_target_properties(zerr_core_static PROPERTIES OUTPUT_NAME "zerr_core")
+set_target_properties(zerr_core_static PROPERTIES
+    OUTPUT_NAME "zerr_core"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
+)
 
 # Installation
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 install(TARGETS zerr_core_static ARCHIVE DESTINATION lib)

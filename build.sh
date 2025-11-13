@@ -18,11 +18,7 @@ shift $((OPTIND -1))
 
 # -----------------------------------------------------------------------------
 build_core() {
-    echo "Building zerr core library..."
-    cd core || { echo "Failed to enter 'core' directory"; exit 1; }
-
-    conan install . --output-folder=build --build=missing
-    cd build || { echo "Failed to enter 'core/build' directory"; exit 1; }
+    echo "Building zerr_core library..."
 
     cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     cmake --build .
@@ -36,7 +32,7 @@ build_core() {
 }
 
 check_core_built() {
-    if [ -d "core/lib" ]; then
+    if [ -d "core/lib/libzerr_core.a" ]; then
         return 0
     else
         return 1
@@ -46,11 +42,8 @@ check_core_built() {
 # -----------------------------------------------------------------------------
 build_puredata() {
     echo "Building Zerr* for Pure Data..."
-    cd puredata || { echo "Failed to enter 'puredata' directory"; exit 1; }
 
-    conan install . --output-folder=build --build=missing
-
-    make
+    cmake --build build --target zerr_puredata
 
     if [ "$install" = true ]; then
         echo "Installing Pure Data build..."
@@ -97,6 +90,9 @@ if [ $# -eq 0 ]; then
     echo "No targets provided. Usage: $0 [-i] <puredata|maxmsp|jack|...>"
     exit 1
 fi
+
+conan install . --output-folder=build --build=missing
+cmake --preset conan-release
 
 # Build core if needed
 if check_core_built; then
