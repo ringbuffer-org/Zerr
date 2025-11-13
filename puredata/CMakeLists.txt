@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19)
 project(zerr_puredata)
 
 # Custom target that calls the Makefile
-add_custom_target(puredata ALL
+add_custom_target(zerr_puredata ALL
     COMMAND make ZERR_CORE_LIBDIR=$<TARGET_FILE_DIR:zerr_core_static>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Building Zerr* for Pure Data"
@@ -11,7 +11,7 @@ add_custom_target(puredata ALL
 
 # Conditionally depend on core if built in a superproject
 if(TARGET zerr_core_static)
-    add_dependencies(puredata zerr_core_static)
+    add_dependencies(zerr_puredata zerr_core_static)
 endif()
 
 # Convenience targets for clean and install via the Makefile
