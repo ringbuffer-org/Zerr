@@ -1,10 +1,8 @@
-# Zerr* Puredata Externals
+# Zerr* PureData Externals
 
-Zerr* can be compiled into a Puredata library. This 
+Zerr* can be compiled into a PureData library. This directory contains PureData external wrappers for each Zerr module, as described in the paper [Autogenous Spatialization for Arbitrary Loudspeaker Setups](https://ieeexplore.ieee.org/abstract/document/10289141).
 
-PureData external wrappers for each Zerr module, as described in the paper (Autogenous Spatialization for Arbitrary Loudspeaker Setups)[https://ieeexplore.ieee.org/abstract/document/10289141]. 
-
-Following externals can be built from scratch.
+The following externals can be built from scratch:
 
 - **zerr_features~**
 - **zerr_envelopes~**
@@ -15,57 +13,57 @@ Following externals can be built from scratch.
 
 ### configs
 
-yaml configuration files used by zerr system. **speakers** folder contains configurations of speaker array setups. **presets** folder contains configurations for zerr system.
+YAML configuration files used by the Zerr system. The **speakers** folder contains configurations for various speaker array setups. The **presets** folder contains configurations for the Zerr system.
 
 ### dependencies
 
-Default path of project dependencies. It contains only empty **lib** and **include** folder.
+Default path for project dependencies. It contains **lib** and **include** folders where you should place external library files.
 
 ### externals
 
-The folder to save built externals. Puredata patches for testing each externals and the combination of all externals are included.
+The folder where built externals are saved. PureData patches for testing each external and the combination of all externals are included.
 
 ### src
 
-Zerr system source files, same as **src** folder in main branch
+Zerr system source files, same as the **src** folder in the main branch.
 
 ### include
 
-Zerr system headers, same as **include** folder in main branch
+Zerr system headers, same as the **include** folder in the main branch.
 
 ### puredata
 
-PureData external wrappers for the zerr modules. A folder corresponds to an external.
+PureData external wrappers for the Zerr modules. Each folder corresponds to one external.
 
 ### build.sh
 
-Script that builds all externals with one click. Tested on macOS only, not guaranteed to work on other systems. 
+Script that builds all externals with one command. Tested on macOS only; compatibility with other systems is not guaranteed.
 
 ## How to Build
 
-Make sure you have **Make** installed :)
+Make sure you have **Make** installed.
 
 ### 1. Dependencies
 
-Zerr depends on  [fftw3](http://fftw.org/) and  [yaml-cpp](https://github.com/jbeder/yaml-cpp). Please follow the instruction from each page for installment. The default location for headers and libraries are the **lib** and **include** inside **dependencies** folder. You can copy the files there. Otherwise please edit the dependency path in Makefile.
+Zerr depends on [fftw3](http://fftw.org/) and [yaml-cpp](https://github.com/jbeder/yaml-cpp). Please follow the instructions on each project's page for installation. The default location for headers and libraries is the **lib** and **include** folders inside the **dependencies** folder. You can copy the files there, or edit the dependency paths in the Makefile.
 
-### 2. Build separately
+### 2. Build Separately
 
-`cd` into to the external folder inside **puredata**. Run the **make.sh** file to start build. This script will detect and start the pd patch in builddir automaticly after building. The **PureData API (m_pd.h)** and **pd-lib-builder** are included. 
+Navigate (`cd`) into the external folder inside **puredata**. Run the **make.sh** file to start the build. This script will automatically detect and start the PureData patch in the build directory after building. The **PureData API (m_pd.h)** and **pd-lib-builder** are included.
 
->  **zerr_envelope_generator~** external may fail to be created when pd is first started. Simply re-create (edit and save) to fix this.
+> **Note:** The **zerr_envelopes~** external may fail to be created when PureData is first started. Simply re-create it (edit and save) to fix this.
 
-### 3. Build all
+### 3. Build All
 
-You can use the **build.sh** script to build all externals together.  The built  externals can be found in the **externals** folder. The PureData patch for testing all externals will also be opened automaticly.
+You can use the **build.sh** script to build all externals together. The built externals can be found in the **externals** folder. The PureData patch for testing all externals will also be opened automatically.
 
 ## Usage
 
 ### zerr_features~
 
-**zerr_feature_tracker~** external calculates different audio features from one mono audio input. Use the feature names in the pd object arguments to indicate the features to be extracted. The outlets send the extracted audio features in the audio rate and in the same order of the feature names in arguments.
+The **zerr_features~** external calculates different audio features from a mono audio input. Use feature names in the PureData object arguments to specify which features to extract. The outlets send the extracted audio features at audio rate in the same order as the feature names in the arguments.
 
-**Valid feature name:**
+**Valid feature names:**
 
 - RootMeanSquare
 - ZeroCrossingRate
@@ -75,17 +73,16 @@ You can use the **build.sh** script to build all externals together.  The built 
 - CrestFactor
 - Flatness
 - ZeroCrossings
-- ...
+- (and more)
 
 ### zerr_envelopes~
 
-**zerr_envelopes~** creates envelope according to the income control signal and the speaker configuration. The first argument assign the envelope generation mode (trajectory/trigger). The second argument is the path to the speaker array configuration file. Relative path is supported.
+The **zerr_envelopes~** external creates envelopes according to the incoming control signal and speaker configuration. The first argument specifies the envelope generation mode (trajectory/trigger). The second argument is the path to the speaker array configuration file. Relative paths are supported.
 
 ### zerr_combinator~
 
-**zerr_envelope_combinator~** combines the multi-channel envelopes from different generators. The first argument is the number of generator and the second is the channel number of every generator. It means that only generators with same channel number can be added together.  Inlet number equals to source number x channel number and the inlets are grouped by source. e.g in the demo graph there are 16 inlets. The first 8 inlets are the 1-8 channels of the first input source. Inlet 9-16 is the second.
+The **zerr_combinator~** external combines multi-channel envelopes from different generators. The first argument specifies the number of generators, and the second specifies the channel number for each generator. Only generators with the same channel number can be combined. The inlet count equals the number of sources multiplied by the channel number, with inlets grouped by source. For example, in the demo patch with 16 inlets: inlets 1-8 are the channels from the first input source, and inlets 9-16 are from the second.
 
 ### zerr_disperser~
 
-**zerr_audio_disperser~** distributes the mono source audio to multi-channels by multiply it with multi-channel envelope. The only argument indicates the channel number. The first inlet receives the input of mono source audio with the rest receives the envelopes.
-
+The **zerr_disperser~** external distributes mono source audio to multiple channels by multiplying it with a multi-channel envelope. The only argument specifies the channel number. The first inlet receives the mono source audio, and the remaining inlets receive the envelopes.
