@@ -102,10 +102,10 @@ jobs:
         working-directory: core
         run: |
           cmake -S . -B build `
-                      -G "MinGW Makefiles" `
-                      -DCMAKE_TOOLCHAIN_FILE="build/conan_toolchain.cmake" `
-                      -DCMAKE_BUILD_TYPE=Release `
-                      -DCMAKE_CXX_STANDARD=17
+            -G "MinGW Makefiles" `
+            -DCMAKE_TOOLCHAIN_FILE="build/conan_toolchain.cmake" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_CXX_STANDARD=17
           cmake --build build --config Release
           cmake --install build
 
@@ -113,5 +113,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zerr-core-windows
-          path: core/lib/libzerr_core.a
+          path: core/lib
           retention-days: 1

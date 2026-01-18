@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 
 project(zerr_core VERSION 0.1.0 LANGUAGES CXX)
 
+add_definitions(-DYAML_CPP_STATIC_LIB)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
