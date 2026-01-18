@@ -191,9 +191,14 @@ jobs:
       - name: Set up Conan
         shell: bash
         run: |
+          set -euo pipefail
           pip install conan
 
-          PROFILE="$HOME/.conan2/profiles/mingw"
+
+          PROFILE_DIR="$HOME/.conan2/profiles"
+          mkdir -p "$PROFILE_DIR"
+
+          PROFILE="$PROFILE_DIR/mingw"
 
           cat > "$PROFILE" << 'EOF'
           [settings]
@@ -211,6 +216,7 @@ jobs:
           conan profile show mingw
 
       - name: Install Dependencies
+        shell: bash
         working-directory: puredata
         run: |
           mkdir -p build
