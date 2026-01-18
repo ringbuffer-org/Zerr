@@ -224,14 +224,11 @@ jobs:
           conan profile detect --force
 
       - name: Install Dependencies
-        working-directory: core
+        working-directory: puredata
         run: |
           mkdir build
-          conan install . --output-folder=build --build=missing `
-            -s compiler=gcc `
-            -s compiler.version=13 `
-            -s compiler.libcxx=libstdc++11 `
-            -s build_type=Release
+          conan install . -of=build --build=missing \
+            -pr:h=./mingw-profile.txt -pr:b=./mingw-profile.txt
 
       - name: Build External
         shell: bash
