@@ -4,6 +4,11 @@ name: build pd-lib-builder based pure data externals
 on:
   workflow_call:
   workflow_dispatch:
+    inputs:
+      core_run_id:
+        description: "Run ID of a successful 'build zerr-core static library' workflow (needed when not triggered via workflow_run)"
+        required: false
+        type: string
   # push:
   #   branches:
   #     - main
@@ -14,6 +19,10 @@ on:
     workflows: ["build zerr-core static library"]
     types:
       - completed
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   macOS:
@@ -26,12 +35,21 @@ jobs:
         with:
           submodules: true
 
+      - name: Ensure core artifact id present
+        env:
+          CORE_RUN_ID: ${{ github.event.workflow_run.id || inputs.core_run_id }}
+        run: |
+          if [ -z "${CORE_RUN_ID}" ]; then
+            echo "CORE_RUN_ID missing. Provide inputs.core_run_id when dispatching manually or trigger via workflow_run." >&2
+            exit 1
+          fi
+
       - name: Download zerr-core library
         uses: actions/download-artifact@v4
         with:
           name: zerr-core-macos
           path: core/lib/
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || inputs.core_run_id }}
           github-token: ${{ github.token }}
 
       - name: Display structure of downloaded files
@@ -69,12 +87,21 @@ jobs:
         with:
           submodules: true
 
+      - name: Ensure core artifact id present
+        env:
+          CORE_RUN_ID: ${{ github.event.workflow_run.id || inputs.core_run_id }}
+        run: |
+          if [ -z "${CORE_RUN_ID}" ]; then
+            echo "CORE_RUN_ID missing. Provide inputs.core_run_id when dispatching manually or trigger via workflow_run." >&2
+            exit 1
+          fi
+
       - name: Download zerr-core library
         uses: actions/download-artifact@v4
         with:
           name: zerr-core-linux
           path: core/lib/
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || inputs.core_run_id }}
           github-token: ${{ github.token }}
 
       - name: Display structure of downloaded files
@@ -113,6 +140,15 @@ jobs:
         with:
           submodules: true
 
+      - name: Ensure core artifact id present
+        env:
+          CORE_RUN_ID: ${{ github.event.workflow_run.id || inputs.core_run_id }}
+        run: |
+          if [ -z "${CORE_RUN_ID}" ]; then
+            echo "CORE_RUN_ID missing. Provide inputs.core_run_id when dispatching manually or trigger via workflow_run." >&2
+            exit 1
+          fi
+
       - name: Set up MinGW
         uses: egor-tensin/setup-mingw@v3
         with:
@@ -134,7 +170,7 @@ jobs:
         with:
           name: zerr-core-windows
           path: core/lib/
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || inputs.core_run_id }}
           github-token: ${{ github.token }}
 
       # - name: Display structure of downloaded files
@@ -160,8 +196,8 @@ jobs:
       - name: Build External
         working-directory: puredata
         run: |
-          make
-          make install PDLIBDIR=build
+          mingw32-make
+          mingw32-make install PDLIBDIR=build
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4

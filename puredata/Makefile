@@ -3,7 +3,7 @@
 # settings and rules.
 
 CC  = g++
-cflags += -std=c++17 -Wall -DYAML_CPP_STATIC_LIB
+cflags += -std=c++17 -Wall -DYAML_CPP_STATIC_DEFINE
 
 include build/conandeps.mk
 cflags += -I$(CONAN_INCLUDE_DIRS_YAML_CPP) -I$(CONAN_INCLUDE_DIRS_FFTW)
