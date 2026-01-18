@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+message(STATUS "------------- Setting up Zerr Core Library -------------")
 # ============================================================================
 # Dependency Management: Conan (default) or System Packages
 # ============================================================================

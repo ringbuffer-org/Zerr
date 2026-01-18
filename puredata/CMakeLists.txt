@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.19)
 
 project(zerr_puredata)
 
+message(STATUS "------------- Setting up Zerr Pure Data -------------")
+
 # Custom target that calls the Makefile
 add_custom_target(zerr_puredata ALL
     COMMAND make ZERR_CORE_LIBDIR=$<TARGET_FILE_DIR:zerr_core_static>

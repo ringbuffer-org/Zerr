@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 
-project(Min-DevKit)
+project(zerr_maxmsp)
+
+message(STATUS "------------- Setting up Zerr Max/MSP -------------")
 
 enable_testing()
 
@@ -46,8 +48,44 @@ endif ()
 #############################################################
 # Dependencies SETUP
 #############################################################
-find_package(FFTW3 REQUIRED)
-find_package(yaml-cpp REQUIRED)
+# Reuse top-level targets if present; otherwise find them here.
+
+# yaml-cpp (prefer config target from Conan/system)
+if(NOT TARGET yaml-cpp::yaml-cpp)
+    find_package(yaml-cpp 0.8 CONFIG REQUIRED)
+endif()
+
+# FFTW3 (accept either FFTW3::fftw3 or fftw::fftw; fallback to MODULE/vars)
+if(NOT TARGET FFTW3::fftw3 AND NOT TARGET fftw::fftw AND NOT FFTW3_LIBRARIES)
+    find_package(FFTW3 3.3 QUIET)
+    if(NOT FFTW3_FOUND)
+        find_package(FFTW3 3.3 MODULE REQUIRED)
+    endif()
+endif()
+
+# Optional: expose zerr_core from the superbuild so subprojects can link it
+if(TARGET zerr_core_static)
+    add_library(zerr_core::zerr_core ALIAS zerr_core_static)
+endif()
+
+# Optional: a convenience INTERFACE target bundling deps for subprojects
+add_library(zerr_deps INTERFACE)
+target_link_libraries(zerr_deps INTERFACE yaml-cpp::yaml-cpp)
+
+if(TARGET FFTW3::fftw3)
+    target_link_libraries(zerr_deps INTERFACE FFTW3::fftw3)
+elseif(TARGET fftw::fftw)
+    target_link_libraries(zerr_deps INTERFACE fftw::fftw)
+elseif(FFTW3_LIBRARIES)
+    target_link_libraries(zerr_deps INTERFACE ${FFTW3_LIBRARIES})
+    if(FFTW3_INCLUDE_DIRS)
+        target_include_directories(zerr_deps INTERFACE ${FFTW3_INCLUDE_DIRS})
+    endif()
+endif()
+
+if(TARGET zerr_core_static)
+    target_link_libraries(zerr_deps INTERFACE zerr_core_static)
+endif()
 
 # Generate a project for every folder in the "source/projects" folder
 SUBDIRLIST(PROJECT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source/projects)
