@@ -3,17 +3,17 @@
 # settings and rules.
 
 CC  = g++
-cflags = -std=c++17 -Wall
+cflags += -std=c++17 -Wall -DYAML_CPP_STATIC_DEFINE
 
 include build/conandeps.mk
-
-ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
-ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
+cflags += -I$(CONAN_INCLUDE_DIRS_YAML_CPP) -I$(CONAN_INCLUDE_DIRS_FFTW)
+# ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
+# ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
 # $(info    CONAN_LIB_DIRS_YAML_CPP is $(CONAN_LIB_DIRS_YAML_CPP))
 # $(info    CONAN_LIBS_YAML_CPP is $(CONAN_LIBS_YAML_CPP))
 
-ldflags += -L../core/lib
-ldlibs += -lzerr_core
+ldflags += -L../core/lib -L$(CONAN_LIB_DIRS_YAML_CPP)
+ldlibs += -lzerr_core -l$(CONAN_LIBS_YAML_CPP)
 
 # Library directory name: zerr
 lib.name = zerr
@@ -27,7 +27,7 @@ class.sources = src/zerr_combinator~.cpp \
 # Source files which must be statically linked to each class in the library.
 
 # Class specific source files
-zerr_combinator~.class.sources += src/zerr_combinator.cpp 
+zerr_combinator~.class.sources += src/zerr_combinator.cpp
 zerr_disperser~.class.sources  += src/zerr_disperser.cpp
 zerr_envelopes~.class.sources  += src/zerr_envelopes.cpp
 zerr_features~.class.sources   += src/zerr_features.cpp

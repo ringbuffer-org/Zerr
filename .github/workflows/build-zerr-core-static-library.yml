@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'core/**'
+      - "core/**"
 
 jobs:
   macOS:
@@ -78,28 +78,36 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v3
+        with:
+          arch: x64
+
       - name: Set up Conan
         run: |
           pip install conan
-          conan profile detect
+          conan profile detect --force
 
       - name: Install Dependencies
         working-directory: core
         run: |
           mkdir build
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build --build=missing `
+            -s compiler=gcc `
+            -s compiler.version=13 `
+            -s compiler.libcxx=libstdc++11 `
+            -s build_type=Release
 
       - name: Build Static Library
         working-directory: core
         run: |
-          cmake --preset conan-default
+          cmake -S . -B build `
+            -G "MinGW Makefiles" `
+            -DCMAKE_TOOLCHAIN_FILE="build/conan_toolchain.cmake" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_CXX_STANDARD=17
           cmake --build build --config Release
-
-      - name: Copy Lib File
-        working-directory: core
-        run: |
-          mkdir lib -Force
-          copy build\Release\zerr_core.lib  lib\
+          cmake --install build
 
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4
