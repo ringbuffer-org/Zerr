@@ -152,7 +152,6 @@ jobs:
           arch: x64
 
       - name: Install Pd
-        shell: pwsh
         run: |
           wget -q -O Pd.zip http://msp.ucsd.edu/Software/pd-0.53-2.msw.zip
           rm -rf "${PROGRAMFILES}/pd" && mkdir -p "${PROGRAMFILES}/pd"
