@@ -20,10 +20,6 @@ on:
     types:
       - completed
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   macOS:
     runs-on: macos-latest
@@ -155,7 +151,7 @@ jobs:
           arch: x64
 
       - name: Install Pd
-        id: pd
+        shell: pwsh
         run: |
           wget -q -O Pd.zip http://msp.ucsd.edu/Software/pd-0.53-2.msw.zip
           rm -rf "${PROGRAMFILES}/pd" && mkdir -p "${PROGRAMFILES}/pd"
@@ -172,9 +168,6 @@ jobs:
           path: core/lib/
           run-id: ${{ github.event.workflow_run.id || inputs.core_run_id }}
           github-token: ${{ github.token }}
-
-      # - name: Display structure of downloaded files
-      #   run: ls -la core/lib/
 
       - name: Set up Conan
         run: |
@@ -194,6 +187,7 @@ jobs:
           conan install . --output-folder=build --build=missing -pr:b=mingw -pr:h=mingw
 
       - name: Build External
+        shell: bash
         working-directory: puredata
         run: |
           mingw32-make
