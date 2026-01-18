@@ -188,39 +188,50 @@ jobs:
           run-id: ${{ github.event.workflow_run.id || inputs.core_run_id }}
           github-token: ${{ github.token }}
 
+      # - name: Set up Conan
+      #   shell: bash
+      #   run: |
+      #     pip install conan
+
+      #     conan profile detect --name mingw --force
+
+      #     PROFILE_PATH=$(conan profile path default)
+
+      #     echo "Default profile path: $PROFILE_PATH"
+
+      #     conan profile set settings.os=Windows mingw
+      #     conan profile set settings.arch=x86_64 mingw
+      #     conan profile set settings.compiler=gcc mingw
+      #     conan profile set settings.compiler.version=13 mingw
+      #     conan profile set settings.compiler.libcxx=libstdc++11 mingw
+      #     conan profile set settings.build_type=Release mingw
+
+      #     conan profile set conf.tools.build:compiler_executables.c=x86_64-w64-mingw32-gcc mingw
+      #     conan profile set conf.tools.build:compiler_executables.cpp=x86_64-w64-mingw32-g++ mingw
+
+      #     conan profile show mingw
+
+      # - name: Install Dependencies
+      #   shell: bash
+      #   working-directory: puredata
+      #   run: |
+      #     mkdir -p build
+      #     conan install . --output-folder=build --build=missing -pr:b=mingw -pr:h=mingw
+
       - name: Set up Conan
-        shell: bash
         run: |
-          set -euo pipefail
           pip install conan
-
-
-          PROFILE_DIR="$HOME/.conan2/profiles"
-          mkdir -p "$PROFILE_DIR"
-
-          PROFILE="$PROFILE_DIR/mingw"
-
-          cat > "$PROFILE" << 'EOF'
-          [settings]
-          os=Windows
-          arch=x86_64
-          build_type=Release
-          compiler=gcc
-          compiler.version=13
-          compiler.libcxx=libstdc++11
-
-          [conf]
-          tools.build:compiler_executables={"c":"x86_64-w64-mingw32-gcc","cpp":"x86_64-w64-mingw32-g++"}
-          EOF
-
-          conan profile show mingw
+          conan profile detect --force
 
       - name: Install Dependencies
-        shell: bash
-        working-directory: puredata
+        working-directory: core
         run: |
-          mkdir -p build
-          conan install . --output-folder=build --build=missing -pr:b=mingw -pr:h=mingw
+          mkdir build
+          conan install . --output-folder=build --build=missing `
+            -s compiler=gcc `
+            -s compiler.version=13 `
+            -s compiler.libcxx=libstdc++11 `
+            -s build_type=Release
 
       - name: Build External
         shell: bash
