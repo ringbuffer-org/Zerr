@@ -137,6 +137,7 @@ jobs:
           submodules: true
 
       - name: Ensure core artifact id present
+        shell: bash
         env:
           CORE_RUN_ID: ${{ github.event.workflow_run.id || inputs.core_run_id }}
         run: |
