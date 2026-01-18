@@ -6,6 +6,7 @@ CC  = g++
 cflags += -std=c++17 -Wall -DYAML_CPP_STATIC_DEFINE
 
 include build/conandeps.mk
+
 cflags += -I$(CONAN_INCLUDE_DIRS_YAML_CPP) -I$(CONAN_INCLUDE_DIRS_FFTW)
 # ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
 # ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
