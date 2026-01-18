@@ -1,7 +1,7 @@
 ---
 name: build pd-lib-builder based pure data externals
 
-on: 
+on:
   workflow_call:
   workflow_dispatch:
   # push:
@@ -53,7 +53,7 @@ jobs:
       - name: Build & Install
         working-directory: puredata
         run: |
-          make 
+          make
           make install PDLIBDIR=build
 
       - name: Upload macOS artifacts
@@ -96,7 +96,7 @@ jobs:
       - name: Build & Install
         working-directory: puredata
         run: |
-          make 
+          make
           make install PDLIBDIR=build
 
       - name: Upload Linux artifacts
@@ -107,24 +107,17 @@ jobs:
 
   windows:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
     steps:
-      - name: Install MSYS2
-        uses: msys2/setup-msys2@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
         with:
-          release: false
-          path-type: inherit
-          install: >-
-            mingw-w64-x86_64-ntldd-git
-            
-      - name: Find usable compiler
-        id: compiler
-        run: |
-          for cc in cc gcc clang; do echo "testing compiler $cc"; "${cc}" -dumpmachine && export CC=${CC:-$cc} || true; done
-          echo "CC=${CC}" | tee "$GITHUB_OUTPUT"
-          
+          submodules: true
+
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v3
+        with:
+          arch: x64
+
       - name: Install Pd
         id: pd
         run: |
@@ -135,12 +128,7 @@ jobs:
           rm -f Pd.zip
           export PD="${PROGRAMFILES}/pd/bin/pd.com"
           echo "PD=${PD}" | tee "$GITHUB_OUTPUT"
-          
-      - name: Checkout Code
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          
+
       - name: Download zerr-core library
         uses: actions/download-artifact@v4
         with:
@@ -148,31 +136,29 @@ jobs:
           path: core/lib/
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
-          
-      - name: Display structure of downloaded files
-        run: ls -la core/lib/
-        
+
+      # - name: Display structure of downloaded files
+      #   run: ls -la core/lib/
+
       - name: Set up Conan
         run: |
           pip install conan
           conan profile detect
-          
+
       - name: Configure Conan
         working-directory: puredata
         run: |
           mkdir -p build
           conan install . --output-folder=build --build=missing
-          
+
       - name: Build & Install
         working-directory: puredata
         run: |
-          make 
+          make
           make install PDLIBDIR=build
-        
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
           name: zerr-pd-windows
           path: puredata/build/zerr
-
