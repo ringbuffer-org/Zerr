@@ -143,15 +143,21 @@ jobs:
       - name: Set up Conan
         run: |
           pip install conan
-          conan profile detect
+          conan profile detect --name=mingw --force
+          conan profile update settings.compiler=gcc mingw
+          conan profile update settings.compiler.version=13 mingw
+          conan profile update settings.compiler.libcxx=libstdc++11 mingw
+          conan profile update settings.os=Windows mingw
+          conan profile update settings.arch=x86_64 mingw
+          conan profile update settings.build_type=Release mingw
 
-      - name: Configure Conan
+      - name: Install Dependencies
         working-directory: puredata
         run: |
           mkdir -p build
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build --build=missing -pr:b=mingw -pr:h=mingw
 
-      - name: Build & Install
+      - name: Build External
         working-directory: puredata
         run: |
           make
