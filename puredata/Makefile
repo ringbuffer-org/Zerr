@@ -27,7 +27,7 @@ class.sources = src/zerr_combinator~.cpp \
 # Source files which must be statically linked to each class in the library.
 
 # Class specific source files
-zerr_combinator~.class.sources += src/zerr_combinator.cpp 
+zerr_combinator~.class.sources += src/zerr_combinator.cpp
 zerr_disperser~.class.sources  += src/zerr_disperser.cpp
 zerr_envelopes~.class.sources  += src/zerr_envelopes.cpp
 zerr_features~.class.sources   += src/zerr_features.cpp
