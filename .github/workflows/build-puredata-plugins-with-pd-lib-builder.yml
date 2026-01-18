@@ -227,7 +227,7 @@ jobs:
         working-directory: puredata
         run: |
           mkdir build
-          conan install . -pr=./mingw-profile.txt --output-folder=build --build=missing
+          conan install . -pr:h=./mingw-profile.txt -pr:b=./mingw-profile.txt --output-folder=build --build=missing
 
       - name: Build External
         shell: bash
