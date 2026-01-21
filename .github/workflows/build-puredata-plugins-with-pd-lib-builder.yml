@@ -20,10 +20,6 @@ on:
     types:
       - completed
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   macOS:
     runs-on: macos-latest
@@ -141,6 +137,7 @@ jobs:
           submodules: true
 
       - name: Ensure core artifact id present
+        shell: bash
         env:
           CORE_RUN_ID: ${{ github.event.workflow_run.id || inputs.core_run_id }}
         run: |
@@ -156,14 +153,32 @@ jobs:
 
       - name: Install Pd
         id: pd
+        shell: pwsh
         run: |
-          wget -q -O Pd.zip http://msp.ucsd.edu/Software/pd-0.53-2.msw.zip
-          rm -rf "${PROGRAMFILES}/pd" && mkdir -p "${PROGRAMFILES}/pd"
-          unzip -q Pd.zip -d "${PROGRAMFILES}/pd"
-          mv -v "${PROGRAMFILES}/pd"/*/* "${PROGRAMFILES}/pd"
-          rm -f Pd.zip
-          export PD="${PROGRAMFILES}/pd/bin/pd.com"
-          echo "PD=${PD}" | tee "$GITHUB_OUTPUT"
+          $ErrorActionPreference = "Stop"
+
+          $url = "http://msp.ucsd.edu/Software/pd-0.53-2.msw.zip"
+          $zip = Join-Path $env:RUNNER_TEMP "Pd.zip"
+          $pdDir = Join-Path $env:ProgramFiles "pd"
+
+          Invoke-WebRequest $url -OutFile $zip
+
+          if (Test-Path $pdDir) { Remove-Item $pdDir -Recurse -Force }
+          New-Item -ItemType Directory -Path $pdDir | Out-Null
+
+          Expand-Archive -LiteralPath $zip -DestinationPath $pdDir -Force
+          Remove-Item $zip -Force
+
+          # flatten nested directory
+          $top = Get-ChildItem $pdDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+          if ($top) {
+            Get-ChildItem $top.FullName | Move-Item -Destination $pdDir -Force
+            Remove-Item $top.FullName -Recurse -Force
+          }
+
+          $pd = "$pdDir\bin\pd.com"
+          "PD=$pd" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "PD=$pd" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Download zerr-core library
         uses: actions/download-artifact@v4
@@ -173,27 +188,49 @@ jobs:
           run-id: ${{ github.event.workflow_run.id || inputs.core_run_id }}
           github-token: ${{ github.token }}
 
-      # - name: Display structure of downloaded files
-      #   run: ls -la core/lib/
+      # - name: Set up Conan
+      #   shell: bash
+      #   run: |
+      #     pip install conan
+
+      #     conan profile detect --name mingw --force
+
+      #     PROFILE_PATH=$(conan profile path default)
+
+      #     echo "Default profile path: $PROFILE_PATH"
+
+      #     conan profile set settings.os=Windows mingw
+      #     conan profile set settings.arch=x86_64 mingw
+      #     conan profile set settings.compiler=gcc mingw
+      #     conan profile set settings.compiler.version=13 mingw
+      #     conan profile set settings.compiler.libcxx=libstdc++11 mingw
+      #     conan profile set settings.build_type=Release mingw
+
+      #     conan profile set conf.tools.build:compiler_executables.c=x86_64-w64-mingw32-gcc mingw
+      #     conan profile set conf.tools.build:compiler_executables.cpp=x86_64-w64-mingw32-g++ mingw
+
+      #     conan profile show mingw
+
+      # - name: Install Dependencies
+      #   shell: bash
+      #   working-directory: puredata
+      #   run: |
+      #     mkdir -p build
+      #     conan install . --output-folder=build --build=missing -pr:b=mingw -pr:h=mingw
 
       - name: Set up Conan
         run: |
           pip install conan
-          conan profile detect --name=mingw --force
-          conan profile update settings.compiler=gcc mingw
-          conan profile update settings.compiler.version=13 mingw
-          conan profile update settings.compiler.libcxx=libstdc++11 mingw
-          conan profile update settings.os=Windows mingw
-          conan profile update settings.arch=x86_64 mingw
-          conan profile update settings.build_type=Release mingw
+          conan profile detect --force
 
       - name: Install Dependencies
         working-directory: puredata
         run: |
-          mkdir -p build
-          conan install . --output-folder=build --build=missing -pr:b=mingw -pr:h=mingw
+          mkdir build
+          conan install . -pr:h=./mingw-profile.txt -pr:b=./mingw-profile.txt --output-folder=build --build=missing
 
       - name: Build External
+        shell: bash
         working-directory: puredata
         run: |
           mingw32-make
