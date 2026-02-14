@@ -1,16 +1,27 @@
 #ifndef CONFIGS_H
 #define CONFIGS_H
 
+#include <cstddef>
+
 // #define TESTMODE /**< Print log when TESTMODE Macro defined */
 
-#define TRIGGER_THRESHOLD 1e-4 /**< Threshold value for triggering feature extraction */
+namespace zerr {
 
-#define PI 3.14159265 /**< Macro definition for Pi  */
+/// Threshold value for triggering feature extraction
+inline constexpr double TRIGGER_THRESHOLD = 1e-4;
 
-#define AUDIO_BUFFER_SIZE 2048 /**< Size of audio processing buffer in samples */
+/// Pi constant
+inline constexpr double PI = 3.14159265;
 
-#define VOLUME_THRESHOLD 1e-4 /**< Minimum volume threshold for audio processing */
+/// Size of audio processing buffer in samples
+inline constexpr std::size_t AUDIO_BUFFER_SIZE = 2048;
 
-#define DISTANCE_SCALE 1e-1 /**< Scaling factor for distance calculations in speaker positioning */
+/// Minimum volume threshold for audio processing
+inline constexpr double VOLUME_THRESHOLD = 1e-4;
 
-#endif  // CONFIGS_H
+/// Scaling factor for distance calculations in speaker positioning
+inline constexpr double DISTANCE_SCALE = 1e-1;
+
+} // namespace zerr
+
+#endif // CONFIGS_H

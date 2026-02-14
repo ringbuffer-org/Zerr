@@ -9,8 +9,11 @@
 #include "envelopegenerator.h"
 
 using zerr::Blocks;
+using zerr::DISTANCE_SCALE;
 using zerr::EnvelopeGenerator;
 using zerr::Param;
+using zerr::PI;
+using zerr::VOLUME_THRESHOLD;
 
 EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speakerCfgs,
                                      Mode genMode)
