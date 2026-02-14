@@ -3,17 +3,33 @@
 # settings and rules.
 
 CC  = g++
-cflags += -std=c++17 -Wall -DYAML_CPP_STATIC_DEFINE
+
+#############################################################
+# ZERR CORE PATHS (centralized — change here if core moves)
+#############################################################
+ZERR_CORE_DIR  ?= ../core
+ZERR_LIB_DIR   := $(ZERR_CORE_DIR)/lib
+ZERR_INCLUDES  := -I$(ZERR_CORE_DIR)/include/utils \
+                  -I$(ZERR_CORE_DIR)/include/modules \
+                  -I$(ZERR_CORE_DIR)/include/features
+
+#############################################################
+# CONAN DEPENDENCIES
+#############################################################
+# Guard: ensure conan dependencies are available
+ifeq ($(wildcard build/conandeps.mk),)
+    $(error build/conandeps.mk not found — run 'conan install . --output-folder=build --build=missing' first)
+endif
 
 include build/conandeps.mk
 
+#############################################################
+# COMPILER & LINKER FLAGS
+#############################################################
+cflags += -std=c++17 -Wall -DYAML_CPP_STATIC_DEFINE
 cflags += -I$(CONAN_INCLUDE_DIRS_YAML_CPP) -I$(CONAN_INCLUDE_DIRS_FFTW)
-# ldflags = -L$(CONAN_LIB_DIRS_YAML_CPP)  # Add library directories
-# ldlibs = -l$(CONAN_LIBS_YAML_CPP)       # Link the yaml-cpp library
-# $(info    CONAN_LIB_DIRS_YAML_CPP is $(CONAN_LIB_DIRS_YAML_CPP))
-# $(info    CONAN_LIBS_YAML_CPP is $(CONAN_LIBS_YAML_CPP))
 
-ldflags += -L../core/lib -L$(CONAN_LIB_DIRS_YAML_CPP)
+ldflags += -L$(ZERR_LIB_DIR) -L$(CONAN_LIB_DIRS_YAML_CPP)
 ldlibs += -lzerr_core -l$(CONAN_LIBS_YAML_CPP)
 
 # Library directory name: zerr
@@ -33,7 +49,7 @@ zerr_disperser~.class.sources  += src/zerr_disperser.cpp
 zerr_envelopes~.class.sources  += src/zerr_envelopes.cpp
 zerr_features~.class.sources   += src/zerr_features.cpp
 
-# class specific depencencies
+# class specific dependencies
 zerr_features~.class.ldflags += -L$(CONAN_LIB_DIRS_FFTW)
 zerr_features~.class.ldlibs += -lfftw3
 zerr_envelopes~.class.ldlibs += -lyaml-cpp
@@ -41,7 +57,6 @@ zerr_envelopes~.class.ldlibs += -lyaml-cpp
 # add library data files
 datafiles += LICENSE
 datafiles += README.md
-# datadirs  += img
 
 datafiles += help/zerr_combinator~-help.pd
 datafiles += help/zerr_envelopes~-help.pd
@@ -49,28 +64,9 @@ datafiles += help/zerr_features~-help.pd
 datafiles += help/zerr_disperser~-help.pd
 datafiles += help/circulation_8.yaml
 
-# Add Zerr* core headers
-CC  += -I../core/include/utils
-CC  += -I../core/include/modules
-CC  += -I../core/include/features
-
-CXX  += -I../core/include/utils
-CXX  += -I../core/include/modules
-CXX  += -I../core/include/features
-
-# Add Puredata wraper headers
-CC  += -Iinclude
-CXX += -Iinclude
-
-
-# Add fftw3 dependency headers
-CC  += -I$(CONAN_INCLUDE_DIRS_FFTW)
-CXX += -I$(CONAN_INCLUDE_DIRS_FFTW)
-
-# Add yaml-cpp dependency headers
-CC  += -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
-CXX += -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
-
+# Add Zerr* core headers and PureData wrapper headers
+CC  += $(ZERR_INCLUDES) -Iinclude -I$(CONAN_INCLUDE_DIRS_FFTW) -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
+CXX += $(ZERR_INCLUDES) -Iinclude -I$(CONAN_INCLUDE_DIRS_FFTW) -I$(CONAN_INCLUDE_DIRS_YAML_CPP)
 
 # include Makefile.pdlibbuilder from submodule directory 'pd-lib-builder'
 include pd-lib-builder/Makefile.pdlibbuilder
