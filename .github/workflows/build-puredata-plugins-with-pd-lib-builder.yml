@@ -24,7 +24,7 @@ jobs:
   macOS:
     runs-on: macos-latest
     env:
-      cflags: -mmacosx-version-min=10.9
+      cflags: -mmacosx-version-min=10.13
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
