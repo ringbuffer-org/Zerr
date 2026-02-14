@@ -6,7 +6,7 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Flatness::name = "Spectral Flatness";
+const std::string Flatness::name     = "Spectral Flatness";
 const std::string Flatness::category = "Frequency-Domain";
 const std::string Flatness::description =
     "Spectral flatness, also known as Wiener entropy, is a measure used in "
@@ -16,20 +16,21 @@ const std::string Flatness::description =
     "more noise-like signal, whereas a lower value indicates a more tonal "
     "signal.";
 
-void Flatness::initialize(SystemConfigs sys_cfg) {
+void Flatness::initialize(SystemConfigs sys_cfg)
+{
     system_configs = sys_cfg;
 
     _reset_param();
     if (is_initialized() == false) {
-        set_initialize_statue(true);
+        set_initialize_status(true);
     }
 }
 
-void Flatness::extract() {
+void Flatness::extract()
+{
     // Calculate the sum of logarithms
-    double logSum = 0.0;
-    const double smallConstant =
-        1e-10;  // Small constant to avoid taking log of 0
+    double logSum              = 0.0;
+    const double smallConstant = 1e-10; // Small constant to avoid taking log of 0
     for (double sample : x) {
         logSum += std::log(sample + smallConstant);
     }
@@ -38,7 +39,7 @@ void Flatness::extract() {
     double geometricMean = std::exp(logSum / x.size());
 
     // Calculate the arithmetic mean
-    double sum = std::accumulate(x.begin(), x.end(), 0.0);
+    double sum            = std::accumulate(x.begin(), x.end(), 0.0);
     double arithmeticMean = sum / x.size();
 
     // Calculate the spectral flatness
@@ -52,12 +53,14 @@ void Flatness::extract() {
 
 void Flatness::reset() { _reset_param(); }
 
-void Flatness::fetch(AudioInputs in) {
-    x = in.spec;
+void Flatness::fetch(AudioInputs in)
+{
+    x     = in.spec;
     prv_y = crr_y;
 }
 
-FeatureVals Flatness::send() {
+FeatureVals Flatness::send()
+{
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
     for (size_t i = 0; i < system_configs.block_size; ++i) {
@@ -68,7 +71,8 @@ FeatureVals Flatness::send() {
     return y;
 }
 
-void Flatness::_reset_param() {
+void Flatness::_reset_param()
+{
     x.resize(AUDIO_BUFFER_SIZE, 0.0f);
 
     prv_y = 0.0;

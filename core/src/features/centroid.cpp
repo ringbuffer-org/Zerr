@@ -18,7 +18,7 @@ void Centroid::initialize(SystemConfigs sys_cfg)
     _reset_param();
 
     if (is_initialized() == false) {
-        set_initialize_statue(true);
+        set_initialize_status(true);
     }
 }
 

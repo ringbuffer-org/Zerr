@@ -21,10 +21,11 @@ namespace zerr {
  * then distributes the results to all activated feature extraction algorithms.
  */
 class FeatureBank {
- public:
-    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)(); /**< Function pointer type for creating
-                                   FeatureExtractor objects  */
-    typedef std::unique_ptr<FeatureExtractor> fe_ptr; /**< The unique_ptr of type virtual class FeatureExtractor  */
+  public:
+    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)(); /**< Function pointer type for
+                                   creating FeatureExtractor objects  */
+    typedef std::unique_ptr<FeatureExtractor>
+        fe_ptr; /**< The unique_ptr of type virtual class FeatureExtractor  */
     /**
      * @brief FeatureBank Constructor
      *
@@ -62,8 +63,9 @@ class FeatureBank {
      */
     void reset(FeatureNames feature_names);
 
- private:
-    std::map<std::string, CreateFunc> registed_features; /**< Map between feature names and their constructor functions */
+  private:
+    std::map<std::string, CreateFunc>
+        registed_features; /**< Map between feature names and their constructor functions */
 
     std::vector<fe_ptr> activated_features; /**< Vector of pointers to activated feature objects */
 
