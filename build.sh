@@ -17,6 +17,21 @@ done
 shift $((OPTIND -1))
 
 # -----------------------------------------------------------------------------
+# Pre-flight checks: verify required tools are available
+# -----------------------------------------------------------------------------
+check_tool() {
+    if ! command -v "$1" &> /dev/null; then
+        echo "Error: '$1' is not installed or not in PATH."
+        echo "Please install $1 before running this script."
+        exit 1
+    fi
+}
+
+check_tool conan
+check_tool cmake
+check_tool make
+
+# -----------------------------------------------------------------------------
 build_core() {
     echo "Building zerr core library..."
     cd core || { echo "Failed to enter 'core' directory"; exit 1; }
@@ -31,8 +46,6 @@ build_core() {
     make install
 
     cd ../.. || exit 1
-
-    echo "Installing zerr_core library to local lib folder..."
 }
 
 check_core_built() {
@@ -65,7 +78,7 @@ build_puredata() {
 # -----------------------------------------------------------------------------
 build_maxmsp() {
     echo "Building Zerr* for Max/MSP..."
-    cd maxmsp || { echo "Failed to enter 'puredata' directory"; exit 1; }
+    cd maxmsp || { echo "Failed to enter 'maxmsp' directory"; exit 1; }
 
     conan install . --output-folder=build --build=missing
 
@@ -73,8 +86,6 @@ build_maxmsp() {
 
     cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     cmake --build .
-
-    echo "Installing zerr_core library to local lib folder..."
 
     if [ "$install" = true ]; then
         echo "Installing Max/MSP build..."
@@ -87,14 +98,24 @@ build_maxmsp() {
 
 # -----------------------------------------------------------------------------
 build_jack() {
-    echo "Building Zerr* for JACK... (placeholder)"
-    # Placeholder for JACK build
+    echo "Building Zerr* for JACK..."
+    cd jack || { echo "Failed to enter 'jack' directory"; exit 1; }
+
+    meson setup builddir --wipe 2>/dev/null || meson setup builddir
+    meson compile -C builddir
+
+    if [ "$install" = true ]; then
+        echo "Installing JACK build..."
+        meson install -C builddir
+    fi
+
+    cd .. || exit 1
 }
 
 
 # -----------------------------------------------------------------------------
 if [ $# -eq 0 ]; then
-    echo "No targets provided. Usage: $0 [-i] <puredata|maxmsp|jack|...>"
+    echo "No targets provided. Usage: $0 [-i] <puredata|maxmsp|jack>"
     exit 1
 fi
 
@@ -118,7 +139,7 @@ for target in "$@"; do
             build_jack
             ;;
         *)
-            echo "Invalid target: $target. Valid options are: puredata, jack"
+            echo "Invalid target: $target. Valid options are: puredata, maxmsp, jack"
             exit 1
             ;;
     esac
