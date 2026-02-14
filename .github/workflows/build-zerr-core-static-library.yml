@@ -38,7 +38,7 @@ jobs:
         with:
           name: zerr-core-macos
           path: core/lib
-          retention-days: 1
+          retention-days: 3
 
   linux:
     runs-on: ubuntu-latest
@@ -70,7 +70,7 @@ jobs:
         with:
           name: zerr-core-linux
           path: core/lib
-          retention-days: 1
+          retention-days: 3
 
   windows:
     runs-on: windows-latest
@@ -114,4 +114,4 @@ jobs:
         with:
           name: zerr-core-windows
           path: core/lib
-          retention-days: 1
+          retention-days: 3
