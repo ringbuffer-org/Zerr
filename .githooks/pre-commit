@@ -1,0 +1,27 @@
+#!/bin/bash
+# Pre-commit hook: auto-format staged C++ files with clang-format
+
+if ! command -v clang-format &> /dev/null; then
+    echo "Error: clang-format not found. Please install it."
+    exit 1
+fi
+
+# Get staged C++ files (only project-owned, exclude submodules)
+staged_files=$(git diff --cached --name-only --diff-filter=ACM \
+    -- '*.cpp' '*.h' '*.hpp' \
+    ':!maxmsp/source/min-api/*' \
+    ':!maxmsp/source/min-lib/*' \
+    ':!puredata/pd-lib-builder/*')
+
+if [ -z "$staged_files" ]; then
+    exit 0
+fi
+
+echo "Formatting staged C++ files..."
+
+for file in $staged_files; do
+    clang-format -i "$file"
+    git add "$file"
+done
+
+echo "Done."
