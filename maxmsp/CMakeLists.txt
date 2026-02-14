@@ -26,7 +26,7 @@ if (APPLE)
     
     # Set minimum macOS version to match the libraries
     if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "macOS deployment target" FORCE)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "macOS deployment target" FORCE)
         message("CMAKE_OSX_DEPLOYMENT_TARGET set to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
     endif()
 endif()
@@ -41,6 +41,23 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/source/min-lib/CMakeLists.txt")
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/min-lib)
 endif ()
 
+
+#############################################################
+# ZERR CORE LIBRARY SETUP
+#############################################################
+# Centralized paths to zerr core library (overridable via -DZERR_LIB_DIR=... -DZERR_INCLUDE_DIR=...)
+set(ZERR_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../core/lib" CACHE PATH "Path to zerr_core library directory")
+set(ZERR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../core/include" CACHE PATH "Path to zerr_core include directory")
+
+find_library(ZERR_LIBRARY zerr_core PATHS ${ZERR_LIB_DIR} NO_DEFAULT_PATH)
+if(NOT ZERR_LIBRARY)
+    message(FATAL_ERROR "ERROR: libzerr_core.a is required but could not be found in ${ZERR_LIB_DIR}")
+endif()
+message(STATUS "Found libzerr_core.a: ${ZERR_LIBRARY}")
+
+if(NOT EXISTS ${ZERR_INCLUDE_DIR})
+    message(FATAL_ERROR "ERROR: Zerr include directory not found at ${ZERR_INCLUDE_DIR}")
+endif()
 
 #############################################################
 # Dependencies SETUP
