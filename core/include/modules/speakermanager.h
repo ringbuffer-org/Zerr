@@ -405,8 +405,8 @@ class SpeakerManager {
 };
 
 #ifdef PUREDATA // explicit instantiation required for PD
-template bool isInKey<int, Speaker>(int element, std::map<Index, Speaker> map);
-template std::string formatVector<Index>(std::vector<Index> vector);
+template bool isInKey<int, Speaker>(int element, const std::map<Index, Speaker>& map);
+template std::string formatVector<Index>(const std::vector<Index>& vector);
 #endif // PUREDATA
 
 } // namespace zerr

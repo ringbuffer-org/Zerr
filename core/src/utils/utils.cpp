@@ -38,13 +38,13 @@ bool isEqualTo1(Param value, Param epsilon) { return std::abs(value - 1.0) < eps
 
 bool isEqualTo0(Param value, Param epsilon) { return std::abs(value) < epsilon; }
 
-template <typename T> bool isInVec(T element, std::vector<T> vector)
+template <typename T> bool isInVec(T element, const std::vector<T>& vector)
 {
     auto it = std::find(vector.begin(), vector.end(), element);
     return it == vector.end() ? false : true;
 }
 // explicit instantiation required for PD
-template bool isInVec<int>(int element, std::vector<int> vector);
+template bool isInVec<int>(int element, const std::vector<int>& vector);
 
 Samples applyMovingAverage(const Samples& segment, int windowSize)
 {

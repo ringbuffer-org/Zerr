@@ -11,11 +11,11 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstdarg>
 #include <cstring>
 #include <iostream>
 #include <limits>
-#include <math.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -37,7 +37,7 @@ std::string formatString(const char* format, ...);
  */
 // template<typename T>
 // std::string formatVector(std::vector<T> vector);
-template <typename T> std::string formatVector(std::vector<T> vector)
+template <typename T> std::string formatVector(const std::vector<T>& vector)
 {
     std::string formated = "";
     for (size_t i = 0; i < vector.size(); ++i) {
@@ -76,14 +76,14 @@ inline float get_hann_sample(int pos, int L)
  * @param vector The vector to search within
  * @return bool True if the element is found in the vector, false otherwise
  */
-template <typename T> bool isInVec(T element, std::vector<T> vector);
+template <typename T> bool isInVec(T element, const std::vector<T>& vector);
 /**
  * @brief Check if a key exists in a map
  * @param element The key to search for
  * @param map The map to search within
  * @return bool True if the key exists in the map, false otherwise
  */
-template <typename T, typename U> bool isInKey(T element, std::map<T, U> map)
+template <typename T, typename U> bool isInKey(T element, const std::map<T, U>& map)
 {
     auto it = map.find(element);
     return it == map.end() ? false : true;
