@@ -2,11 +2,15 @@
 set -e
 
 install=false
+clean=false
 
-while getopts ":i" opt; do
+while getopts ":ic" opt; do
   case ${opt} in
     i )
       install=true
+      ;;
+    c )
+      clean=true
       ;;
     \? )
       echo "Invalid Option: -$OPTARG" 1>&2
@@ -114,33 +118,73 @@ build_jack() {
 
 
 # -----------------------------------------------------------------------------
+clean_core() {
+    echo "Cleaning core build artifacts..."
+    rm -rf core/build core/lib
+    echo "Core cleaned."
+}
+
+clean_puredata() {
+    echo "Cleaning PureData build artifacts..."
+    rm -rf puredata/build
+    cd puredata && make clean 2>/dev/null; cd ..
+    echo "PureData cleaned."
+}
+
+clean_maxmsp() {
+    echo "Cleaning Max/MSP build artifacts..."
+    rm -rf maxmsp/build
+    echo "Max/MSP cleaned."
+}
+
+clean_jack() {
+    echo "Cleaning JACK build artifacts..."
+    rm -rf jack/builddir
+    echo "JACK cleaned."
+}
+
+# -----------------------------------------------------------------------------
 if [ $# -eq 0 ]; then
-    echo "No targets provided. Usage: $0 [-i] <puredata|maxmsp|jack>"
+    echo "No targets provided. Usage: $0 [-i] [-c] <core|puredata|maxmsp|jack>"
     exit 1
 fi
 
-# Build core if needed
-if check_core_built; then
-    echo "Core already built. Skipping core build."
-else
-    build_core
-fi
-
-# Build the requested targets
 for target in "$@"; do
     case $target in
-        puredata)
-            build_puredata
-            ;;
-        maxmsp)
-            build_maxmsp
-            ;;
-        jack)
-            build_jack
-            ;;
+        core|puredata|maxmsp|jack) ;;
         *)
-            echo "Invalid target: $target. Valid options are: puredata, maxmsp, jack"
+            echo "Invalid target: $target. Valid options are: core, puredata, maxmsp, jack"
             exit 1
             ;;
     esac
+done
+
+# Clean or build the requested targets
+for target in "$@"; do
+    if [ "$clean" = true ]; then
+        case $target in
+            core)     clean_core ;;
+            puredata) clean_puredata ;;
+            maxmsp)   clean_maxmsp ;;
+            jack)     clean_jack ;;
+        esac
+    else
+        case $target in
+            core)
+                build_core
+                ;;
+            puredata|maxmsp|jack)
+                if check_core_built; then
+                    echo "Core already built. Skipping core build."
+                else
+                    build_core
+                fi
+                case $target in
+                    puredata) build_puredata ;;
+                    maxmsp)   build_maxmsp ;;
+                    jack)     build_jack ;;
+                esac
+                ;;
+        esac
+    fi
 done
