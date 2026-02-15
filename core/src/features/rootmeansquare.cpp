@@ -4,11 +4,12 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string RootMeanSquare::name     = "Root-Mean-Squre Amplitude";
-const std::string RootMeanSquare::category = "Time-Domain";
-const std::string RootMeanSquare::description =
-    "The RMS is defined as the square root of the mean over time of the square "
-    "of the vertical distance of the graph from the rest state";
+RootMeanSquare::RootMeanSquare()
+    : FeatureExtractor("Root-Mean-Square Amplitude", "Time-Domain",
+                       "The RMS is defined as the square root of the mean over time of the square "
+                       "of the vertical distance of the graph from the rest state")
+{
+}
 
 void RootMeanSquare::initialize(SystemConfigs sys_cfg)
 {

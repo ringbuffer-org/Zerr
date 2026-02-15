@@ -6,13 +6,14 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Rolloff::name     = "Spectral Rolloff";
-const std::string Rolloff::category = "Frequency-Domain";
-const std::string Rolloff::description =
-    "The spectral rolloff is a measure used in signal processing to determine "
-    "the frequency below which a specified percentage of the total spectral "
-    "energy lies. It is often used to distinguish between harmonic and "
-    "non-harmonic content in an audio signal.";
+Rolloff::Rolloff()
+    : FeatureExtractor("Spectral Rolloff", "Frequency-Domain",
+                       "The spectral rolloff is a measure used in signal processing to determine "
+                       "the frequency below which a specified percentage of the total spectral "
+                       "energy lies. It is often used to distinguish between harmonic and "
+                       "non-harmonic content in an audio signal.")
+{
+}
 
 void Rolloff::initialize(SystemConfigs sys_cfg)
 {

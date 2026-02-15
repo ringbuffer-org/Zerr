@@ -4,11 +4,12 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Centroid::name     = "Spectral Centroid";
-const std::string Centroid::category = "Frequency-Domain";
-const std::string Centroid::description =
-    "The spectral centroid is a measure used in digital signal processing to "
-    "characterise a spectrum.";
+Centroid::Centroid()
+    : FeatureExtractor("Spectral Centroid", "Frequency-Domain",
+                       "The spectral centroid is a measure used in digital signal processing to "
+                       "characterise a spectrum.")
+{
+}
 
 void Centroid::initialize(SystemConfigs sys_cfg)
 {

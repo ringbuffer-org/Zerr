@@ -13,24 +13,35 @@ namespace zerr {
 class FeatureExtractor {
   public:
     /**
+     * @brief Construct a FeatureExtractor with metadata
+     * @param name Name identifier for this feature
+     * @param category Category this feature belongs to (e.g. "Time-Domain", "Frequency-Domain")
+     * @param description Detailed description of what this feature measures
+     */
+    FeatureExtractor(std::string name, std::string category, std::string description)
+        : name_(std::move(name)), category_(std::move(category)),
+          description_(std::move(description))
+    {
+    }
+    /**
      * @brief Virtual destructor for proper cleanup of derived classes
      */
     virtual ~FeatureExtractor() {};
     /**
-     * @brief Get basic information about the feature extractor
+     * @brief Get the name identifier of this feature
      * @return Name of the feature extractor
      */
-    virtual std::string get_name() = 0;
+    const std::string& get_name() const { return name_; }
     /**
      * @brief Get the category this feature belongs to
-     * @return Category name (e.g. "spectral", "temporal", etc.)
+     * @return Category name (e.g. "Time-Domain", "Frequency-Domain", etc.)
      */
-    virtual std::string get_category() = 0;
+    const std::string& get_category() const { return category_; }
     /**
      * @brief Get detailed description of what this feature measures
      * @return Description string
      */
-    virtual std::string get_description() = 0;
+    const std::string& get_description() const { return description_; }
     /**
      * @brief Initialize the feature extraction algorithm with system configuration
      * @param sys_cfg System configuration containing sample rate, block size etc.
@@ -76,6 +87,11 @@ class FeatureExtractor {
 
     SystemConfigs system_configs; /**< System configuration parameters */
     bool initialized = false;     /**< Tracks whether the extractor is initialized */
+
+  private:
+    std::string name_;        /**< Name identifier for this feature */
+    std::string category_;    /**< Category this feature belongs to */
+    std::string description_; /**< Description of what this feature measures */
 }; // Class FeatureExtractor
 
 } // Namespace zerr

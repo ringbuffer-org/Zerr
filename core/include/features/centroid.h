@@ -17,27 +17,7 @@ namespace feature {
  */
 class Centroid : public FeatureExtractor {
   public:
-    static const std::string name;        ///< Name identifier for this feature
-    static const std::string category;    ///< Category this feature belongs to
-    static const std::string description; ///< Description of what this feature measures
-
-    /**
-     * @brief Get the name identifier of this feature
-     * @return std::string The feature name
-     */
-    std::string get_name() { return name; }
-
-    /**
-     * @brief Get the category this feature belongs to
-     * @return std::string The feature category
-     */
-    std::string get_category() { return category; }
-
-    /**
-     * @brief Get the description of what this feature measures
-     * @return std::string The feature description
-     */
-    std::string get_description() { return description; }
+    Centroid();
 
     /**
      * @brief Initialize the centroid extractor with system configurations

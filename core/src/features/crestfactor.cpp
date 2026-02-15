@@ -4,13 +4,14 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string CrestFactor::name     = "Crest Factor";
-const std::string CrestFactor::category = "Time-Domain";
-const std::string CrestFactor::description =
-    "Crest Factor is a parameter used in signal processing and audio "
-    "engineering to describe the characteristics of a waveform. It is defined "
-    "as the ratio of the peak value of a waveform to its RMS (Root Mean "
-    "Square) value. ";
+CrestFactor::CrestFactor()
+    : FeatureExtractor("Crest Factor", "Time-Domain",
+                       "Crest Factor is a parameter used in signal processing and audio "
+                       "engineering to describe the characteristics of a waveform. It is defined "
+                       "as the ratio of the peak value of a waveform to its RMS (Root Mean "
+                       "Square) value.")
+{
+}
 
 void CrestFactor::initialize(SystemConfigs sys_cfg)
 {

@@ -6,15 +6,16 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Flatness::name     = "Spectral Flatness";
-const std::string Flatness::category = "Frequency-Domain";
-const std::string Flatness::description =
-    "Spectral flatness, also known as Wiener entropy, is a measure used in "
-    "digital signal processing to characterize an audio spectrum. Spectral "
-    "flatness is typically used to quantify how noise-like a signal is, as "
-    "opposed to being tonal. A higher value of spectral flatness indicates a "
-    "more noise-like signal, whereas a lower value indicates a more tonal "
-    "signal.";
+Flatness::Flatness()
+    : FeatureExtractor("Spectral Flatness", "Frequency-Domain",
+                       "Spectral flatness, also known as Wiener entropy, is a measure used in "
+                       "digital signal processing to characterize an audio spectrum. Spectral "
+                       "flatness is typically used to quantify how noise-like a signal is, as "
+                       "opposed to being tonal. A higher value of spectral flatness indicates a "
+                       "more noise-like signal, whereas a lower value indicates a more tonal "
+                       "signal.")
+{
+}
 
 void Flatness::initialize(SystemConfigs sys_cfg)
 {

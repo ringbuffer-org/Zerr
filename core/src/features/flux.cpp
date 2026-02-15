@@ -3,12 +3,13 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Flux::name     = "Spectral Flux";
-const std::string Flux::category = "Frequency-Domain";
-const std::string Flux::description =
-    "Spectral flux is a measure used in digital signal processing that "
-    "quantifies how quickly the power spectrum of a signal changes. It is "
-    "often used in audio analysis for onset detection and other applications.";
+Flux::Flux()
+    : FeatureExtractor("Spectral Flux", "Frequency-Domain",
+                       "Spectral flux is a measure used in digital signal processing that "
+                       "quantifies how quickly the power spectrum of a signal changes. It is "
+                       "often used in audio analysis for onset detection and other applications.")
+{
+}
 
 void Flux::initialize(SystemConfigs sys_cfg)
 {

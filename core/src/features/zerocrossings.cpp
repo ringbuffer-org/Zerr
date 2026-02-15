@@ -4,11 +4,12 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string ZeroCrossings::name     = "ZeroCrossings";
-const std::string ZeroCrossings::category = "Sample-Level";
-const std::string ZeroCrossings::description =
-    "Zero crossing is used to describe the point at which a signal changes its "
-    "sign from positive to negative or from negative to positive.";
+ZeroCrossings::ZeroCrossings()
+    : FeatureExtractor("ZeroCrossings", "Sample-Level",
+                       "Zero crossing is used to describe the point at which a signal changes its "
+                       "sign from positive to negative or from negative to positive.")
+{
+}
 
 void ZeroCrossings::initialize(SystemConfigs sys_cfg)
 {
