@@ -62,12 +62,6 @@ inline GenMode parseGenMode(const std::string& s)
 
 using ConfigPath = std::string; /**< Path string for configuration files */
 
-// TODO(Zeyu Yang): If this only use in PD wrapper, move it out
-struct t_featureNames {
-    char** names; /**< Array of feature name strings */
-    int num;      /**< Number of feature names in the array */
-};
-
 using Params = std::vector<Param>; /**< Vector container for parameter values */
 
 using FeatureVal   = Param;  /**< Single feature value computed from an audio block */
