@@ -22,17 +22,12 @@ using Param  = float;  /**< Base type for parameter values used in audio process
 using Index  = int;    /**< Base type for indexing and counting */
 
 using Samples = std::vector<Sample>; /**< Vector container for audio samples */
-
-using Block  = Samples;            /**< Single block of audio samples */
-using Blocks = std::vector<Block>; /**< Collection of audio blocks for multi-channel processing */
-
-using AudioBuffer = Samples; /**< Buffer for storing audio frames */
-using AudioBuffers =
-    std::vector<AudioBuffer>; /**< Collection of audio buffers for multi-channel storage */
+using Blocks =
+    std::vector<Samples>; /**< Collection of sample vectors for multi-channel processing */
 
 struct AudioInputs {
-    Block block;              /**< Single block of audio samples for processing */
-    AudioBuffer wave;         /**< Buffered audio frame for temporal analysis */
+    Samples block;            /**< Single block of audio samples for processing */
+    Samples wave;             /**< Buffered audio frame for temporal analysis */
     std::vector<Sample> spec; /**< Spectral power data for frequency analysis */
 }; /**< Consolidated structure for different types of audio input data */
 

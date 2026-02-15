@@ -41,4 +41,4 @@ double* FrequencyTransformer::fft_input() { return fft_in; }
 
 fftw_complex* FrequencyTransformer::fft_output() { return fft_out; }
 
-AudioBuffer FrequencyTransformer::get_power_spectrum() { return power_spec; }
+Samples FrequencyTransformer::get_power_spectrum() { return power_spec; }

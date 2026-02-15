@@ -55,9 +55,9 @@ class FrequencyTransformer {
     fftw_complex* fft_output();
     /**
      * @brief Get the computed power spectrum
-     * @return AudioBuffer Buffer containing the power spectrum values
+     * @return Samples Buffer containing the power spectrum values
      */
-    AudioBuffer get_power_spectrum();
+    Samples get_power_spectrum();
 
     /**
      * @brief Apply window function to input data
@@ -76,7 +76,7 @@ class FrequencyTransformer {
     int frame_size; ///< Size of the analysis frame in samples
     int fft_size;   ///< Size of the FFT (typically frame_size/2 + 1)
 
-    AudioBuffer power_spec; ///< Buffer to store power spectrum results
+    Samples power_spec; ///< Buffer to store power spectrum results
 
     double* fft_in;        ///< Input buffer for FFT
     fftw_complex* fft_out; ///< Output buffer for FFT results

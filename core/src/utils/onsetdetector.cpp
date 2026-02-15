@@ -8,9 +8,9 @@
  */
 #include "onsetdetector.h"
 
-using zerr::Block;
 using zerr::Index;
 using zerr::OnsetDetector;
+using zerr::Samples;
 
 void OnsetDetector::setDebounceThreshold(int newThreshold)
 {
@@ -18,7 +18,7 @@ void OnsetDetector::setDebounceThreshold(int newThreshold)
     lastOnsetPosition = -debounceThreshold; // Reset lastOnsetPosition based on new threshold
 }
 
-void OnsetDetector::detectOnsetInBlock(Block& block)
+void OnsetDetector::detectOnsetInBlock(Samples& block)
 {
     if (block.empty())
         return;

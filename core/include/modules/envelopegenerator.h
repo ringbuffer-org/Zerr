@@ -130,10 +130,10 @@ class EnvelopeGenerator {
     Mode triggerMode; /**< The strategy for choosing the next speaker to jump to
                          using trigger with topology */
 
-    AudioBuffers inputBuffers;  /**< multi-channel input buffer in the shape of
-                                   input channel number x block size */
-    AudioBuffers outputBuffers; /**< multi-channel output buffer in the shape of
-                                   output channel number x block size */
+    Blocks inputBuffers;  /**< multi-channel input buffer in the shape of
+                             input channel number x block size */
+    Blocks outputBuffers; /**< multi-channel output buffer in the shape of
+                             output channel number x block size */
 
     std::map<Index, size_t> indexChannelLookup; /**< index to channel reverse lookup table */
     /**

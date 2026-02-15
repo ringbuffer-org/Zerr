@@ -49,7 +49,7 @@ class RingBuffer {
      * @brief Add a block of samples to the buffer
      * @param block Block of samples to enqueue
      */
-    void enqueue(const Block& block);
+    void enqueue(const Samples& block);
 
     /**
      * @brief Retrieve samples from the buffer

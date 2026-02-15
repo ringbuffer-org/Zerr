@@ -56,7 +56,7 @@ class FeatureBank {
      * @param in Input audio block to analyze
      * @return Map of feature names to extracted feature values
      */
-    FeaturesVals perform(Block in);
+    FeaturesVals perform(Samples in);
     /**
      * @brief Reset the feature bank parameters and load a new set of features
      * @param feature_names New list of feature names to activate

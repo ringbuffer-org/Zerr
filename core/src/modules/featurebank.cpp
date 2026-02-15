@@ -46,7 +46,7 @@ void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs system_co
     x.wave.resize(AUDIO_BUFFER_SIZE);
 }
 
-FeaturesVals FeatureBank::perform(Block in)
+FeaturesVals FeatureBank::perform(Samples in)
 {
     // fetch
     Sample* buf_ptr = nullptr;
