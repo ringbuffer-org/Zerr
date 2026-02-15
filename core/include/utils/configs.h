@@ -10,8 +10,8 @@ namespace zerr {
 /// Threshold value for triggering feature extraction
 inline constexpr double TRIGGER_THRESHOLD = 1e-4;
 
-/// Pi constant
-inline constexpr double PI = 3.14159265;
+/// Pi constant (lowercase to avoid macro clash with Max/MSP SDK)
+inline constexpr double pi = 3.14159265;
 
 /// Size of audio processing buffer in samples
 inline constexpr std::size_t AUDIO_BUFFER_SIZE = 2048;

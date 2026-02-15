@@ -67,7 +67,7 @@ bool isEqualTo0(Param value, Param epsilon = std::numeric_limits<Param>::epsilon
  */
 inline float get_hann_sample(int pos, int L)
 {
-    float val = 0.5 * (1.0 - cos((2.0 * PI * (float)pos) / (float)L));
+    float val = 0.5 * (1.0 - cos((2.0 * pi * static_cast<float>(pos)) / static_cast<float>(L)));
     return val;
 }
 /**

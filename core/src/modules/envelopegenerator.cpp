@@ -12,24 +12,17 @@ using zerr::Blocks;
 using zerr::DISTANCE_SCALE;
 using zerr::EnvelopeGenerator;
 using zerr::Param;
-using zerr::PI;
+using zerr::pi;
 using zerr::VOLUME_THRESHOLD;
 
 EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speakerCfgs,
                                      Mode genMode)
+    : systemCfgs(systemCfgs), speakerCfgs(speakerCfgs), genMode(genMode),
+      speakerManager(std::make_unique<SpeakerManager>(speakerCfgs)),
+      onsetDetector(std::make_unique<OnsetDetector>(50))
 {
-    this->systemCfgs  = systemCfgs;
-    this->speakerCfgs = speakerCfgs;
-    this->genMode     = genMode;
-
-    speakerManager = new SpeakerManager(this->speakerCfgs);
-
-    logger = new Logger();
-
-    onsetDetector = new OnsetDetector(50);
-
 #ifdef TESTMODE
-    logger->setLogLevel(LogLevel::INFO);
+    logger.setLogLevel(LogLevel::INFO);
 #endif // TESTMODE
 }
 
@@ -47,7 +40,7 @@ bool EnvelopeGenerator::initialize()
         processFunc = &EnvelopeGenerator::_processTrajectory;
     }
     else {
-        logger->logError("EnvelopeGenerator::initialize Unknown selection mode: " + genMode);
+        logger.logError("EnvelopeGenerator::initialize Unknown selection mode: " + genMode);
         return false;
     }
 
@@ -114,23 +107,16 @@ void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs)
 void EnvelopeGenerator::setTriggerInterval(Param newInterval)
 {
     newInterval      = newInterval < 0 ? 0 : newInterval;
-    int newThreshold = (int)(newInterval / 1000.0 * systemCfgs.sample_rate);
+    int newThreshold = static_cast<int>(newInterval / 1000.0 * systemCfgs.sample_rate);
     onsetDetector->setDebounceThreshold(newThreshold);
 }
 
 void EnvelopeGenerator::printParameters() { speakerManager->printParameters(); }
 
-EnvelopeGenerator::~EnvelopeGenerator()
-{
-    delete speakerManager;
-    delete logger;
-    delete onsetDetector;
-}
-
 void EnvelopeGenerator::setPrinter(Logger::PrintStrategy newPrinter)
 {
     // The logger of EnvelopeGenerator
-    logger->setPrinter(newPrinter);
+    logger.setPrinter(newPrinter);
     // The logger of SpeakerManger
     speakerManager->setPrinter(newPrinter);
 }
@@ -226,9 +212,9 @@ Param EnvelopeGenerator::_calculateGain(Param x, Param theta)
     theta = theta < 0.0 ? 0 : theta;
     theta = theta > 1.0 ? 1 : theta;
 
-    Param tmp = tan(theta * PI / 2.0);
+    Param tmp = tan(theta * pi / 2.0);
 
-    Param gain = isEqualTo0(tmp, VOLUME_THRESHOLD) ? 0.0 : 1.0 - x / tan(theta * PI / 2.0);
+    Param gain = isEqualTo0(tmp, VOLUME_THRESHOLD) ? 0.0 : 1.0 - x / tan(theta * pi / 2.0);
 
     // clip gain
     gain = gain < 0.0 ? 0 : gain;
