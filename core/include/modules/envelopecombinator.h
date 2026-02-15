@@ -51,7 +51,7 @@ class EnvelopeCombinator {
     ~EnvelopeCombinator() = default;
 
   private:
-    typedef void (EnvelopeCombinator::*ProcessFunction)();
+    using ProcessFunction = void (EnvelopeCombinator::*)();
     ProcessFunction processFunc;
 
     int numSource;                  /**< Number of envelope sources to combine */

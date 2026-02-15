@@ -24,8 +24,8 @@ class FeatureBank {
   public:
     using CreateFunc = std::unique_ptr<FeatureExtractor> (*)(); /**< Function pointer type for
                                    creating FeatureExtractor objects  */
-    typedef std::unique_ptr<FeatureExtractor>
-        fe_ptr; /**< The unique_ptr of type virtual class FeatureExtractor  */
+    using fe_ptr = std::unique_ptr<FeatureExtractor>; /**< The unique_ptr of type virtual class
+                                                         FeatureExtractor  */
     /**
      * @brief FeatureBank Constructor
      *

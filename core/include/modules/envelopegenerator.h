@@ -124,7 +124,7 @@ class EnvelopeGenerator {
     std::unique_ptr<OnsetDetector>
         onsetDetector; /**< Detector for identifying onset triggers in the input signal */
 
-    typedef void (EnvelopeGenerator::*ProcessFunction)();
+    using ProcessFunction = void (EnvelopeGenerator::*)();
     ProcessFunction processFunc;
 
     Mode triggerMode; /**< The strategy for choosing the next speaker to jump to

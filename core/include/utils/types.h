@@ -51,10 +51,10 @@ using Mode       = std::string; /**< String identifier for processing modes */
 using ConfigPath = std::string; /**< Path string for configuration files */
 
 // TODO(Zeyu Yang): If this only use in PD wrapper, move it out
-typedef struct {
+struct t_featureNames {
     char** names; /**< Array of feature name strings */
     int num;      /**< Number of feature names in the array */
-} t_featureNames;
+};
 
 using Params = std::vector<Param>; /**< Vector container for parameter values */
 
@@ -93,10 +93,10 @@ using TopoMatrix =
 using Pair = std::pair<Index, Index>; /**< Pair of indices for representing connections */
 
 // system config
-typedef struct {
+struct SystemConfigs {
     size_t sample_rate; /**< Audio sampling rate in Hz */
     size_t block_size;  /**< Size of processing blocks in samples */
-} SystemConfigs;
+};
 
 } // namespace zerr
 #endif // TYPES_H
