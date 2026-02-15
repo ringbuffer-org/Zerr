@@ -21,11 +21,6 @@ using Sample = double; /**< Base type for audio sample values */
 using Param  = float;  /**< Base type for parameter values used in audio processing */
 using Index  = int;    /**< Base type for indexing and counting */
 
-struct Complex {
-    Sample real; /**< Real component of complex number */
-    Sample img;  /**< Imaginary component of complex number */
-}; /**< Complex number representation for frequency domain calculations */
-
 using Samples = std::vector<Sample>; /**< Vector container for audio samples */
 
 using Block  = Samples;            /**< Single block of audio samples */
@@ -35,17 +30,13 @@ using AudioBuffer = Samples; /**< Buffer for storing audio frames */
 using AudioBuffers =
     std::vector<AudioBuffer>; /**< Collection of audio buffers for multi-channel storage */
 
-using FFTBuffer  = std::vector<Complex>; /**< Buffer for storing FFT results as complex numbers */
-using SpecBuffer = std::vector<Sample>;  /**< Buffer for storing spectral power values */
-
 struct AudioInputs {
-    Block block;      /**< Single block of audio samples for processing */
-    AudioBuffer wave; /**< Buffered audio frame for temporal analysis */
-    SpecBuffer spec;  /**< Spectral power data for frequency analysis */
+    Block block;              /**< Single block of audio samples for processing */
+    AudioBuffer wave;         /**< Buffered audio frame for temporal analysis */
+    std::vector<Sample> spec; /**< Spectral power data for frequency analysis */
 }; /**< Consolidated structure for different types of audio input data */
 
-using FeatureName  = std::string;              /**< String identifier for audio features */
-using FeatureNames = std::vector<FeatureName>; /**< List of feature names to be processed */
+using FeatureNames = std::vector<std::string>; /**< List of feature names to be processed */
 
 using Mode       = std::string; /**< String identifier for processing modes */
 using ConfigPath = std::string; /**< Path string for configuration files */
