@@ -11,11 +11,14 @@ namespace feature {
 /**
  * @brief Zero Crossing Rate algorithm - Calculates how often a signal crosses the zero level
  *
- * The zero crossing rate measures the number of times an audio signal changes sign
- * (crosses zero amplitude) within a given frame, divided by the frame length. Higher
- * rates indicate more high frequency content or noise-like signals, while lower rates
- * suggest more low frequency or tonal content. This feature is useful for distinguishing
- * between voiced and unvoiced speech segments or detecting percussive sounds.
+ * Category: Time-Domain
+ *
+ * The zero crossing rate (ZCR) is a measure of how frequently a signal changes its sign.
+ * It represents the rate at which the signal crosses the zero amplitude level over a given
+ * time period, normalized by the frame length. Higher rates indicate more high frequency
+ * content or noise-like signals, while lower rates suggest more low frequency or tonal
+ * content. This feature is useful for distinguishing between voiced and unvoiced speech
+ * segments or detecting percussive sounds.
  */
 class ZeroCrossingRate : public FeatureExtractor {
   public:

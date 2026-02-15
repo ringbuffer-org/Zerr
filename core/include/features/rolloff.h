@@ -21,11 +21,13 @@ namespace feature {
  * @brief Spectral Rolloff algorithm - Calculates frequency threshold containing N% of spectral
  * energy
  *
- * The spectral rolloff is a measure used in signal processing to determine the
- * frequency below which a specified percentage of the total spectral energy
- * lies. It is often used to distinguish between harmonic and non-harmonic
- * content in an audio signal. Higher rolloff frequencies indicate more high-frequency
- * content, while lower values suggest more energy concentrated in lower frequencies.
+ * Category: Frequency-Domain
+ *
+ * The spectral rolloff is a measure used in signal processing to determine the frequency
+ * below which a specified percentage of the total spectral energy lies. It is often used
+ * to distinguish between harmonic and non-harmonic content in an audio signal. Higher
+ * rolloff frequencies indicate more high-frequency content, while lower values suggest
+ * more energy concentrated in lower frequencies.
  */
 class Rolloff : public FeatureExtractor {
   public:

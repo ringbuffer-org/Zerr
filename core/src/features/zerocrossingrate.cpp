@@ -4,13 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-ZeroCrossingRate::ZeroCrossingRate()
-    : FeatureExtractor("Zero Crossing Rate", "Time-Domain",
-                       "The zero crossing rate (ZCR) is a measure of how frequently a signal "
-                       "changes its sign. It represents the rate at which the signal crosses the "
-                       "zero amplitude level over a given time period.")
-{
-}
+ZeroCrossingRate::ZeroCrossingRate() {}
 
 void ZeroCrossingRate::initialize(SystemConfigs sys_cfg)
 {

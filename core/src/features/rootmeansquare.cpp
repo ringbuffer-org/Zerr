@@ -4,12 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-RootMeanSquare::RootMeanSquare()
-    : FeatureExtractor("Root-Mean-Square Amplitude", "Time-Domain",
-                       "The RMS is defined as the square root of the mean over time of the square "
-                       "of the vertical distance of the graph from the rest state")
-{
-}
+RootMeanSquare::RootMeanSquare() {}
 
 void RootMeanSquare::initialize(SystemConfigs sys_cfg)
 {

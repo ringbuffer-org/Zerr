@@ -10,12 +10,14 @@ namespace feature {
 /**
  * @brief Zero Crossings algorithm - Counts the number of times a signal crosses the zero level
  *
- * The zero crossings feature counts the total number of times an audio signal crosses
- * the zero amplitude level within a frame. Unlike zero crossing rate, this provides
- * the absolute count rather than a rate normalized by frame length. Higher counts
- * indicate more high frequency content or noise-like signals, while lower counts
- * suggest more low frequency or tonal content. This can help characterize signal
- * periodicity and frequency content.
+ * Category: Sample-Level
+ *
+ * Zero crossing is used to describe the point at which a signal changes its sign from
+ * positive to negative or from negative to positive. Unlike zero crossing rate, this
+ * provides the absolute count rather than a rate normalized by frame length. Higher counts
+ * indicate more high frequency content or noise-like signals, while lower counts suggest
+ * more low frequency or tonal content. This can help characterize signal periodicity and
+ * frequency content.
  */
 class ZeroCrossings : public FeatureExtractor {
   public:

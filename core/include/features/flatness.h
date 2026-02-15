@@ -12,10 +12,14 @@ namespace feature {
  * @brief Spectral Flatness algorithm - Calculates the ratio of geometric to arithmetic mean of
  * spectrum
  *
- * The spectral flatness measures how noise-like or tone-like a sound is by comparing the
- * geometric mean to the arithmetic mean of the spectrum. Values closer to 1 indicate more
- * noise-like signals with energy spread across frequencies, while values closer to 0
- * suggest more tonal sounds with energy concentrated at specific frequencies.
+ * Category: Frequency-Domain
+ *
+ * Spectral flatness, also known as Wiener entropy, is a measure used in digital signal
+ * processing to characterize an audio spectrum. It is typically used to quantify how
+ * noise-like a signal is, as opposed to being tonal. A higher value of spectral flatness
+ * indicates a more noise-like signal, whereas a lower value indicates a more tonal signal.
+ * Values closer to 1 indicate energy spread across frequencies, while values closer to 0
+ * suggest energy concentrated at specific frequencies.
  */
 class Flatness : public FeatureExtractor {
   public:

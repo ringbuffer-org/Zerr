@@ -11,10 +11,13 @@ namespace feature {
 /**
  * @brief Spectral Flux algorithm - Calculates frame-to-frame changes in the spectrum
  *
- * The spectral flux measures how quickly the spectrum is changing between successive frames
- * by calculating the difference between consecutive spectral frames. Higher flux values
- * indicate more rapid spectral changes, while lower values suggest more steady spectral
- * content. This can help detect note onsets and transitions in audio signals.
+ * Category: Frequency-Domain
+ *
+ * Spectral flux is a measure used in digital signal processing that quantifies how quickly
+ * the power spectrum of a signal changes. It is calculated as the difference between
+ * consecutive spectral frames. Higher flux values indicate more rapid spectral changes,
+ * while lower values suggest more steady spectral content. It is often used in audio
+ * analysis for onset detection and other applications.
  */
 class Flux : public FeatureExtractor {
   public:

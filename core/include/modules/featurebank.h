@@ -69,6 +69,8 @@ class FeatureBank {
 
     std::vector<fe_ptr> activated_features; /**< Vector of pointers to activated feature objects */
 
+    FeatureNames active_feature_names; /**< Names of currently activated features */
+
     RingBuffer ring_buffer; /**< Ring buffer to hold previous audio samples for analysis */
 
     FrequencyTransformer freq_transformer; /**< FFT wrapper to perform frequency analysis

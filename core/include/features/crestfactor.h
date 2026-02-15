@@ -11,10 +11,13 @@ namespace feature {
 /**
  * @brief Crest Factor algorithm - Calculates the ratio of peak amplitude to RMS value
  *
- * The crest factor, also known as peak-to-average ratio (PAR), measures the waveform's
- * dynamic range by comparing its peak values to the RMS level. Higher crest factors
- * indicate more peaky signals with greater dynamic range, while lower values suggest
- * more consistent amplitude levels.
+ * Category: Time-Domain
+ *
+ * Crest Factor is a parameter used in signal processing and audio engineering to describe
+ * the characteristics of a waveform. It is defined as the ratio of the peak value of a
+ * waveform to its RMS (Root Mean Square) value. Higher crest factors indicate more peaky
+ * signals with greater dynamic range, while lower values suggest more consistent amplitude
+ * levels. Also known as peak-to-average ratio (PAR).
  */
 class CrestFactor : public FeatureExtractor {
   public:

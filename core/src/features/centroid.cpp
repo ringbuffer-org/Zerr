@@ -4,12 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-Centroid::Centroid()
-    : FeatureExtractor("Spectral Centroid", "Frequency-Domain",
-                       "The spectral centroid is a measure used in digital signal processing to "
-                       "characterise a spectrum.")
-{
-}
+Centroid::Centroid() {}
 
 void Centroid::initialize(SystemConfigs sys_cfg)
 {

@@ -23,16 +23,14 @@ void FeatureBank::print_all_features()
 void FeatureBank::print_active_features()
 {
     std::cout << "All activated features: " << std::endl;
-    for (const auto& feature : activated_features) {
-        std::cout << "  -Name: " << feature->get_name() << std::endl;
-        std::cout << "  -Category: " << feature->get_category() << std::endl;
-        std::cout << "  -Description: " << feature->get_description() << std::endl;
-        std::cout << std::endl;
+    for (const auto& name : active_feature_names) {
+        std::cout << "  -Name: " << name << std::endl;
     }
 }
 
 void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs system_configs)
 {
+    active_feature_names = feature_names;
     for (const auto& name : feature_names) {
         activated_features.push_back(_create(name));
     }

@@ -11,9 +11,12 @@ namespace feature {
 /**
  * @brief Spectral Centroid algorithm - Calculates the center of mass of the spectrum
  *
- * The spectral centroid represents the "brightness" of a sound by indicating where
- * the center of mass of the spectrum is located. Higher centroid values generally
- * correspond to brighter sounds with more high frequency content.
+ * Category: Frequency-Domain
+ *
+ * The spectral centroid is a measure used in digital signal processing to characterise
+ * a spectrum. It represents the "brightness" of a sound by indicating where the center
+ * of mass of the spectrum is located. Higher centroid values generally correspond to
+ * brighter sounds with more high frequency content.
  */
 class Centroid : public FeatureExtractor {
   public:

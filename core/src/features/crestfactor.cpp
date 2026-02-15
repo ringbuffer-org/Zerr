@@ -4,14 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-CrestFactor::CrestFactor()
-    : FeatureExtractor("Crest Factor", "Time-Domain",
-                       "Crest Factor is a parameter used in signal processing and audio "
-                       "engineering to describe the characteristics of a waveform. It is defined "
-                       "as the ratio of the peak value of a waveform to its RMS (Root Mean "
-                       "Square) value.")
-{
-}
+CrestFactor::CrestFactor() {}
 
 void CrestFactor::initialize(SystemConfigs sys_cfg)
 {

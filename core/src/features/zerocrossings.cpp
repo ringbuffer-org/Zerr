@@ -4,12 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-ZeroCrossings::ZeroCrossings()
-    : FeatureExtractor("ZeroCrossings", "Sample-Level",
-                       "Zero crossing is used to describe the point at which a signal changes its "
-                       "sign from positive to negative or from negative to positive.")
-{
-}
+ZeroCrossings::ZeroCrossings() {}
 
 void ZeroCrossings::initialize(SystemConfigs sys_cfg)
 {

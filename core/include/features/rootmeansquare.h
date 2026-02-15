@@ -20,12 +20,12 @@ namespace feature {
 /**
  * @brief Root Mean Square algorithm - Calculates the quadratic mean amplitude of a signal
  *
- * The RMS value of a set of values (or a continuous-time waveform) is
- * the square root of the arithmetic mean of the squares of the values,
- * or the square of the function that defines the continuous waveform.
- * RMS is commonly used as a measure of signal power or amplitude level,
- * providing a more meaningful average than simple arithmetic mean for
- * oscillating signals.
+ * Category: Time-Domain
+ *
+ * The RMS is defined as the square root of the mean over time of the square of the
+ * vertical distance of the graph from the rest state. RMS is commonly used as a measure
+ * of signal power or amplitude level, providing a more meaningful average than simple
+ * arithmetic mean for oscillating signals.
  *
  * https://en.wikipedia.org/wiki/Root_mean_square
  */
