@@ -137,15 +137,14 @@ bool SpeakerManager::initialize()
 
     // initialize the specific configs
     // every speaker is actvSpkIdx when at initialize point
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        trajVector.push_back(actvSpkIdx[i]);
+    for (auto idx : actvSpkIdx) {
+        trajVector.push_back(idx);
     }
     std::sort(trajVector.begin(), trajVector.end());
 
     // topoMatrix every speaker is connected
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        Indexes tmp_idx           = actvSpkIdx; // deepcopy
-        topoMatrix[actvSpkIdx[i]] = tmp_idx;
+    for (auto idx : actvSpkIdx) {
+        topoMatrix[idx] = actvSpkIdx; // copy
     }
 
     return true;
@@ -210,10 +209,7 @@ Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<
     assert(mask.size() == 3 && "ERROR: The mask vector for geometry selection muss be in size 3.");
 
     Param tmp_distan;
-    for (const auto& maps : speakers) {
-        Index key    = maps.first;
-        Speaker spkr = maps.second;
-
+    for (auto& [key, spkr] : speakers) {
         if (coordinate == "cartesian") {
             tmp_distan = abs(spkr.getX() - pos[0]) * mask[0] + abs(spkr.getY() - pos[1]) * mask[1] +
                          abs(spkr.getZ() - pos[2]) * mask[2];
@@ -429,9 +425,8 @@ void SpeakerManager::printActiveSpeakerIndexs()
 void SpeakerManager::printTopoMatrix()
 {
     logger.logInfo("Topological Matrix: ");
-    for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
-        logger.logInfo("    " + std::to_string(it->first) + " | " +
-                       formatVector<Index>(it->second));
+    for (const auto& [idx, connections] : topoMatrix) {
+        logger.logInfo("    " + std::to_string(idx) + " | " + formatVector<Index>(connections));
     }
 }
 
@@ -548,15 +543,14 @@ void SpeakerManager::_setActiveSpeakerIndexs(Indexes spkrIdxes)
     _initDistanceMatrix();
 
     trajVector.clear();
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        trajVector.push_back(actvSpkIdx[i]);
+    for (auto idx : actvSpkIdx) {
+        trajVector.push_back(idx);
     }
     std::sort(trajVector.begin(), trajVector.end());
 
     topoMatrix.clear();
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        Indexes tmp_idx           = actvSpkIdx;
-        topoMatrix[actvSpkIdx[i]] = tmp_idx;
+    for (auto idx : actvSpkIdx) {
+        topoMatrix[idx] = actvSpkIdx; // copy
     }
 }
 
@@ -609,10 +603,10 @@ void SpeakerManager::_delActiveSpeakerIndexs(Indexes spkrIdxes)
         if (isInKey<Index, Indexes>(spkrIdxes[i], topoMatrix)) {
             topoMatrix.erase(spkrIdxes[i]);
         }
-        for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
-            if (isInVec<Index>(spkrIdxes[i], it->second)) {
-                it->second.erase(std::remove(it->second.begin(), it->second.end(), spkrIdxes[i]),
-                                 it->second.end());
+        for (auto& [idx, connections] : topoMatrix) {
+            if (isInVec<Index>(spkrIdxes[i], connections)) {
+                connections.erase(std::remove(connections.begin(), connections.end(), spkrIdxes[i]),
+                                  connections.end());
             }
         }
     }
