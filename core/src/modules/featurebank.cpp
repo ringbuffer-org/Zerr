@@ -53,8 +53,7 @@ FeaturesVals FeatureBank::perform(Samples in)
     size_t buf_len;
     ring_buffer.enqueue(in);
 
-    x.block.clear();
-    x.block = in;
+    x.block = std::move(in);
 
     buf_ptr = x.wave.data();
     buf_len = x.wave.size();
@@ -69,7 +68,6 @@ FeaturesVals FeatureBank::perform(Samples in)
     x.spec = freq_transformer.get_power_spectrum();
 
     // process:
-    // TODO: use multi-thread
     for (size_t i = 0; i < activated_features.size(); ++i) {
         activated_features[i]->fetch(x);
         activated_features[i]->extract();
