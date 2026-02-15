@@ -29,10 +29,9 @@ void Flatness::initialize(SystemConfigs sys_cfg)
 void Flatness::extract()
 {
     // Calculate the sum of logarithms
-    double logSum              = 0.0;
-    const double smallConstant = 1e-10; // Small constant to avoid taking log of 0
+    double logSum = 0.0;
     for (double sample : x) {
-        logSum += std::log(sample + smallConstant);
+        logSum += std::log(sample + LOG_FLOOR);
     }
 
     // Calculate the geometric mean using exponentiation

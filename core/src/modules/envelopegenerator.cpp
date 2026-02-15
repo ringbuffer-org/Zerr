@@ -9,6 +9,7 @@
 #include "envelopegenerator.h"
 
 using zerr::Blocks;
+using zerr::DEFAULT_ONSET_DEBOUNCE;
 using zerr::DISTANCE_SCALE;
 using zerr::EnvelopeGenerator;
 using zerr::Param;
@@ -19,7 +20,7 @@ EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speak
                                      Mode genMode)
     : systemCfgs(systemCfgs), speakerCfgs(speakerCfgs), genMode(genMode),
       speakerManager(std::make_unique<SpeakerManager>(speakerCfgs)),
-      onsetDetector(std::make_unique<OnsetDetector>(50))
+      onsetDetector(std::make_unique<OnsetDetector>(DEFAULT_ONSET_DEBOUNCE))
 {
 #ifdef TESTMODE
     logger.setLogLevel(LogLevel::INFO);
