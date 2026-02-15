@@ -9,10 +9,10 @@
 #ifndef ENVELOPECOMBINATOR_H
 #define ENVELOPECOMBINATOR_H
 
-#include <functional>
 #include "logger.h"
 #include "types.h"
 #include "utils.h"
+#include <functional>
 
 namespace zerr {
 /**
@@ -48,10 +48,7 @@ class EnvelopeCombinator {
      * @return Combined output envelope blocks
      */
     Blocks perform(Blocks in);
-    /**
-     * @brief Destructor for the Envelope Combinator
-     */
-    ~EnvelopeCombinator();
+    ~EnvelopeCombinator() = default;
 
   private:
     typedef void (EnvelopeCombinator::*ProcessFunction)();
@@ -62,7 +59,7 @@ class EnvelopeCombinator {
     zerr::SystemConfigs systemCfgs; /**< system configuration: sample_rate, block_size */
     std::string combMode;           /**< Mode for combining envelopes */
 
-    Logger* logger; /**< Logger instance for debug/error messages */
+    Logger logger; /**< Logger instance for debug/error messages */
 
     Blocks inputBuffer;  /**< Buffer for storing input envelope blocks */
     Blocks outputBuffer; /**< Buffer for storing combined output blocks */

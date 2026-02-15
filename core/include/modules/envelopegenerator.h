@@ -13,11 +13,12 @@
 #ifndef CORE_ENVELOPEGENERATOR_H
 #define CORE_ENVELOPEGENERATOR_H
 
-#include <functional>
 #include "logger.h"
 #include "onsetdetector.h"
 #include "speakermanager.h"
 #include "types.h"
+#include <functional>
+#include <memory>
 
 namespace zerr {
 
@@ -32,10 +33,10 @@ namespace zerr {
  * envelope shaping.
  */
 class EnvelopeGenerator {
- public:
+  public:
     const int numInlet = 3; ///< Number of inlets: main(1), spread(2), volume(3).
-    int numOutlet; ///< Number of outlets, assigned according to the speaker
-                   ///< configuration.
+    int numOutlet;          ///< Number of outlets, assigned according to the speaker
+                            ///< configuration.
     /**
      * @brief Constructor of EnvelopeGenerator setups the parameters for
      * initializing this Class.
@@ -103,41 +104,36 @@ class EnvelopeGenerator {
      * @brief Resets all parameters to default values and reinitializes the generator
      */
     void reset();
-    /**
-     * @brief Destructor that cleans up allocated resources
-     */
-    ~EnvelopeGenerator();
+    ~EnvelopeGenerator() = default;
 
     /**
      * @brief xxxxx
      */
     void setPrinter(Logger::PrintStrategy newPrinter);
 
+  private:
+    // NOTE: declaration order matters — config members must precede objects that depend on them
+    SystemConfigs systemCfgs; /**< System configurations: sample rate, block size etc. */
+    ConfigPath speakerCfgs;   /**< Path to the speaker array setup configuration file */
+    Mode genMode;             /**< The strategy for generating envelope: trigger |
+                                 trajectory */
 
- private:
-    Logger* logger; /**< Logger object for printing logs to all kinds of console */
-
-    SpeakerManager* speakerManager; /**< SpeakerManger object to access the speaker array information */
+    Logger logger; /**< Logger object for printing logs to all kinds of console */
+    std::unique_ptr<SpeakerManager>
+        speakerManager; /**< SpeakerManger object to access the speaker array information */
+    std::unique_ptr<OnsetDetector>
+        onsetDetector; /**< Detector for identifying onset triggers in the input signal */
 
     typedef void (EnvelopeGenerator::*ProcessFunction)();
     ProcessFunction processFunc;
 
-    SystemConfigs systemCfgs; /**< System configurations: sample rate, block size etc. */
-
-    ConfigPath speakerCfgs; /**< Path to the speaker array setup configuration file */
-    Mode genMode; /**< The strategy for generating envelope: trigger |
-                     trajectory */
     Mode triggerMode; /**< The strategy for choosing the next speaker to jump to
                          using trigger with topology */
 
-    AudioBuffers inputBuffers; /**< multi-channel input buffer in the shape of
-                                  input channel number x block size */
+    AudioBuffers inputBuffers;  /**< multi-channel input buffer in the shape of
+                                   input channel number x block size */
     AudioBuffers outputBuffers; /**< multi-channel output buffer in the shape of
                                    output channel number x block size */
-
-    // SpeakerManager* speakerManager; /**< SpeakerManger object to access the speaker array information */
-
-    OnsetDetector* onsetDetector; /**< Detector for identifying onset triggers in the input signal */
 
     std::map<Index, size_t> indexChannelLookup; /**< index to channel reverse lookup table */
     /**

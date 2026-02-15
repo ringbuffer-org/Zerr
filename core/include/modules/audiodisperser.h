@@ -9,9 +9,9 @@
 #ifndef AUDIODISPERSER_H
 #define AUDIODISPERSER_H
 
-#include <functional>
 #include "logger.h"
 #include "types.h"
+#include <functional>
 
 namespace zerr {
 /**
@@ -49,7 +49,7 @@ class AudioDisperser {
     int numChannel;              /**< Number of audio channels for dispersal */
     SystemConfigs systemCfgs;    /**< system configuration: sample_rate, block_size */
     std::string combinationMode; /**< Mode for combining audio signals */
-    Logger* logger;              /**< Logger instance for debug/error messages */
+    Logger logger;               /**< Logger instance for debug/error messages */
     Blocks inputBuffer;          /**< Buffer for storing input audio blocks */
     Blocks outputBuffer;         /**< Buffer for storing processed output blocks */
 };

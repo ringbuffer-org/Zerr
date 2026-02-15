@@ -10,27 +10,27 @@
 #include "audiodisperser.h"
 using namespace zerr;
 
-AudioDisperser::AudioDisperser(int numChannel, zerr::SystemConfigs systemCfgs) {
-    this->numChannel = numChannel;
-    this->systemCfgs = systemCfgs;
-
-    numInlet = numChannel + 1;
+AudioDisperser::AudioDisperser(int numChannel, zerr::SystemConfigs systemCfgs)
+    : numChannel(numChannel), systemCfgs(systemCfgs)
+{
+    numInlet  = numChannel + 1;
     numOutlet = numChannel;
 
-    logger = new Logger();
 #ifdef TESTMODE
-    logger->setLogLevel(LogLevel::INFO);
-#endif  // TESTMODE
+    logger.setLogLevel(LogLevel::INFO);
+#endif // TESTMODE
 }
 
-bool AudioDisperser::initialize() {
+bool AudioDisperser::initialize()
+{
     inputBuffer.resize(numInlet, Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
     return true;
 }
 
-Blocks AudioDisperser::perfrom(Blocks in) {
+Blocks AudioDisperser::perfrom(Blocks in)
+{
     inputBuffer = in;
 
     // clean the output buffer

@@ -39,7 +39,7 @@ void Rolloff::extract()
         sumEnergy += x[i];
         if (sumEnergy >= rolloffThreshold) {
             // Calculate the frequency corresponding to the bin index
-            crr_y = (double)i * freq_max / (double)x.size();
+            crr_y = static_cast<double>(i) * freq_max / static_cast<double>(x.size());
             return;
         }
     }
