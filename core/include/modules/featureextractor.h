@@ -53,7 +53,7 @@ class FeatureExtractor {
      * @brief Load new audio data into the input buffer
      * @param x Input audio data structure containing time/frequency domain signals
      */
-    virtual void fetch(AudioInputs x) = 0;
+    virtual void fetch(const AudioInputs& x) = 0;
     /**
      * @brief Retrieve the calculated feature values
      * @return Map of feature names to their computed values

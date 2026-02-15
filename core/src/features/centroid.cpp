@@ -42,7 +42,7 @@ void Centroid::extract()
 
 void Centroid::reset() { _reset_param(); }
 
-void Centroid::fetch(AudioInputs in)
+void Centroid::fetch(const AudioInputs& in)
 {
     x     = in.spec;
     prv_y = crr_y;

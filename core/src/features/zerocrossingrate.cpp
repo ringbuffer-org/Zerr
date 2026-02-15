@@ -41,7 +41,7 @@ void ZeroCrossingRate::extract()
 
 void ZeroCrossingRate::reset() { _reset_param(); }
 
-void ZeroCrossingRate::fetch(AudioInputs in)
+void ZeroCrossingRate::fetch(const AudioInputs& in)
 {
     x     = in.wave;
     prv_y = crr_y;

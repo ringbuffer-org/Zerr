@@ -35,7 +35,7 @@ void ZeroCrossings::extract()
 
 void ZeroCrossings::reset() { _reset_param(); }
 
-void ZeroCrossings::fetch(AudioInputs in)
+void ZeroCrossings::fetch(const AudioInputs& in)
 {
     x = in.block;
     y.clear();

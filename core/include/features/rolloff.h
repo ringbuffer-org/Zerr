@@ -71,7 +71,7 @@ class Rolloff : public FeatureExtractor {
      * @brief Load new audio input data for processing
      * @param in Audio input data
      */
-    void fetch(AudioInputs in);
+    void fetch(const AudioInputs& in);
 
     /**
      * @brief Get the calculated rolloff values

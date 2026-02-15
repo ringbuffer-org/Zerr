@@ -49,7 +49,7 @@ void Rolloff::extract()
 
 void Rolloff::reset() { _reset_param(); }
 
-void Rolloff::fetch(AudioInputs in)
+void Rolloff::fetch(const AudioInputs& in)
 {
     x     = in.spec;
     prv_y = crr_y;

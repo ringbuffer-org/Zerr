@@ -1,13 +1,13 @@
 #ifndef FLUX_H
 #define FLUX_H
 
-#include "utils.h"
 #include "configs.h"
 #include "featureextractor.h"
 #include "linearinterpolator.h"
+#include "utils.h"
 
 namespace zerr {
-namespace feature{
+namespace feature {
 /**
  * @brief Spectral Flux algorithm - Calculates frame-to-frame changes in the spectrum
  *
@@ -17,7 +17,7 @@ namespace feature{
  * content. This can help detect note onsets and transitions in audio signals.
  */
 class Flux : public FeatureExtractor {
-public:
+  public:
     static const std::string name;        ///< Name identifier for this feature
     static const std::string category;    ///< Category this feature belongs to
     static const std::string description; ///< Description of what this feature measures
@@ -26,19 +26,19 @@ public:
      * @brief Get the name identifier of this feature
      * @return std::string The feature name
      */
-    std::string get_name(){return name;}
+    std::string get_name() { return name; }
 
     /**
      * @brief Get the category this feature belongs to
      * @return std::string The feature category
      */
-    std::string get_category(){return category;}
+    std::string get_category() { return category; }
 
     /**
      * @brief Get the description of what this feature measures
      * @return std::string The feature description
      */
-    std::string get_description(){return description;}
+    std::string get_description() { return description; }
 
     /**
      * @brief Initialize the flux extractor with system configurations
@@ -60,7 +60,7 @@ public:
      * @brief Load new audio input data for processing
      * @param in Audio input data
      */
-    void fetch(AudioInputs in);
+    void fetch(const AudioInputs& in);
 
     /**
      * @brief Get the calculated flux values
@@ -69,19 +69,19 @@ public:
     FeatureVals send();
     // FeatureVals perform(AudioInputs x);
 
-private:
+  private:
     /**
      * @brief Reset internal parameters to initial state
      */
     void _reset_param();
 
-    Samples      prv_x; ///< Previous spectral frame
-    FeatureVal prv_y;   ///< Previous flux value
-    FeatureVal crr_y;   ///< Current flux value
+    Samples prv_x;    ///< Previous spectral frame
+    FeatureVal prv_y; ///< Previous flux value
+    FeatureVal crr_y; ///< Current flux value
 
     LinearInterpolator linear_interpolator; ///< Interpolator for smoothing flux values
 };
 
-} //namespace feature
-} //namespace zerr
+} // namespace feature
+} // namespace zerr
 #endif // FLUX_H

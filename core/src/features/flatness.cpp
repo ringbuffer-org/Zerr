@@ -52,7 +52,7 @@ void Flatness::extract()
 
 void Flatness::reset() { _reset_param(); }
 
-void Flatness::fetch(AudioInputs in)
+void Flatness::fetch(const AudioInputs& in)
 {
     x     = in.spec;
     prv_y = crr_y;

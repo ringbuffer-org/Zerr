@@ -36,7 +36,7 @@ void Flux::extract()
 
 void Flux::reset() { _reset_param(); }
 
-void Flux::fetch(AudioInputs in)
+void Flux::fetch(const AudioInputs& in)
 {
     prv_x = x;
     x     = in.spec;

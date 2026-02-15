@@ -38,7 +38,7 @@ void RootMeanSquare::extract()
 
 void RootMeanSquare::reset() { _reset_param(); }
 
-void RootMeanSquare::fetch(AudioInputs in)
+void RootMeanSquare::fetch(const AudioInputs& in)
 {
     x     = in.wave;
     prv_y = crr_y;

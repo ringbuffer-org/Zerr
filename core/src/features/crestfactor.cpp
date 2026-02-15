@@ -46,7 +46,7 @@ void CrestFactor::extract()
 
 void CrestFactor::reset() { _reset_param(); }
 
-void CrestFactor::fetch(AudioInputs in)
+void CrestFactor::fetch(const AudioInputs& in)
 {
     x     = in.wave;
     prv_y = crr_y;
