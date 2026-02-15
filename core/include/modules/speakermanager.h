@@ -224,7 +224,7 @@ class SpeakerManager {
      * @param mode The operation mode that determines the selection algorithm.
      * @return Index The selected speaker index based on the trigger and mode.
      */
-    Index getIndexesByTrigger(Param trigger, Mode mode);
+    Index getIndexesByTrigger(Param trigger, TriggerMode mode);
 
     /**
      * @brief Get a vector of distances from a specific speaker index to all

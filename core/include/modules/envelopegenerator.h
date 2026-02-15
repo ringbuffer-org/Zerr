@@ -47,7 +47,7 @@ class EnvelopeGenerator {
      * @param selectionMode The strategy for generating envelope: trigger |
      * trajectory
      */
-    EnvelopeGenerator(SystemConfigs systemCfgs, ConfigPath speakerCfgs, Mode genMode);
+    EnvelopeGenerator(SystemConfigs systemCfgs, ConfigPath speakerCfgs, GenMode genMode);
     /**
      * @brief Initialize the EnvelopeGenerator.
      *
@@ -115,7 +115,7 @@ class EnvelopeGenerator {
     // NOTE: declaration order matters — config members must precede objects that depend on them
     SystemConfigs systemCfgs; /**< System configurations: sample rate, block size etc. */
     ConfigPath speakerCfgs;   /**< Path to the speaker array setup configuration file */
-    Mode genMode;             /**< The strategy for generating envelope: trigger |
+    GenMode genMode;          /**< The strategy for generating envelope: trigger |
                                  trajectory */
 
     Logger logger; /**< Logger object for printing logs to all kinds of console */
@@ -127,8 +127,8 @@ class EnvelopeGenerator {
     using ProcessFunction = void (EnvelopeGenerator::*)();
     ProcessFunction processFunc;
 
-    Mode triggerMode; /**< The strategy for choosing the next speaker to jump to
-                         using trigger with topology */
+    TriggerMode triggerMode; /**< The strategy for choosing the next speaker to jump to
+                                using trigger with topology */
 
     Blocks inputBuffers;  /**< multi-channel input buffer in the shape of
                              input channel number x block size */

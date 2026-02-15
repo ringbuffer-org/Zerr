@@ -10,6 +10,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -33,7 +34,32 @@ struct AudioInputs {
 
 using FeatureNames = std::vector<std::string>; /**< List of feature names to be processed */
 
-using Mode       = std::string; /**< String identifier for processing modes */
+/**< Envelope generation strategy */
+enum class GenMode {
+    Trigger,    /**< Jump to a new speaker on each trigger event */
+    Trajectory, /**< Continuously move along a trajectory path */
+};
+
+/**< Speaker selection strategy within trigger mode */
+enum class TriggerMode {
+    Random, /**< Randomly select from connected speakers */
+};
+
+/**
+ * @brief Parse a string into a GenMode enum value
+ * @param s The string to parse ("trigger" or "trajectory")
+ * @return GenMode The corresponding enum value
+ * @throws std::invalid_argument if the string is not a valid mode
+ */
+inline GenMode parseGenMode(const std::string& s)
+{
+    if (s == "trigger")
+        return GenMode::Trigger;
+    if (s == "trajectory")
+        return GenMode::Trajectory;
+    throw std::invalid_argument("Unknown GenMode: " + s);
+}
+
 using ConfigPath = std::string; /**< Path string for configuration files */
 
 // TODO(Zeyu Yang): If this only use in PD wrapper, move it out

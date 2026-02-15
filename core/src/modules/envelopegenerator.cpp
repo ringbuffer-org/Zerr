@@ -17,7 +17,7 @@ using zerr::pi;
 using zerr::VOLUME_THRESHOLD;
 
 EnvelopeGenerator::EnvelopeGenerator(SystemConfigs systemCfgs, std::string speakerCfgs,
-                                     Mode genMode)
+                                     GenMode genMode)
     : systemCfgs(systemCfgs), speakerCfgs(speakerCfgs), genMode(genMode),
       speakerManager(std::make_unique<SpeakerManager>(speakerCfgs)),
       onsetDetector(std::make_unique<OnsetDetector>(DEFAULT_ONSET_DEBOUNCE))
@@ -34,15 +34,13 @@ bool EnvelopeGenerator::initialize()
         return false;
 
     // check the generator mode and bind process func
-    if (genMode == "trigger") {
+    switch (genMode) {
+    case GenMode::Trigger:
         processFunc = &EnvelopeGenerator::_processTrigger;
-    }
-    else if (genMode == "trajectory") {
+        break;
+    case GenMode::Trajectory:
         processFunc = &EnvelopeGenerator::_processTrajectory;
-    }
-    else {
-        logger.logError("EnvelopeGenerator::initialize Unknown selection mode: " + genMode);
-        return false;
+        break;
     }
 
     // get the number of speakers
@@ -60,9 +58,9 @@ bool EnvelopeGenerator::initialize()
     }
 
     // initialize trigger mode specified parameters
-    if (genMode == "trigger") {
+    if (genMode == GenMode::Trigger) {
         speakerManager->setCurrentSpeaker(speakerManager->getRandomIndex());
-        triggerMode = "random";
+        triggerMode = TriggerMode::Random;
     }
 
     // initialized

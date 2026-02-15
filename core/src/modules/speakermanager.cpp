@@ -242,7 +242,7 @@ Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<
     return std::make_pair(smallest, second_small);
 }
 
-Index SpeakerManager::getIndexesByTrigger(Param trigger, Mode mode)
+Index SpeakerManager::getIndexesByTrigger(Param trigger, TriggerMode mode)
 {
     // just return the original one when trigger doesn't close to 1.0
     if (!isEqualTo1(trigger, TRIGGER_THRESHOLD))
