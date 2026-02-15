@@ -1,0 +1,51 @@
+# Doxyfile for Zerr* core library documentation
+# Run from project root: doxygen docs/Doxyfile
+
+PROJECT_NAME           = "Zerr*"
+PROJECT_BRIEF          = "Channel-based audio spatialization system"
+PROJECT_NUMBER         =
+
+OUTPUT_DIRECTORY       = docs/build/
+CREATE_SUBDIRS         = NO
+
+# Input sources (relative to project root)
+INPUT                  = core/include/ README.md
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h
+USE_MDFILE_AS_MAINPAGE = README.md
+
+# Extraction settings
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+# Build settings
+JAVADOC_AUTOBRIEF      = YES
+BUILTIN_STL_SUPPORT    = YES
+SORT_MEMBER_DOCS       = YES
+
+# Output formats
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+# Doxygen Awesome theme
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+HTML_COLORSTYLE        = LIGHT
+HTML_HEADER            = docs/header.html
+HTML_EXTRA_STYLESHEET  = docs/doxygen-awesome-css/doxygen-awesome.css \
+                         docs/doxygen-awesome-css/doxygen-awesome-sidebar-only.css \
+                         docs/doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css
+HTML_EXTRA_FILES       = docs/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js \
+                         docs/doxygen-awesome-css/doxygen-awesome-fragment-copy-button.js \
+                         docs/doxygen-awesome-css/doxygen-awesome-paragraph-link.js \
+                         docs/doxygen-awesome-css/doxygen-awesome-interactive-toc.js
+HTML_COPY_CLIPBOARD    = NO
+
+# Graph settings
+HAVE_DOT               = NO
+
+# Warnings
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = NO

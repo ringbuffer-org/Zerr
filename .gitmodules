@@ -9,3 +9,6 @@
 [submodule "maxmsp/source/min-lib"]
 	path = maxmsp/source/min-lib
 	url = https://github.com/Cycling74/min-lib.git
+[submodule "doxygen-awesome-css"]
+	path = docs/doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
