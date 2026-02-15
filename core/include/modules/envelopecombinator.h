@@ -41,7 +41,7 @@ class EnvelopeCombinator {
      * @brief Get the block size used by the envelope combinator
      * @return The block size from system configuration
      */
-    int get_block_size() { return systemCfgs.block_size; }
+    int get_block_size() const noexcept { return systemCfgs.block_size; }
     /**
      * @brief Process input envelope blocks and combine using selected mode
      * @param in Input envelope blocks to process

@@ -37,13 +37,13 @@ class RingBuffer {
      * @brief Get the current number of samples in the buffer
      * @return size_t Current number of samples stored
      */
-    size_t get_size() const;
+    size_t get_size() const noexcept;
 
     /**
      * @brief Get the maximum capacity of the buffer
      * @return size_t Maximum number of samples the buffer can hold
      */
-    size_t get_capacity() const;
+    size_t get_capacity() const noexcept;
 
     /**
      * @brief Add a block of samples to the buffer

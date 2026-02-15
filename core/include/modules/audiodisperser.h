@@ -43,7 +43,7 @@ class AudioDisperser {
      * @brief Get the block size used by the audio disperser
      * @return The block size from system configuration
      */
-    int get_block_size() { return systemCfgs.block_size; }
+    int get_block_size() const noexcept { return systemCfgs.block_size; }
 
   private:
     int numChannel;              /**< Number of audio channels for dispersal */

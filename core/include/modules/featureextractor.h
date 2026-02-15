@@ -63,12 +63,12 @@ class FeatureExtractor {
      * @brief Check if the feature extractor is properly initialized
      * @return True if initialized, false otherwise
      */
-    bool is_initialized() { return initialized; }
+    bool is_initialized() const noexcept { return initialized; }
     /**
      * @brief Set the initialization status
      * @param s New initialization status
      */
-    void set_initialize_status(bool s) { initialized = s; }
+    void set_initialize_status(bool s) noexcept { initialized = s; }
 
   protected:
     Samples x;     /**< Input data buffer containing time or frequency domain samples */

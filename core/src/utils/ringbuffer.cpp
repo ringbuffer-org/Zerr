@@ -3,9 +3,9 @@ using namespace zerr;
 
 RingBuffer::RingBuffer(size_t capacity) : buffer(capacity, 0.0f), head(0), tail(0), size(0) {}
 
-size_t RingBuffer::get_size() const { return size; }
+size_t RingBuffer::get_size() const noexcept { return size; }
 
-size_t RingBuffer::get_capacity() const { return buffer.size(); }
+size_t RingBuffer::get_capacity() const noexcept { return buffer.size(); }
 
 void RingBuffer::enqueue(const Block& block)
 {
