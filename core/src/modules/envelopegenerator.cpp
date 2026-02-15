@@ -170,8 +170,8 @@ void EnvelopeGenerator::_processTrigger()
 
 void EnvelopeGenerator::_processTrajectory()
 {
-    Pair speakerPair;
-    Pair channelPair;
+    SpeakerPair speakerPair;
+    SpeakerPair channelPair;
 
     Param panRatio;
 

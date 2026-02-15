@@ -171,7 +171,7 @@ Speaker SpeakerManager::getSpeakerByIndex(Index spkrIdx)
     return it->second;
 }
 
-Pair SpeakerManager::getIndexesByTrajectory(Param trajVal)
+SpeakerPair SpeakerManager::getIndexesByTrajectory(Param trajVal)
 {
     trajVal = trajVal < 0.0 ? 0.0 : trajVal;
 
@@ -200,8 +200,8 @@ Param SpeakerManager::getPanningRatio(Param trajVal)
     return (scaled - std::floor(scaled));
 }
 
-Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
-                                            std::string coordinate)
+SpeakerPair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
+                                                   std::string coordinate)
 {
     std::vector<Param> distance;
     std::vector<Index> indexs;

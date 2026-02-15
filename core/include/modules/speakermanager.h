@@ -191,10 +191,10 @@ class SpeakerManager {
      * @brief Get a pair of speaker indexes based on the trajectory input value.
      * @param trajVal The trajectory input value between 0.0 and 1.0 used to determine speaker
      * selection along the defined trajectory.
-     * @return Pair A pair of adjacent speaker indexes selected based on the trajectory
+     * @return SpeakerPair A pair of adjacent speaker indexes selected based on the trajectory
      * value.
      */
-    Pair getIndexesByTrajectory(Param trajVal);
+    SpeakerPair getIndexesByTrajectory(Param trajVal);
 
     /**
      * @brief Calculate the panning ratio based on the trajectory input value.
@@ -212,10 +212,10 @@ class SpeakerManager {
      * @param pos The target position coordinates.
      * @param mask A boolean vector to include (true) or exclude (false) specific speakers.
      * @param coordinate The coordinate system to use ("Cartesian" or "spherical").
-     * @return Pair A pair of speaker indexes closest to the given position.
+     * @return SpeakerPair A pair of speaker indexes closest to the given position.
      */
-    Pair get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
-                                std::string coordinate);
+    SpeakerPair get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
+                                       std::string coordinate);
 
     /**
      * @brief Select a speaker index based on a trigger signal and the current

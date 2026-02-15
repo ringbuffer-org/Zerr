@@ -101,8 +101,9 @@ struct Orientation {
 // specific configs
 using Indexes = std::vector<Index>; /**< Collection of index values */
 using TopoMatrix =
-    std::map<Index, Indexes>;         /**< Topology matrix mapping indices to their connections */
-using Pair = std::pair<Index, Index>; /**< Pair of indices for representing connections */
+    std::map<Index, Indexes>; /**< Topology matrix mapping indices to their connections */
+using SpeakerPair =
+    std::pair<Index, Index>; /**< Pair of speaker indices for representing connections */
 
 // system config
 struct SystemConfigs {
