@@ -42,13 +42,19 @@ Otherwise, you can also build it for your own machine.
 #### Dependencies
 
 - Zerr* uses [Conan](https://docs.conan.io/2/tutorial.html) for dependency management, please refer to its documentation for details
-- The core library of Zerr* depends only on [yaml-cpp](https://github.com/jbeder/yaml-cpp) and [fftw3](https://www.fftw.org/). Use the following Conan command to install them
+- The core library of Zerr* depends only on [yaml-cpp](https://github.com/jbeder/yaml-cpp) and [fftw3](https://www.fftw.org/). Both are declared once in the root `conanfile.txt` and resolved into a single shared `build/` folder that every target consumes — the core and Max/MSP via `build/conan_toolchain.cmake`, PureData via `build/conandeps.mk`
 
 ```bash
-conan install . --output-folder=build --build=missing
+# from the repo root; pick the profile matching your host
+conan install . --output-folder=build --build=missing \
+  -pr:h=profiles/macos -pr:b=profiles/macos
 ```
 
-- You can also edit the paths in MakefIle/CMakeLists.txt to point to your own 
+- Committed profiles live in `profiles/` (`macos`, `linux`, `mingw`), so dependency resolution is reproducible instead of depending on each machine's `~/.conan2` default. Recipe revisions are pinned in `conanfile.txt` because both libraries need a ConanCenter revision that supports CMake 4. Read `profiles/macos` before changing either — it records which settings are deliberately *not* pinned, and why
+- The macOS deployment target is set in `core/CMakeLists.txt` (and `maxmsp/CMakeLists.txt`), not via the Conan profile — see the comment in `profiles/macos` for the reasoning
+- `./build.sh` resolves dependencies automatically on first use, so the command above is only needed for a manual or non-default build. `./build.sh deps` re-runs just the resolve step, and `./build.sh -c deps` discards it
+- Conan is only required when dependencies actually need resolving; a tree with a populated `build/` folder still builds without it
+- You can also edit the paths in Makefile/CMakeLists.txt to point to your own 
 
 #### For Puredata
 

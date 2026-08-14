@@ -1,0 +1,17 @@
+# Zerr* Linux build profile.
+#
+# Inherits the machine-detected `default` profile and pins only the build type,
+# so CI and local builds resolve one consistent set of dependency binaries.
+#
+# fPIC is not set here: ConanCenter's fftw and yaml-cpp recipes already default
+# to fPIC=True for static builds (confirmed in the cached packages' conaninfo),
+# and core/CMakeLists.txt sets CMAKE_POSITION_INDEPENDENT_CODE for zerr_core
+# itself, which is what the shared-object wrappers require.
+#
+# See profiles/macos for why compiler.cppstd and compiler.version are inherited
+# rather than pinned.
+
+include(default)
+
+[settings]
+build_type=Release
