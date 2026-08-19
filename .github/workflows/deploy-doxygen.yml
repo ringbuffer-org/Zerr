@@ -40,13 +40,16 @@ jobs:
       - name: Generate documentation
         run: doxygen docs/Doxyfile
 
-      # enablement: true creates the Pages site on first run. The default (false)
-      # only *queries* for an existing site, so on a repository where Pages was
-      # never turned on the action fails with "Get Pages site failed ... HttpError:
-      # Not Found" and every step after it is skipped -- which is exactly what
-      # happened the first time this workflow ran on main. Provisioning here keeps
-      # the deploy self-contained instead of depending on someone having clicked
-      # through repository settings; it uses the `pages: write` scope granted above.
+      # This step currently FAILS, and that is expected -- Pages is deliberately not
+      # enabled for this repository pending the organization owner's approval. See
+      # docs/design/github-pages-deployment.md before trying to fix it.
+      #
+      # `enablement: true` does not rescue it: creating a Pages site requires admin
+      # repository permission, and `administration` is not a scope a workflow's
+      # `permissions:` block can grant to GITHUB_TOKEN, so the call comes back
+      # "Resource not accessible by integration". It is kept only so that no edit is
+      # needed here once Pages is switched on out-of-band -- at which point the
+      # initial Get succeeds and Create is never reached.
       - name: Configure Pages
         uses: actions/configure-pages@v4
         with:
