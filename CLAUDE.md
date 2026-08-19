@@ -102,4 +102,11 @@ YAML files defining speaker positions in Cartesian coordinates (x, y, z). Exampl
 
 - **macOS**: Supports Intel + Apple Silicon (fat binaries with Xcode 12+)
 - **Linux**: Requires `-fPIC` for static library builds
-- **Windows**: MinGW-w64 gcc 13 for PureData; uses the `profiles/mingw` Conan profile
+- **Windows**: MinGW-w64 gcc 13 for PureData; uses the `profiles/mingw` Conan profile. `build.sh`
+  runs from an MSYS2 MINGW64 / Git Bash shell — it pins the `MinGW Makefiles` generator and prefers
+  `mingw32-make`. Max/MSP is not buildable there (`.mxe64` needs MSVC, which cannot link a
+  MinGW-built core); `build.sh maxmsp` refuses with a message
+
+Before changing any `find_package` call, the `CONAN_*` variables in `puredata/Makefile`, or
+`conanfile.txt`, read `docs/design/dependency-fallbacks.md` — it records which non-conan resolve
+routes are viable and what each one breaks (target names, static/shared, deployment target, CMake 4).

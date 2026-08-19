@@ -70,6 +70,29 @@ conan install . --output-folder=build --build=missing \
 ./build.sh -i puredata
 ```
 
+#### On Windows
+
+`build.sh` runs on Windows as well, from an **MSYS2 MINGW64** or Git Bash shell. It detects the host
+and selects `profiles/mingw`, pins CMake to the `MinGW Makefiles` generator — without that, CMake
+picks Visual Studio whenever one is installed and compiles with MSVC against a MinGW toolchain — and
+uses `mingw32-make` in preference to the MSYS `make`. There is no `.bat`/PowerShell equivalent;
+native `cmd.exe` is not supported.
+
+```bash
+# in an MSYS2 MINGW64 shell, with MinGW-w64 gcc 13 on PATH
+./build.sh deps
+./build.sh core
+./build.sh puredata
+```
+
+pd-lib-builder needs to find your Pd installation for `m_pd.h`; set `PDDIR` if it does not locate it
+on its own.
+
+Max/MSP cannot be built on Windows from this script — a `.mxe64` requires an MSVC toolchain, whose
+runtime and C++ ABI cannot link against the MinGW-built `libzerr_core.a` that `profiles/mingw`
+produces. `./build.sh maxmsp` reports this and exits rather than failing inside Min-DevKit. See
+[`docs/design/dependency-fallbacks.md`](docs/design/dependency-fallbacks.md) §3.7.
+
 #### For Jack
 
 ```bash

@@ -40,11 +40,19 @@ check_tool() {
 }
 
 check_tool cmake
-check_tool make
 
 # -----------------------------------------------------------------------------
-# Dependencies (conan, once, at the root)
+# Host platform
 # -----------------------------------------------------------------------------
+# "Windows" here always means an MSYS2 / MinGW64 / Git Bash shell -- that is the
+# only way a bash script runs on Windows, and it is what profiles/mingw targets.
+is_windows() {
+    case "$(uname -s)" in
+        MINGW*|MSYS*|CYGWIN*) return 0 ;;
+        *)                    return 1 ;;
+    esac
+}
+
 # Pick the committed profile matching the host. Each pins the settings that must
 # agree between zerr_core and the wrappers; see profiles/ for the rationale.
 detect_profile() {
@@ -55,6 +63,72 @@ detect_profile() {
         *)                    echo "default" ;;
     esac
 }
+
+# The MinGW-w64 toolchain ships its make as `mingw32-make`. MSYS2 additionally
+# provides a plain `make` built against the MSYS runtime, which is *not* the one
+# that pairs with the mingw compilers. The PureData Windows CI job runs
+# mingw32-make; prefer the same binary, and fall back to `make` where it is all
+# that exists.
+detect_make() {
+    if is_windows && command -v mingw32-make &> /dev/null; then
+        echo "mingw32-make"
+    else
+        echo "make"
+    fi
+}
+
+MAKE="$(detect_make)"
+check_tool "$MAKE"
+
+# CMake on Windows defaults to a Visual Studio generator whenever one is installed,
+# which would compile with MSVC against the gcc/libstdc++ toolchain profiles/mingw
+# resolves -- objects that cannot link together. The core CI job pins the generator
+# for exactly this reason; match it rather than depending on what happens to be
+# installed on the machine.
+CMAKE_GEN_ARGS=()
+CMAKE_GENERATOR_NAME=""
+if is_windows; then
+    CMAKE_GENERATOR_NAME="MinGW Makefiles"
+    CMAKE_GEN_ARGS=(-G "$CMAKE_GENERATOR_NAME")
+fi
+
+# What CMake records in CMakeCache.txt is not the string we handed it. Under
+# MSYS2 / Git Bash, $ROOT comes out of `pwd` as /c/Users/..., and the MSYS layer
+# rewrites the argument to the native C:/Users/... on its way to a native CMake --
+# so comparing the cached CMAKE_TOOLCHAIN_FILE against $TOOLCHAIN verbatim can
+# never match, and every single run would discard the build tree and rebuild the
+# core. Keep $TOOLCHAIN in POSIX form (bash still has to stat it) and compare
+# against the native spelling instead.
+#
+# If cygpath is somehow absent this degrades to the over-eager discard rather than
+# to a wrong build, which is the right way round to fail.
+TOOLCHAIN_CACHE="$TOOLCHAIN"
+if is_windows && command -v cygpath &> /dev/null; then
+    TOOLCHAIN_CACHE="$(cygpath -m "$TOOLCHAIN")"
+fi
+
+# A Max external on Windows is a .mxe64, which Max loads with the MSVC runtime.
+# profiles/mingw resolves gcc/libstdc++11 packages and builds a libzerr_core.a to
+# match, and the two ABIs cannot be linked together -- so there is no way to
+# produce a working .mxe64 from this script's single conan resolve.
+#
+# Checked up front, over the whole target list, rather than inside build_maxmsp:
+# the dispatcher builds the core library before it calls the per-target function,
+# so a guard down there would resolve dependencies and compile the entire core
+# before announcing that it cannot proceed.
+assert_target_supported() {
+    if [ "$1" = "maxmsp" ] && is_windows; then
+        echo "Max/MSP is not buildable on Windows from this script."
+        echo "  A .mxe64 requires an MSVC toolchain and a matching conan profile;"
+        echo "  profiles/mingw produces gcc/libstdc++ objects that cannot link into one."
+        echo "  See docs/design/dependency-fallbacks.md section 3.7."
+        exit 1
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# Dependencies (conan, once, at the root)
+# -----------------------------------------------------------------------------
 
 # Existence is not freshness. A git pull that bumps the pinned recipe revisions in
 # conanfile.txt -- the whole reason those revisions are pinned there -- leaves a
@@ -110,10 +184,18 @@ stale_cache_reason() {
         # build folder, so this cache has that older toolchain baked in.
         echo "it holds a pre-consolidation conan output"
     elif [ -f "$build_dir/CMakeCache.txt" ]; then
-        local cached
+        local cached generator
         cached="$(sed -n 's/^CMAKE_TOOLCHAIN_FILE:[^=]*=//p' "$build_dir/CMakeCache.txt" | head -1)"
-        if [ "$cached" != "$TOOLCHAIN" ]; then
+        generator="$(sed -n 's/^CMAKE_GENERATOR:[^=]*=//p' "$build_dir/CMakeCache.txt" | head -1)"
+        if [ "$cached" != "$TOOLCHAIN_CACHE" ]; then
             echo "it was configured with ${cached:-<no toolchain>}"
+        elif [ -n "$CMAKE_GENERATOR_NAME" ] && [ "$generator" != "$CMAKE_GENERATOR_NAME" ]; then
+            # Passing -G to a build directory whose cache names a different generator
+            # is a hard CMake error, not a warning. The case that matters: a cache
+            # written before this script pinned "MinGW Makefiles", when CMake picked
+            # Visual Studio on its own. Discard it like any other disagreement rather
+            # than making the user delete it by hand.
+            echo "it was configured with the ${generator:-<unknown>} generator"
         elif [ -f "$TOOLCHAIN" ] && [ "$TOOLCHAIN" -nt "$build_dir/CMakeCache.txt" ]; then
             # The toolchain's *contents* changed since this cache was written -- a
             # re-resolve with different profile settings, for instance. The toolchain
@@ -145,7 +227,7 @@ build_core() {
     reconfigure_if_stale "$ROOT/core/build"
 
     echo "Building zerr core library..."
-    cmake -S "$ROOT/core" -B "$ROOT/core/build" \
+    cmake -S "$ROOT/core" -B "$ROOT/core/build" "${CMAKE_GEN_ARGS[@]}" \
         -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
         -DCMAKE_BUILD_TYPE=Release
     cmake --build "$ROOT/core/build"
@@ -190,11 +272,11 @@ build_puredata() {
     echo "Building Zerr* for Pure Data..."
     cd "$ROOT/puredata" || { echo "Failed to enter 'puredata' directory"; exit 1; }
 
-    make
+    "$MAKE"
 
     if [ "$install" = true ]; then
         echo "Installing Pure Data build..."
-        make install
+        "$MAKE" install
     fi
 
     cd "$ROOT" || exit 1
@@ -204,11 +286,12 @@ build_puredata() {
 
 # -----------------------------------------------------------------------------
 build_maxmsp() {
+    # Windows is rejected by assert_target_supported before any build starts.
     ensure_deps
     reconfigure_if_stale "$ROOT/maxmsp/build"
 
     echo "Building Zerr* for Max/MSP..."
-    cmake -S "$ROOT/maxmsp" -B "$ROOT/maxmsp/build" \
+    cmake -S "$ROOT/maxmsp" -B "$ROOT/maxmsp/build" "${CMAKE_GEN_ARGS[@]}" \
         -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
         -DCMAKE_BUILD_TYPE=Release
     cmake --build "$ROOT/maxmsp/build"
@@ -257,7 +340,7 @@ clean_puredata() {
     # Subshell so the cd cannot leak, and `|| true` because `set -e` would abort the
     # whole script -- skipping any remaining targets -- if `make clean` failed (it
     # needs the pd-lib-builder submodule checked out).
-    ( cd "$ROOT/puredata" && make clean >/dev/null 2>&1 ) || true
+    ( cd "$ROOT/puredata" && "$MAKE" clean >/dev/null 2>&1 ) || true
     echo "PureData cleaned."
 }
 
@@ -287,6 +370,8 @@ for target in "$@"; do
             exit 1
             ;;
     esac
+    # Cleaning an unsupported target is still fine -- it is only ever an rm -rf.
+    [ "$clean" = true ] || assert_target_supported "$target"
 done
 
 # Clean or build the requested targets

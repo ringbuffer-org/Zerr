@@ -127,7 +127,24 @@ It is **53 commits behind** and touches precisely the files `core_modernization`
 conflict throughout. This needs **re-application, not a merge**, and it is the work most likely to
 be silently lost.
 
-> **Status: re-applied by hand** — see §4. The branch itself can now be deleted.
+> **Status: partly re-applied by hand, remainder declined.**
+>
+> - The conanfile consolidation and the generic `puredata/Makefile` paths were re-applied — see §4.
+> - The **root `CMakeLists.txt` + `puredata/CMakeLists.txt` superbuild** was assessed and
+>   **declined**. It was considered as a way to widen platform coverage and cannot do that: the Pd
+>   path is a Makefile needing `mingw32-make`, which breaks under an MSVC generator, and a Windows
+>   Max external needs MSVC, which cannot share one CMake configure with a MinGW-built core. One
+>   configure means one toolchain. Its remaining value was IDE integration, which did not justify a
+>   second build entry point beside `build.sh`.
+> - The **`USE_SYSTEM_DEPS` / `find_package_with_help` fallback** was **declined** and replaced by
+>   [`dependency-fallbacks.md`](dependency-fallbacks.md), which records which non-conan routes are
+>   viable and what each one breaks. An untested second resolve path reintroduces exactly the ABI
+>   split §4 closes.
+> - Note the branch also carries two regressions against `core_modernization`: unpinned recipe
+>   revisions in `conanfile.txt` (breaks under CMake 4, see §4) and
+>   `CMAKE_OSX_DEPLOYMENT_TARGET "13.3"` in `maxmsp/CMakeLists.txt` against 10.13 everywhere else.
+>
+> Nothing further is owed to the branch; it can be deleted.
 
 ### 2.4 The JACK target is dead code but still advertised
 
