@@ -24,9 +24,9 @@
  * @brief Main data structure for the mc.zerr.envelopes~ object
  */
 typedef struct _zerr_envelopes {
-    t_pxobject x_obj; ///< DSP object header (must be first)
+    t_pxobject x_obj;   ///< DSP object header (must be first)
     long channel_count; ///< Channel count of multichannel signal
-    ZerrEnvelopes* ze; ///< Pointer to the zerr_envelopes implementation
+    ZerrEnvelopes* ze;  ///< Pointer to the zerr_envelopes implementation
 } t_zerr_envelopes;
 
 //------------------------------------------------------------------------------
@@ -36,8 +36,11 @@ typedef struct _zerr_envelopes {
 void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv);
 void zerr_envelopes_free(t_zerr_envelopes* x);
 void zerr_envelopes_assist(t_zerr_envelopes* x, void* b, long m, long a, char* s);
-void zerr_envelopes_dsp64(t_zerr_envelopes* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags);
-void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam);
+void zerr_envelopes_dsp64(t_zerr_envelopes* x, t_object* dsp64, short* count, double samplerate,
+                          long maxvectorsize, long flags);
+void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins, long numins,
+                              double** outs, long numouts, long sampleframes, long flags,
+                              void* userparam);
 long zerr_envelopes_multichanneloutputs(t_zerr_envelopes* x, long outletindex);
 //------------------------------------------------------------------------------
 void zerr_envelopes_bang(t_zerr_envelopes* x);
@@ -59,18 +62,14 @@ C74_EXPORT void ext_main(void* r)
 {
     t_class* c;
 
-    c = class_new("mc.zerr.envelopes~",
-        (method)zerr_envelopes_new,
-        (method)zerr_envelopes_free,
-        sizeof(t_zerr_envelopes),
-        0L,
-        A_GIMME,
-        0);
+    c = class_new("mc.zerr.envelopes~", (method)zerr_envelopes_new, (method)zerr_envelopes_free,
+                  sizeof(t_zerr_envelopes), 0L, A_GIMME, 0);
 
     // Register methods
     class_addmethod(c, (method)zerr_envelopes_dsp64, "dsp64", A_CANT, 0);
     class_addmethod(c, (method)zerr_envelopes_assist, "assist", A_CANT, 0);
-    class_addmethod(c, (method)zerr_envelopes_multichanneloutputs, "multichanneloutputs", A_CANT, 0);
+    class_addmethod(c, (method)zerr_envelopes_multichanneloutputs, "multichanneloutputs", A_CANT,
+                    0);
     class_addmethod(c, (method)zerr_envelopes_bang, "bang", 0);
     class_addmethod(c, (method)zerr_envelopes_active, "active", A_GIMME, 0);
     class_addmethod(c, (method)zerr_envelopes_curr, "curr", A_GIMME, 0);
@@ -105,7 +104,7 @@ void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
         return NULL;
 
     // Initialize default values -----------------------------------------------
-    x->ze = NULL;
+    x->ze            = NULL;
     x->channel_count = 1; // Default 1 channel output for the multichannel outlet
 
     // Parsing arguments -------------------------------------------------------
@@ -114,7 +113,7 @@ void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
     }
 
     // Process argument 1: mode
-    t_symbol* arg1 = atom_getsym(argv);
+    t_symbol* arg1   = atom_getsym(argv);
     const char* mode = arg1->s_name;
 
     // Process argument 2: relative path of the speaker configuration file
@@ -125,10 +124,10 @@ void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
 
     // Find the absolute path of configuration file ----------------------------
     bool yaml_found = false;
-    size_t len = strlen(file_path->s_name);
+    size_t len      = strlen(file_path->s_name);
 
     t_symbol* absolute_path = NULL;
-    t_fourcc file_types[] = { 'TEXT', 'YAML' };
+    t_fourcc file_types[]   = {'TEXT', 'YAML'};
     t_max_err err;
 
     char* unix_path = NULL;
@@ -144,7 +143,7 @@ void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
 
     // Check if path already has .yaml or .yml extension
     bool has_yaml_ext = (len > 5 && strcmp(file_path->s_name + len - 5, ".yaml") == 0);
-    bool has_yml_ext = (len > 4 && strcmp(file_path->s_name + len - 4, ".yml") == 0);
+    bool has_yml_ext  = (len > 4 && strcmp(file_path->s_name + len - 4, ".yml") == 0);
 
     if (has_yaml_ext || has_yml_ext) {
         err = path_absolutepath(&absolute_path, file_path, file_types, 2);
@@ -196,18 +195,37 @@ void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
     }
 
     if (!yaml_found) {
-        object_error((t_object*)x, "Cannot find YAML file: %s (tried as-is, with .yaml, and with .yml)", file_path->s_name);
-        object_free(x); // temporary solution
+        object_error((t_object*)x,
+                     "Cannot find YAML file: %s (tried as-is, with .yaml, and with .yml)",
+                     file_path->s_name);
         return NULL;
     }
 
     // create & initialize ZerrEnvelopes instance ------------------------------
-    x->ze = new ZerrEnvelopes(sys_getsr(), sys_getblksize(), mode, unix_path);
-    if (!x->ze)
-        return NULL;
+    // The constructor calls zerr::parseGenMode(), which throws on an unknown mode
+    // argument. An exception must never escape into Max's C call stack: it would
+    // reach std::terminate and abort the host. Report and return NULL instead.
+    //
+    // Return NULL rather than object_free(x): object_free reaches zerr_envelopes_free,
+    // which calls dsp_free() -- but dsp_setup() does not run until further down, and
+    // MSP requires those two to be paired. This path is one typo in the mode argument
+    // away for any user, so it has to be the safe kind of failure. Leaving x for Max
+    // to reclaim is what every other early return in this function already does.
+    // x->ze is NULL until the assignment below, so the delete in the catch is correct
+    // whether the throw came from the constructor or from initialize().
+    try {
+        x->ze = new ZerrEnvelopes(sys_getsr(), sys_getblksize(), mode, unix_path);
 
-    if (!x->ze->initialize()) {
+        if (!x->ze->initialize()) {
+            delete x->ze;
+            x->ze = NULL;
+            return NULL;
+        }
+    }
+    catch (const std::exception& e) {
+        object_error((t_object*)x, "mc.zerr.envelopes~: %s", e.what());
         delete x->ze;
+        x->ze = NULL;
         return NULL;
     }
 
@@ -241,7 +259,8 @@ void zerr_envelopes_assist(t_zerr_envelopes* x, void* b, long m, long a, char* s
 {
     if (m == ASSIST_INLET) {
         strcpy(s, "(signal) Input source signal");
-    } else if (m == ASSIST_OUTLET) {
+    }
+    else if (m == ASSIST_OUTLET) {
         strcpy(s, "(multichannel signal) Output envelopes");
     }
 }
@@ -259,12 +278,15 @@ long zerr_envelopes_multichanneloutputs(t_zerr_envelopes* x, long outletindex)
 // DSP Methods
 //------------------------------------------------------------------------------
 
-void zerr_envelopes_dsp64(t_zerr_envelopes* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags)
+void zerr_envelopes_dsp64(t_zerr_envelopes* x, t_object* dsp64, short* count, double samplerate,
+                          long maxvectorsize, long flags)
 {
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_envelopes_perform64, 0, NULL);
 }
 
-void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam)
+void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins, long numins,
+                              double** outs, long numouts, long sampleframes, long flags,
+                              void* userparam)
 {
     x->ze->perform(ins, numins, outs, numouts, sampleframes);
 }
@@ -294,7 +316,7 @@ void zerr_envelopes_active(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom
         return;
     }
 
-    action = atom_getsym(argv);
+    action      = atom_getsym(argv);
     index_count = argc - 1;
 
     indices = (int*)sysmem_newptr(index_count * sizeof(int));
@@ -306,9 +328,11 @@ void zerr_envelopes_active(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom
     for (i = 0; i < index_count; i++) {
         if (atom_gettype(argv + i + 1) == A_LONG) {
             indices[i] = (int)atom_getlong(argv + i + 1);
-        } else if (atom_gettype(argv + i + 1) == A_FLOAT) {
+        }
+        else if (atom_gettype(argv + i + 1) == A_FLOAT) {
             indices[i] = (int)atom_getfloat(argv + i + 1);
-        } else {
+        }
+        else {
             object_error((t_object*)x, "active: index %ld must be a number", i + 1);
             sysmem_freeptr(indices);
             return;
@@ -338,9 +362,11 @@ void zerr_envelopes_curr(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
 
     if (atom_gettype(argv) == A_LONG) {
         speaker_index = atom_getlong(argv);
-    } else if (atom_gettype(argv) == A_FLOAT) {
+    }
+    else if (atom_gettype(argv) == A_FLOAT) {
         speaker_index = (long)atom_getfloat(argv);
-    } else {
+    }
+    else {
         object_error((t_object*)x, "current_speaker: argument must be a number");
         return;
     }
@@ -371,7 +397,7 @@ void zerr_envelopes_topo(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
         return;
     }
 
-    action = atom_getsym(argv);
+    action      = atom_getsym(argv);
     index_count = argc - 1;
 
     indices = (int*)sysmem_newptr(index_count * sizeof(int));
@@ -383,9 +409,11 @@ void zerr_envelopes_topo(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
     for (i = 0; i < index_count; i++) {
         if (atom_gettype(argv + i + 1) == A_LONG) {
             indices[i] = (int)atom_getlong(argv + i + 1);
-        } else if (atom_gettype(argv + i + 1) == A_FLOAT) {
+        }
+        else if (atom_gettype(argv + i + 1) == A_FLOAT) {
             indices[i] = (int)atom_getfloat(argv + i + 1);
-        } else {
+        }
+        else {
             object_error((t_object*)x, "topomatrix: index %ld must be a number", i + 1);
             sysmem_freeptr(indices);
             return;
@@ -423,9 +451,11 @@ void zerr_envelopes_traj(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
     for (i = 0; i < argc; i++) {
         if (atom_gettype(argv + i) == A_LONG) {
             indices[i] = (int)atom_getlong(argv + i);
-        } else if (atom_gettype(argv + i) == A_FLOAT) {
+        }
+        else if (atom_gettype(argv + i) == A_FLOAT) {
             indices[i] = (int)atom_getfloat(argv + i);
-        } else {
+        }
+        else {
             object_error((t_object*)x, "trajectory: index %ld must be a number", i);
             sysmem_freeptr(indices);
             return;
@@ -455,9 +485,11 @@ void zerr_envelopes_interval(t_zerr_envelopes* x, t_symbol* msg, long argc, t_at
 
     if (atom_gettype(argv) == A_FLOAT) {
         interval = atom_getfloat(argv);
-    } else if (atom_gettype(argv) == A_LONG) {
+    }
+    else if (atom_gettype(argv) == A_LONG) {
         interval = (double)atom_getlong(argv);
-    } else {
+    }
+    else {
         object_error((t_object*)x, "trigger_interval: argument must be a number");
         return;
     }
@@ -470,7 +502,4 @@ void zerr_envelopes_interval(t_zerr_envelopes* x, t_symbol* msg, long argc, t_at
  * @param x Pointer to the t_zerr_envelopes object.
  * @param s Unused symbol parameter.
  */
-void zerr_envelopes_print(t_zerr_envelopes* x)
-{
-    x->ze->printParameters();
-}
+void zerr_envelopes_print(t_zerr_envelopes* x) { x->ze->printParameters(); }

@@ -10,6 +10,11 @@ on:
       - "docs/**"
 
 permissions:
+  # Specifying any permissions sets every unlisted scope to `none`, so
+  # actions/checkout needs contents: read stated explicitly -- without it the
+  # checkout has no repo read scope and the deploy breaks the moment the repo is
+  # private or default token permissions tighten.
+  contents: read
   pages: write
   id-token: write
 

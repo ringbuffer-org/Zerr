@@ -56,13 +56,15 @@ jobs:
 
       - name: Set up Conan
         run: |
-          pip install conan
+          pip install "conan>=2.13,<3"
           conan profile detect
 
+      # Resolved at the repo root so this wrapper and zerr_core share one profile;
+      # puredata/Makefile reads ../build/conandeps.mk by default.
       - name: Configure Conan
-        working-directory: puredata
         run: |
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build --build=missing \
+            -pr:h=profiles/macos -pr:b=profiles/macos
 
       - name: Build & Install
         working-directory: puredata
@@ -108,13 +110,13 @@ jobs:
 
       - name: Set up Conan
         run: |
-          pip install conan
+          pip install "conan>=2.13,<3"
           conan profile detect
 
       - name: Configure Conan
-        working-directory: puredata
         run: |
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build --build=missing \
+            -pr:h=profiles/linux -pr:b=profiles/linux
 
       - name: Build & Install
         working-directory: puredata
@@ -220,14 +222,13 @@ jobs:
 
       - name: Set up Conan
         run: |
-          pip install conan
+          pip install "conan>=2.13,<3"
           conan profile detect --force
 
+      # mingw-profile.txt moved to profiles/mingw alongside the other profiles.
       - name: Install Dependencies
-        working-directory: puredata
         run: |
-          mkdir build
-          conan install . -pr:h=./mingw-profile.txt -pr:b=./mingw-profile.txt --output-folder=build --build=missing
+          conan install . -pr:h=profiles/mingw -pr:b=profiles/mingw --output-folder=build --build=missing
 
       - name: Build External
         shell: bash

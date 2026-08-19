@@ -12,8 +12,11 @@
 #include <stdlib.h>
 
 ZerrFeatures::ZerrFeatures(zerr::SystemConfigs sys_cnfg, zerr::FeatureNames ft_names)
-    : input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)),
-      featureNames(std::move(ft_names))
+    // Order matches the declaration order in zerr_features.h (featureNames precedes
+    // input_buffer); initializers run in declaration order regardless, so listing
+    // them out of order only produces a -Wreorder-ctor warning.
+    : featureNames(std::move(ft_names)),
+      input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f))
 {
     bank = new zerr::FeatureBank();
 

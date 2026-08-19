@@ -16,12 +16,32 @@ ZERR_INCLUDES  := -I$(ZERR_CORE_DIR)/include/utils \
 #############################################################
 # CONAN DEPENDENCIES
 #############################################################
-# Guard: ensure conan dependencies are available
-ifeq ($(wildcard build/conandeps.mk),)
-    $(error build/conandeps.mk not found — run 'conan install . --output-folder=build --build=missing' first)
-endif
+# Dependencies are resolved once at the repo root (see /conanfile.txt) so that
+# this wrapper and zerr_core are built against one identical profile. Override
+# ZERR_CONAN_DIR if the conan output folder lives elsewhere.
+ZERR_CONAN_DIR ?= ../build
 
-include build/conandeps.mk
+# Guard: ensure conan dependencies are available before building.
+#
+# $(error) fires while the makefile is being parsed, i.e. for *every* goal, so an
+# unconditional guard makes `make clean` fail too whenever the dependencies are
+# absent -- which is exactly the state you are in after removing them. Cleaning
+# must not require them, so the guard is skipped for clean-only invocations.
+#
+# "Clean-only" means every named goal needs no dependencies -- not merely that one
+# of them does. A plain `$(filter clean,...)` also matches `make clean all`, which
+# would then build with the CONAN_* variables empty: `-I$(CONAN_INCLUDE_DIRS_YAML_CPP)`
+# collapses to a bare `-I` that swallows the flag behind it, and `-l$(CONAN_LIBS_YAML_CPP)`
+# to a bare `-l`, trading this message for a cryptic compiler error. An empty goal
+# list means the default target, which does need them.
+NODEPS_GOALS := clean
+CLEAN_ONLY   := $(if $(MAKECMDGOALS),$(if $(filter-out $(NODEPS_GOALS),$(MAKECMDGOALS)),,yes))
+
+ifneq ($(wildcard $(ZERR_CONAN_DIR)/conandeps.mk),)
+    include $(ZERR_CONAN_DIR)/conandeps.mk
+else ifeq ($(CLEAN_ONLY),)
+    $(error $(ZERR_CONAN_DIR)/conandeps.mk not found — from the repo root run: conan install . --output-folder=build --build=missing -pr:h=profiles/<macos|linux|mingw> -pr:b=profiles/<macos|linux|mingw>)
+endif
 
 #############################################################
 # COMPILER & LINKER FLAGS
@@ -52,7 +72,8 @@ zerr_features~.class.sources   += src/zerr_features.cpp
 # class specific dependencies
 zerr_features~.class.ldflags += -L$(CONAN_LIB_DIRS_FFTW)
 zerr_features~.class.ldlibs += -lfftw3
-zerr_envelopes~.class.ldlibs += -lyaml-cpp
+# yaml-cpp is already in the library-wide ldlibs above; repeating it here made the
+# linker report "ignoring duplicate libraries: '-lyaml-cpp'".
 
 # add library data files
 datafiles += LICENSE
