@@ -2,6 +2,16 @@ name: build zerr-core static library
 
 on:
   workflow_dispatch:
+  # Deliberately unfiltered, unlike the push trigger below: a pull request should
+  # be gated on the core still building regardless of which directory it touched.
+  # Nothing ran on PRs #13-#16 at all, so they merged on manual dispatch alone.
+  #
+  # Only this workflow gains the trigger for now. The PureData workflow takes its
+  # core artifact from `workflow_run`, so on a pull_request event its CORE_RUN_ID
+  # would be empty and it would fail at its own guard; the Doxygen deploy fails by
+  # design pending the org owner, and would paint every PR red. Both are addressed
+  # by the ci.yml restructure that follows this change.
+  pull_request:
   push:
     branches:
       - main
