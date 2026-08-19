@@ -4,13 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string CrestFactor::name = "Crest Factor";
-const std::string CrestFactor::category = "Time-Domain";
-const std::string CrestFactor::description =
-    "Crest Factor is a parameter used in signal processing and audio "
-    "engineering to describe the characteristics of a waveform. It is defined "
-    "as the ratio of the peak value of a waveform to its RMS (Root Mean "
-    "Square) value. ";
+CrestFactor::CrestFactor() {}
 
 void CrestFactor::initialize(SystemConfigs sys_cfg)
 {
@@ -18,29 +12,27 @@ void CrestFactor::initialize(SystemConfigs sys_cfg)
 
     _reset_param();
 
-    if (is_initialized() == false)
-    {
-        set_initialize_statue(true);
+    if (is_initialized() == false) {
+        set_initialize_status(true);
     }
 }
 
 void CrestFactor::extract()
 {
-    double square_sum = 0.0;
+    double square_sum  = 0.0;
     double square_root = 0.0;
-    double peak_max = 0.0;
-    double peak_tmp = 0.0;
-    int x_size = x.size();
+    double peak_max    = 0.0;
+    double peak_tmp    = 0.0;
+    int x_size         = x.size();
 
-    for (int i = 0; i < x_size; ++i)
-    {
+    for (int i = 0; i < x_size; ++i) {
         square_sum += x[i] * x[i];
 
         peak_tmp = abs(x[i]);
         peak_max = peak_tmp > peak_max ? peak_tmp : peak_max;
     }
 
-    square_sum = square_sum / x_size;
+    square_sum  = square_sum / x_size;
     square_root = std::sqrt(square_sum);
 
     crr_y = peak_max / square_root;
@@ -48,9 +40,9 @@ void CrestFactor::extract()
 
 void CrestFactor::reset() { _reset_param(); }
 
-void CrestFactor::fetch(AudioInputs in)
+void CrestFactor::fetch(const AudioInputs& in)
 {
-    x = in.wave;
+    x     = in.wave;
     prv_y = crr_y;
 }
 
@@ -58,8 +50,7 @@ FeatureVals CrestFactor::send()
 {
     linear_interpolator.set_value(prv_y, crr_y, system_configs.block_size);
 
-    for (size_t i = 0; i < system_configs.block_size; ++i)
-    {
+    for (size_t i = 0; i < system_configs.block_size; ++i) {
         y[i] = linear_interpolator.get_value();
         linear_interpolator.next_step();
     }

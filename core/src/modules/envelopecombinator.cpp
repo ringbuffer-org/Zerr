@@ -20,9 +20,8 @@ EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, SystemConf
     numInlet  = numSource * numChannel;
     numOutlet = numChannel;
 
-    logger = new Logger();
 #ifdef TESTMODE
-    logger->setLogLevel(LogLevel::INFO);
+    logger.setLogLevel(LogLevel::INFO);
 #endif // TESTMODE
 }
 
@@ -41,7 +40,7 @@ bool EnvelopeCombinator::initialize()
         processFunc = &EnvelopeCombinator::_process_max;
     }
     else {
-        logger->logError("EnvelopeCombinator::initialize Unknown combination mode: " + combMode);
+        logger.logError("EnvelopeCombinator::initialize Unknown combination mode: " + combMode);
         return false;
     }
 
@@ -82,7 +81,7 @@ void EnvelopeCombinator::_process_root()
         buffer.assign(buffer.size(), 0.0f);
     }
 
-    double exponent = 1.0 / (double)numSource;
+    double exponent = 1.0 / static_cast<double>(numSource);
     Sample multi_tmp;
     for (int i = 0; i < numChannel; ++i) {
         // TODO: use systemcfg.block_size could cause bug(sometimes smaller)
@@ -116,5 +115,3 @@ void EnvelopeCombinator::_process_max()
         }
     }
 }
-
-EnvelopeCombinator::~EnvelopeCombinator() { delete logger; }

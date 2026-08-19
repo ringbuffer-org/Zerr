@@ -1,0 +1,53 @@
+name: Deploy Doxygen documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "core/include/**"
+      - "docs/**"
+
+permissions:
+  # Specifying any permissions sets every unlisted scope to `none`, so
+  # actions/checkout needs contents: read stated explicitly -- without it the
+  # checkout has no repo read scope and the deploy breaks the moment the repo is
+  # private or default token permissions tighten.
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install Doxygen
+        run: sudo apt-get install -y doxygen
+
+      - name: Generate documentation
+        run: doxygen docs/Doxyfile
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build/html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

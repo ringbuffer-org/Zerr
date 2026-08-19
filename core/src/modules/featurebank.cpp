@@ -23,38 +23,35 @@ void FeatureBank::print_all_features()
 void FeatureBank::print_active_features()
 {
     std::cout << "All activated features: " << std::endl;
-    for (size_t i = 0; i < activated_features.size(); ++i) {
-        std::cout << "  -Name: " << activated_features[i]->get_name() << std::endl;
-        std::cout << "  -Category: " << activated_features[i]->get_category() << std::endl;
-        std::cout << "  -Description: " << activated_features[i]->get_description() << std::endl;
-        std::cout << std::endl;
+    for (const auto& name : active_feature_names) {
+        std::cout << "  -Name: " << name << std::endl;
     }
 }
 
 void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs system_configs)
 {
-    for (auto name : feature_names) {
+    active_feature_names = feature_names;
+    for (const auto& name : feature_names) {
         activated_features.push_back(_create(name));
     }
 
     n_features = activated_features.size();
-    for (int i = 0; i < n_features; ++i) {
-        activated_features[i]->initialize(system_configs);
+    for (auto& feature : activated_features) {
+        feature->initialize(system_configs);
     }
     y.resize(activated_features.size());
 
     x.wave.resize(AUDIO_BUFFER_SIZE);
 }
 
-FeaturesVals FeatureBank::perform(Block in)
+FeaturesVals FeatureBank::perform(Samples in)
 {
     // fetch
     Sample* buf_ptr = nullptr;
     size_t buf_len;
     ring_buffer.enqueue(in);
 
-    x.block.clear();
-    x.block = in;
+    x.block = std::move(in);
 
     buf_ptr = x.wave.data();
     buf_len = x.wave.size();
@@ -69,7 +66,6 @@ FeaturesVals FeatureBank::perform(Block in)
     x.spec = freq_transformer.get_power_spectrum();
 
     // process:
-    // TODO: use multi-thread
     for (size_t i = 0; i < activated_features.size(); ++i) {
         activated_features[i]->fetch(x);
         activated_features[i]->extract();

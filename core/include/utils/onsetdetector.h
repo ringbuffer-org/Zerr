@@ -53,7 +53,7 @@ class OnsetDetector {
      * Analyzes a block of audio samples to detect onset events by comparing
      * consecutive samples and identifying significant amplitude increases.
      */
-    void detectOnsetInBlock(Block& block);
+    void detectOnsetInBlock(Samples& block);
 
   private:
     int lastSample;        ///< Previous sample value for amplitude comparison

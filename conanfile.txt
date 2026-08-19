@@ -1,0 +1,34 @@
+# Single source of truth for Zerr*'s external dependencies.
+#
+# Previously core/, puredata/ and maxmsp/ each carried an identical [requires]
+# block and ran their own `conan install`. Three independent installs meant three
+# independent profile resolutions, which is how the core came to be compiled for a
+# different macOS deployment target than the wrappers linked against.
+#
+# One install at the repo root, consumed by all three targets:
+#   core, maxmsp  -> build/conan_toolchain.cmake  (CMakeToolchain + CMakeDeps)
+#   puredata      -> build/conandeps.mk           (MakeDeps, for pd-lib-builder)
+#
+#   conan install . --output-folder=build --build=missing -pr:h=profiles/macos -pr:b=profiles/macos
+
+# Recipe revisions are pinned deliberately. Both libraries ship a bundled
+# CMakeLists.txt with `cmake_minimum_required` below 3.5 (fftw 3.0, yaml-cpp 3.4),
+# and CMake 4.x removed that compatibility -- so building either from source with
+# CMake 4 fails at configure time with "Compatibility with CMake < 3.5 has been
+# removed". The revisions below are the ConanCenter ones that set
+# `CMAKE_POLICY_VERSION_MINIMUM=3.5` as a cache variable, which is the only
+# placement that works (line 1 runs before the toolchain file is loaded).
+#
+# Pinned rather than floating so a `conan install` cannot silently pick up a
+# revision that regresses this. To move them, check the candidate revision with:
+#   conan list "<name>/<version>#*" -r=conancenter
+#   grep POLICY_VERSION_MINIMUM "$(conan cache path <name>/<version>#<rev>)/conanfile.py"
+
+[requires]
+fftw/3.3.10#3b4cceb8283a56cac30946c1b6f57bf8
+yaml-cpp/0.8.0#1aa371213f0307605d88ad5445581aff
+
+[generators]
+CMakeDeps
+CMakeToolchain
+MakeDeps

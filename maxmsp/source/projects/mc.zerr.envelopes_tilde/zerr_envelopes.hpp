@@ -13,13 +13,15 @@
 
 /**
  * @class ZerrEnvelopes
- * @brief Main wrapper class that interfaces between Max/MSP and the core multi-channel envelope generation functionality
+ * @brief Main wrapper class that interfaces between Max/MSP and the core multi-channel envelope
+ * generation functionality
  *
- * This class handles the initialization, audio processing, and cleanup of audio feature extraction operations.
- * It manages the data flow between Max/MSP's audio system and the internal feature processing chain.
+ * This class handles the initialization, audio processing, and cleanup of audio feature extraction
+ * operations. It manages the data flow between Max/MSP's audio system and the internal feature
+ * processing chain.
  */
 class ZerrEnvelopes {
- public:
+  public:
     /**
      * @brief Creates a new ZerrEnvelopes instance
      * @param sampleRate The audio sample rate in Hz
@@ -34,15 +36,15 @@ class ZerrEnvelopes {
         }
         , selectionMode { selectionMode }
         , spkrCfgFile { spkrCfgFile }
-        , generator { std::make_unique<zerr::EnvelopeGenerator>(systemConfigs, spkrCfgFile, selectionMode) }
+        , generator { std::make_unique<zerr::EnvelopeGenerator>(systemConfigs, spkrCfgFile, zerr::parseGenMode(selectionMode)) }
     {
     }
 
     // Disable copying but allow moving
-    ZerrEnvelopes(const ZerrEnvelopes&) = delete;
+    ZerrEnvelopes(const ZerrEnvelopes&)            = delete;
     ZerrEnvelopes& operator=(const ZerrEnvelopes&) = delete;
-    ZerrEnvelopes(ZerrEnvelopes&&) = default;
-    ZerrEnvelopes& operator=(ZerrEnvelopes&&) = default;
+    ZerrEnvelopes(ZerrEnvelopes&&)                 = default;
+    ZerrEnvelopes& operator=(ZerrEnvelopes&&)      = default;
 
     /**
      * @brief Initializes all internal components and prepares the object for processing
@@ -58,9 +60,7 @@ class ZerrEnvelopes {
 
         // assgin Max/MSP print method the the logger function
         // Because we want to see logs in the PD log window
-        auto printFunc = [](const std::string& msg) {
-            post(msg.c_str());
-        };
+        auto printFunc = [](const std::string& msg) { post(msg.c_str()); };
         generator->setPrinter(printFunc);
 
         outputCount = generator->getNumSpeakers();
@@ -76,7 +76,7 @@ class ZerrEnvelopes {
      * @brief Main DSP callback function that processes audio buffers
      * @param ins Array of pointers to input audio buffers
      * @param numins Number of input channels
-     * @param outs Array of pointers to output audio buffers  
+     * @param outs Array of pointers to output audio buffers
      * @param numouts Number of output channels
      * @param sampleframes Number of samples to process
      * @throws std::invalid_argument if buffer pointers or sizes are invalid
@@ -176,22 +176,21 @@ class ZerrEnvelopes {
     /**
      * @brief Prints current parameters to the console
      */
-    void printParameters()
-    {
-        generator->printParameters();
-    }
+    void printParameters() { generator->printParameters(); }
 
- private:
-    static constexpr int inputCount = 3; /**< Number of signal inlets: main(0), spread(1), volume(2) */
+  private:
+    static constexpr int inputCount =
+        3;               /**< Number of signal inlets: main(0), spread(1), volume(2) */
     int outputCount = 0; /**< Number of signal outlets based on the loudspeaker setup */
 
     zerr::SystemConfigs systemConfigs; /**< System configuration: sample rate and block size */
 
-    zerr::Blocks inputBuffer; /**< Multi-channel buffer for storing incoming audio samples */
+    zerr::Blocks inputBuffer;  /**< Multi-channel buffer for storing incoming audio samples */
     zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing envelope outputs */
 
-    std::unique_ptr<zerr::EnvelopeGenerator> generator; /**< Core component that implements envelope generation logic */
+    std::unique_ptr<zerr::EnvelopeGenerator>
+        generator; /**< Core component that implements envelope generation logic */
 
-    std::string spkrCfgFile; /**< Path to speaker configuration YAML file */
+    std::string spkrCfgFile;   /**< Path to speaker configuration YAML file */
     std::string selectionMode; /**< Envelope generation mode: "trajectory" or "trigger" */
 };

@@ -7,6 +7,32 @@ add_definitions(-DYAML_CPP_STATIC_DEFINE)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Pin the macOS deployment target, matching maxmsp/CMakeLists.txt's approach.
+#
+# Without this the core compiles against the host SDK while the wrappers link at
+# a much older floor -- measured before the fix: libzerr_core.a at `minos 15.0`
+# inside a zerr_features~.pd_darwin declaring `minos 11.0`. Nothing in the core
+# uses availability-gated libc++ today (no <filesystem>, <charconv>, <format>),
+# so that was latent rather than broken -- but at a 15.0 target the compiler would
+# silently accept a newer-only API and ship an external that fails on older macs.
+#
+# 10.13 is the project's single declared floor: it is what maxmsp/CMakeLists.txt
+# pins and what the PureData macOS CI job passes as -mmacosx-version-min. Do not
+# raise it here in isolation -- on arm64 clang clamps any lower value up to 11.0
+# (arm64's own floor), so 10.13 and 11.0 are indistinguishable on Apple Silicon,
+# but on an Intel or fat build a core pinned to 11.0 against wrappers at 10.13
+# reintroduces the very object-version mismatch this is meant to remove, just in
+# the opposite direction. One floor, stated in each place that needs it.
+#
+# Deliberately set here rather than via `os.version` in the Conan profile:
+# os.version is part of the package_id, so pinning it there means no ConanCenter
+# prebuilt ever matches and every dependency is rebuilt from source, in CI too.
+# See profiles/macos and docs/design/repo-audit-2026-07-30.md.
+if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "macOS deployment target" FORCE)
+    message(STATUS "CMAKE_OSX_DEPLOYMENT_TARGET set to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+endif()
+
 # find packages
 find_package(FFTW3 REQUIRED)
 find_package(yaml-cpp REQUIRED)

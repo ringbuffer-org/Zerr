@@ -10,25 +10,43 @@ Reference paper: "Autogenous Spatialization for Arbitrary Loudspeaker Setups" (I
 
 ## Build Commands
 
+### Dependencies (resolved once, at the repo root)
+
+Declared in the root `conanfile.txt` and installed into a single shared `build/` folder that every
+target consumes: core and Max/MSP via `build/conan_toolchain.cmake`, PureData via
+`build/conandeps.mk`. Committed profiles in `profiles/` (`macos`, `linux`, `mingw`) pin the settings
+that must be reproducible across machines. Recipe revisions are pinned in `conanfile.txt` because both
+libraries need a ConanCenter revision that supports CMake 4. The macOS deployment target is set in
+`core/CMakeLists.txt` and `maxmsp/CMakeLists.txt`, not in the profile.
+
+```bash
+conan install . --output-folder=build --build=missing \
+  -pr:h=profiles/macos -pr:b=profiles/macos   # or profiles/linux, profiles/mingw
+```
+
+`build.sh` does this automatically on first use. Conan is only needed when dependencies actually
+need resolving — a tree with a populated `build/` still builds without it.
+
 ### Core Library (must be built first — other targets depend on `libzerr_core.a`)
 
 ```bash
-cd core
-conan install . --output-folder=build --build=missing
-cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-make install  # Installs to core/lib
+cmake -S core -B core/build \
+  -DCMAKE_TOOLCHAIN_FILE="$PWD/build/conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release
+cmake --build core/build
+cmake --install core/build   # Installs to core/lib
 ```
 
 ### Using the build script (recommended)
 
 ```bash
+./build.sh deps              # Resolve dependencies only
+./build.sh -c deps           # Discard resolved dependencies
+./build.sh core              # Build core library
 ./build.sh puredata          # Build PureData externals (auto-builds core if needed)
 ./build.sh -i puredata       # Build and install
 ./build.sh maxmsp            # Build Max/MSP externals
 ./build.sh -i maxmsp         # Build and install
-./build.sh jack              # JACK client (in development)
+./build.sh jack              # JACK client — currently broken, see docs/design/repo-audit-2026-07-30.md
 ```
 
 ### Code Formatting
@@ -78,10 +96,17 @@ YAML files defining speaker positions in Cartesian coordinates (x, y, z). Exampl
 - **Namespace**: `zerr`, features in `zerr::feature`
 - **Custom types** (`types.h`): `Sample` = double, `Param` = float, `Index` = int
 - **Naming**: PascalCase classes, camelCase methods, `_prefixed` private methods
-- **Dependencies**: Conan 2.x manages fftw3 and yaml-cpp
+- **Dependencies**: Conan 2.x manages fftw3 and yaml-cpp, declared once in the root `conanfile.txt`
 
 ## Platform Notes
 
 - **macOS**: Supports Intel + Apple Silicon (fat binaries with Xcode 12+)
 - **Linux**: Requires `-fPIC` for static library builds
-- **Windows**: MinGW-w64 gcc 13 for PureData; uses `puredata/mingw-profile.txt` Conan profile
+- **Windows**: MinGW-w64 gcc 13 for PureData; uses the `profiles/mingw` Conan profile. `build.sh`
+  runs from an MSYS2 MINGW64 / Git Bash shell — it pins the `MinGW Makefiles` generator and prefers
+  `mingw32-make`. Max/MSP is not buildable there (`.mxe64` needs MSVC, which cannot link a
+  MinGW-built core); `build.sh maxmsp` refuses with a message
+
+Before changing any `find_package` call, the `CONAN_*` variables in `puredata/Makefile`, or
+`conanfile.txt`, read `docs/design/dependency-fallbacks.md` — it records which non-conan resolve
+routes are viable and what each one breaks (target names, static/shared, deployment target, CMake 4).

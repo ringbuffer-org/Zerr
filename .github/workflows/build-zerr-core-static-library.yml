@@ -7,6 +7,13 @@ on:
       - main
     paths:
       - "core/**"
+      - "conanfile.txt"
+      - "profiles/**"
+
+# Dependencies are resolved once at the repo root (see /conanfile.txt) using a
+# committed profile, so CI and local builds share one dependency configuration.
+# conan is pinned below the next major: a bare `pip install conan` would float to
+# conan 3.x and break these jobs with no change on our side.
 
 jobs:
   macOS:
@@ -17,21 +24,21 @@ jobs:
 
       - name: Set up Conan
         run: |
-          pip install conan
+          pip install "conan>=2.13,<3"
           conan profile detect
 
       - name: Install Dependencies
-        working-directory: core
         run: |
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build --build=missing \
+            -pr:h=profiles/macos -pr:b=profiles/macos
 
       - name: Build Static Library
-        working-directory: core
         run: |
-          cd build/
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build .
-          make install
+          cmake -S core -B core/build \
+            -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/build/conan_toolchain.cmake" \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build core/build
+          cmake --install core/build
 
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4
@@ -48,22 +55,22 @@ jobs:
 
       - name: Set up Conan
         run: |
-          pip install conan
+          pip install "conan>=2.13,<3"
           conan profile detect
 
       - name: Install Dependencies
-        working-directory: core
         run: |
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build --build=missing \
+            -pr:h=profiles/linux -pr:b=profiles/linux
 
       - name: Build Static Library
-        working-directory: core
         run: |
           export CXXFLAGS="-fPIC"
-          cd build/
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build .
-          make install
+          cmake -S core -B core/build \
+            -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/build/conan_toolchain.cmake" \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build core/build
+          cmake --install core/build
 
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4
@@ -85,13 +92,15 @@ jobs:
 
       - name: Set up Conan
         run: |
-          pip install conan
+          pip install "conan>=2.13,<3"
           conan profile detect --force
 
+      # Deliberately keeps its inline settings rather than -pr:h=profiles/mingw:
+      # this job builds natively with "MinGW Makefiles" on windows-latest, whereas
+      # profiles/mingw additionally pins compiler_executables for the
+      # cross-compiling PureData job. Switching it is untested — see docs/design.
       - name: Install Dependencies
-        working-directory: core
         run: |
-          mkdir build
           conan install . --output-folder=build --build=missing `
             -s compiler=gcc `
             -s compiler.version=13 `
@@ -99,15 +108,14 @@ jobs:
             -s build_type=Release
 
       - name: Build Static Library
-        working-directory: core
         run: |
-          cmake -S . -B build `
+          cmake -S core -B core/build `
             -G "MinGW Makefiles" `
-            -DCMAKE_TOOLCHAIN_FILE="build/conan_toolchain.cmake" `
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake" `
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_CXX_STANDARD=17
-          cmake --build build --config Release
-          cmake --install build
+          cmake --build core/build --config Release
+          cmake --install core/build
 
       - name: Upload zerr-core library
         uses: actions/upload-artifact@v4

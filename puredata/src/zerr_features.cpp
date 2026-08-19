@@ -3,7 +3,7 @@
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
  * @brief AudioFeatures Class Puredata Wrapper
  * @date 2024-01-30
- * 
+ *
  * @copyright Copyright (c) 2023-2025
  */
 
@@ -11,23 +11,25 @@
 
 #include <stdlib.h>
 
-ZerrFeatures::ZerrFeatures(zerr::SystemConfigs sys_cnfg, zerr::t_featureNames ft_names):
-            input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f)) {
+ZerrFeatures::ZerrFeatures(zerr::SystemConfigs sys_cnfg, zerr::FeatureNames ft_names)
+    // Order matches the declaration order in zerr_features.h (featureNames precedes
+    // input_buffer); initializers run in declaration order regardless, so listing
+    // them out of order only produces a -Wreorder-ctor warning.
+    : featureNames(std::move(ft_names)),
+      input_buffer(n_inlet, std::vector<double>(sys_cnfg.block_size, 0.0f))
+{
     bank = new zerr::FeatureBank();
 
     systemConfigs.sample_rate = sys_cnfg.sample_rate;
     systemConfigs.block_size  = sys_cnfg.block_size;
-
-    for (int i = 0; i < ft_names.num; ++i) {
-        featureNames.push_back(ft_names.names[i]);
-    }
 }
 
-
-int ZerrFeatures::initialize() {
+int ZerrFeatures::initialize()
+{
     try {
         bank->initialize(featureNames, systemConfigs);
-    } catch (...) {
+    }
+    catch (...) {
         // send bank initialize failed
         return 0;
     }
@@ -37,16 +39,16 @@ int ZerrFeatures::initialize() {
     input_buffer.resize(n_inlet, std::vector<double>(systemConfigs.block_size, 0.0f));
     output_buffer.resize(n_outlet);
 
-    in_ptr  = (float **) malloc(n_inlet * sizeof(float **));
-    out_ptr = (float **) malloc(n_outlet * sizeof(float **));
+    in_ptr  = (float**)malloc(n_inlet * sizeof(float**));
+    out_ptr = (float**)malloc(n_outlet * sizeof(float**));
 
     return 1;
 }
 
-
-void ZerrFeatures::perform(float **ports, int n_vec) {
-    in_ptr  = (float **) &ports[0];
-    out_ptr = (float **) &ports[n_inlet];
+void ZerrFeatures::perform(float** ports, int n_vec)
+{
+    in_ptr  = (float**)&ports[0];
+    out_ptr = (float**)&ports[n_inlet];
 
     for (int i = 0; i < n_inlet; i++) {
         for (int j = 0; j < n_vec; j++) {
@@ -63,12 +65,6 @@ void ZerrFeatures::perform(float **ports, int n_vec) {
     }
 }
 
+int ZerrFeatures::get_port_count() { return n_inlet + n_outlet; }
 
-int ZerrFeatures::get_port_count() {
-    return n_inlet+n_outlet;
-}
-
-
-ZerrFeatures::~ZerrFeatures() {
-    delete bank;
-}
+ZerrFeatures::~ZerrFeatures() { delete bank; }

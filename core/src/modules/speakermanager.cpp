@@ -11,57 +11,48 @@
 using namespace zerr;
 
 Speaker::Speaker(Index index, Position position, Orientation orientation)
+    : index(index), position(position), orientation(orientation)
 {
-    logger = new Logger();
-
 #ifdef TESTMODE
-    logger->setLogLevel(LogLevel::INFO);
+    logger.setLogLevel(LogLevel::INFO);
 #endif // TESTMODE
-
-    this->index       = index;
-    this->position    = position;
-    this->orientation = orientation;
 }
 
 void Speaker::printAll()
 {
-    logger->logInfo("-----------------------");
+    logger.logInfo("-----------------------");
     _print_index();
     _print_position();
     _print_orientation();
 }
 
-void Speaker::_print_index() { logger->logInfo(formatString("Speaker ID: %d", index)); }
+void Speaker::_print_index() { logger.logInfo(formatString("Speaker ID: %d", index)); }
 
 void Speaker::_print_position()
 {
-    logger->logInfo("Cartesian Position: ");
-    logger->logInfo(formatString("    x: %.2f", position.cartesian.x));
-    logger->logInfo(formatString("    y: %.2f", position.cartesian.y));
-    logger->logInfo(formatString("    z: %.2f", position.cartesian.z));
-    logger->logInfo("Spherical Position: ");
-    logger->logInfo(formatString("    azimuth:   : %.2f", position.spherical.azimuth));
-    logger->logInfo(formatString("    elevation: : %.2f", position.spherical.elevation));
-    logger->logInfo(formatString("    distance:  : %.2f", position.spherical.distance));
+    logger.logInfo("Cartesian Position: ");
+    logger.logInfo(formatString("    x: %.2f", position.cartesian.x));
+    logger.logInfo(formatString("    y: %.2f", position.cartesian.y));
+    logger.logInfo(formatString("    z: %.2f", position.cartesian.z));
+    logger.logInfo("Spherical Position: ");
+    logger.logInfo(formatString("    azimuth:   : %.2f", position.spherical.azimuth));
+    logger.logInfo(formatString("    elevation: : %.2f", position.spherical.elevation));
+    logger.logInfo(formatString("    distance:  : %.2f", position.spherical.distance));
 }
 
 void Speaker::_print_orientation()
 {
-    logger->logInfo("Orientation: ");
-    logger->logInfo(formatString("    yaw:   : %.2f", orientation.yaw));
-    logger->logInfo(formatString("    pitch: : %.2f", orientation.pitch));
+    logger.logInfo("Orientation: ");
+    logger.logInfo(formatString("    yaw:   : %.2f", orientation.yaw));
+    logger.logInfo(formatString("    pitch: : %.2f", orientation.pitch));
 }
 
-SpeakerManager::SpeakerManager(ConfigPath spkrArry)
+SpeakerManager::SpeakerManager(ConfigPath spkrArry) : speakerArrayPath(spkrArry)
 {
-    this->speakerArrayPath = spkrArry;
-
-    logger = new Logger();
-
 #ifdef TESTMODE
-    logger->setLogLevel(LogLevel::INFO);
+    logger.setLogLevel(LogLevel::INFO);
 #endif // TESTMODE
-    logger->logInfo("SpeakerManager::SpeakerManager " + speakerArrayPath);
+    logger.logInfo("SpeakerManager::SpeakerManager " + speakerArrayPath);
 }
 
 bool SpeakerManager::initialize()
@@ -72,8 +63,8 @@ bool SpeakerManager::initialize()
         speakerArrayNode = YAML::LoadFile(speakerArrayPath);
     }
     catch (...) {
-        logger->logError("SpeakerManager::initialize: Load speaker configuration " +
-                         speakerArrayPath + " failed");
+        logger.logError("SpeakerManager::initialize: Load speaker configuration " +
+                        speakerArrayPath + " failed");
         return false;
     }
     // analysis speaker configuration file
@@ -146,15 +137,14 @@ bool SpeakerManager::initialize()
 
     // initialize the specific configs
     // every speaker is actvSpkIdx when at initialize point
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        trajVector.push_back(actvSpkIdx[i]);
+    for (auto idx : actvSpkIdx) {
+        trajVector.push_back(idx);
     }
     std::sort(trajVector.begin(), trajVector.end());
 
     // topoMatrix every speaker is connected
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        Indexes tmp_idx           = actvSpkIdx; // deepcopy
-        topoMatrix[actvSpkIdx[i]] = tmp_idx;
+    for (auto idx : actvSpkIdx) {
+        topoMatrix[idx] = actvSpkIdx; // copy
     }
 
     return true;
@@ -181,7 +171,7 @@ Speaker SpeakerManager::getSpeakerByIndex(Index spkrIdx)
     return it->second;
 }
 
-Pair SpeakerManager::getIndexesByTrajectory(Param trajVal)
+SpeakerPair SpeakerManager::getIndexesByTrajectory(Param trajVal)
 {
     trajVal = trajVal < 0.0 ? 0.0 : trajVal;
 
@@ -210,8 +200,8 @@ Param SpeakerManager::getPanningRatio(Param trajVal)
     return (scaled - std::floor(scaled));
 }
 
-Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
-                                            std::string coordinate)
+SpeakerPair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
+                                                   std::string coordinate)
 {
     std::vector<Param> distance;
     std::vector<Index> indexs;
@@ -219,10 +209,7 @@ Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<
     assert(mask.size() == 3 && "ERROR: The mask vector for geometry selection muss be in size 3.");
 
     Param tmp_distan;
-    for (const auto& maps : speakers) {
-        Index key    = maps.first;
-        Speaker spkr = maps.second;
-
+    for (auto& [key, spkr] : speakers) {
         if (coordinate == "cartesian") {
             tmp_distan = abs(spkr.getX() - pos[0]) * mask[0] + abs(spkr.getY() - pos[1]) * mask[1] +
                          abs(spkr.getZ() - pos[2]) * mask[2];
@@ -255,7 +242,7 @@ Pair SpeakerManager::get_indexs_by_geometry(std::vector<Param> pos, std::vector<
     return std::make_pair(smallest, second_small);
 }
 
-Index SpeakerManager::getIndexesByTrigger(Param trigger, Mode mode)
+Index SpeakerManager::getIndexesByTrigger(Param trigger, TriggerMode mode)
 {
     // just return the original one when trigger doesn't close to 1.0
     if (!isEqualTo1(trigger, TRIGGER_THRESHOLD))
@@ -304,7 +291,7 @@ void SpeakerManager::setActiveSpeakers(std::string action, Indexes spkrIdxes)
         _delActiveSpeakerIndexs(spkrIdxes);
     }
     else {
-        logger->logWarning("SpeakerManager::setActiveSpeakers unknown action " + action);
+        logger.logWarning("SpeakerManager::setActiveSpeakers unknown action " + action);
     }
 
 #ifdef TESTMODE
@@ -317,7 +304,7 @@ void SpeakerManager::setTrajectoryVector(Indexes spkrIdxes)
     Indexes tmpTrajVector;
     for (size_t i = 0; i < spkrIdxes.size(); ++i) {
         if (!isInVec<Index>(spkrIdxes[i], actvSpkIdx)) {
-            logger->logError(
+            logger.logError(
                 formatString("SpeakerManager: speaker %d is not activated!", spkrIdxes[i]));
             return;
         }
@@ -343,7 +330,7 @@ void SpeakerManager::setTopoMatrix(std::string action, Indexes spkrIdxes)
         _delTopoMatrixIndexes(spkrIdxes);
     }
     else {
-        logger->logWarning("SpeakerManager::setTopoMatrix unknown action " + action);
+        logger.logWarning("SpeakerManager::setTopoMatrix unknown action " + action);
     }
 #ifdef TESTMODE
     printTopoMatrix();
@@ -353,7 +340,7 @@ void SpeakerManager::setTopoMatrix(std::string action, Indexes spkrIdxes)
 void SpeakerManager::setCurrentSpeaker(Index newIdx)
 {
     if (!isInVec<Index>(newIdx, actvSpkIdx)) {
-        logger->logError(formatString("SpeakerManager: speaker %d is not activated!", newIdx));
+        logger.logError(formatString("SpeakerManager: speaker %d is not activated!", newIdx));
         return;
     }
     else {
@@ -361,14 +348,14 @@ void SpeakerManager::setCurrentSpeaker(Index newIdx)
     }
 
 #ifdef TESTMODE
-    logger->logDebug(formatString("EnvelopeGenerator::initialize currIdx %d", currIdx));
+    logger.logDebug(formatString("EnvelopeGenerator::initialize currIdx %d", currIdx));
 #endif // TESTMODE
 }
 
 bool SpeakerManager::_isActivated(Index idx)
 {
     if (!isInVec<Index>(idx, actvSpkIdx)) {
-        logger->logError(formatString("Speaker %d is not activated!", idx));
+        logger.logError(formatString("Speaker %d is not activated!", idx));
         return false;
     }
     return true;
@@ -431,23 +418,22 @@ void SpeakerManager::printParameters()
 
 void SpeakerManager::printActiveSpeakerIndexs()
 {
-    logger->logInfo("Active Speakers: ");
-    logger->logInfo("    " + formatVector<Index>(actvSpkIdx));
+    logger.logInfo("Active Speakers: ");
+    logger.logInfo("    " + formatVector<Index>(actvSpkIdx));
 }
 
 void SpeakerManager::printTopoMatrix()
 {
-    logger->logInfo("Topological Matrix: ");
-    for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
-        logger->logInfo("    " + std::to_string(it->first) + " | " +
-                        formatVector<Index>(it->second));
+    logger.logInfo("Topological Matrix: ");
+    for (const auto& [idx, connections] : topoMatrix) {
+        logger.logInfo("    " + std::to_string(idx) + " | " + formatVector<Index>(connections));
     }
 }
 
 void SpeakerManager::printTrajectoryVector()
 {
-    logger->logInfo("Trajectory Vector: ");
-    logger->logInfo("    " + formatVector<Index>(trajVector));
+    logger.logInfo("Trajectory Vector: ");
+    logger.logInfo("    " + formatVector<Index>(trajVector));
 }
 
 void SpeakerManager::_initDistanceMatrix()
@@ -512,11 +498,11 @@ Cartesian SpeakerManager::_spherical2cartesian(Spherical spherical)
 {
     // test
     Cartesian cartesian;
-    cartesian.x = spherical.distance * cos(spherical.elevation / 180.0 * PI) *
-                  cos(spherical.azimuth / 180.0 * PI);
-    cartesian.y = spherical.distance * cos(spherical.elevation / 180.0 * PI) *
-                  sin(spherical.azimuth / 180.0 * PI);
-    cartesian.z = spherical.distance * sin(spherical.elevation / 180.0 * PI);
+    cartesian.x = spherical.distance * cos(spherical.elevation / 180.0 * pi) *
+                  cos(spherical.azimuth / 180.0 * pi);
+    cartesian.y = spherical.distance * cos(spherical.elevation / 180.0 * pi) *
+                  sin(spherical.azimuth / 180.0 * pi);
+    cartesian.z = spherical.distance * sin(spherical.elevation / 180.0 * pi);
 
     return cartesian;
 }
@@ -526,8 +512,8 @@ Spherical SpeakerManager::_cartesian2spherical(Cartesian cartesian)
     Spherical spherical;
     spherical.distance =
         sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y + cartesian.z * cartesian.z);
-    spherical.azimuth   = atan2(cartesian.y, cartesian.x) / PI * 180.0;
-    spherical.elevation = asin(cartesian.z / spherical.distance) / PI * 180.0;
+    spherical.azimuth   = atan2(cartesian.y, cartesian.x) / pi * 180.0;
+    spherical.elevation = asin(cartesian.z / spherical.distance) / pi * 180.0;
 
     return spherical;
 }
@@ -538,14 +524,14 @@ void SpeakerManager::_setActiveSpeakerIndexs(Indexes spkrIdxes)
     for (size_t i = 0; i < spkrIdxes.size(); ++i) {
         auto it = speakers.find(spkrIdxes[i]);
         if (it == speakers.end()) {
-            logger->logError(formatString("SpeakerManager::_set_actvSpkIdx_indexs unknow "
-                                          "speaker index %d!",
-                                          spkrIdxes[i]));
+            logger.logError(formatString("SpeakerManager::_set_actvSpkIdx_indexs unknow "
+                                         "speaker index %d!",
+                                         spkrIdxes[i]));
             return;
         }
         // add to actvSpkIdx
         if (isInVec<Index>(spkrIdxes[i], actvSpkIdx)) {
-            logger->logWarning(
+            logger.logWarning(
                 formatString("SpeakerManager: index %d already added, ignored", spkrIdxes[i]));
         }
         else {
@@ -557,15 +543,14 @@ void SpeakerManager::_setActiveSpeakerIndexs(Indexes spkrIdxes)
     _initDistanceMatrix();
 
     trajVector.clear();
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        trajVector.push_back(actvSpkIdx[i]);
+    for (auto idx : actvSpkIdx) {
+        trajVector.push_back(idx);
     }
     std::sort(trajVector.begin(), trajVector.end());
 
     topoMatrix.clear();
-    for (size_t i = 0; i < actvSpkIdx.size(); ++i) {
-        Indexes tmp_idx           = actvSpkIdx;
-        topoMatrix[actvSpkIdx[i]] = tmp_idx;
+    for (auto idx : actvSpkIdx) {
+        topoMatrix[idx] = actvSpkIdx; // copy
     }
 }
 
@@ -574,12 +559,12 @@ void SpeakerManager::_addActiveSpeakerIndexs(Indexes spkrIdxes)
     for (size_t i = 0; i < spkrIdxes.size(); ++i) {
         // check if the input index is valid
         if (!isInKey<Index, Speaker>(spkrIdxes[i], speakers)) {
-            logger->logError("SpeakerManager unknow speaker index!");
+            logger.logError("SpeakerManager unknow speaker index!");
             return;
         }
         // add to actvSpkIdx
         if (isInVec<Index>(spkrIdxes[i], actvSpkIdx)) {
-            logger->logWarning(
+            logger.logWarning(
                 formatString("SpeakerManager: index %d already added, ignored", spkrIdxes[i]));
         }
         else {
@@ -593,12 +578,12 @@ void SpeakerManager::_delActiveSpeakerIndexs(Indexes spkrIdxes)
     for (size_t i = 0; i < spkrIdxes.size(); ++i) {
         // check if the input index is valid
         if (!isInKey<Index, Speaker>(spkrIdxes[i], speakers)) {
-            logger->logError("SpeakerManager unknow speaker index!");
+            logger.logError("SpeakerManager unknow speaker index!");
             return;
         }
         // remove from actvSpkIdx
         if (!isInVec<Index>(spkrIdxes[i], actvSpkIdx)) {
-            logger->logWarning(
+            logger.logWarning(
                 formatString("SpeakerManager index %d already removed, ignored", spkrIdxes[i]));
         }
         else {
@@ -607,7 +592,7 @@ void SpeakerManager::_delActiveSpeakerIndexs(Indexes spkrIdxes)
         }
         // remove from trajVector
         if (!isInVec<Index>(spkrIdxes[i], trajVector)) {
-            logger->logWarning(
+            logger.logWarning(
                 formatString("SpeakerManager index %d already removed, ignored", spkrIdxes[i]));
         }
         else {
@@ -618,10 +603,10 @@ void SpeakerManager::_delActiveSpeakerIndexs(Indexes spkrIdxes)
         if (isInKey<Index, Indexes>(spkrIdxes[i], topoMatrix)) {
             topoMatrix.erase(spkrIdxes[i]);
         }
-        for (auto it = topoMatrix.begin(); it != topoMatrix.end(); ++it) {
-            if (isInVec<Index>(spkrIdxes[i], it->second)) {
-                it->second.erase(std::remove(it->second.begin(), it->second.end(), spkrIdxes[i]),
-                                 it->second.end());
+        for (auto& [idx, connections] : topoMatrix) {
+            if (isInVec<Index>(spkrIdxes[i], connections)) {
+                connections.erase(std::remove(connections.begin(), connections.end(), spkrIdxes[i]),
+                                  connections.end());
             }
         }
     }

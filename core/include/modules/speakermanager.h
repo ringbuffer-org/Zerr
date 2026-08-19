@@ -1,7 +1,8 @@
 /**
  * @file speakermanager.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief  Speaker & SpeakerManager Classes Header - Contains class definitions for managing speaker configurations and behaviors
+ * @brief  Speaker & SpeakerManager Classes Header - Contains class definitions for managing speaker
+ * configurations and behaviors
  * @date 2024-02-18
  *
  * @copyright Copyright (c) 2023-2025
@@ -20,9 +21,9 @@
 #define SPEAKERMANAGER_H
 
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <random>
-#include <functional>
 
 #include "configs.h"
 #include "logger.h"
@@ -43,7 +44,7 @@ namespace zerr {
  * accessing and displaying these properties.
  */
 class Speaker {
- public:
+  public:
     /**
      * @brief Construct a new Speaker object with specified configurations.
      * @param index Unique identification number of the speaker.
@@ -57,55 +58,57 @@ class Speaker {
      * @brief Get the identification index of this speaker instance.
      * @return Index The unique identification number of the speaker.
      */
-    Index getIndex() { return index; };
+    Index getIndex() noexcept { return index; }
 
     /**
      * @brief Get the x coordinate in Cartesian system of this speaker instance.
      * @return Param The x coordinate value.
      */
-    Param getX() { return position.cartesian.x; };
+    Param getX() noexcept { return position.cartesian.x; }
 
     /**
      * @brief Get the y coordinate in Cartesian system of this speaker instance.
      * @return Param The y coordinate value.
      */
-    Param getY() { return position.cartesian.y; };
+    Param getY() noexcept { return position.cartesian.y; }
 
     /**
      * @brief Get the z coordinate in Cartesian system of this speaker instance.
      * @return Param The z coordinate value.
      */
-    Param getZ() { return position.cartesian.z; };
+    Param getZ() noexcept { return position.cartesian.z; }
 
     /**
      * @brief Get the azimuth in spherical system of this speaker instance.
-     * @return Param The azimuth value in degrees, where 0° is front center and positive values rotate clockwise.
+     * @return Param The azimuth value in degrees, where 0° is front center and positive values
+     * rotate clockwise.
      */
-    Param getAzimuth() { return position.spherical.azimuth; };
+    Param getAzimuth() noexcept { return position.spherical.azimuth; }
 
     /**
      * @brief Get the elevation in spherical system of this speaker instance.
-     * @return Param The elevation value in degrees, where 0° is horizontal and positive values point upward.
+     * @return Param The elevation value in degrees, where 0° is horizontal and positive values
+     * point upward.
      */
-    Param getElevation() { return position.spherical.elevation; };
+    Param getElevation() noexcept { return position.spherical.elevation; }
 
     /**
      * @brief Get the distance in spherical system of this speaker instance.
      * @return Param The distance value in meters from the origin to the speaker.
      */
-    Param getDistance() { return position.spherical.distance; };
+    Param getDistance() noexcept { return position.spherical.distance; }
 
     /**
      * @brief Get the yaw orientation of this speaker instance.
      * @return Param The yaw value in degrees, representing horizontal rotation of the speaker.
      */
-    Param getYaw() { return orientation.yaw; };
+    Param getYaw() noexcept { return orientation.yaw; }
 
     /**
      * @brief Get the pitch orientation of this speaker instance.
      * @return Param The pitch value in degrees, representing vertical tilt of the speaker.
      */
-    Param getPitch() { return orientation.pitch; };
+    Param getPitch() noexcept { return orientation.pitch; }
 
     /**
      * @brief Print all configurations of the speaker, including index,
@@ -113,15 +116,15 @@ class Speaker {
      */
     void printAll();
 
- private:
-    Logger* logger; ///< Logger object for logging messages and errors.
-    Index index; ///< Unique identification number of the speaker.
-    Position position; ///< Position of the speaker in both Cartesian and
-                       ///< spherical coordinates.
+  private:
+    Logger logger;           ///< Logger object for logging messages and errors.
+    Index index;             ///< Unique identification number of the speaker.
+    Position position;       ///< Position of the speaker in both Cartesian and
+                             ///< spherical coordinates.
     Orientation orientation; ///< Orientation of the speaker in terms of yaw and pitch.
 
-    void _print_index(); ///< Internal method to print the speaker's index to console.
-    void _print_position(); ///< Internal method to print the speaker's position coordinates.
+    void _print_index();       ///< Internal method to print the speaker's index to console.
+    void _print_position();    ///< Internal method to print the speaker's position coordinates.
     void _print_orientation(); ///< Internal method to print the speaker's
                                ///< orientation angles.
 };
@@ -139,7 +142,7 @@ class Speaker {
  * user-defined patterns.
  */
 class SpeakerManager {
- public:
+  public:
     /**
      * @brief Construct a new SpeakerManager object and set the configuration
      * file path.
@@ -188,10 +191,10 @@ class SpeakerManager {
      * @brief Get a pair of speaker indexes based on the trajectory input value.
      * @param trajVal The trajectory input value between 0.0 and 1.0 used to determine speaker
      * selection along the defined trajectory.
-     * @return Pair A pair of adjacent speaker indexes selected based on the trajectory
+     * @return SpeakerPair A pair of adjacent speaker indexes selected based on the trajectory
      * value.
      */
-    Pair getIndexesByTrajectory(Param trajVal);
+    SpeakerPair getIndexesByTrajectory(Param trajVal);
 
     /**
      * @brief Calculate the panning ratio based on the trajectory input value.
@@ -209,10 +212,10 @@ class SpeakerManager {
      * @param pos The target position coordinates.
      * @param mask A boolean vector to include (true) or exclude (false) specific speakers.
      * @param coordinate The coordinate system to use ("Cartesian" or "spherical").
-     * @return Pair A pair of speaker indexes closest to the given position.
+     * @return SpeakerPair A pair of speaker indexes closest to the given position.
      */
-    Pair get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
-        std::string coordinate);
+    SpeakerPair get_indexs_by_geometry(std::vector<Param> pos, std::vector<bool> mask,
+                                       std::string coordinate);
 
     /**
      * @brief Select a speaker index based on a trigger signal and the current
@@ -221,7 +224,7 @@ class SpeakerManager {
      * @param mode The operation mode that determines the selection algorithm.
      * @return Index The selected speaker index based on the trigger and mode.
      */
-    Index getIndexesByTrigger(Param trigger, Mode mode);
+    Index getIndexesByTrigger(Param trigger, TriggerMode mode);
 
     /**
      * @brief Get a vector of distances from a specific speaker index to all
@@ -234,7 +237,8 @@ class SpeakerManager {
     /**
      * @brief Activate or deactivate speakers based on the given action and
      * speaker indexes.
-     * @param action The action to perform: "set" (replace current), "add" (activate), or "del" (deactivate).
+     * @param action The action to perform: "set" (replace current), "add" (activate), or "del"
+     * (deactivate).
      * @param spkrIdxes The speaker indexes to modify.
      */
     void setActiveSpeakers(std::string action, Indexes spkrIdxes);
@@ -250,7 +254,8 @@ class SpeakerManager {
      * @brief Set or update the topology matrix based on specified actions and
      * speaker indexes. The topology matrix is used to manage spatial
      * relationships between speakers.
-     * @param action The action to perform: "set" (replace), "add" (create connection), or "del" (remove connection).
+     * @param action The action to perform: "set" (replace), "add" (create connection), or "del"
+     * (remove connection).
      * @param spkrIdxes The speaker indexes to modify in the topology.
      */
     void setTopoMatrix(std::string action, Indexes spkrIdxes);
@@ -287,25 +292,26 @@ class SpeakerManager {
     void setPrinter(Logger::PrintStrategy newPrinter)
     {
         // The logger of SpeakerManger
-        logger->setPrinter(newPrinter);
+        logger.setPrinter(newPrinter);
     }
 
-    Logger* logger; ///< Pointer to a Logger object for logging messages and errors
-                    ///< in different environments.
+    Logger logger; ///< Logger object for logging messages and errors
+                   ///< in different environments.
 
- private:
+  private:
     ConfigPath speakerArrayPath; ///< Path to the YAML speaker array configuration file.
     YAML::Node speakerArrayNode; ///< YAML Node containing the parsed speaker
                                  ///< array configuration data.
 
-    std::map<Index, Speaker> speakers; ///< Map associating speaker indexes with their Speaker objects.
+    std::map<Index, Speaker>
+        speakers; ///< Map associating speaker indexes with their Speaker objects.
     std::map<Index, Params> distanceMatrix; ///< Matrix storing pre-calculated
                                             ///< distances between all speaker pairs.
 
-    Index currIdx; ///< Index of the currently selected speaker.
-    Indexes actvSpkIdx; ///< Vector storing indexes of all currently active speakers.
-    Indexes trajVector; ///< Ordered vector of speaker indexes defining the spatial
-                        ///< trajectory for playback.
+    Index currIdx;         ///< Index of the currently selected speaker.
+    Indexes actvSpkIdx;    ///< Vector storing indexes of all currently active speakers.
+    Indexes trajVector;    ///< Ordered vector of speaker indexes defining the spatial
+                           ///< trajectory for playback.
     TopoMatrix topoMatrix; ///< Matrix defining the connectivity and spatial
                            ///< relationships between speakers.
 
@@ -399,8 +405,8 @@ class SpeakerManager {
 };
 
 #ifdef PUREDATA // explicit instantiation required for PD
-template bool isInKey<int, Speaker>(int element, std::map<Index, Speaker> map);
-template std::string formatVector<Index>(std::vector<Index> vector);
+template bool isInKey<int, Speaker>(int element, const std::map<Index, Speaker>& map);
+template std::string formatVector<Index>(const std::vector<Index>& vector);
 #endif // PUREDATA
 
 } // namespace zerr

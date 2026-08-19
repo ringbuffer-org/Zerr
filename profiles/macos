@@ -1,0 +1,42 @@
+# Zerr* macOS build profile.
+#
+# Inherits the machine-detected `default` profile, so compiler and architecture
+# stay local, then pins only the build type.
+#
+# Deliberately NOT pinned here: os.version. The macOS deployment target is set in
+# core/CMakeLists.txt (and already in maxmsp/CMakeLists.txt) instead.
+#
+# Setting os.version here does work -- Conan then emits CMAKE_OSX_DEPLOYMENT_TARGET
+# and additionally rebuilds the dependencies at that target, which silences the
+# ~357 `ld` "built for newer macOS version" warnings the prebuilt fftw/yaml-cpp
+# binaries produce. But os.version is part of the package_id, and ConanCenter
+# builds its binaries with it unset, so no prebuilt would ever match: every
+# dependency would be compiled from source on every machine and on every CI run
+# without a ~/.conan2 cache. It would also raise the x86_64 floor to 11.0, which
+# contradicts the 10.13 that maxmsp/CMakeLists.txt asks for in a fat build.
+#
+# Setting it in CMake gets the part that matters -- our own objects built at the
+# floor we advertise, so the compiler rejects a newer-only libc++ API instead of
+# silently shipping an external that fails on older macs -- at no build cost. The
+# residual dependency warnings are cosmetic and documented in
+# docs/design/repo-audit-2026-07-30.md.
+#
+# If you do want bit-consistent targets across dependencies too, prefer an explicit
+# one-off over changing this file:
+#   conan install . --output-folder=build --build=missing \
+#     -pr:h=profiles/macos -pr:b=profiles/macos -s os.version=11.0
+#
+# Also deliberately NOT pinned: compiler.cppstd. The detected default's `gnu17` is
+# part of yaml-cpp's package_id, so forcing `17` would invalidate the cached
+# binaries for no behavioural gain -- core sets CMAKE_CXX_STANDARD 17 itself.
+#
+# Note: `conan profile detect` may record a compiler.version older than the active
+# toolchain (e.g. apple-clang 14 against AppleClang 17). That is inherited here on
+# purpose: compiler.version *is* part of the package_id, so re-detecting invalidates
+# the dependency cache. Re-run `conan profile detect --force` only when you actually
+# intend to rebuild the dependencies.
+
+include(default)
+
+[settings]
+build_type=Release

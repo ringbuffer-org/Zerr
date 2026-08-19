@@ -21,10 +21,11 @@ namespace zerr {
  * then distributes the results to all activated feature extraction algorithms.
  */
 class FeatureBank {
- public:
-    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)(); /**< Function pointer type for creating
-                                   FeatureExtractor objects  */
-    typedef std::unique_ptr<FeatureExtractor> fe_ptr; /**< The unique_ptr of type virtual class FeatureExtractor  */
+  public:
+    using CreateFunc = std::unique_ptr<FeatureExtractor> (*)(); /**< Function pointer type for
+                                   creating FeatureExtractor objects  */
+    using fe_ptr = std::unique_ptr<FeatureExtractor>; /**< The unique_ptr of type virtual class
+                                                         FeatureExtractor  */
     /**
      * @brief FeatureBank Constructor
      *
@@ -55,17 +56,20 @@ class FeatureBank {
      * @param in Input audio block to analyze
      * @return Map of feature names to extracted feature values
      */
-    FeaturesVals perform(Block in);
+    FeaturesVals perform(Samples in);
     /**
      * @brief Reset the feature bank parameters and load a new set of features
      * @param feature_names New list of feature names to activate
      */
     void reset(FeatureNames feature_names);
 
- private:
-    std::map<std::string, CreateFunc> registed_features; /**< Map between feature names and their constructor functions */
+  private:
+    std::map<std::string, CreateFunc>
+        registed_features; /**< Map between feature names and their constructor functions */
 
     std::vector<fe_ptr> activated_features; /**< Vector of pointers to activated feature objects */
+
+    FeatureNames active_feature_names; /**< Names of currently activated features */
 
     RingBuffer ring_buffer; /**< Ring buffer to hold previous audio samples for analysis */
 

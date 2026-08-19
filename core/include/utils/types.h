@@ -10,6 +10,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -21,40 +22,45 @@ using Sample = double; /**< Base type for audio sample values */
 using Param  = float;  /**< Base type for parameter values used in audio processing */
 using Index  = int;    /**< Base type for indexing and counting */
 
-struct Complex {
-    Sample real; /**< Real component of complex number */
-    Sample img;  /**< Imaginary component of complex number */
-}; /**< Complex number representation for frequency domain calculations */
-
 using Samples = std::vector<Sample>; /**< Vector container for audio samples */
-
-using Block  = Samples;            /**< Single block of audio samples */
-using Blocks = std::vector<Block>; /**< Collection of audio blocks for multi-channel processing */
-
-using AudioBuffer = Samples; /**< Buffer for storing audio frames */
-using AudioBuffers =
-    std::vector<AudioBuffer>; /**< Collection of audio buffers for multi-channel storage */
-
-using FFTBuffer  = std::vector<Complex>; /**< Buffer for storing FFT results as complex numbers */
-using SpecBuffer = std::vector<Sample>;  /**< Buffer for storing spectral power values */
+using Blocks =
+    std::vector<Samples>; /**< Collection of sample vectors for multi-channel processing */
 
 struct AudioInputs {
-    Block block;      /**< Single block of audio samples for processing */
-    AudioBuffer wave; /**< Buffered audio frame for temporal analysis */
-    SpecBuffer spec;  /**< Spectral power data for frequency analysis */
+    Samples block;            /**< Single block of audio samples for processing */
+    Samples wave;             /**< Buffered audio frame for temporal analysis */
+    std::vector<Sample> spec; /**< Spectral power data for frequency analysis */
 }; /**< Consolidated structure for different types of audio input data */
 
-using FeatureName  = std::string;              /**< String identifier for audio features */
-using FeatureNames = std::vector<FeatureName>; /**< List of feature names to be processed */
+using FeatureNames = std::vector<std::string>; /**< List of feature names to be processed */
 
-using Mode       = std::string; /**< String identifier for processing modes */
+/**< Envelope generation strategy */
+enum class GenMode {
+    Trigger,    /**< Jump to a new speaker on each trigger event */
+    Trajectory, /**< Continuously move along a trajectory path */
+};
+
+/**< Speaker selection strategy within trigger mode */
+enum class TriggerMode {
+    Random, /**< Randomly select from connected speakers */
+};
+
+/**
+ * @brief Parse a string into a GenMode enum value
+ * @param s The string to parse ("trigger" or "trajectory")
+ * @return GenMode The corresponding enum value
+ * @throws std::invalid_argument if the string is not a valid mode
+ */
+inline GenMode parseGenMode(const std::string& s)
+{
+    if (s == "trigger")
+        return GenMode::Trigger;
+    if (s == "trajectory")
+        return GenMode::Trajectory;
+    throw std::invalid_argument("Unknown GenMode: " + s);
+}
+
 using ConfigPath = std::string; /**< Path string for configuration files */
-
-// TODO(Zeyu Yang): If this only use in PD wrapper, move it out
-typedef struct {
-    char** names; /**< Array of feature name strings */
-    int num;      /**< Number of feature names in the array */
-} t_featureNames;
 
 using Params = std::vector<Param>; /**< Vector container for parameter values */
 
@@ -89,14 +95,15 @@ struct Orientation {
 // specific configs
 using Indexes = std::vector<Index>; /**< Collection of index values */
 using TopoMatrix =
-    std::map<Index, Indexes>;         /**< Topology matrix mapping indices to their connections */
-using Pair = std::pair<Index, Index>; /**< Pair of indices for representing connections */
+    std::map<Index, Indexes>; /**< Topology matrix mapping indices to their connections */
+using SpeakerPair =
+    std::pair<Index, Index>; /**< Pair of speaker indices for representing connections */
 
 // system config
-typedef struct {
+struct SystemConfigs {
     size_t sample_rate; /**< Audio sampling rate in Hz */
     size_t block_size;  /**< Size of processing blocks in samples */
-} SystemConfigs;
+};
 
 } // namespace zerr
 #endif // TYPES_H

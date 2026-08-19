@@ -42,10 +42,14 @@ void* zerr_envelopes_tilde_new(__attribute__((unused)) t_symbol* s, int argc, t_
         return NULL; // no enough args to initialize object
     if (argv[0].a_type != A_SYMBOL)
         return NULL;
-    char* selectionMode = strdup(atom_getsymbol(argv)->s_name);
+    // Borrowed, not copied: a t_symbol's name lives as long as the Pd process, and
+    // both strings are consumed before this function returns (selectionMode into a
+    // std::string parameter, spkrCfgName into canvas_open). strdup here only added
+    // an allocation that every early return below would leak.
+    const char* selectionMode = atom_getsymbol(argv)->s_name;
     if (argv[1].a_type != A_SYMBOL)
         return NULL;
-    char* spkrCfgName = strdup(atom_getsymbol(argv + 1)->s_name);
+    const char* spkrCfgName = atom_getsymbol(argv + 1)->s_name;
 
     // find the absolute path of config file
     t_canvas* canvas = canvas_getcurrent();
@@ -69,12 +73,33 @@ void* zerr_envelopes_tilde_new(__attribute__((unused)) t_symbol* s, int argc, t_
     strcat(spkrCfgFile, nameResult);
     post(spkrCfgFile);
 
-    // create & initialize ZerrEnvelopes object
-    x->z = new ZerrEnvelopes(systemCfgs, selectionMode, spkrCfgFile);
-    if (!x->z)
+    // create & initialize ZerrEnvelopes object.
+    // The constructor calls zerr::parseGenMode(), which throws on an unknown mode
+    // argument. An exception must never escape into Pd's C call stack: it would
+    // reach std::terminate and abort the whole host, losing unsaved patches. Fail
+    // the way Pd expects instead -- report and return NULL, so the object simply
+    // "couldn't create".
+    //
+    // Both failure paths destroy the instance: Pd does not call the free method when
+    // the new method returns NULL, so anything constructed here is ours to release.
+    // x->z is NULL on entry (pd_new zeroes the object), which is what makes the
+    // delete in the catch correct whether the throw came from the constructor --
+    // nothing to destroy -- or from initialize().
+    x->z = NULL;
+    try {
+        x->z = new ZerrEnvelopes(systemCfgs, selectionMode, spkrCfgFile);
+        if (!x->z->initialize()) {
+            delete x->z;
+            x->z = NULL;
+            return NULL;
+        }
+    }
+    catch (const std::exception& e) {
+        pd_error(x, "zerr_envelopes~: %s", e.what());
+        delete x->z;
+        x->z = NULL;
         return NULL;
-    if (!x->z->initialize())
-        return NULL;
+    }
 
     // create inlets
     x->spread_inlet = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);

@@ -4,11 +4,7 @@
 using namespace zerr;
 using namespace feature;
 
-const std::string Centroid::name     = "Spectral Centroid";
-const std::string Centroid::category = "Frequency-Domain";
-const std::string Centroid::description =
-    "The spectral centroid is a measure used in digital signal processing to "
-    "characterise a spectrum.";
+Centroid::Centroid() {}
 
 void Centroid::initialize(SystemConfigs sys_cfg)
 {
@@ -18,7 +14,7 @@ void Centroid::initialize(SystemConfigs sys_cfg)
     _reset_param();
 
     if (is_initialized() == false) {
-        set_initialize_statue(true);
+        set_initialize_status(true);
     }
 }
 
@@ -42,7 +38,7 @@ void Centroid::extract()
 
 void Centroid::reset() { _reset_param(); }
 
-void Centroid::fetch(AudioInputs in)
+void Centroid::fetch(const AudioInputs& in)
 {
     x     = in.spec;
     prv_y = crr_y;

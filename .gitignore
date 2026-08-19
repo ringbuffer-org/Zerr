@@ -26,6 +26,7 @@ fftw3/
 yaml-cpp/
 
 # Documentation output
+docs/build/
 html/
 latex/
 

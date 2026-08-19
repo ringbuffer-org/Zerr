@@ -6,84 +6,66 @@
 #include "linearinterpolator.h"
 #include "utils.h"
 
-namespace zerr
-{
-    namespace feature
-    {
-        /**
-         * @brief Spectral Flatness algorithm - Calculates the ratio of geometric to arithmetic mean of spectrum
-         *
-         * The spectral flatness measures how noise-like or tone-like a sound is by comparing the
-         * geometric mean to the arithmetic mean of the spectrum. Values closer to 1 indicate more
-         * noise-like signals with energy spread across frequencies, while values closer to 0
-         * suggest more tonal sounds with energy concentrated at specific frequencies.
-         */
-        class Flatness : public FeatureExtractor
-        {
-        public:
-            static const std::string name;        ///< Name identifier for this feature
-            static const std::string category;    ///< Category this feature belongs to
-            static const std::string description; ///< Description of what this feature measures
+namespace zerr {
+namespace feature {
+/**
+ * @brief Spectral Flatness algorithm - Calculates the ratio of geometric to arithmetic mean of
+ * spectrum
+ *
+ * Category: Frequency-Domain
+ *
+ * Spectral flatness, also known as Wiener entropy, is a measure used in digital signal
+ * processing to characterize an audio spectrum. It is typically used to quantify how
+ * noise-like a signal is, as opposed to being tonal. A higher value of spectral flatness
+ * indicates a more noise-like signal, whereas a lower value indicates a more tonal signal.
+ * Values closer to 1 indicate energy spread across frequencies, while values closer to 0
+ * suggest energy concentrated at specific frequencies.
+ */
+class Flatness : public FeatureExtractor {
+  public:
+    Flatness();
 
-            /**
-             * @brief Get the name identifier of this feature
-             * @return std::string The feature name
-             */
-            std::string get_name() { return name; }
+    /**
+     * @brief Initialize the flatness extractor with system configurations
+     * @param sys_cfg System configuration parameters
+     */
+    void initialize(SystemConfigs sys_cfg);
 
-            /**
-             * @brief Get the category this feature belongs to
-             * @return std::string The feature category
-             */
-            std::string get_category() { return category; }
+    /**
+     * @brief Extract the spectral flatness from the current audio frame
+     */
+    void extract();
 
-            /**
-             * @brief Get the description of what this feature measures
-             * @return std::string The feature description
-             */
-            std::string get_description() { return description; }
+    /**
+     * @brief Reset the flatness extractor state
+     */
+    void reset();
 
-            /**
-             * @brief Initialize the flatness extractor with system configurations
-             * @param sys_cfg System configuration parameters
-             */
-            void initialize(SystemConfigs sys_cfg);
+    /**
+     * @brief Load new audio input data for processing
+     * @param in Audio input data
+     */
+    void fetch(const AudioInputs& in);
 
-            /**
-             * @brief Extract the spectral flatness from the current audio frame
-             */
-            void extract();
+    /**
+     * @brief Get the calculated flatness values
+     * @return FeatureVals The extracted flatness values
+     */
+    FeatureVals send();
+    // FeatureVals perform(AudioInputs x);
 
-            /**
-             * @brief Reset the flatness extractor state
-             */
-            void reset();
+  private:
+    /**
+     * @brief Reset internal parameters to initial state
+     */
+    void _reset_param();
 
-            /**
-             * @brief Load new audio input data for processing
-             * @param in Audio input data
-             */
-            void fetch(AudioInputs in);
+    FeatureVal prv_y; ///< Previous flatness value
+    FeatureVal crr_y; ///< Current flatness value
 
-            /**
-             * @brief Get the calculated flatness values
-             * @return FeatureVals The extracted flatness values
-             */
-            FeatureVals send();
-            // FeatureVals perform(AudioInputs x);
+    LinearInterpolator linear_interpolator; ///< Interpolator for smoothing flatness values
+};
 
-        private:
-            /**
-             * @brief Reset internal parameters to initial state
-             */
-            void _reset_param();
-
-            FeatureVal prv_y; ///< Previous flatness value
-            FeatureVal crr_y; ///< Current flatness value
-
-            LinearInterpolator linear_interpolator; ///< Interpolator for smoothing flatness values
-        };
-
-    } // namespace feature
+} // namespace feature
 } // namespace zerr
 #endif // FLATNESS_H
