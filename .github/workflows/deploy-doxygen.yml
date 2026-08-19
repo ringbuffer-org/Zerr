@@ -40,8 +40,17 @@ jobs:
       - name: Generate documentation
         run: doxygen docs/Doxyfile
 
+      # enablement: true creates the Pages site on first run. The default (false)
+      # only *queries* for an existing site, so on a repository where Pages was
+      # never turned on the action fails with "Get Pages site failed ... HttpError:
+      # Not Found" and every step after it is skipped -- which is exactly what
+      # happened the first time this workflow ran on main. Provisioning here keeps
+      # the deploy self-contained instead of depending on someone having clicked
+      # through repository settings; it uses the `pages: write` scope granted above.
       - name: Configure Pages
         uses: actions/configure-pages@v4
+        with:
+          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
