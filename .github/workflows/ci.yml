@@ -1,0 +1,239 @@
+name: CI
+
+# One run = one commit = one consistent set of artifacts.
+#
+# This replaces a pair of workflows chained with `workflow_run`. That chaining was
+# not merely awkward, it was wrong: `workflow_run` checks out the *default branch*
+# rather than the ref that triggered it, while downloading the core artifact from
+# the triggering run. Dispatching the core build on a feature branch therefore made
+# the PureData workflow link old main sources against a new libzerr_core.a, which
+# failed with an undefined reference that looked like a real defect and was not.
+#
+# Here every wrapper job takes its core artifact from its own run via `needs:`, so
+# a cross-commit mix is not representable rather than merely unlikely.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Deliberately no `paths:` filters. A core change must rebuild every wrapper, and
+# a wrapper-only change must still build -- the old per-workflow filters are why a
+# puredata/- or maxmsp/-only change used to trigger nothing at all. The extra
+# minutes are paid back by the conan cache and by cancelling superseded runs.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Artifacts are keyed by TOOLCHAIN, not by platform. Windows needs two distinct
+  # core builds -- MinGW for PureData, and later MSVC/static-CRT for Max/MSP, whose
+  # max-pretarget.cmake forces /MT. A single `zerr-core-windows` artifact could
+  # never express that, which is the structural reason this file exists.
+  #
+  # Adding a platform or a compiler is one row here plus one row in the consumer.
+  core:
+    name: core (${{ matrix.id }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: macos
+            runner: macos-latest
+            profile: profiles/macos
+          - id: linux
+            runner: ubuntu-latest
+            profile: profiles/linux
+            cxxflags: -fPIC
+          - id: windows-mingw
+            runner: windows-latest
+            profile: profiles/mingw
+            mingw: true
+            # Without this CMake picks Visual Studio whenever one is installed and
+            # compiles with MSVC against the gcc/libstdc++ packages profiles/mingw
+            # resolved -- objects that cannot link together.
+            cmake_args: -G "MinGW Makefiles"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MinGW
+        if: matrix.mingw
+        uses: egor-tensin/setup-mingw@v3
+        with:
+          arch: x64
+
+      - uses: ./.github/actions/setup-deps
+        with:
+          profile: ${{ matrix.profile }}
+
+      # github.workspace yields a mixed-separator path on Windows
+      # (D:\a\Zerr\Zerr/build/...). CMake normalises it -- verified in run
+      # 32297202438, which logged `Using Conan toolchain: D:/a/Zerr/Zerr/build/...`.
+      - name: Build and install
+        shell: bash
+        env:
+          CXXFLAGS: ${{ matrix.cxxflags }}
+        run: |
+          cmake -S core -B core/build ${{ matrix.cmake_args }} \
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake" \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build core/build --config Release
+          cmake --install core/build
+
+      - name: Upload core library
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-core-${{ matrix.id }}
+          path: core/lib
+          retention-days: 7
+
+  puredata:
+    name: puredata (${{ matrix.id }})
+    needs: core
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: macos
+            runner: macos-latest
+            profile: profiles/macos
+            cflags: -mmacosx-version-min=10.13
+          - id: linux
+            runner: ubuntu-latest
+            profile: profiles/linux
+          # The only job that can catch core/wrapper API drift at build time.
+          # macOS links externals with `-undefined suppress` and Linux permits
+          # undefined symbols in a .so, so both happily produce an external that
+          # fails at load; a .dll must resolve every symbol at link time.
+          - id: windows-mingw
+            runner: windows-latest
+            profile: profiles/mingw
+            mingw: true
+            make: mingw32-make
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up MinGW
+        if: matrix.mingw
+        uses: egor-tensin/setup-mingw@v3
+        with:
+          arch: x64
+
+      # No run-id and no github-token: this resolves to the current run, which is
+      # what makes the artifact and the checked-out sources the same commit.
+      - name: Download core library
+        uses: actions/download-artifact@v4
+        with:
+          name: zerr-core-${{ matrix.id }}
+          path: core/lib
+
+      - name: Install Pure Data (macOS)
+        if: matrix.id == 'macos'
+        run: brew install --cask pd
+
+      - name: Install Pure Data (Linux)
+        if: matrix.id == 'linux'
+        run: sudo apt update && sudo apt install -y puredata-dev
+
+      - name: Install Pure Data (Windows)
+        if: matrix.id == 'windows-mingw'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $url = "http://msp.ucsd.edu/Software/pd-0.53-2.msw.zip"
+          $zip = Join-Path $env:RUNNER_TEMP "Pd.zip"
+          $pdDir = Join-Path $env:ProgramFiles "pd"
+
+          Invoke-WebRequest $url -OutFile $zip
+
+          if (Test-Path $pdDir) { Remove-Item $pdDir -Recurse -Force }
+          New-Item -ItemType Directory -Path $pdDir | Out-Null
+
+          Expand-Archive -LiteralPath $zip -DestinationPath $pdDir -Force
+          Remove-Item $zip -Force
+
+          # flatten nested directory
+          $top = Get-ChildItem $pdDir | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+          if ($top) {
+            Get-ChildItem $top.FullName | Move-Item -Destination $pdDir -Force
+            Remove-Item $top.FullName -Recurse -Force
+          }
+
+          "PD=$pdDir\bin\pd.com" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - uses: ./.github/actions/setup-deps
+        with:
+          profile: ${{ matrix.profile }}
+
+      - name: Build and install externals
+        shell: bash
+        working-directory: puredata
+        env:
+          cflags: ${{ matrix.cflags }}
+        run: |
+          ${{ matrix.make || 'make' }}
+          ${{ matrix.make || 'make' }} install PDLIBDIR=build
+
+      - name: Upload PureData externals
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-pd-${{ matrix.id }}
+          path: puredata/build/zerr
+          retention-days: 7
+
+  # Max/MSP has never had a CI job on any platform. macOS only for now: Max does
+  # not exist on Linux, and Windows needs an MSVC toolchain with static CRT to
+  # match max-pretarget.cmake's /MT, which means a profiles/windows-msvc and a
+  # second Windows core build. That is a follow-up, tracked in the PR body.
+  maxmsp:
+    name: maxmsp (${{ matrix.id }})
+    needs: core
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: macos
+            runner: macos-latest
+            profile: profiles/macos
+
+    steps:
+      # recursive: min-api carries max-sdk-base as a nested submodule, and the
+      # Max headers live there.
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Download core library
+        uses: actions/download-artifact@v4
+        with:
+          name: zerr-core-${{ matrix.id }}
+          path: core/lib
+
+      - uses: ./.github/actions/setup-deps
+        with:
+          profile: ${{ matrix.profile }}
+
+      - name: Build externals
+        shell: bash
+        run: |
+          cmake -S maxmsp -B maxmsp/build \
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake" \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build maxmsp/build --config Release
+
+      - name: Upload Max/MSP externals
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerr-max-${{ matrix.id }}
+          path: maxmsp/externals
+          retention-days: 7

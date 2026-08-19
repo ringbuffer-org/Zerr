@@ -1,0 +1,46 @@
+name: Set up Zerr* dependencies
+description: >
+  Resolve fftw and yaml-cpp once, at the repo root, using a committed profile --
+  the same single resolve that build.sh performs locally, so CI and developer
+  machines share one dependency configuration.
+
+inputs:
+  profile:
+    description: 'Committed conan profile to resolve with, e.g. profiles/macos'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # Keyed on the profile as well as the OS: windows-mingw and windows-msvc are
+    # both runner.os == Windows but must never share a cache entry, since their
+    # package_ids differ. Any change to conanfile.txt or to any profile
+    # invalidates every entry, which is coarse but cheap -- profiles change rarely,
+    # and a stale hit here would silently reintroduce the mismatched-dependency
+    # problem the single root resolve exists to prevent.
+    - name: Cache conan packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.conan2
+        key: conan-${{ runner.os }}-${{ inputs.profile }}-${{ hashFiles('conanfile.txt', 'profiles/*') }}
+        restore-keys: |
+          conan-${{ runner.os }}-${{ inputs.profile }}-
+
+    # Pinned below the next major: a bare `pip install conan` would float to
+    # conan 3.x and break these jobs with no change on our side.
+    - name: Install conan
+      shell: bash
+      run: pip install "conan>=2.13,<3"
+
+    # profiles/macos and profiles/linux are `include(default)`, so the default
+    # profile has to exist even though every invocation passes an explicit one.
+    # profiles/mingw is standalone and does not need it.
+    - name: Detect default profile
+      shell: bash
+      run: conan profile detect --force
+
+    - name: Resolve dependencies
+      shell: bash
+      run: |
+        conan install . --output-folder=build --build=missing \
+          -pr:h="${{ inputs.profile }}" -pr:b="${{ inputs.profile }}"
