@@ -202,6 +202,23 @@ Net effect: 23 commits rewriting the core have **never been built on Linux or Wi
 locally on arm64 macOS. No workflow covers Max/MSP or JACK at all. The Windows job in the PureData
 workflow also carries two "Set up Conan" blocks, one commented out — leftover experimentation.
 
+> **Status: resolved.** Both workflows named above were deleted and replaced by a single
+> `.github/workflows/ci.yml`; the description here is kept for the record, not as current state.
+>
+> - `pull_request` now triggers the whole graph, so PRs are gated. Nothing ran on PRs #13–#16.
+> - The `workflow_run` chain is gone. It was not merely fragile: `workflow_run` checks out the
+>   *default branch* rather than the triggering ref while downloading the triggering run's artifact,
+>   so dispatching the core build on a feature branch compiled old `main` sources against a new
+>   `libzerr_core.a`. Wrapper jobs now take the core artifact from their own run via `needs:`.
+> - Artifacts are keyed by **toolchain**, not platform (`zerr-core-windows-mingw`), because Windows
+>   needs a MinGW core for PureData and an MSVC/static-CRT core for Max/MSP.
+> - **Max/MSP has CI for the first time**, on macOS. Windows Max needs the MSVC profile described in
+>   [`dependency-fallbacks.md`](dependency-fallbacks.md) §3.7 and is still outstanding.
+> - JACK remains uncovered, and cannot be — see §2.4, it does not build at all.
+> - The fat-binary gap in §2.5 above now applies to published artifacts too: the macOS CI runners
+>   are arm64, so `zerr-max-macos` and `zerr-pd-macos` ship a single arm64 slice while CLAUDE.md
+>   still advertises Intel support. Knowingly deferred, not fixed.
+
 ### 2.7 Minor
 
 - **`doxygen` not installed locally**, so the docs pipeline this branch added cannot be exercised

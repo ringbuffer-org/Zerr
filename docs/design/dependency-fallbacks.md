@@ -144,9 +144,19 @@ These cannot share one conan resolve or one CMake configure. `build.sh` refuses 
 Windows for this reason, and it is also why there is no CMake superbuild in this repo: one configure
 means one toolchain.
 
-Note that `profiles/mingw` pins `tools.build:compiler_executables` to the `x86_64-w64-mingw32-*`
-names, and the core CI job deliberately bypasses the profile for that reason — see the comment in
-`.github/workflows/build-zerr-core-static-library.yml`.
+`profiles/mingw` pins `tools.build:compiler_executables` to the `x86_64-w64-mingw32-*` names. The
+core CI job used to bypass the profile with inline settings because that pin was untested on a
+runner; it no longer does. Since the `ci.yml` restructure both the core and the PureData jobs
+resolve through `profiles/mingw`, and the pinned names do resolve — verified in run 32297202438,
+which logged `tools.build:compiler_executables={'c': 'x86_64-w64-mingw32-gcc', ...}` on a green
+Windows core build.
+
+One caveat that survives: the profile declares `compiler.version=13` while the runners now carry
+gcc 16.1.0. It works because the `libstdc++11` ABI is stable across those versions, but the
+declared version is drifting from the real one, and `compiler.version` is a `package_id` input — so
+nothing in the resolve notices when the runner's toolchain moves. `.github/actions/setup-deps`
+compensates by keying its conan cache on `ImageVersion`, which turns a runner toolchain bump into a
+cache miss rather than a silent reuse of libraries built by the previous compiler.
 
 ### 3.8 Core and wrappers must come from one resolve
 
