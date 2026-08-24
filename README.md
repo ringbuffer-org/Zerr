@@ -9,7 +9,7 @@
 |                   | Linux | MacOS(M1) | MacOS(Intel) | Windows |
 | ----------------- | ----- | --------- | ------------ | ------- |
 | **Puredata**      | ✅     | ✅         | ✅            | ✅       |
-| **JACK**          | 🛠️     | 🛠️         | 🛠️            | 🛠️       |
+| **JACK**          | 🛠️     | ✅         | 🛠️            | 🛠️       |
 | **SuperCollider** | ⏳     | ⏳         | ⏳            | ⏳       |
 | **Max/MSP**       | **➖** | ✅         | ✅            | 🛠️       |
 
@@ -93,11 +93,45 @@ runtime and C++ ABI cannot link against the MinGW-built `libzerr_core.a` that `p
 produces. `./build.sh maxmsp` reports this and exits rather than failing inside Min-DevKit. See
 [`docs/design/dependency-fallbacks.md`](docs/design/dependency-fallbacks.md) §3.7.
 
-#### For Jack
+#### For JACK
+
+The JACK target is a standalone client rather than a plugin: `zerr_jack` runs the whole pipeline in
+one process — `FeatureBank` → `EnvelopeGenerator`(s) → `EnvelopeCombinator` → `AudioDisperser` — and
+registers one audio input port plus one output port per speaker in the configured array.
+
+`libjack` is resolved from the system through `pkg-config`, not from conan, because the client has to
+link the same library the running server was built against. Install JACK first (`brew install jack`,
+`apt install libjack-jackd2-dev`, …); everything else comes from the shared conan resolve at the
+repo root.
 
 ```bash
-# build Jack client
+# build the JACK client (builds the core first if needed)
 ./build.sh jack
+
+# build and install to jack/bin/zerr_jack
+./build.sh -i jack
 ```
+
+Run it against a client config — [`jack/config/example.yaml`](jack/config/example.yaml) is annotated
+and can be copied as a starting point:
+
+```bash
+jack/bin/zerr_jack --auto-connect jack/config/example.yaml
+jack/bin/zerr_jack --list-features    # the feature names a config may reference
+```
+
+The config picks the speaker array, the features to extract, and which feature (or fixed value)
+drives each of the envelope generator's three control inputs — trajectory position or trigger,
+spread, and volume. Listing more than one envelope source runs one generator per entry and merges
+them through the `EnvelopeCombinator`.
+
+Two known limitations, both shared with the PureData and Max/MSP wrappers or inherent to them:
+
+- The core's `perform()` methods return their buffers by value, so the process callback allocates on
+  the realtime thread. Raise the JACK buffer size if this shows up as xruns; the client reports the
+  xrun count on exit.
+- The modules size their buffers once, against the block size and sample rate reported at startup.
+  If the server changes either one, the client outputs silence and exits with a message asking for a
+  restart rather than resizing under the realtime thread.
 
 <img src="./zerr_logo.png" alt="zerr_logo" />

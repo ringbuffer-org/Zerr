@@ -162,6 +162,18 @@ deps via pkg-config rather than conan. `./build.sh jack` — documented in `READ
 succeed. The toolchain is not the problem: meson 1.2.0 and the `jack` pkg-config file are both
 present locally.
 
+> **Resolved — 2026-08-19.** Not repaired; replaced. None of the four files described above could be
+> salvaged — they are written against modules (`Mapper`, `AudioRouter`, `TrajectoryGenerator`) that
+> no longer exist in any form, and `origin/jack` is 312 commits behind, so there was nothing to
+> restore from either. `jack/` is now `CMakeLists.txt` + `include/zerr_jack.h` + `src/{main,
+> zerr_jack}.cpp` + `config/example.yaml`: a standalone client running the current pipeline
+> (`FeatureBank` → `EnvelopeGenerator`(s) → `EnvelopeCombinator` → `AudioDisperser`) with one input
+> port and one output port per speaker, configured from a YAML file. meson is gone; the target
+> builds with CMake against the shared conan toolchain like `core/` and `maxmsp/`, with `libjack`
+> alone coming from pkg-config — it must match the running server, so it cannot come from conan.
+> Verified on arm64 macOS against `jackd -d dummy`: single-source and two-source (combinator) chains
+> both run clean, no xruns, clean shutdown on SIGINT.
+
 ### 2.5 Max/MSP is unverified against the new core
 
 The 23-commit sweep touched exactly **one** maxmsp file
@@ -394,8 +406,8 @@ warnings from our own sources.
 5. **Merge `core_modernization` → `main`** (clean fast-forward) so CI finally builds it on **Linux and
    Windows**, the two platforms still unverified — or temporarily widen the workflow triggers to run
    on the branch first.
-6. **Decide `jack`'s fate** — fix it against the current core, or drop it from `build.sh` and
-   `README.md` rather than shipping a target that cannot build (§2.4).
+6. ~~**Decide `jack`'s fate**~~ — ✅ done: rewritten against the current core as a standalone client
+   (§2.4). Builds and runs; not fixed, replaced.
 7. **Triage** `speakermanager.cpp:454` and `envelopecombinator.cpp:87` (§3); add a minimal smoke
    harness — `ctest` currently registers 0 tests on every platform.
 8. **Audit the remaining exception escapes at wrapper boundaries.** §5's finding 1 was one instance of

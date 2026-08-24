@@ -118,7 +118,8 @@ Audio features drive spatial distribution — no manual positioning.
 - **PD message interface** for runtime control (set trajectory vector, topological matrix,
   enable/disable speakers) is marked *"still in development"* in `zerr_envelopes~-help.pd`.
 - **JACK client** is a 4-file skeleton (`zerr.h/.cpp`, `main.cpp`, `meson.build`), no README —
-  earliest-stage wrapper.
+  earliest-stage wrapper. _(Superseded 2026-08-19: replaced by a standalone client built on the
+  current core — see `repo-audit-2026-07-30.md` §2.4 and the JACK section of `README.md`.)_
 
 **Testing:** no formal test suite; verification is manual via PD/Max help patches. Given the scale
 of the current refactor (~1,300 lines changed across 51 files vs. `main`), this is a real

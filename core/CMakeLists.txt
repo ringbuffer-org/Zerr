@@ -7,6 +7,13 @@ add_definitions(-DYAML_CPP_STATIC_DEFINE)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Emit build/compile_commands.json, so clangd can resolve the core's own sources.
+# Its three include directories and the conan dependency paths are known only
+# here; without the database an editor reports every #include as missing. clangd
+# finds it unaided -- it searches the "build" subdirectory of each ancestor of
+# the file being edited -- but it only exists once the target is configured.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Pin the macOS deployment target, matching maxmsp/CMakeLists.txt's approach.
 #
 # Without this the core compiles against the host SDK while the wrappers link at

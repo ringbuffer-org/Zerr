@@ -1,0 +1,53 @@
+# Zerr* JACK client configuration.
+#
+#   zerr_jack jack/config/example.yaml
+#
+# The client registers one audio input port and one output port per speaker in
+# the speaker array below, and runs the full pipeline on every block:
+#
+#   in -> FeatureBank -> EnvelopeGenerator(s) -> [EnvelopeCombinator] -> AudioDisperser -> out_1..N
+
+client:
+  # JACK client name. If it is already taken, JACK registers a numbered variant
+  # and the client prints the name it actually got.
+  name: zerr
+  # Connect the input to the first physical capture port and the outputs to the
+  # physical playback ports on activation. Also available as --auto-connect.
+  auto_connect: false
+
+# Speaker array setup. Relative paths resolve against this file's directory, so
+# this points at the repo-level configs/ folder.
+speaker_config: ../../configs/ring_8.yaml
+
+# Features to extract from the input signal, in order. Every name here must be
+# one the core registers -- run `zerr_jack --list-features` for the full list:
+#
+#   rms  root mean square      zcr  zero crossing rate
+#   flx  spectral flux         ctd  spectral centroid
+#   rlf  spectral rolloff      cf   crest factor
+#   flt  spectral flatness     zc   zero crossings
+features: [ctd, rms, flt]
+
+envelope:
+  # How several sources are merged into one envelope per speaker: add, root or
+  # max. Ignored when there is only one source -- the combinator is then left out
+  # of the chain entirely.
+  combination_mode: max
+
+  # One EnvelopeGenerator per entry. Each of the three control inputs takes
+  # either the name of a feature listed above or a fixed number.
+  sources:
+      # trajectory: the envelope pans continuously along the speaker trajectory,
+      # with `main` as the position (0.0-1.0, wrapping).
+    - mode: trajectory
+      main: ctd
+      spread: 0.4
+      volume: rms
+
+      # trigger: the envelope jumps to a new speaker on each onset detected in
+      # `main`, spreading over the neighbours by `spread`.
+      # Uncomment to drive both at once and hear them combined.
+      # - mode: trigger
+      #   main: flx
+      #   spread: flt
+      #   volume: rms

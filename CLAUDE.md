@@ -46,7 +46,8 @@ cmake --install core/build   # Installs to core/lib
 ./build.sh -i puredata       # Build and install
 ./build.sh maxmsp            # Build Max/MSP externals
 ./build.sh -i maxmsp         # Build and install
-./build.sh jack              # JACK client — currently broken, see docs/design/repo-audit-2026-07-30.md
+./build.sh jack              # Standalone JACK client
+./build.sh -i jack           # Build and install to jack/bin/zerr_jack
 ```
 
 ### Code Formatting
@@ -85,7 +86,10 @@ Platform-independent C++17 static library (`zerr_core`). Three subsystems:
 
 - **PureData** (`puredata/`): 4 externals (`zerr_features~`, `zerr_envelopes~`, `zerr_combinator~`, `zerr_disperser~`). Built with pd-lib-builder (git submodule) + Makefile.
 - **Max/MSP** (`maxmsp/`): 5 externals (mc.zerr.* variants). Built with Min-DevKit (git submodule) + CMake.
-- **JACK** (`jack/`): Standalone client, in development. Uses Meson.
+- **JACK** (`jack/`): Standalone client `zerr_jack` running the whole pipeline in one process —
+  1 input port, 1 output port per speaker, configured from a YAML file (`jack/config/example.yaml`).
+  Built with CMake against the shared conan toolchain; `libjack` alone comes from pkg-config, since
+  it must match the running server. Installs to `jack/bin/`.
 
 ### Speaker Configurations (`configs/`)
 

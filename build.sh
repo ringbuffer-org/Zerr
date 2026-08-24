@@ -304,18 +304,20 @@ build_maxmsp() {
 
 # -----------------------------------------------------------------------------
 build_jack() {
-    echo "Building Zerr* for JACK..."
-    cd "$ROOT/jack" || { echo "Failed to enter 'jack' directory"; exit 1; }
+    # Windows is rejected by assert_target_supported before any build starts.
+    ensure_deps
+    reconfigure_if_stale "$ROOT/jack/build"
 
-    meson setup builddir --wipe 2>/dev/null || meson setup builddir
-    meson compile -C builddir
+    echo "Building Zerr* for JACK..."
+    cmake -S "$ROOT/jack" -B "$ROOT/jack/build" "${CMAKE_GEN_ARGS[@]}" \
+        -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
+        -DCMAKE_BUILD_TYPE=Release
+    cmake --build "$ROOT/jack/build"
 
     if [ "$install" = true ]; then
         echo "Installing JACK build..."
-        meson install -C builddir
+        cmake --build "$ROOT/jack/build" --target install
     fi
-
-    cd "$ROOT" || exit 1
 }
 
 
@@ -352,7 +354,9 @@ clean_maxmsp() {
 
 clean_jack() {
     echo "Cleaning JACK build artifacts..."
-    rm -rf "$ROOT/jack/builddir"
+    # builddir is the meson output the pre-CMake target left behind; drop it too so
+    # a tree carried across the switch does not keep a stale one around forever.
+    rm -rf "$ROOT/jack/build" "$ROOT/jack/builddir" "$ROOT/jack/bin"
     echo "JACK cleaned."
 }
 

@@ -18,6 +18,9 @@ lib/
 # Compiled libraries
 libzerr_core.a
 
+# JACK client install destination
+jack/bin/
+
 # C/C++ build artifacts
 *.o
 
