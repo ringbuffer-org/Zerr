@@ -19,13 +19,23 @@ on:
       - main
   workflow_dispatch:
 
+# Jobs only ever read the repository: there is no cross-run artifact download left,
+# so nothing here needs a token beyond checkout. State it rather than inherit
+# whatever the repository default happens to be, as deploy-doxygen.yml already does.
+permissions:
+  contents: read
+
 # Deliberately no `paths:` filters. A core change must rebuild every wrapper, and
 # a wrapper-only change must still build -- the old per-workflow filters are why a
 # puredata/- or maxmsp/-only change used to trigger nothing at all. The extra
 # minutes are paid back by the conan cache and by cancelling superseded runs.
+#
+# Superseding is right for a branch, wrong for main: two merges in quick succession
+# would cancel the first one's run, and that commit would never get the artifact set
+# the header above promises. Only cancel outside main.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   # Artifacts are keyed by TOOLCHAIN, not by platform. Windows needs two distinct
@@ -64,7 +74,11 @@ jobs:
         if: matrix.mingw
         uses: egor-tensin/setup-mingw@v3
         with:
-          arch: x64
+          # `platform`, not `arch`. The old workflows passed `arch: x64`, which the
+          # action rejects -- run 32314194864 logged "Unexpected input(s) 'arch',
+          # valid inputs are ['platform', 'cc', 'version']". The builds were 64-bit
+          # only because that is the action's default, never because we asked.
+          platform: x64
 
       - uses: ./.github/actions/setup-deps
         with:
@@ -89,11 +103,20 @@ jobs:
         with:
           name: zerr-core-${{ matrix.id }}
           path: core/lib
+          if-no-files-found: error
           retention-days: 7
 
   puredata:
     name: puredata (${{ matrix.id }})
+    # `needs` cannot name a single matrix leg, so this waits on all three core legs.
+    # Without the `if`, one platform's core failure would *skip* every wrapper job --
+    # including puredata (windows-mingw), the only job that can catch core/wrapper
+    # API drift at build time. `!cancelled()` runs them anyway: the leg whose core
+    # artifact is genuinely missing fails at download, and the others still report.
+    # (The wait itself is inherent to matrix-level `needs`; splitting core into
+    # per-platform jobs would remove it at the cost of the matrix.)
     needs: core
+    if: ${{ !cancelled() }}
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -125,7 +148,11 @@ jobs:
         if: matrix.mingw
         uses: egor-tensin/setup-mingw@v3
         with:
-          arch: x64
+          # `platform`, not `arch`. The old workflows passed `arch: x64`, which the
+          # action rejects -- run 32314194864 logged "Unexpected input(s) 'arch',
+          # valid inputs are ['platform', 'cc', 'version']". The builds were 64-bit
+          # only because that is the action's default, never because we asked.
+          platform: x64
 
       # No run-id and no github-token: this resolves to the current run, which is
       # what makes the artifact and the checked-out sources the same commit.
@@ -188,6 +215,10 @@ jobs:
         with:
           name: zerr-pd-${{ matrix.id }}
           path: puredata/build/zerr
+          # Nothing consumes this artifact, so without `error` a wrapper that stopped
+          # emitting into puredata/build/zerr would leave the job green and publish
+          # nothing. The core job is only incidentally protected by its consumers.
+          if-no-files-found: error
           retention-days: 7
 
   # Max/MSP has never had a CI job on any platform. macOS only for now: Max does
@@ -197,6 +228,7 @@ jobs:
   maxmsp:
     name: maxmsp (${{ matrix.id }})
     needs: core
+    if: ${{ !cancelled() }}   # see the note on puredata above
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -236,4 +268,5 @@ jobs:
         with:
           name: zerr-max-${{ matrix.id }}
           path: maxmsp/externals
+          if-no-files-found: error
           retention-days: 7

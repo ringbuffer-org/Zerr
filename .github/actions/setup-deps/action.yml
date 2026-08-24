@@ -14,17 +14,26 @@ runs:
   steps:
     # Keyed on the profile as well as the OS: windows-mingw and windows-msvc are
     # both runner.os == Windows but must never share a cache entry, since their
-    # package_ids differ. Any change to conanfile.txt or to any profile
-    # invalidates every entry, which is coarse but cheap -- profiles change rarely,
-    # and a stale hit here would silently reintroduce the mismatched-dependency
-    # problem the single root resolve exists to prevent.
+    # package_ids differ.
+    #
+    # ImageVersion is in the key because the compiler is not. profiles/mingw pins
+    # compiler.version=13 while the runner actually compiles with gcc 16.1.0, so
+    # neither the package_id nor a conanfile/profile hash changes when the image
+    # bumps its toolchain -- conan would restore fftw and yaml-cpp built by the
+    # previous compiler and link them into a core built by the new one. Keying on
+    # the image makes a toolchain change a cache miss, which is the honest outcome.
+    #
+    # No restore-keys, deliberately. A prefix restore is by definition a stale hit,
+    # which is what this key exists to prevent; it also re-saves the restored tree
+    # under the new key, so ~/.conan2 would accrete every historical revision until
+    # it hit the 10GB repository ceiling and started evicting live entries. A full
+    # miss costs one from-source build of fftw and yaml-cpp, which is the correct
+    # price for a changed toolchain.
     - name: Cache conan packages
       uses: actions/cache@v4
       with:
         path: ~/.conan2
-        key: conan-${{ runner.os }}-${{ inputs.profile }}-${{ hashFiles('conanfile.txt', 'profiles/*') }}
-        restore-keys: |
-          conan-${{ runner.os }}-${{ inputs.profile }}-
+        key: conan-${{ runner.os }}-${{ env.ImageVersion }}-${{ inputs.profile }}-${{ hashFiles('conanfile.txt', 'profiles/*') }}
 
     # Pinned below the next major: a bare `pip install conan` would float to
     # conan 3.x and break these jobs with no change on our side.
