@@ -29,11 +29,21 @@ runs:
     # it hit the 10GB repository ceiling and started evicting live entries. A full
     # miss costs one from-source build of fftw and yaml-cpp, which is the correct
     # price for a changed toolchain.
+    # ImageVersion has to be read in a shell: the `env` context is not populated
+    # with the runner image's variables inside a composite action's `with:`, so
+    # `${{ env.ImageVersion }}` there silently expands to an empty string and the
+    # key gains a blank field instead of the image id. Verified the wrong way
+    # round in run 32787801135, whose key came out `conan-Windows--profiles/...`.
+    - name: Identify runner image
+      id: image
+      shell: bash
+      run: echo "id=${ImageVersion:-unknown}" >> "$GITHUB_OUTPUT"
+
     - name: Cache conan packages
       uses: actions/cache@v4
       with:
         path: ~/.conan2
-        key: conan-${{ runner.os }}-${{ env.ImageVersion }}-${{ inputs.profile }}-${{ hashFiles('conanfile.txt', 'profiles/*') }}
+        key: conan-${{ runner.os }}-${{ steps.image.outputs.id }}-${{ inputs.profile }}-${{ hashFiles('conanfile.txt', 'profiles/*') }}
 
     # Pinned below the next major: a bare `pip install conan` would float to
     # conan 3.x and break these jobs with no change on our side.
