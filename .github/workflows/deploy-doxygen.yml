@@ -50,6 +50,13 @@ jobs:
       # "Resource not accessible by integration". It is kept only so that no edit is
       # needed here once Pages is switched on out-of-band -- at which point the
       # initial Get succeeds and Create is never reached.
+      #
+      # Do not read that as a safety net. It cannot switch an existing site's
+      # build_type from legacy to workflow either (that PUT needs admin too), so if
+      # Pages is enabled as "Deploy from a branch", GitHub's legacy Jekyll builder
+      # keeps running and races this job for the same environment -- on 2026-08-24 it
+      # won by 16 seconds and published a rendering of the repo root instead of the
+      # generated docs. Whoever enables Pages must choose source "GitHub Actions".
       - name: Configure Pages
         uses: actions/configure-pages@v4
         with:
