@@ -12,7 +12,7 @@
 #include "logger.h"
 #include "types.h"
 #include "utils.h"
-#include <functional>
+#include <atomic>
 
 namespace zerr {
 /**
@@ -45,19 +45,56 @@ class EnvelopeCombinator {
     /**
      * @brief Process input envelope blocks and combine using selected mode
      * @param in Input envelope blocks to process
-     * @return Combined output envelope blocks
+     * @return Reference to the internal output buffer, valid until the next perform()
+     *
+     * Taken and returned by reference so that nothing is allocated on the audio thread.
      */
-    Blocks perform(Blocks in);
+    const Blocks& perform(const Blocks& in);
+    /**
+     * @brief Change the combination mode
+     * @param mode Mode name: "add", "root" or "max"
+     * @return false, leaving the mode unchanged, if the name is not a known mode
+     *
+     * Safe to call from a control thread while perform() runs on an audio thread: the
+     * mode is a lock-free atomic that perform() loads once per block, so a block is
+     * never processed partly in one mode and partly in another.
+     */
+    bool set_mode(const std::string& mode) noexcept;
+    /**
+     * @brief Change the combination mode
+     * @param mode The mode to switch to
+     */
+    void set_mode(CombMode mode) noexcept;
+    /**
+     * @brief Get the combination mode currently in use
+     */
+    [[nodiscard]] CombMode get_mode() const noexcept
+    {
+        return combMode.load(std::memory_order_relaxed);
+    }
+    /**
+     * @brief Get the name of the combination mode currently in use
+     * @return "add", "root" or "max"
+     */
+    [[nodiscard]] const char* get_mode_name() const noexcept { return toString(get_mode()); }
     ~EnvelopeCombinator() = default;
 
   private:
-    using ProcessFunction = void (EnvelopeCombinator::*)();
-    ProcessFunction processFunc;
-
     int numSource;                  /**< Number of envelope sources to combine */
     int numChannel;                 /**< Number of channels per source */
     zerr::SystemConfigs systemCfgs; /**< system configuration: sample_rate, block_size */
-    std::string combMode;           /**< Mode for combining envelopes */
+
+    /**< Mode for combining envelopes. Atomic because a control thread may change it while
+         the audio thread is inside perform(). */
+    std::atomic<CombMode> combMode{CombMode::Max};
+    static_assert(std::atomic<CombMode>::is_always_lock_free,
+                  "CombMode must be lock-free so set_mode() never blocks the audio thread");
+
+    bool modeValid{true}; /**< False when the constructor was given an unknown mode name */
+    /**< The mode name as given to the constructor, kept only so initialize() can name it in
+         its error message. Control thread only -- never read while perform() runs. */
+    std::string requestedModeName;
+    bool prepared{false}; /**< True once initialize() has sized the buffers */
 
     Logger logger; /**< Logger instance for debug/error messages */
 

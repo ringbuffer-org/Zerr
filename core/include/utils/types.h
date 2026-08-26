@@ -60,6 +60,78 @@ inline GenMode parseGenMode(const std::string& s)
     throw std::invalid_argument("Unknown GenMode: " + s);
 }
 
+/**< Strategy for combining envelopes coming from several sources */
+enum class CombMode {
+    Add,  /**< Sum the envelopes across sources */
+    Root, /**< Geometric mean: the Nth root of the N sources multiplied together */
+    Max,  /**< Largest envelope value across sources */
+};
+
+/**
+ * @brief Parse a string into a CombMode enum value without throwing
+ * @param s The string to parse ("add", "root" or "max")
+ * @param out Receives the parsed value; left untouched when the string is not a mode
+ * @return true if the string named a mode
+ *
+ * The non-throwing counterpart of parseCombMode, for callers on a host's C callback
+ * stack where an escaping exception would terminate the process.
+ */
+inline bool tryParseCombMode(const std::string& s, CombMode& out) noexcept
+{
+    if (s == "add") {
+        out = CombMode::Add;
+        return true;
+    }
+    if (s == "root") {
+        out = CombMode::Root;
+        return true;
+    }
+    if (s == "max") {
+        out = CombMode::Max;
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief Parse a string into a CombMode enum value
+ * @param s The string to parse ("add", "root" or "max")
+ * @return CombMode The corresponding enum value
+ * @throws std::invalid_argument if the string is not a valid mode
+ */
+inline CombMode parseCombMode(const std::string& s)
+{
+    CombMode mode;
+    if (!tryParseCombMode(s, mode)) {
+        throw std::invalid_argument("Unknown CombMode: " + s);
+    }
+    return mode;
+}
+
+/**
+ * @brief Render a CombMode as the string that names it
+ */
+inline const char* toString(CombMode mode) noexcept
+{
+    switch (mode) {
+    case CombMode::Add:
+        return "add";
+    case CombMode::Root:
+        return "root";
+    case CombMode::Max:
+        return "max";
+    }
+    return "max";
+}
+
+/**
+ * @brief The supported combination modes as a human-readable list, for error messages
+ *
+ * Single source of truth for wrappers reporting a bad mode, so a new mode only has to be
+ * added here and in tryParseCombMode.
+ */
+inline const char* combModeNames() noexcept { return "add, root or max"; }
+
 using ConfigPath = std::string; /**< Path string for configuration files */
 
 using Params = std::vector<Param>; /**< Vector container for parameter values */
