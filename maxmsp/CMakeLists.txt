@@ -110,6 +110,7 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/help/" DESTINATION help
         FILES_MATCHING PATTERN "*.maxhelp" PATTERN "*.yaml" PATTERN "*.mxo" EXCLUDE)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/extras/" DESTINATION extras
         FILES_MATCHING PATTERN "*.maxpat")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/media/" DESTINATION media)
 # Speaker layouts shipped with the package. Max adds a package's misc/ folder to
 # the search path, so `zerr.envelopes~ trigger ring_8` resolves without a path.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../configs/" DESTINATION misc
