@@ -8,6 +8,10 @@ _Maintainer steps for shipping `maxmsp/` as a Max package. User-facing instructi
 - The release notes must open with a **Breaking** section when anything below applies. Pending as
   of 2026-10-12: the Max objects lost their `mc.` prefix (PR #21), and `root` combination mode now
   computes the geometric mean instead of behaving like `max` (PR #19).
+- Keep `os.macintosh.platform` as `["x64", "aarch64"]` in `package-info.json` even though the
+  bundles are arm64 only. Cycling '74's docs describe `x64` as 64-bit Intel, but Max 9 on Apple
+  Silicon refuses a package that lists only `aarch64` ("Could not load package 'Zerr', 64-bit
+  architecture unsupported", seen 2026-10-12). The README states the real requirement.
 - Bump `version` in `maxmsp/package-info.json`. It is the only place the version lives: CMake reads
   it, every external is compiled with it as `ZERR_MAX_VERSION`, and the zip name carries it.
 - Restyle `maxmsp/extras/Zerr_Overview.maxpat` in Max if it has not been done since the last text
