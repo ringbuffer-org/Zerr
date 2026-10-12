@@ -62,6 +62,14 @@ class FeatureBank {
      * @param feature_names New list of feature names to activate
      */
     void reset(FeatureNames feature_names);
+    /**
+     * @brief The short names every FeatureBank can activate, in registration order
+     *
+     * Static so a host can list or validate names without building a bank (the
+     * constructor allocates FFT plans). Wrappers print this in their error messages
+     * instead of carrying their own copy of the table.
+     */
+    static FeatureNames availableFeatures();
 
   private:
     std::map<std::string, CreateFunc>

@@ -76,17 +76,39 @@ FeaturesVals FeatureBank::perform(Samples in)
     return y;
 }
 
-// TODO(Zeyu yang): make this an external function
+namespace {
+struct Registration {
+    const char* name;
+    FeatureBank::CreateFunc create;
+};
+
+// The one table of feature extractors. Adding a feature is one line here.
+const Registration kRegistry[] = {
+    {"rms", []() { return FeatureBank::fe_ptr(new RootMeanSquare()); }},   // Root Mean Square
+    {"zcr", []() { return FeatureBank::fe_ptr(new ZeroCrossingRate()); }}, // Zero Crossing Rate
+    {"flx", []() { return FeatureBank::fe_ptr(new Flux()); }},             // Spectral Flux
+    {"ctd", []() { return FeatureBank::fe_ptr(new Centroid()); }},         // Spectral Centroid
+    {"rlf", []() { return FeatureBank::fe_ptr(new Rolloff()); }},          // Spectral Rolloff
+    {"cf", []() { return FeatureBank::fe_ptr(new CrestFactor()); }},       // Crest Factor
+    {"flt", []() { return FeatureBank::fe_ptr(new Flatness()); }},         // Spectral Flatness
+    {"zc", []() { return FeatureBank::fe_ptr(new ZeroCrossings()); }},     // Zero Crossings
+};
+} // namespace
+
 void FeatureBank::_regist_all()
 {
-    _regist("rms", []() { return fe_ptr(new RootMeanSquare()); });   // Root Mean Square
-    _regist("zcr", []() { return fe_ptr(new ZeroCrossingRate()); }); // Zero Crossing Rate
-    _regist("flx", []() { return fe_ptr(new Flux()); });             // Spectral Flux
-    _regist("ctd", []() { return fe_ptr(new Centroid()); });         // Spectral Centroid
-    _regist("rlf", []() { return fe_ptr(new Rolloff()); });          // Spectral Rolloff
-    _regist("cf", []() { return fe_ptr(new CrestFactor()); });       // Crest Factor
-    _regist("flt", []() { return fe_ptr(new Flatness()); });         // Spectral Flatness
-    _regist("zc", []() { return fe_ptr(new ZeroCrossings()); });     // Zero Crossings
+    for (const auto& entry : kRegistry) {
+        _regist(entry.name, entry.create);
+    }
+}
+
+FeatureNames FeatureBank::availableFeatures()
+{
+    FeatureNames names;
+    for (const auto& entry : kRegistry) {
+        names.emplace_back(entry.name);
+    }
+    return names;
 }
 
 void FeatureBank::_regist(const std::string& className, CreateFunc createFunc)
