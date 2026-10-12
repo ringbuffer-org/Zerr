@@ -1,7 +1,7 @@
 /**
- * @file    mc.zerr.features_tilde.cpp
+ * @file    zerr.features_tilde.cpp
  * @author  Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief   mc.zerr.features~ Max/MSP External using Max API for better multi-channel support
+ * @brief   zerr.features~ Max/MSP External - one signal outlet per audio feature
  * @date    2025-05-01
  *
  * @copyright  Copyright (c) 2023-2025 Zeyu Yang
@@ -21,12 +21,12 @@
 
 /**
  * @struct t_zerr_features
- * @brief Main data structure for the mc.zerr.features~ object
+ * @brief Main data structure for the zerr.features~ object
  */
 typedef struct _zerr_features {
-    t_pxobject x_obj; ///< DSP object header (must be first)
+    t_pxobject x_obj;   ///< DSP object header (must be first)
     long channel_count; ///< Channel count of output signal
-    ZerrFeatures* zf; ///< Pointer to the zerr_features implementation
+    ZerrFeatures* zf;   ///< Pointer to the zerr_features implementation
 } t_zerr_features;
 
 //------------------------------------------------------------------------------
@@ -36,8 +36,11 @@ typedef struct _zerr_features {
 void* zerr_features_new(t_symbol* s, long argc, t_atom* argv);
 void zerr_features_free(t_zerr_features* x);
 void zerr_features_assist(t_zerr_features* x, void* b, long m, long a, char* s);
-void zerr_features_dsp64(t_zerr_features* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags);
-void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam);
+void zerr_features_dsp64(t_zerr_features* x, t_object* dsp64, short* count, double samplerate,
+                         long maxvectorsize, long flags);
+void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, long numins,
+                             double** outs, long numouts, long sampleframes, long flags,
+                             void* userparam);
 void zerr_features_bang(t_zerr_features* x);
 
 // Class pointer
@@ -51,17 +54,13 @@ C74_EXPORT void ext_main(void* r)
 {
     t_class* c;
 
-    c = class_new("zerr.features~",
-        (method)zerr_features_new,
-        (method)zerr_features_free,
-        sizeof(t_zerr_features),
-        0L,
-        A_GIMME,
-        0);
+    c = class_new("zerr.features~", (method)zerr_features_new, (method)zerr_features_free,
+                  sizeof(t_zerr_features), 0L, A_GIMME, 0);
 
     class_addmethod(c, (method)zerr_features_dsp64, "dsp64", A_CANT, 0);
     class_addmethod(c, (method)zerr_features_assist, "assist", A_CANT, 0);
-    // class_addmethod(c, (method)zerr_features_multichanneloutputs, "multichanneloutputs", A_CANT, 0);
+    // class_addmethod(c, (method)zerr_features_multichanneloutputs, "multichanneloutputs", A_CANT,
+    // 0);
     class_addmethod(c, (method)zerr_features_bang, "bang", 0);
 
     // CLASS_ATTR_LONG(c, "chans", 0, t_zerr_features, channel_count);
@@ -88,8 +87,8 @@ void* zerr_features_new(t_symbol* s, long argc, t_atom* argv)
         return NULL;
 
     // Initialize default values -----------------------------------------------
-    x->zf = NULL;
-    x->channel_count = 1; // Default 1 channel output for the multichannel outlet
+    x->zf            = NULL;
+    x->channel_count = 1; // Default 1 outlet; one signal outlet per requested feature
 
     // Parsing arguments -------------------------------------------------------
     long offset = attr_args_offset(argc, argv);
@@ -153,8 +152,9 @@ void zerr_features_assist(t_zerr_features* x, void* b, long m, long a, char* s)
 {
     if (m == ASSIST_INLET) {
         strcpy(s, "(signal) Input source signal");
-    } else if (m == ASSIST_OUTLET) {
-        strcpy(s, "(multichannel signal) Output extracted audio features");
+    }
+    else if (m == ASSIST_OUTLET) {
+        strcpy(s, "(signal) Extracted audio feature, one outlet per feature argument");
     }
 }
 
@@ -162,12 +162,15 @@ void zerr_features_assist(t_zerr_features* x, void* b, long m, long a, char* s)
 // DSP Methods
 //------------------------------------------------------------------------------
 
-void zerr_features_dsp64(t_zerr_features* x, t_object* dsp64, short* count, double samplerate, long maxvectorsize, long flags)
+void zerr_features_dsp64(t_zerr_features* x, t_object* dsp64, short* count, double samplerate,
+                         long maxvectorsize, long flags)
 {
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_features_perform64, 0, NULL);
 }
 
-void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, long numins, double** outs, long numouts, long sampleframes, long flags, void* userparam)
+void zerr_features_perform64(t_zerr_features* x, t_object* dsp64, double** ins, long numins,
+                             double** outs, long numouts, long sampleframes, long flags,
+                             void* userparam)
 {
     x->zf->perform(ins, numins, outs, numouts, sampleframes);
 }

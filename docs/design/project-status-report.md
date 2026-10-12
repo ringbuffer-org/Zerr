@@ -92,7 +92,7 @@ Audio features drive spatial distribution — no manual positioning.
 | Env                        | Linux | macOS | Windows | Build system            |
 | -------------------------- | :---: | :---: | :-----: | ----------------------- |
 | **PureData** (4 externals) |   ✅   |   ✅   |    ✅    | pd-lib-builder + Make   |
-| **Max/MSP** (5 `mc.zerr.*`)|   ➖   |   ✅   |   🛠️    | Min-DevKit + CMake      |
+| **Max/MSP** (4 `zerr.*`)      |   ➖   |   ✅   |   🛠️    | Min-DevKit + CMake      |
 | **JACK** (skeleton)        |  🛠️   |  🛠️   |   🛠️    | Meson                   |
 | **SuperCollider**          |   ⏳   |   ⏳   |    ⏳    | planned                 |
 

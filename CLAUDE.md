@@ -84,7 +84,7 @@ Platform-independent C++17 static library (`zerr_core`). Three subsystems:
 ### Platform Wrappers
 
 - **PureData** (`puredata/`): 4 externals (`zerr_features~`, `zerr_envelopes~`, `zerr_combinator~`, `zerr_disperser~`). Built with pd-lib-builder (git submodule) + Makefile.
-- **Max/MSP** (`maxmsp/`): 5 externals (mc.zerr.* variants). Built with Min-DevKit (git submodule) + CMake.
+- **Max/MSP** (`maxmsp/`): 4 externals (`zerr.features~`, `zerr.envelopes~`, `zerr.combinator~`, `zerr.disperser~`; natively multichannel, no `mc.` prefix). Built with Min-DevKit (git submodule) + CMake.
 - **JACK** (`jack/`): Standalone client, in development. Uses Meson.
 
 ### Speaker Configurations (`configs/`)

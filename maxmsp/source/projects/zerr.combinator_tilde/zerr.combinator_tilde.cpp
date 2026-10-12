@@ -1,7 +1,7 @@
 /**
- * @file    mc.zerr.combinator_tilde.cpp
+ * @file    zerr.combinator_tilde.cpp
  * @author  Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief   mc.zerr.combinator~ Max/MSP External - Multichannel signal combinator
+ * @brief   zerr.combinator~ Max/MSP External - Multichannel signal combinator
  * @date    2025-05-03
  *
  * @copyright  Copyright (c) 2023-2025 Zeyu Yang
@@ -27,7 +27,7 @@
 
 /**
  * @struct t_zerr_combinator
- * @brief Main data structure for the mc.zerr.combinator~ object
+ * @brief Main data structure for the zerr.combinator~ object
  */
 typedef struct _zerr_combinator {
     t_pxobject x_obj;   ///< DSP object header (must be first)
@@ -76,7 +76,7 @@ C74_EXPORT void ext_main(void* r)
 {
     t_class* c;
 
-    c = class_new("mc.zerr.combinator~", (method)zerr_combinator_new, (method)zerr_combinator_free,
+    c = class_new("zerr.combinator~", (method)zerr_combinator_new, (method)zerr_combinator_free,
                   sizeof(t_zerr_combinator), 0L, A_GIMME, 0);
 
     // Register methods
