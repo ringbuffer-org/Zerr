@@ -27,8 +27,9 @@ add_library(
     ${SOURCE_FILES}
 )
 
-# Link against zerr_core (FFTW3 and yaml-cpp propagate transitively via core)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${ZERR_LIBRARY})
+# Pure Min-API object: it multiplies signals and uses nothing from zerr_core,
+# so it links no library at all.
+target_compile_definitions(${PROJECT_NAME} PRIVATE ZERR_MAX_VERSION="${ZERR_MAX_PACKAGE_VERSION}")
 
 include(${C74_MIN_API_DIR}/script/min-posttarget.cmake)
 

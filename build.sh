@@ -297,9 +297,32 @@ build_maxmsp() {
     cmake --build "$ROOT/maxmsp/build"
 
     if [ "$install" = true ]; then
-        echo "Installing Max/MSP build..."
-        cmake --build "$ROOT/maxmsp/build" --target install
+        package_maxmsp
     fi
+}
+
+# Assembles the Max package (maxmsp/dist/Zerr, see the install rules in
+# maxmsp/CMakeLists.txt) and zips it the way a release would ship it. ditto keeps the
+# bundle metadata and permissions that a plain zip of a .mxo can lose.
+package_maxmsp() {
+    local dist="$ROOT/maxmsp/dist"
+    echo "Assembling the Max package..."
+    cmake --install "$ROOT/maxmsp/build"
+
+    local version
+    version=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' "$ROOT/maxmsp/package-info.json" | head -n 1)
+    local probe archs
+    probe=$(ls -d "$dist"/Zerr/externals/*.mxo | head -n 1)
+    archs=$(lipo -archs "$probe/Contents/MacOS/$(basename "$probe" .mxo)")
+    case "$archs" in
+        *" "*) archs=universal ;;
+    esac
+    local zip="Zerr-${version}-macos-${archs}.zip"
+
+    rm -f "$dist/$zip"
+    ( cd "$dist" && ditto -c -k --sequesterRsrc --keepParent Zerr "$zip" )
+    echo "Max package assembled: $dist/Zerr"
+    echo "Max package zipped:    $dist/$zip"
 }
 
 # -----------------------------------------------------------------------------
@@ -346,7 +369,10 @@ clean_puredata() {
 
 clean_maxmsp() {
     echo "Cleaning Max/MSP build artifacts..."
-    rm -rf "$ROOT/maxmsp/build"
+    rm -rf "$ROOT/maxmsp/build" "$ROOT/maxmsp/externals" "$ROOT/maxmsp/dist"
+    # Hand-copied bundles beside the help patches shadow fresh builds; the
+    # installed package in maxmsp/dist/Zerr is the place to test from.
+    rm -rf "$ROOT"/maxmsp/help/*.mxo
     echo "Max/MSP cleaned."
 }
 
