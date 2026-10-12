@@ -8,6 +8,8 @@
  */
 #include "envelopegenerator.h"
 
+#include <algorithm>
+
 using zerr::Blocks;
 using zerr::DEFAULT_ONSET_DEBOUNCE;
 using zerr::DISTANCE_SCALE;
@@ -43,9 +45,8 @@ bool EnvelopeGenerator::initialize()
         break;
     }
 
-    // get the number of speakers
-    int numOutlet = speakerManager->getNumAllSpeakers();
-    ;
+    // get the number of speakers (the public member, not a shadowing local)
+    numOutlet = speakerManager->getNumAllSpeakers();
 
     // initialize the inputbuffer and outputbuffer size.
     inputBuffers.resize(numInlet, Samples(systemCfgs.block_size, 0.0f));
@@ -163,12 +164,21 @@ void EnvelopeGenerator::_processTrigger()
     // process trigger blocks: detect onsets
     onsetDetector->detectOnsetInBlock(triggr);
 
+    // never write past the shorter of the input and output blocks
+    const size_t frames =
+        std::min(triggr.size(), outputBuffers.empty() ? size_t{0} : outputBuffers[0].size());
+
     // calculate the envelopes TODO: add interpolator
-    for (size_t cnt = 0; cnt < inputBuffers[0].size(); ++cnt) {
+    for (size_t cnt = 0; cnt < frames; ++cnt) {
         // find main speaker
         currIdx = speakerManager->getIndexesByTrigger(triggr[cnt], triggerMode);
-        channel = indexChannelLookup[currIdx]; // get the channel of the
-                                               // current speaker
+        // find, not operator[]: never insert into the lookup from the audio thread, and a
+        // speaker without a channel (deactivated at runtime) leaves this frame silent
+        auto lookup = indexChannelLookup.find(currIdx);
+        if (lookup == indexChannelLookup.end() || lookup->second >= outputBuffers.size()) {
+            continue;
+        }
+        channel                     = lookup->second;
         outputBuffers[channel][cnt] = 1.0;
         powerSum                    = 1.0;
 
@@ -178,7 +188,8 @@ void EnvelopeGenerator::_processTrigger()
             if (chnl == channel) {
                 continue;
             }
-            gain                     = _calculateGain(distances[chnl], spread[cnt]);
+            // the distance row can be shorter than the channel count after `active set`
+            gain = chnl < distances.size() ? _calculateGain(distances[chnl], spread[cnt]) : 0.0;
             outputBuffers[chnl][cnt] = gain * gain;
             powerSum += gain * gain;
         }
@@ -207,11 +218,21 @@ void EnvelopeGenerator::_processTrajectory()
     Samples& spread = inputBuffers[1];
     Samples& volume = inputBuffers[2];
 
-    for (size_t cnt = 0; cnt < trjcty.size(); ++cnt) {
+    const size_t frames =
+        std::min(trjcty.size(), outputBuffers.empty() ? size_t{0} : outputBuffers[0].size());
+
+    for (size_t cnt = 0; cnt < frames; ++cnt) {
         speakerPair = speakerManager->getIndexesByTrajectory(trjcty[cnt]);
 
-        channelPair.first  = indexChannelLookup[speakerPair.first];
-        channelPair.second = indexChannelLookup[speakerPair.second];
+        // find, not operator[]: see _processTrigger
+        auto first  = indexChannelLookup.find(speakerPair.first);
+        auto second = indexChannelLookup.find(speakerPair.second);
+        if (first == indexChannelLookup.end() || second == indexChannelLookup.end() ||
+            first->second >= outputBuffers.size() || second->second >= outputBuffers.size()) {
+            continue;
+        }
+        channelPair.first  = first->second;
+        channelPair.second = second->second;
 
         if (speakerPair.first == speakerPair.second) {
             outputBuffers[channelPair.first][cnt] = volume[cnt];
