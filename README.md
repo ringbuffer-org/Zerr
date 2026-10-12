@@ -66,11 +66,18 @@ conan install . --output-folder=build --build=missing \
 - Build/Install with following commands
 
 ```bash
-# build puredta externals
+# build puredata externals
 ./build.sh puredata
 
-# build and install puredata package
+# build and stage the puredata package in puredata/dist/zerr (plus a zip)
+./build.sh -p puredata
+
+# build and install the package into Pd's user library folder (~/Library/Pd on macOS;
+# set PDLIBDIR to choose another, e.g. ~/.local/lib/pd/extra on Linux)
 ./build.sh -i puredata
+
+# for development: install as a symlink to puredata/dist/zerr instead of a copy
+./build.sh -l puredata
 ```
 
 #### For Max/MSP
@@ -82,11 +89,17 @@ conan install . --output-folder=build --build=missing \
 # build Max externals into maxmsp/externals
 ./build.sh maxmsp
 
-# build, then assemble the Max package in maxmsp/dist/Zerr and zip it
+# build and stage the Max package in maxmsp/dist/Zerr (plus a zip)
+./build.sh -p maxmsp
+
+# build and install the package into ~/Documents/Max 9/Packages (set MAX_PACKAGES_DIR to override)
 ./build.sh -i maxmsp
+
+# for development: install as a symlink to maxmsp/dist/Zerr instead of a copy
+./build.sh -l maxmsp
 ```
 
-- To use the build from Max, symlink or copy `maxmsp/dist/Zerr` into `~/Documents/Max 9/Packages/`.
+- Max scans its Packages folder at launch, so restart Max after installing or rebuilding.
   The externals are arm64 only; a universal build is not produced
 
 #### On Windows

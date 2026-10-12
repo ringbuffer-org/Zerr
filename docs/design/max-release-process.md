@@ -21,7 +21,7 @@ _Maintainer steps for shipping `maxmsp/` as a Max package. User-facing instructi
 ```bash
 ./build.sh -c maxmsp            # drops build/, externals/, dist/ and stray help/*.mxo
 ./build.sh core
-./build.sh -i maxmsp            # builds, then cmake --install → maxmsp/dist/Zerr + ditto zip
+./build.sh -p maxmsp            # builds, then cmake --install → maxmsp/dist/Zerr + ditto zip
 ```
 
 Expected: `maxmsp/dist/Zerr/externals/` holds exactly `zerr.combinator~.mxo`, `zerr.disperser~.mxo`,
@@ -46,7 +46,7 @@ Max loads whatever it finds first on its search path. Test from the assembled pa
 
 1. Quit Max.
 2. Remove any older `~/Documents/Max 9/Packages/{Zerr,zerr,maxmsp}`.
-3. Symlink or copy `maxmsp/dist/Zerr` into `~/Documents/Max 9/Packages/`.
+3. `./build.sh -l maxmsp` (symlink) or `./build.sh -i maxmsp` (copy) to put it into `~/Documents/Max 9/Packages/`.
 4. Start Max; in each help patch send `bang` to the object and confirm the Console shows the new
    version string. That is the stale-binary detector.
 5. Once per release, download the CI artifact through a browser, unzip, confirm `xattr -l` shows

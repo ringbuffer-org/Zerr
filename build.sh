@@ -1,24 +1,56 @@
 #!/bin/bash
 set -e
 
+# -----------------------------------------------------------------------------
+# Usage: build.sh [-p|-i|-l] [-c] <deps|core|puredata|maxmsp|jack>...
+#
+#   (none)  build only
+#   -p      package: stage a distributable in <target>/dist/ and zip it
+#   -i      install by copy into the host application's user folder (implies -p)
+#   -l      install by symlink to the staged package, for development (implies -p)
+#   -c      clean the target's build output (and dist/) instead of building
+#
+# -p, -i and -l mean the same thing for every wrapper, so the Pd and Max targets
+# are driven the same way; see package_<target>, install_copy and install_link.
+# -----------------------------------------------------------------------------
+usage() {
+    cat <<USAGE
+Usage: $0 [-p|-i|-l] [-c] <deps|core|puredata|maxmsp|jack>...
+
+  (none)  build only
+  -p      package: stage a distributable in <target>/dist/ and zip it
+  -i      install by copy into the host app's user folder (implies -p)
+            puredata -> \$PDLIBDIR/zerr        (pd-lib-builder's default: ~/Library/Pd on macOS)
+            maxmsp   -> \$MAX_PACKAGES_DIR/Zerr (default: ~/Documents/Max 9/Packages)
+  -l      install by symlink to the staged package, for development (implies -p)
+  -c      clean the target's build output and dist/ instead of building
+USAGE
+}
+
+package=false
 install=false
+link=false
 clean=false
 
-while getopts ":ic" opt; do
+while getopts ":pilc" opt; do
   case ${opt} in
-    i )
-      install=true
-      ;;
-    c )
-      clean=true
-      ;;
+    p ) package=true ;;
+    i ) install=true; package=true ;;
+    l ) link=true;    package=true ;;
+    c ) clean=true ;;
     \? )
       echo "Invalid Option: -$OPTARG" 1>&2
+      usage 1>&2
       exit 1
       ;;
   esac
 done
 shift $((OPTIND -1))
+
+if [ "$install" = true ] && [ "$link" = true ]; then
+    echo "-i (install by copy) and -l (install by symlink) exclude each other." 1>&2
+    exit 1
+fi
 
 # -----------------------------------------------------------------------------
 # Paths. Dependencies are resolved once at the repo root (see /conanfile.txt) and
@@ -274,12 +306,50 @@ build_puredata() {
 
     "$MAKE"
 
-    if [ "$install" = true ]; then
-        echo "Installing Pure Data build..."
-        "$MAKE" install
-    fi
-
     cd "$ROOT" || exit 1
+
+    if [ "$package" = true ]; then
+        package_puredata
+    fi
+    if [ "$install" = true ]; then
+        install_copy "$ROOT/puredata/dist/zerr" "$(host_pd_dir)/zerr" puredata
+    elif [ "$link" = true ]; then
+        install_link "$ROOT/puredata/dist/zerr" "$(host_pd_dir)/zerr"
+    fi
+}
+
+# Stages the Pd library the way `make install` lays it out (externals, help patches,
+# circulation_8.yaml, LICENSE, README) under puredata/dist/zerr, then zips it.
+package_puredata() {
+    local dist="$ROOT/puredata/dist"
+    echo "Assembling the Pure Data package..."
+    rm -rf "$dist/zerr"
+    ( cd "$ROOT/puredata" && "$MAKE" install PDLIBDIR="$dist" )
+
+    local zip
+    zip="zerr-pd-$(project_version)-$(host_os)-$(host_arch).zip"
+    rm -f "$dist"/zerr-pd-*.zip
+    zip_dir "$dist" zerr "$zip"
+    echo "Pure Data package assembled: $dist/zerr"
+    echo "Pure Data package zipped:    $dist/$zip"
+}
+
+# Where Pd looks for user libraries, as pd-lib-builder resolves it for this host
+# (~/Library/Pd on macOS, /usr/local/lib/pd-externals on Linux -- set PDLIBDIR to
+# e.g. ~/.local/lib/pd/extra there to avoid needing root). PDLIBDIR in the
+# environment wins, exactly as it does for `make install`.
+host_pd_dir() {
+    if [ -n "$PDLIBDIR" ]; then
+        echo "$PDLIBDIR"
+        return
+    fi
+    local dir
+    dir="$(cd "$ROOT/puredata" && "$MAKE" -s vars 2>/dev/null | sed -n 's/^variable PDLIBDIR = //p')"
+    if [ -z "$dir" ]; then
+        echo "Could not determine Pd's library folder from pd-lib-builder; set PDLIBDIR." 1>&2
+        exit 1
+    fi
+    echo "$dir"
 }
 
 
@@ -296,9 +366,32 @@ build_maxmsp() {
         -DCMAKE_BUILD_TYPE=Release
     cmake --build "$ROOT/maxmsp/build"
 
-    if [ "$install" = true ]; then
+    if [ "$package" = true ]; then
         package_maxmsp
     fi
+    if [ "$install" = true ]; then
+        install_copy "$ROOT/maxmsp/dist/Zerr" "$(host_max_dir)/Zerr" maxmsp
+    elif [ "$link" = true ]; then
+        install_link "$ROOT/maxmsp/dist/Zerr" "$(host_max_dir)/Zerr"
+    fi
+}
+
+# Max's user package folder. MAX_PACKAGES_DIR in the environment wins; otherwise
+# the newest "Max N/Packages" under ~/Documents.
+host_max_dir() {
+    if [ -n "$MAX_PACKAGES_DIR" ]; then
+        echo "$MAX_PACKAGES_DIR"
+        return
+    fi
+    local candidate
+    for candidate in "$HOME/Documents/Max 9/Packages" "$HOME/Documents/Max 8/Packages"; do
+        if [ -d "$candidate" ]; then
+            echo "$candidate"
+            return
+        fi
+    done
+    echo "No Max Packages folder found under ~/Documents; set MAX_PACKAGES_DIR." 1>&2
+    exit 1
 }
 
 # Assembles the Max package (maxmsp/dist/Zerr, see the install rules in
@@ -309,20 +402,104 @@ package_maxmsp() {
     echo "Assembling the Max package..."
     cmake --install "$ROOT/maxmsp/build"
 
-    local version
-    version=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' "$ROOT/maxmsp/package-info.json" | head -n 1)
     local probe archs
     probe=$(ls -d "$dist"/Zerr/externals/*.mxo | head -n 1)
     archs=$(lipo -archs "$probe/Contents/MacOS/$(basename "$probe" .mxo)")
     case "$archs" in
         *" "*) archs=universal ;;
     esac
-    local zip="Zerr-${version}-macos-${archs}.zip"
+    local zip="Zerr-$(project_version)-macos-${archs}.zip"
 
     rm -f "$dist"/Zerr-*.zip   # also zips from a previous version or architecture
-    ( cd "$dist" && ditto -c -k --sequesterRsrc --keepParent Zerr "$zip" )
+    zip_dir "$dist" Zerr "$zip"
     echo "Max package assembled: $dist/Zerr"
     echo "Max package zipped:    $dist/$zip"
+}
+
+# -----------------------------------------------------------------------------
+# Packaging and install helpers shared by the wrappers
+# -----------------------------------------------------------------------------
+
+# The one version number in the tree. maxmsp/package-info.json is where Max reads
+# it from, CMake reads it for ZERR_MAX_VERSION, and both package zips carry it.
+project_version() {
+    sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' "$ROOT/maxmsp/package-info.json" | head -n 1
+}
+
+host_os() {
+    case "$(uname -s)" in
+        Darwin)               echo "macos" ;;
+        Linux)                echo "linux" ;;
+        MINGW*|MSYS*|CYGWIN*) echo "windows" ;;
+        *)                    uname -s | tr '[:upper:]' '[:lower:]' ;;
+    esac
+}
+
+host_arch() {
+    uname -m
+}
+
+# zip_dir <parent> <folder> <zip>: zips <parent>/<folder> as <parent>/<zip> with the
+# folder as the top-level entry. ditto keeps the bundle metadata and permissions a
+# plain zip of a .mxo can lose; elsewhere CMake's tar does the job.
+zip_dir() {
+    local parent="$1" folder="$2" zip="$3"
+    if command -v ditto &> /dev/null; then
+        ( cd "$parent" && ditto -c -k --sequesterRsrc --keepParent "$folder" "$zip" )
+    else
+        ( cd "$parent" && cmake -E tar cf "$zip" --format=zip "$folder" )
+    fi
+}
+
+# Does <dir> look like a Zerr package of the given kind? Guards the rm -rf in
+# install_copy: we only ever replace something we put there.
+is_zerr_package() {
+    local dir="$1" kind="$2"
+    case "$kind" in
+        maxmsp)   grep -qi '"name" *: *"zerr"' "$dir/package-info.json" 2>/dev/null ;;
+        puredata) ls "$dir"/zerr_*~.* >/dev/null 2>&1 ;;
+        *)        return 1 ;;
+    esac
+}
+
+# install_copy <staged> <destination> <kind>: copies the staged package into the
+# host folder. A symlink there (a previous -l) is replaced; a real folder is
+# replaced only if it is a Zerr package; anything else is left alone with an error.
+install_copy() {
+    local src="$1" dst="$2" kind="$3"
+    mkdir -p "$(dirname "$dst")"
+    if [ -L "$dst" ]; then
+        rm "$dst"
+    elif [ -d "$dst" ]; then
+        if is_zerr_package "$dst" "$kind"; then
+            rm -rf "$dst"
+        else
+            echo "$dst exists and does not look like a Zerr package; not replacing it." 1>&2
+            exit 1
+        fi
+    elif [ -e "$dst" ]; then
+        echo "$dst exists and is not a folder; not replacing it." 1>&2
+        exit 1
+    fi
+    cp -R "$src" "$dst"
+    echo "Installed (copy):    $dst"
+}
+
+# install_link <staged> <destination>: points the host folder at the staged
+# package, so every later build is what the host loads (after a restart). Refuses
+# to replace a real folder -- use -i, or remove it by hand -- so a copied install
+# is never deleted by accident.
+install_link() {
+    local src="$1" dst="$2"
+    mkdir -p "$(dirname "$dst")"
+    if [ -L "$dst" ]; then
+        rm "$dst"
+    elif [ -e "$dst" ]; then
+        echo "$dst exists and is not a symlink; remove it or use -i to replace it." 1>&2
+        exit 1
+    fi
+    ln -s "$src" "$dst"
+    echo "Installed (symlink): $dst -> $src"
 }
 
 # -----------------------------------------------------------------------------
@@ -333,6 +510,9 @@ build_jack() {
     meson setup builddir --wipe 2>/dev/null || meson setup builddir
     meson compile -C builddir
 
+    if [ "$package" = true ] && [ "$install" != true ]; then
+        echo "JACK has no package or symlink install; only -i (meson install) applies." 1>&2
+    fi
     if [ "$install" = true ]; then
         echo "Installing JACK build..."
         meson install -C builddir
@@ -357,9 +537,9 @@ clean_core() {
 
 clean_puredata() {
     echo "Cleaning PureData build artifacts..."
-    # puredata/build is now only an install destination (PDLIBDIR); the conan
-    # output it used to hold lives at the repo root -- see clean_deps.
-    rm -rf "$ROOT/puredata/build"
+    # puredata/build is a leftover from older trees (conan output now lives at the
+    # repo root -- see clean_deps); puredata/dist is what -p stages.
+    rm -rf "$ROOT/puredata/build" "$ROOT/puredata/dist"
     # Subshell so the cd cannot leak, and `|| true` because `set -e` would abort the
     # whole script -- skipping any remaining targets -- if `make clean` failed (it
     # needs the pd-lib-builder submodule checked out).
@@ -384,7 +564,8 @@ clean_jack() {
 
 # -----------------------------------------------------------------------------
 if [ $# -eq 0 ]; then
-    echo "No targets provided. Usage: $0 [-i] [-c] <deps|core|puredata|maxmsp|jack>"
+    echo "No targets provided." 1>&2
+    usage 1>&2
     exit 1
 fi
 

@@ -147,9 +147,10 @@ Multiplies a mono source by a set of envelopes. No arguments.
 ## Building from source
 
 See the repository's [README](https://github.com/ringbuffer-org/Zerr#readme). In short:
-`./build.sh core && ./build.sh -i maxmsp` builds the externals and assembles this package in
-`maxmsp/dist/Zerr`, zipped alongside. For development, symlink that folder into `Packages`
-instead of copying it.
+`./build.sh -p maxmsp` builds the externals and assembles this package in `maxmsp/dist/Zerr`,
+zipped alongside; `./build.sh -i maxmsp` also copies it into `~/Documents/Max 9/Packages`, and
+`./build.sh -l maxmsp` symlinks it there instead, so every rebuild is what Max loads after a
+restart.
 
 ## License
 

@@ -43,9 +43,11 @@ cmake --install core/build   # Installs to core/lib
 ./build.sh -c deps           # Discard resolved dependencies
 ./build.sh core              # Build core library
 ./build.sh puredata          # Build PureData externals (auto-builds core if needed)
-./build.sh -i puredata       # Build and install
 ./build.sh maxmsp            # Build Max/MSP externals
-./build.sh -i maxmsp         # Build, then assemble the Max package in maxmsp/dist/Zerr and zip it
+./build.sh -p <target>       # ...and stage a distributable package in <target>/dist/ plus a zip
+./build.sh -i <target>       # ...and install it by copy into the host app's user folder
+                             #    (Pd: $PDLIBDIR/zerr, ~/Library/Pd on macOS; Max: ~/Documents/Max 9/Packages/Zerr)
+./build.sh -l <target>       # ...and install it by symlink to the staged package (development)
 ./build.sh jack              # JACK client — currently broken, see docs/design/repo-audit-2026-07-30.md
 ```
 
