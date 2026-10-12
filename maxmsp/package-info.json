@@ -6,8 +6,12 @@
 	"name" : "Zerr",
 	"os" : {
 		"macintosh" : {
-			"platform" : [ "aarch64" ],
+			"platform" : [ "x64", "aarch64" ],
 			"min_version" : "11.0"
+		},
+		"windows" : {
+			"platform" : [ "x64" ],
+			"min_version" : "none"
 		}
 	},
 	"package_extra" : {
