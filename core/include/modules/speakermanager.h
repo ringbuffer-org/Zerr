@@ -149,6 +149,15 @@ class SpeakerManager {
      * @param spkrArry Path to the speaker array configuration file in YAML format.
      */
     SpeakerManager(ConfigPath spkrArry);
+    /**
+     * @brief Use YAML text instead of reading the file named in the constructor
+     * @param yamlText A complete speaker layout document (the same format as the files)
+     *
+     * Call before initialize(). Lets a host ship a built-in default layout without
+     * depending on a file being findable on its search path. The constructor's path
+     * is then only a label for log messages.
+     */
+    void setConfigText(std::string yamlText) { speakerArrayText = std::move(yamlText); }
 
     /**
      * @brief Initialize the speaker array using the configuration file.
@@ -299,9 +308,10 @@ class SpeakerManager {
                    ///< in different environments.
 
   private:
-    ConfigPath speakerArrayPath; ///< Path to the YAML speaker array configuration file.
-    YAML::Node speakerArrayNode; ///< YAML Node containing the parsed speaker
-                                 ///< array configuration data.
+    ConfigPath speakerArrayPath;  ///< Path to the YAML speaker array configuration file.
+    std::string speakerArrayText; ///< YAML text to load instead of the file, when non-empty.
+    YAML::Node speakerArrayNode;  ///< YAML Node containing the parsed speaker
+                                  ///< array configuration data.
 
     std::map<Index, Speaker>
         speakers; ///< Map associating speaker indexes with their Speaker objects.

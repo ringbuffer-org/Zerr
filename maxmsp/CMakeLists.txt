@@ -66,6 +66,12 @@ find_package(FFTW3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 #############################################################
+# SHARED WRAPPER HELPERS
+#############################################################
+# Headers every project may use (Max Console log bridge, built-in default layout).
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source/shared)
+
+#############################################################
 # PACKAGE VERSION
 #############################################################
 # package-info.json is the single source of truth for the version: the objects

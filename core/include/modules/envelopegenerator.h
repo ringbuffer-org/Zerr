@@ -107,9 +107,29 @@ class EnvelopeGenerator {
     ~EnvelopeGenerator() = default;
 
     /**
-     * @brief xxxxx
+     * @brief Route this generator's and its SpeakerManager's log output to the host
      */
     void setPrinter(Logger::PrintStrategy newPrinter);
+    /**
+     * @brief Set the log level of this generator and its SpeakerManager
+     */
+    void setLogLevel(LogLevel level);
+    /**
+     * @brief Load the speaker layout from YAML text instead of the file given at construction
+     *
+     * Call before initialize(). See SpeakerManager::setConfigText.
+     */
+    void setSpeakerConfigText(std::string yamlText);
+    /**
+     * @brief Adopt a new sample rate and block size after initialize()
+     * @param newCfgs The new system configuration
+     *
+     * Resizes the I/O blocks and keeps every speaker setting (active set, trajectory,
+     * topology, current speaker). Call from the host's control thread while the audio
+     * callback is not running, i.e. from the DSP-chain rebuild that reports the change.
+     * The trigger debounce is in samples, so re-apply setTriggerInterval() afterwards.
+     */
+    void setSystemConfigs(SystemConfigs newCfgs);
 
   private:
     // NOTE: declaration order matters — config members must precede objects that depend on them

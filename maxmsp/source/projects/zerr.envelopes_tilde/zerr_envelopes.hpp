@@ -1,196 +1,279 @@
+/**
+ * @file    zerr_envelopes.hpp
+ * @author  Zeyu Yang (zeyuuyang42@gmail.com)
+ * @brief   Header for the ZerrEnvelopes class used in the zerr.envelopes~ Max/MSP external
+ * @date    2025-05-03
+ *
+ * @copyright  Copyright (c) 2023-2026 Zeyu Yang
+ * @license    MIT license
+ */
 #pragma once
 
+#include <algorithm>
+#include <atomic>
+#include <cstring>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "envelopegenerator.h"
-// #include "logger.h"
-// #include "ringbuffer.h"
-// #include "types.h"
+#include "logger.h"
+#include "types.h"
 
 /**
  * @class ZerrEnvelopes
- * @brief Main wrapper class that interfaces between Max/MSP and the core multi-channel envelope
- * generation functionality
+ * @brief Wrapper between Max/MSP's audio system and the core envelope generation
  *
- * This class handles the initialization, audio processing, and cleanup of audio feature extraction
- * operations. It manages the data flow between Max/MSP's audio system and the internal feature
- * processing chain.
+ * The core zerr::EnvelopeGenerator is built once, in the constructor, because it owns
+ * the speaker state the user shapes with messages (active set, trajectory, topology,
+ * current speaker). A change of sample rate or block size reported by dsp64 is handed
+ * to it through prepare(), which resizes its blocks and keeps that state; the old
+ * wrapper froze the creation-time vector size and overflowed the heap when it grew.
  */
 class ZerrEnvelopes {
   public:
     /**
      * @brief Creates a new ZerrEnvelopes instance
-     * @param sampleRate The audio sample rate in Hz
-     * @param BlockSize The audio processing block size in samples
-     * @param selectionMode The envelope generation mode ("trajectory" or "trigger")
-     * @param spkrCfgFile Path to the speaker configuration file
+     * @param sampleRate    Sample rate the generator is first sized for
+     * @param blockSize     Block size the generator is first sized for
+     * @param selectionMode "trajectory" or "trigger"
+     * @param layoutName    The speaker layout file path, or a label when layoutYaml is given
+     * @param layoutYaml    YAML text of the layout; empty to read the file at layoutName
+     * @param printer       Where the core's log lines go (installed before anything can log)
+     * @throws std::invalid_argument if selectionMode is not a known mode
      */
-    ZerrEnvelopes(float sampleRate, int BlockSize, std::string selectionMode, std::string spkrCfgFile)
-        : systemConfigs {
-            .sample_rate = (size_t)sampleRate,
-            .block_size = (size_t)BlockSize,
-        }
-        , selectionMode { selectionMode }
-        , spkrCfgFile { spkrCfgFile }
-        , generator { std::make_unique<zerr::EnvelopeGenerator>(systemConfigs, spkrCfgFile, zerr::parseGenMode(selectionMode)) }
+    ZerrEnvelopes(float sampleRate, int blockSize, const std::string& selectionMode,
+                  std::string layoutName, const std::string& layoutYaml,
+                  zerr::Logger::PrintStrategy printer)
+        : systemConfigs{static_cast<size_t>(sampleRate), static_cast<size_t>(blockSize)},
+          selectionMode{selectionMode}, layoutName{std::move(layoutName)},
+          generator{std::make_unique<zerr::EnvelopeGenerator>(systemConfigs, this->layoutName,
+                                                              zerr::parseGenMode(selectionMode))}
     {
+        generator->setPrinter(std::move(printer));
+        // INFO so that `print` (printParameters logs at INFO) reaches the Console.
+        generator->setLogLevel(zerr::LogLevel::INFO);
+        if (!layoutYaml.empty()) {
+            generator->setSpeakerConfigText(layoutYaml);
+        }
     }
 
-    // Disable copying but allow moving
+    // Neither copyable nor movable: holds an atomic and is owned by a raw pointer in the
+    // Max object struct, so neither operation is needed.
     ZerrEnvelopes(const ZerrEnvelopes&)            = delete;
     ZerrEnvelopes& operator=(const ZerrEnvelopes&) = delete;
-    ZerrEnvelopes(ZerrEnvelopes&&)                 = default;
-    ZerrEnvelopes& operator=(ZerrEnvelopes&&)      = default;
+    ZerrEnvelopes(ZerrEnvelopes&&)                 = delete;
+    ZerrEnvelopes& operator=(ZerrEnvelopes&&)      = delete;
 
     /**
-     * @brief Initializes all internal components and prepares the object for processing
-     * @return true if initialization was successful, false otherwise
+     * @brief Loads the speaker layout and sizes the buffers for the creation-time shape
+     * @param error Receives a message when loading fails
+     * @return true if the object is ready to process
+     *
+     * Main thread only, once. The core reports load failures through its logger (already
+     * routed to the Console) and by returning false; a malformed document may also throw
+     * from yaml-cpp, which is caught here so that a bad file never reaches Max's C stack.
      */
-    bool initialize()
+    bool initialize(std::string* error = nullptr)
     {
-        // Initialize the Envelope Generator module
-        if (!generator->initialize()) {
-            // post("ZerrEnvelopes::initialize failed to initialize generator");
+        bool ok = false;
+        try {
+            ok = generator->initialize();
+        }
+        catch (const std::exception& e) {
+            if (error) {
+                *error = "cannot read speaker layout " + layoutName + ": " + e.what();
+            }
             return false;
-        };
-
-        // assgin Max/MSP print method the the logger function
-        // Because we want to see logs in the PD log window
-        auto printFunc = [](const std::string& msg) { post(msg.c_str()); };
-        generator->setPrinter(printFunc);
+        }
+        if (!ok) {
+            if (error) {
+                *error = "cannot load speaker layout " + layoutName;
+            }
+            return false;
+        }
 
         outputCount = generator->getNumSpeakers();
-        // post("ZerrEnvelopes::initialize outputCount is %d", outputCount);
+        if (outputCount < 1) {
+            if (error) {
+                *error = "speaker layout " + layoutName + " defines no speakers under 'standard:'";
+            }
+            return false;
+        }
 
-        inputBuffer.resize(inputCount, zerr::Samples(systemConfigs.block_size, 0.0f));
-        outputBuffer.resize(outputCount, zerr::Samples(systemConfigs.block_size, 0.0f));
+        inputBuffer.assign(inputCount, zerr::Samples(systemConfigs.block_size, 0.0));
+        initialized = true;
+        ready.store(true, std::memory_order_release);
+        return true;
+    }
 
+    /**
+     * @brief Adopts the sample rate and block size of the signal chain, as dsp64 reports them
+     * @return true if the object is ready to process
+     *
+     * Main thread only. Idempotent when nothing changed, so toggling DSP costs nothing.
+     * The speaker state survives; only the blocks are resized. The trigger debounce is
+     * kept in samples by the core, so the last interval in milliseconds is re-applied.
+     */
+    bool prepare(const zerr::SystemConfigs& cfg)
+    {
+        if (!initialized || cfg.block_size == 0 || cfg.sample_rate == 0) {
+            return false;
+        }
+        if (ready.load(std::memory_order_acquire) && cfg.block_size == systemConfigs.block_size &&
+            cfg.sample_rate == systemConfigs.sample_rate) {
+            return true;
+        }
+
+        // MSP rebuilds the DSP chain around dsp64, so perform() is not running for this
+        // object while the blocks are resized.
+        ready.store(false, std::memory_order_release);
+        generator->setSystemConfigs(cfg);
+        inputBuffer.assign(inputCount, zerr::Samples(cfg.block_size, 0.0));
+        systemConfigs = cfg;
+        if (intervalMs) {
+            generator->setTriggerInterval(*intervalMs);
+        }
+        ready.store(true, std::memory_order_release);
         return true;
     }
 
     /**
      * @brief Main DSP callback function that processes audio buffers
-     * @param ins Array of pointers to input audio buffers
-     * @param numins Number of input channels
-     * @param outs Array of pointers to output audio buffers
-     * @param numouts Number of output channels
-     * @param sampleframes Number of samples to process
-     * @throws std::invalid_argument if buffer pointers or sizes are invalid
+     *
+     * noexcept by contract: this runs on the audio thread, inside Max's C call stack, where
+     * an escaping exception would terminate the host. Anything unexpected zeroes the output.
      */
-    void perform(double** ins, long numins, double** outs, long numouts, long sampleframes)
+    void perform(double** ins, long numins, double** outs, long numouts, long sampleframes) noexcept
     {
-        if (!ins || !outs || numins < inputCount || numouts < outputCount) {
-            throw std::invalid_argument("Invalid buffer pointers or sizes in perform()");
+        const long numOut = outputCount;
+
+        if (!ready.load(std::memory_order_acquire) || !ins || !outs || numins < inputCount ||
+            numouts < numOut) {
+            silence(outs, numouts, sampleframes);
+            return;
         }
 
-        for (int i = 0; i < numins; ++i) {
-            std::copy_n(ins[i], sampleframes, inputBuffer[i].begin());
+        // The core sizes its blocks from block_size; never read or write past them.
+        const long block = static_cast<long>(systemConfigs.block_size);
+        const long count = std::min<long>(sampleframes, block);
+
+        for (int i = 0; i < inputCount; ++i) {
+            if (!ins[i]) {
+                silence(outs, numouts, sampleframes);
+                return;
+            }
+            std::copy_n(ins[i], count, inputBuffer[i].begin());
+            if (count < block) {
+                std::fill(inputBuffer[i].begin() + count, inputBuffer[i].end(), 0.0);
+            }
         }
 
-        outputBuffer = generator->perform(inputBuffer);
+        try {
+            outputBuffer = generator->perform(inputBuffer);
+        }
+        catch (...) {
+            silence(outs, numouts, sampleframes);
+            return;
+        }
 
-        for (int i = 0; i < numouts; ++i) {
-            std::copy_n(outputBuffer[i].begin(), sampleframes, outs[i]);
+        if (static_cast<long>(outputBuffer.size()) < numOut) {
+            silence(outs, numouts, sampleframes);
+            return;
+        }
+
+        for (long i = 0; i < numOut; ++i) {
+            if (!outs[i]) {
+                continue;
+            }
+            const long have = std::min<long>(count, static_cast<long>(outputBuffer[i].size()));
+            std::copy_n(outputBuffer[i].begin(), have, outs[i]);
+            if (have < sampleframes) {
+                std::memset(outs[i] + have, 0, (sampleframes - have) * sizeof(double));
+            }
         }
     }
 
-    /**
-     * @brief Gets the number of output channels
-     * @return Number of output channels corresponding to the speaker setup
-     */
+    /** @brief Number of output channels: one envelope per speaker in the layout */
     [[nodiscard]] int getOutputCount() const noexcept { return outputCount; }
 
-    /**
-     * @brief Gets the number of input channels
-     * @return Number of input channels (fixed at 3: main, spread, volume)
-     */
+    /** @brief Number of signal inlets (fixed at 3: control, spread, gain) */
     [[nodiscard]] constexpr int getInputCount() const noexcept { return inputCount; }
 
-    /**
-     * @brief Gets the total number of ports (inlets + outlets)
-     * @return Total count of all audio ports
-     */
-    [[nodiscard]] int getPortCount() const noexcept { return inputCount + outputCount; }
+    /** @brief The mode name this object was created with */
+    [[nodiscard]] const std::string& getMode() const noexcept { return selectionMode; }
+
+    /** @brief The layout file path, or the built-in layout's label */
+    [[nodiscard]] const std::string& getLayoutName() const noexcept { return layoutName; }
+
+    /** @brief The sample rate and block size the object is currently sized for */
+    [[nodiscard]] const zerr::SystemConfigs& getSystemConfigs() const noexcept
+    {
+        return systemConfigs;
+    }
 
     ~ZerrEnvelopes() = default;
 
-    /**
-     * @brief Sets the active speaker indices with specified action
-     * @param action Action to perform: "add", "del", or "set"
-     * @param idxs Array of speaker indices
-     * @param size Number of indices in the array
-     */
-    void setActiveSpeakerIndexs(char* action, int* idxs, size_t size)
+    // ---- control-thread setters, forwarded to the core ----
+
+    void setActiveSpeakerIndexs(const char* action, const int* idxs, size_t size)
     {
-        zerr::Indexes indexVec(idxs, idxs + size);
-        generator->setActiveSpeakerIndexs(action, indexVec);
+        generator->setActiveSpeakerIndexs(action, zerr::Indexes(idxs, idxs + size));
     }
 
-    /**
-     * @brief Sets the current active speaker
-     * @param idx Index of the speaker to set as current
-     */
-    void setCurrentSpeaker(int idx)
+    void setCurrentSpeaker(int idx) { generator->setCurrentSpeaker(idx); }
+
+    void setTopoMatrix(const char* action, const int* idxs, size_t size)
     {
-        zerr::Index newIdx = idx;
-        generator->setCurrentSpeaker(newIdx);
+        generator->setTopoMatrix(action, zerr::Indexes(idxs, idxs + size));
     }
 
-    /**
-     * @brief Updates the topology matrix with specified action
-     * @param action Action to perform: "add", "del", or "set"
-     * @param idxs Array of topology connections
-     * @param size Number of indices in the array
-     */
-    void setTopoMatrix(char* action, int* idxs, size_t size)
+    void setTrajectoryVector(const int* idxs, size_t size)
     {
-        zerr::Indexes indexVec(idxs, idxs + size);
-        generator->setTopoMatrix(action, indexVec);
+        generator->setTrajectoryVector(zerr::Indexes(idxs, idxs + size));
     }
 
-    /**
-     * @brief Sets the trajectory vector for envelope movement
-     * @param idxs Array of speaker indices defining the trajectory
-     * @param size Number of indices in the array
-     */
-    void setTrajectoryVector(int* idxs, size_t size)
-    {
-        zerr::Indexes indexVec(idxs, idxs + size);
-        generator->setTrajectoryVector(indexVec);
-    }
-
-    /**
-     * @brief Sets the trigger interval for envelope triggering
-     * @param interval Time interval in milliseconds
-     */
+    /** @brief Sets the minimum time between two trigger jumps, in milliseconds */
     void setTriggerInterval(float interval)
     {
-        zerr::Param newInterval = interval;
-        generator->setTriggerInterval(newInterval);
+        intervalMs = interval;
+        generator->setTriggerInterval(interval);
     }
 
-    /**
-     * @brief Prints current parameters to the console
-     */
+    /** @brief Posts the speaker setup to the Console */
     void printParameters() { generator->printParameters(); }
 
   private:
-    static constexpr int inputCount =
-        3;               /**< Number of signal inlets: main(0), spread(1), volume(2) */
-    int outputCount = 0; /**< Number of signal outlets based on the loudspeaker setup */
+    /**
+     * @brief Zeroes every output buffer; the fallback whenever processing cannot proceed
+     */
+    static void silence(double** outs, long numouts, long sampleframes) noexcept
+    {
+        if (!outs) {
+            return;
+        }
+        for (long i = 0; i < numouts; ++i) {
+            if (outs[i]) {
+                std::memset(outs[i], 0, sampleframes * sizeof(double));
+            }
+        }
+    }
 
-    zerr::SystemConfigs systemConfigs; /**< System configuration: sample rate and block size */
+    static constexpr int inputCount = 3; /**< Signal inlets: control(0), spread(1), gain(2) */
+    int outputCount                 = 0; /**< One envelope per speaker in the layout */
 
-    zerr::Blocks inputBuffer;  /**< Multi-channel buffer for storing incoming audio samples */
-    zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing envelope outputs */
+    zerr::SystemConfigs systemConfigs; /**< Shape the generator is currently sized for */
+    std::string selectionMode;         /**< "trajectory" or "trigger" */
+    std::string layoutName;            /**< File path, or the built-in layout's label */
 
-    std::unique_ptr<zerr::EnvelopeGenerator>
-        generator; /**< Core component that implements envelope generation logic */
+    bool initialized = false;        /**< initialize() succeeded */
+    std::atomic<bool> ready{false};  /**< Blocks are sized for systemConfigs; perform may run */
+    std::optional<float> intervalMs; /**< Last trigger interval, re-applied on a rate change */
 
-    std::string spkrCfgFile;   /**< Path to speaker configuration YAML file */
-    std::string selectionMode; /**< Envelope generation mode: "trajectory" or "trigger" */
+    zerr::Blocks inputBuffer;  /**< One block per inlet, sized to block_size */
+    zerr::Blocks outputBuffer; /**< The core's output, one block per speaker */
+
+    std::unique_ptr<zerr::EnvelopeGenerator> generator; /**< Core envelope generation */
 };

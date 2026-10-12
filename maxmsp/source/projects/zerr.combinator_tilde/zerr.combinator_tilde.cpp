@@ -36,6 +36,7 @@ typedef struct _zerr_combinator {
     t_symbol* mode_sym; ///< Combination mode in use, for bang/attribute reporting
     bool channel_muted; ///< Mute flag for unequal channel counts
     ZerrCombinator* zc; ///< Pointer to the zerr_combinator implementation
+    bool dsp_ready;     ///< dsp_setup() has run, so free must call dsp_free()
 } t_zerr_combinator;
 
 //------------------------------------------------------------------------------
@@ -113,6 +114,15 @@ C74_EXPORT void ext_main(void* r)
 // Object Creation/Destruction
 //------------------------------------------------------------------------------
 
+// Every failure path in new() ends here. object_free() runs zerr_combinator_free(), which
+// tolerates every partial state (no wrapper yet, dsp_setup() not yet run), so neither the
+// Max object nor the wrapper leaks.
+static void* zerr_combinator_fail(t_zerr_combinator* x)
+{
+    object_free((t_object*)x);
+    return NULL;
+}
+
 void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
 {
     t_zerr_combinator* x = (t_zerr_combinator*)object_alloc(zerr_combinator_class);
@@ -124,27 +134,27 @@ void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
         x->input_count   = 2; // Default: combine two sets of envelopes
         x->mode_sym      = gensym(ZERR_COMBINATOR_DEFAULT_MODE);
         x->channel_muted = FALSE;
+        x->dsp_ready     = false;
 
         // Positional arguments end at the first @attribute
         long offset = attr_args_offset(argc, argv);
 
-        // Validate arguments
+        // Argument 1: number of envelope sets. Optional; a plain [zerr.combinator~]
+        // combines two sets.
         if (offset < 1) {
-            object_error((t_object*)x,
-                         "requires at least 1 argument: <number of envelope sets> [mode]");
-            return NULL;
+            object_post((t_object*)x, "no set count given, combining %ld sets", x->input_count);
         }
-
-        // Process argument 1: number of envelope sets
-        if (atom_gettype(argv) != A_LONG) {
-            object_error((t_object*)x,
-                         "first argument must be an integer (number of envelope sets)");
-            return NULL;
-        }
-        x->input_count = atom_getlong(argv);
-        if (x->input_count < 1) {
-            object_error((t_object*)x, "number of envelope sets must be at least 1");
-            return NULL;
+        else {
+            if (atom_gettype(argv) != A_LONG) {
+                object_error((t_object*)x,
+                             "first argument must be an integer (number of envelope sets)");
+                return zerr_combinator_fail(x);
+            }
+            x->input_count = atom_getlong(argv);
+            if (x->input_count < 1) {
+                object_error((t_object*)x, "number of envelope sets must be at least 1");
+                return zerr_combinator_fail(x);
+            }
         }
 
         // Process argument 2: combine mode. Optional, defaults to "max".
@@ -154,7 +164,7 @@ void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
         if (offset > 1) {
             if (atom_gettype(argv + 1) != A_SYM) {
                 object_error((t_object*)x, "second argument must be a symbol (combination mode)");
-                return NULL;
+                return zerr_combinator_fail(x);
             }
             const char* requested = atom_getsym(argv + 1)->s_name;
             zerr::CombMode parsed;
@@ -176,7 +186,7 @@ void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
         }
         catch (const std::exception& e) {
             object_error((t_object*)x, "failed to create combinator: %s", e.what());
-            return NULL;
+            return zerr_combinator_fail(x);
         }
 
         // Process attributes
@@ -184,7 +194,8 @@ void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
 
         // Set up DSP with the number of inlets
         dsp_setup((t_pxobject*)x, x->input_count);
-        x->x_obj.z_misc = Z_MC_INLETS;
+        x->dsp_ready = true;
+        x->x_obj.z_misc |= Z_MC_INLETS;
 
         // Create multichannel outlet
         outlet_new((t_object*)x, "multichannelsignal");
@@ -197,7 +208,10 @@ void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
 
 void zerr_combinator_free(t_zerr_combinator* x)
 {
-    dsp_free((t_pxobject*)x);
+    // dsp_free() must pair with dsp_setup(); a creation that failed earlier never ran it.
+    if (x->dsp_ready) {
+        dsp_free((t_pxobject*)x);
+    }
 
     // Clean up the ZerrCombinator object if it exists
     if (x->zc) {
