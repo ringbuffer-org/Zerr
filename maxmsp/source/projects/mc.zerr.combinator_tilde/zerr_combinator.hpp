@@ -42,14 +42,11 @@ class ZerrCombinator {
      * @param mode       Combination mode: "add", "root" or "max"
      * @throws std::invalid_argument if inputCount < 1 or mode is not a known mode
      */
-    ZerrCombinator(int inputCount, std::string mode)
-        : inputCount{inputCount}, combMode{std::move(mode)}
+    ZerrCombinator(int inputCount, const std::string& mode)
+        : inputCount{inputCount}, combMode{zerr::parseCombMode(mode)}
     {
         if (inputCount < 1) {
             throw std::invalid_argument("ZerrCombinator: inputCount must be at least 1");
-        }
-        if (!isValidMode(combMode)) {
-            throw std::invalid_argument("ZerrCombinator: unknown combination mode: " + combMode);
         }
     }
 
@@ -59,25 +56,6 @@ class ZerrCombinator {
     ZerrCombinator& operator=(const ZerrCombinator&) = delete;
     ZerrCombinator(ZerrCombinator&&)                 = delete;
     ZerrCombinator& operator=(ZerrCombinator&&)      = delete;
-
-    /**
-     * @brief Checks a combination mode name without constructing anything
-     * @param mode Mode name to check
-     * @return true if the core supports this mode
-     *
-     * Duplicates the mode names in zerr::EnvelopeCombinator::initialize() so that a typo in
-     * an object argument can be reported at creation time rather than at DSP start. Replace
-     * this with a core-side parser once zerr::EnvelopeCombinator exposes one.
-     */
-    [[nodiscard]] static bool isValidMode(const std::string& mode) noexcept
-    {
-        return mode == "add" || mode == "root" || mode == "max";
-    }
-
-    /**
-     * @brief Human-readable list of the supported modes, for error messages
-     */
-    [[nodiscard]] static const char* modeNames() noexcept { return "add, root or max"; }
 
     /**
      * @brief Builds (or rebuilds) the core module for a given signal shape
@@ -100,14 +78,13 @@ class ZerrCombinator {
             return true;
         }
 
-        auto next =
-            std::make_unique<zerr::EnvelopeCombinator>(inputCount, numChannel, cfg, combMode);
+        auto next = std::make_unique<zerr::EnvelopeCombinator>(inputCount, numChannel, cfg,
+                                                               zerr::toString(combMode));
         if (!next->initialize()) {
             return false;
         }
 
         zerr::Blocks nextIn(next->numInlet, zerr::Samples(cfg.block_size, 0.0));
-        zerr::Blocks nextOut(next->numOutlet, zerr::Samples(cfg.block_size, 0.0));
 
         // MSP rebuilds the DSP chain around dsp64, so perform() is not running for this
         // object while we swap. The flag covers the states MSP does not: never prepared,
@@ -115,7 +92,6 @@ class ZerrCombinator {
         ready.store(false, std::memory_order_release);
         combinator.swap(next);
         inputBuffer.swap(nextIn);
-        outputBuffer.swap(nextOut);
         systemConfigs    = cfg;
         this->numChannel = numChannel;
         ready.store(true, std::memory_order_release);
@@ -137,7 +113,7 @@ class ZerrCombinator {
     void perform(double** ins, long numins, double** outs, long numouts, long sampleframes) noexcept
     {
         const long numIn  = static_cast<long>(inputBuffer.size());
-        const long numOut = static_cast<long>(outputBuffer.size());
+        const long numOut = numChannel;
 
         if (!ready.load(std::memory_order_acquire) || !ins || !outs || numins < numIn ||
             numouts < numOut) {
@@ -157,13 +133,18 @@ class ZerrCombinator {
             std::copy_n(ins[i], count, inputBuffer[i].begin());
         }
 
-        outputBuffer = combinator->perform(inputBuffer);
+        // Read the core's buffer directly rather than copying it into one of our own.
+        const zerr::Blocks& combined = combinator->perform(inputBuffer);
+        if (static_cast<long>(combined.size()) < numOut) {
+            silence(outs, numouts, sampleframes);
+            return;
+        }
 
         for (long i = 0; i < numOut; ++i) {
             if (!outs[i]) {
                 continue;
             }
-            std::copy_n(outputBuffer[i].begin(), count, outs[i]);
+            std::copy_n(combined[i].begin(), count, outs[i]);
             if (count < sampleframes) {
                 std::memset(outs[i] + count, 0, (sampleframes - count) * sizeof(double));
             }
@@ -171,9 +152,31 @@ class ZerrCombinator {
     }
 
     /**
-     * @brief Gets the combination mode this object was created with
+     * @brief Changes the combination mode, with or without DSP running
+     * @param mode Mode name: "add", "root" or "max"
+     * @return false, leaving the mode unchanged, if the name is not a known mode
+     *
+     * Control thread only. Nothing is rebuilt: the core swaps a lock-free atomic, and the
+     * mode is remembered here too so that a change made before DSP ever started is applied
+     * by the next prepare().
      */
-    [[nodiscard]] const std::string& getMode() const noexcept { return combMode; }
+    bool setMode(const std::string& mode) noexcept
+    {
+        zerr::CombMode parsed;
+        if (!zerr::tryParseCombMode(mode, parsed)) {
+            return false;
+        }
+        combMode = parsed;
+        if (combinator) {
+            combinator->set_mode(parsed);
+        }
+        return true;
+    }
+
+    /**
+     * @brief Gets the combination mode currently in use
+     */
+    [[nodiscard]] const char* getMode() const noexcept { return zerr::toString(combMode); }
 
     /**
      * @brief Gets the number of envelope sets being combined
@@ -203,16 +206,15 @@ class ZerrCombinator {
         }
     }
 
-    int inputCount;       /**< Number of envelope sets, one multichannel inlet each */
-    int numChannel{0};    /**< Envelopes per set; known only once prepare() has run */
-    std::string combMode; /**< Combination mode: "add", "root" or "max" */
+    int inputCount;          /**< Number of envelope sets, one multichannel inlet each */
+    int numChannel{0};       /**< Envelopes per set; known only once prepare() has run */
+    zerr::CombMode combMode; /**< Combination mode; control thread only, mirrored into the core */
 
     zerr::SystemConfigs systemConfigs{0, 0}; /**< System configuration settings */
 
     std::atomic<bool> ready{false}; /**< True once the core module is built and buffers sized */
 
-    zerr::Blocks inputBuffer;  /**< Buffer for storing incoming audio samples */
-    zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing processed audio samples */
+    zerr::Blocks inputBuffer; /**< Buffer for storing incoming audio samples */
 
     std::unique_ptr<zerr::EnvelopeCombinator> combinator; /**< Core combination algorithms */
 };

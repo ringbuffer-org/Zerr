@@ -57,6 +57,10 @@ void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64, double** i
 
 void zerr_combinator_bang(t_zerr_combinator* x);
 
+void zerr_combinator_mode(t_zerr_combinator* x, t_symbol* msg, long argc, t_atom* argv);
+
+t_max_err zerr_combinator_mode_set(t_zerr_combinator* x, t_object* attr, long argc, t_atom* argv);
+
 long zerr_combinator_multichanneloutputs(t_zerr_combinator* x, long outletindex);
 
 long zerr_combinator_inputchanged(t_zerr_combinator* x, long index, long count);
@@ -82,12 +86,21 @@ C74_EXPORT void ext_main(void* r)
                     0);
     class_addmethod(c, (method)zerr_combinator_inputchanged, "inputchanged", A_CANT, 0);
     class_addmethod(c, (method)zerr_combinator_bang, "bang", 0);
+    class_addmethod(c, (method)zerr_combinator_mode, "mode", A_GIMME, 0);
 
     // Attributes. "chans" is derived from the inlets' channel count in dsp64, so it is
     // readable but not settable -- writing it would only desync it from the real signal.
     CLASS_ATTR_LONG(c, "chans", ATTR_SET_OPAQUE_USER, t_zerr_combinator, channel_count);
     CLASS_ATTR_LABEL(c, "chans", 0, "Output Channels (read-only)");
     CLASS_ATTR_BASIC(c, "chans", 0);
+
+    // The same switch as the "mode" message, so it also works from the inspector and as
+    // an @mode attribute at object creation.
+    CLASS_ATTR_SYM(c, "mode", 0, t_zerr_combinator, mode_sym);
+    CLASS_ATTR_ACCESSORS(c, "mode", NULL, zerr_combinator_mode_set);
+    CLASS_ATTR_ENUM(c, "mode", 0, "\"add\" \"root\" \"max\"");
+    CLASS_ATTR_LABEL(c, "mode", 0, "Combination Mode");
+    CLASS_ATTR_BASIC(c, "mode", 0);
 
     // Initialize DSP and register the class
     class_dspinit(c);
@@ -144,13 +157,14 @@ void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
                 return NULL;
             }
             const char* requested = atom_getsym(argv + 1)->s_name;
-            if (ZerrCombinator::isValidMode(requested)) {
+            zerr::CombMode parsed;
+            if (zerr::tryParseCombMode(requested, parsed)) {
                 mode = requested;
             }
             else {
                 object_error((t_object*)x,
                              "unknown combination mode '%s'; expected %s. Using '%s'.", requested,
-                             ZerrCombinator::modeNames(), mode);
+                             zerr::combModeNames(), mode);
             }
         }
         x->mode_sym = gensym(mode);
@@ -215,6 +229,40 @@ void zerr_combinator_bang(t_zerr_combinator* x)
 {
     object_post((t_object*)x, "combination mode: %s, envelope sets: %ld, envelopes per set: %ld",
                 x->mode_sym ? x->mode_sym->s_name : "unknown", x->input_count, x->channel_count);
+}
+
+/**
+ * Applies a combination mode by name. Shared by the "mode" message and the "mode"
+ * attribute so the two can never diverge. Control thread only -- the core publishes the
+ * change through a lock-free atomic, so no deferral is needed and DSP can keep running.
+ */
+static bool zerr_combinator_apply_mode(t_zerr_combinator* x, t_symbol* mode)
+{
+    if (!mode || !x->zc || !x->zc->setMode(mode->s_name)) {
+        object_error((t_object*)x, "mode: unknown combination mode '%s'; expected %s",
+                     mode ? mode->s_name : "", zerr::combModeNames());
+        return false;
+    }
+    x->mode_sym = mode;
+    return true;
+}
+
+void zerr_combinator_mode(t_zerr_combinator* x, t_symbol* msg, long argc, t_atom* argv)
+{
+    if (argc < 1 || atom_gettype(argv) != A_SYM) {
+        object_error((t_object*)x, "mode: expects one symbol (%s)", zerr::combModeNames());
+        return;
+    }
+    zerr_combinator_apply_mode(x, atom_getsym(argv));
+}
+
+t_max_err zerr_combinator_mode_set(t_zerr_combinator* x, t_object* attr, long argc, t_atom* argv)
+{
+    if (argc < 1 || !argv || atom_gettype(argv) != A_SYM) {
+        object_error((t_object*)x, "mode: expects one symbol (%s)", zerr::combModeNames());
+        return MAX_ERR_GENERIC;
+    }
+    return zerr_combinator_apply_mode(x, atom_getsym(argv)) ? MAX_ERR_NONE : MAX_ERR_GENERIC;
 }
 
 //------------------------------------------------------------------------------

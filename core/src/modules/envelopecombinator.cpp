@@ -15,7 +15,15 @@ EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, SystemConf
     this->numSource  = numSource;
     this->numChannel = numChannel;
     this->systemCfgs = systemCfgs;
-    this->combMode   = combMode;
+
+    // Parse now, report in initialize(). The constructor cannot fail, and wrappers
+    // already gate on initialize()'s return value.
+    CombMode parsed;
+    modeValid = tryParseCombMode(combMode, parsed);
+    if (modeValid) {
+        this->combMode.store(parsed, std::memory_order_relaxed);
+    }
+    this->requestedModeName = combMode;
 
     numInlet  = numSource * numChannel;
     numOutlet = numChannel;
@@ -30,29 +38,51 @@ bool EnvelopeCombinator::initialize()
     inputBuffer.resize(numInlet, Samples(systemCfgs.block_size, 0.0f));
     outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
 
-    if (combMode == "add") {
-        processFunc = &EnvelopeCombinator::_process_add;
-    }
-    else if (combMode == "root") {
-        processFunc = &EnvelopeCombinator::_process_root;
-    }
-    else if (combMode == "max") {
-        processFunc = &EnvelopeCombinator::_process_max;
-    }
-    else {
-        logger.logError("EnvelopeCombinator::initialize Unknown combination mode: " + combMode);
+    if (!modeValid) {
+        logger.logError("EnvelopeCombinator::initialize Unknown combination mode: " +
+                        requestedModeName);
         return false;
     }
 
+    prepared = true;
     return true;
 }
 
-Blocks EnvelopeCombinator::perform(Blocks in)
+bool EnvelopeCombinator::set_mode(const std::string& mode) noexcept
 {
+    CombMode parsed;
+    if (!tryParseCombMode(mode, parsed)) {
+        return false;
+    }
+    set_mode(parsed);
+    return true;
+}
+
+void EnvelopeCombinator::set_mode(CombMode mode) noexcept
+{
+    // Relaxed is enough: the enum is the only datum published, and it guards nothing else.
+    combMode.store(mode, std::memory_order_relaxed);
+}
+
+const Blocks& EnvelopeCombinator::perform(const Blocks& in)
+{
+    if (!prepared) {
+        return outputBuffer;
+    }
+
     inputBuffer = in;
 
-    if (processFunc) {
-        (this->*processFunc)();
+    // Load once per block so a block is never processed partly in one mode.
+    switch (combMode.load(std::memory_order_relaxed)) {
+    case CombMode::Add:
+        _process_add();
+        break;
+    case CombMode::Root:
+        _process_root();
+        break;
+    case CombMode::Max:
+        _process_max();
+        break;
     }
 
     return outputBuffer;
