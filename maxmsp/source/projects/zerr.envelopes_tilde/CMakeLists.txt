@@ -27,8 +27,10 @@ add_library(
     ${SOURCE_FILES}
 )
 
-# Link against zerr_core (FFTW3 and yaml-cpp propagate transitively via core)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${ZERR_LIBRARY} yaml-cpp FFTW3::fftw3)
+# Link zerr_core and yaml-cpp (speaker YAML). libzerr_core.a is found as a plain archive path, so its own
+# dependencies do not propagate: every object names what it actually uses.
+target_link_libraries(${PROJECT_NAME} PRIVATE ${ZERR_LIBRARY} yaml-cpp)
+target_compile_definitions(${PROJECT_NAME} PRIVATE ZERR_MAX_VERSION="${ZERR_MAX_PACKAGE_VERSION}")
 
 include(${C74_MIN_API_DIR}/script/min-posttarget.cmake)
 

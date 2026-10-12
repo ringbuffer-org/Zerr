@@ -263,10 +263,27 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release
           cmake --build maxmsp/build --config Release
 
-      - name: Upload Max/MSP externals
+      # The same assembly ./build.sh -i maxmsp does locally. The ditto zip is what
+      # a release attaches; it also survives upload-artifact, which does not keep
+      # file permissions and would break the bundles if they were uploaded loose.
+      - name: Assemble the Max package
+        shell: bash
+        run: |
+          cmake --install maxmsp/build
+          for bundle in maxmsp/dist/Zerr/externals/*.mxo; do
+            name=$(basename "$bundle" .mxo)
+            codesign --verify --deep --strict "$bundle"
+            echo "$name: $(lipo -archs "$bundle/Contents/MacOS/$name")"
+          done
+          version=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' maxmsp/package-info.json | head -n 1)
+          ( cd maxmsp/dist && ditto -c -k --sequesterRsrc --keepParent Zerr "Zerr-${version}-macos-arm64.zip" )
+          find maxmsp/dist/Zerr -type f | sort
+          ls -l maxmsp/dist/*.zip
+
+      - name: Upload Max package
         uses: actions/upload-artifact@v4
         with:
-          name: zerr-max-${{ matrix.id }}
-          path: maxmsp/externals
+          name: zerr-max-${{ matrix.id }}-arm64
+          path: maxmsp/dist/Zerr-*.zip
           if-no-files-found: error
           retention-days: 7

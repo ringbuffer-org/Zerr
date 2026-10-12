@@ -45,7 +45,7 @@ cmake --install core/build   # Installs to core/lib
 ./build.sh puredata          # Build PureData externals (auto-builds core if needed)
 ./build.sh -i puredata       # Build and install
 ./build.sh maxmsp            # Build Max/MSP externals
-./build.sh -i maxmsp         # Build and install
+./build.sh -i maxmsp         # Build, then assemble the Max package in maxmsp/dist/Zerr and zip it
 ./build.sh jack              # JACK client — currently broken, see docs/design/repo-audit-2026-07-30.md
 ```
 
