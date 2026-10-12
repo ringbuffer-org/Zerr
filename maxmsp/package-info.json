@@ -1,17 +1,13 @@
 {
 	"author" : "Zeyu Yang",
-	"description" : "Zerr~: Autogenous Spatialization Toolbox",
+	"description" : "Zerr*: Autogenous Spatialization Toolbox",
 	"homepatcher" : "Zerr_Overview.maxpat",
-	"max_version_min" : "8.0", "max_version_max" : "none",
-	"name" : "zerr",
+	"max_version_min" : "9.0", "max_version_max" : "none",
+	"name" : "Zerr",
 	"os" : {
 		"macintosh" : {
-			"platform" : [ "x64", "aarch64" ],
-			"min_version" : "none"
-		},
-		"windows" : {
-			"platform" : [ "x64" ],
-			"min_version" : "none"
+			"platform" : [ "aarch64" ],
+			"min_version" : "11.0"
 		}
 	},
 	"package_extra" : {
@@ -19,6 +15,6 @@
 		"copyright" : "Copyright (c) 2023-2026 Zeyu Yang"
 	},
 	"tags" : [ "sound spatialization", "multi-channel", "spatiomorphology", "spatial sound synthesis", "panning" ],
-	"version" : "0.1.0",
+	"version" : "0.3.0",
 	"website" : "https://github.com/ringbuffer-org/Zerr"
 }

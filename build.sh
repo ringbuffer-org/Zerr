@@ -319,7 +319,7 @@ package_maxmsp() {
     esac
     local zip="Zerr-${version}-macos-${archs}.zip"
 
-    rm -f "$dist/$zip"
+    rm -f "$dist"/Zerr-*.zip   # also zips from a previous version or architecture
     ( cd "$dist" && ditto -c -k --sequesterRsrc --keepParent Zerr "$zip" )
     echo "Max package assembled: $dist/Zerr"
     echo "Max package zipped:    $dist/$zip"

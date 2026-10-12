@@ -66,18 +66,20 @@ No formal test suite. Testing is done via help patches in PureData (`puredata/he
 ### Processing Pipeline
 
 ```
-Audio Input → FeatureExtractor → FeatureBank → FeatureProcessor
-                                                      ↓
-Speaker Output ← AudioDisperser ← EnvelopeCombinator ← EnvelopeGenerator
+Audio Input → FeatureExtractor → FeatureBank ─(host patch)─▶ EnvelopeGenerator
+                                                                    ↓
+Speaker Output ← AudioDisperser ← EnvelopeCombinator ←──────────────┘
 ```
 
 Audio features (spectral centroid, RMS, flux, etc.) drive spatial distribution — no manual positioning.
+The step from features to the envelope generator's control inlets is deliberately left to the host
+patch (Pd/Max): `FeatureProcessor` exists as a header only and is not a live pipeline stage.
 
 ### Core Library (`core/`)
 
 Platform-independent C++17 static library (`zerr_core`). Three subsystems:
 
-- **Modules** (`core/include/modules/`): High-level processing — SpeakerManager, FeatureBank, FeatureProcessor, EnvelopeGenerator, EnvelopeCombinator, AudioDisperser
+- **Modules** (`core/include/modules/`): High-level processing — SpeakerManager, FeatureBank, EnvelopeGenerator, EnvelopeCombinator, AudioDisperser (`FeatureProcessor` is a dead header)
 - **Features** (`core/include/features/`): Spectral (Centroid, Rolloff, Flatness, Flux) and temporal (RMS, ZeroCrossingRate, CrestFactor, ZeroCrossings) extractors, all inheriting from `FeatureExtractor` base class
 - **Utils** (`core/include/utils/`): Types (`types.h`), configs (`configs.h`), FrequencyTransformer (FFTW3 wrapper), RingBuffer, OnsetDetector, LinearInterpolator
 
@@ -100,7 +102,9 @@ YAML files defining speaker positions in Cartesian coordinates (x, y, z). Exampl
 
 ## Platform Notes
 
-- **macOS**: Supports Intel + Apple Silicon (fat binaries with Xcode 12+)
+- **macOS**: Builds for the host architecture only (arm64 on Apple Silicon); the conan toolchain pins
+  `CMAKE_OSX_ARCHITECTURES`, and the fat-binary branch in `maxmsp/CMakeLists.txt` applies only to the
+  Xcode generator, which `build.sh` does not use. Shipped Max packages are arm64 only
 - **Linux**: Requires `-fPIC` for static library builds
 - **Windows**: MinGW-w64 gcc 13 for PureData; uses the `profiles/mingw` Conan profile. `build.sh`
   runs from an MSYS2 MINGW64 / Git Bash shell — it pins the `MinGW Makefiles` generator and prefers

@@ -114,7 +114,7 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/extras/" DESTINATION extras
 # the search path, so `zerr.envelopes~ trigger ring_8` resolves without a path.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../configs/" DESTINATION misc
         FILES_MATCHING PATTERN "*.yaml")
-install(FILES package-info.json ReadMe.md LICENSE DESTINATION .)
+install(FILES package-info.json README.md LICENSE DESTINATION .)
 
 # Hand-copied bundles in help/ shadow fresh builds (Max loads whichever it finds
 # first) and would duplicate every object if help/ were shipped as-is.
