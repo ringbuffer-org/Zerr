@@ -15,6 +15,12 @@
 
 #include "./zerr_combinator.hpp"
 
+#include <exception>
+
+/// Combination mode used when the object is created without a mode argument.
+/// "max" is what this object has always computed, so existing patches are unaffected.
+#define ZERR_COMBINATOR_DEFAULT_MODE "max"
+
 //------------------------------------------------------------------------------
 // Type Definitions
 //------------------------------------------------------------------------------
@@ -24,9 +30,10 @@
  * @brief Main data structure for the mc.zerr.combinator~ object
  */
 typedef struct _zerr_combinator {
-    t_pxobject x_obj; ///< DSP object header (must be first)
-    long channel_count; ///< Channel count of multichannel signal
-    long input_count; ///< Number of input channel groups
+    t_pxobject x_obj;   ///< DSP object header (must be first)
+    long channel_count; ///< Envelopes per set, derived from the inlets' channel count
+    long input_count;   ///< Number of envelope sets, one multichannel inlet each
+    t_symbol* mode_sym; ///< Combination mode in use, for bang/attribute reporting
     bool channel_muted; ///< Mute flag for unequal channel counts
     ZerrCombinator* zc; ///< Pointer to the zerr_combinator implementation
 } t_zerr_combinator;
@@ -41,13 +48,12 @@ void zerr_combinator_free(t_zerr_combinator* x);
 
 void zerr_combinator_assist(t_zerr_combinator* x, void* b, long m, long a, char* s);
 
-void zerr_combinator_dsp64(t_zerr_combinator* x, t_object* dsp64, short* count,
-    double samplerate, long maxvectorsize, long flags);
+void zerr_combinator_dsp64(t_zerr_combinator* x, t_object* dsp64, short* count, double samplerate,
+                           long maxvectorsize, long flags);
 
-void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64,
-    double** ins, long numins, double** outs,
-    long numouts, long sampleframes, long flags,
-    void* userparam);
+void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64, double** ins, long numins,
+                               double** outs, long numouts, long sampleframes, long flags,
+                               void* userparam);
 
 void zerr_combinator_bang(t_zerr_combinator* x);
 
@@ -66,25 +72,21 @@ C74_EXPORT void ext_main(void* r)
 {
     t_class* c;
 
-    c = class_new("mc.zerr.combinator~",
-        (method)zerr_combinator_new,
-        (method)zerr_combinator_free,
-        sizeof(t_zerr_combinator),
-        0L,
-        A_GIMME,
-        0);
+    c = class_new("mc.zerr.combinator~", (method)zerr_combinator_new, (method)zerr_combinator_free,
+                  sizeof(t_zerr_combinator), 0L, A_GIMME, 0);
 
     // Register methods
     class_addmethod(c, (method)zerr_combinator_dsp64, "dsp64", A_CANT, 0);
     class_addmethod(c, (method)zerr_combinator_assist, "assist", A_CANT, 0);
-    class_addmethod(c, (method)zerr_combinator_multichanneloutputs, "multichanneloutputs", A_CANT, 0);
+    class_addmethod(c, (method)zerr_combinator_multichanneloutputs, "multichanneloutputs", A_CANT,
+                    0);
     class_addmethod(c, (method)zerr_combinator_inputchanged, "inputchanged", A_CANT, 0);
     class_addmethod(c, (method)zerr_combinator_bang, "bang", 0);
 
-    // Attributes
-    CLASS_ATTR_LONG(c, "chans", 0, t_zerr_combinator, channel_count);
-    CLASS_ATTR_LABEL(c, "chans", 0, "Output Channels");
-    CLASS_ATTR_FILTER_CLIP(c, "chans", 1, MC_MAX_CHANS);
+    // Attributes. "chans" is derived from the inlets' channel count in dsp64, so it is
+    // readable but not settable -- writing it would only desync it from the real signal.
+    CLASS_ATTR_LONG(c, "chans", ATTR_SET_OPAQUE_USER, t_zerr_combinator, channel_count);
+    CLASS_ATTR_LABEL(c, "chans", 0, "Output Channels (read-only)");
     CLASS_ATTR_BASIC(c, "chans", 0);
 
     // Initialize DSP and register the class
@@ -104,38 +106,64 @@ void* zerr_combinator_new(t_symbol* s, long argc, t_atom* argv)
 
     if (x) {
         // Initialize default values
-        x->zc = NULL;
-        x->channel_count = 1; // Default: 1 channel output
-        x->input_count = 2; // Default: combine two sets of envelopes
+        x->zc            = NULL;
+        x->channel_count = 1; // Until dsp64 reports the inlets' channel count
+        x->input_count   = 2; // Default: combine two sets of envelopes
+        x->mode_sym      = gensym(ZERR_COMBINATOR_DEFAULT_MODE);
         x->channel_muted = FALSE;
 
+        // Positional arguments end at the first @attribute
+        long offset = attr_args_offset(argc, argv);
+
         // Validate arguments
-        if (argc < 2) {
-            object_error((t_object*)x, "requires 2 arguments");
+        if (offset < 1) {
+            object_error((t_object*)x,
+                         "requires at least 1 argument: <number of envelope sets> [mode]");
             return NULL;
         }
 
-        // Process argument 1: number of inputs
-        if (atom_gettype(argv) == A_LONG) {
-            x->input_count = atom_getlong(argv);
-            if (x->input_count < 1) {
-                object_error((t_object*)x, "input_count must be at least 1");
+        // Process argument 1: number of envelope sets
+        if (atom_gettype(argv) != A_LONG) {
+            object_error((t_object*)x,
+                         "first argument must be an integer (number of envelope sets)");
+            return NULL;
+        }
+        x->input_count = atom_getlong(argv);
+        if (x->input_count < 1) {
+            object_error((t_object*)x, "number of envelope sets must be at least 1");
+            return NULL;
+        }
+
+        // Process argument 2: combine mode. Optional, defaults to "max".
+        // A bad mode name is recoverable, so report it and fall back rather than
+        // leaving the user with a dead object box.
+        const char* mode = ZERR_COMBINATOR_DEFAULT_MODE;
+        if (offset > 1) {
+            if (atom_gettype(argv + 1) != A_SYM) {
+                object_error((t_object*)x, "second argument must be a symbol (combination mode)");
                 return NULL;
             }
-        } else {
-            object_error((t_object*)x, "first argument must be an integer");
+            const char* requested = atom_getsym(argv + 1)->s_name;
+            if (ZerrCombinator::isValidMode(requested)) {
+                mode = requested;
+            }
+            else {
+                object_error((t_object*)x,
+                             "unknown combination mode '%s'; expected %s. Using '%s'.", requested,
+                             ZerrCombinator::modeNames(), mode);
+            }
+        }
+        x->mode_sym = gensym(mode);
+
+        // Build the wrapper. The core module itself is built in dsp64, once the
+        // channel count, sample rate and block size are known.
+        try {
+            x->zc = new ZerrCombinator((int)x->input_count, mode);
+        }
+        catch (const std::exception& e) {
+            object_error((t_object*)x, "failed to create combinator: %s", e.what());
             return NULL;
         }
-
-        // Process argument 2: combine mode
-        if (atom_gettype(argv + 1) != A_SYM) {
-            object_error((t_object*)x, "second argument must be a symbol");
-            return NULL;
-        }
-        t_symbol* arg2 = atom_getsym(argv + 1);
-        const char* mode = arg2->s_name;
-
-        // TODO: Initialize the ZerrCombinator based on the mode
 
         // Process attributes
         attr_args_process(x, argc, argv);
@@ -171,15 +199,22 @@ void zerr_combinator_free(t_zerr_combinator* x)
 void zerr_combinator_assist(t_zerr_combinator* x, void* b, long m, long a, char* s)
 {
     if (m == ASSIST_INLET) {
-        snprintf(s, 128, "Signal Input %ld: Envelope Group", a + 1);
-    } else if (m == ASSIST_OUTLET) {
+        // The number of envelopes per set is the inlet's own channel count, and every
+        // inlet must agree -- it is not an object argument.
+        snprintf(
+            s, 128,
+            "(multichannel signal) Envelope Set %ld; all sets must have the same channel count",
+            a + 1);
+    }
+    else if (m == ASSIST_OUTLET) {
         strcpy(s, "(multichannel signal) Combined Envelopes");
     }
 }
 
 void zerr_combinator_bang(t_zerr_combinator* x)
 {
-    object_post((t_object*)x, "combination mode: %s \n channel count = %ld", "everything", x->channel_count);
+    object_post((t_object*)x, "combination mode: %s, envelope sets: %ld, envelopes per set: %ld",
+                x->mode_sym ? x->mode_sym->s_name : "unknown", x->input_count, x->channel_count);
 }
 
 //------------------------------------------------------------------------------
@@ -204,38 +239,51 @@ long zerr_combinator_inputchanged(t_zerr_combinator* x, long index, long count)
 // DSP Methods
 //------------------------------------------------------------------------------
 
-void zerr_combinator_dsp64(t_zerr_combinator* x, t_object* dsp64, short* count,
-    double samplerate, long maxvectorsize, long flags)
+void zerr_combinator_dsp64(t_zerr_combinator* x, t_object* dsp64, short* count, double samplerate,
+                           long maxvectorsize, long flags)
 {
 
-    // Get actual channel counts for diagnostics
-    long total_input_channels = 0;
-    for (int i = 0; i < x->input_count; i++) {
-        long inlet_channels = (long)object_method(dsp64, gensym("getnuminputchannels"), x, i);
-        total_input_channels += inlet_channels;
-    }
-
-    // Verify all inlets have the same channel count
+    // Verify all inlets have the same channel count. The perform routine is added even
+    // when they don't, so that the muted path actually silences the outlet instead of
+    // leaving whatever the previous DSP chain wrote there.
     long inletchannelcount = (long)object_method(dsp64, gensym("getnuminputchannels"), x, 0);
     for (int i = 1; i < x->input_count; ++i) {
         if (inletchannelcount != (long)object_method(dsp64, gensym("getnuminputchannels"), x, i)) {
+            object_error((t_object*)x,
+                         "all envelope sets must have the same channel count; output muted");
             x->channel_muted = TRUE;
+            dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_combinator_perform64, 0, NULL);
             return;
         }
     }
 
-    // All channel counts are equal, enable audio processing
-    x->channel_muted = FALSE;
+    x->channel_count = inletchannelcount;
+
+    // Build the core module for this signal shape. Take the sample rate and block size
+    // from the dsp64 arguments rather than sys_getsr()/sys_getblksize(), which differ
+    // inside poly~.
+    zerr::SystemConfigs cfgs;
+    cfgs.sample_rate = (size_t)samplerate;
+    cfgs.block_size  = (size_t)maxvectorsize;
+
+    if (!x->zc || !x->zc->prepare(cfgs, (int)x->channel_count)) {
+        object_error((t_object*)x, "failed to configure combinator for %ld channels; output muted",
+                     inletchannelcount);
+        x->channel_muted = TRUE;
+    }
+    else {
+        x->channel_muted = FALSE;
+    }
+
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_combinator_perform64, 0, NULL);
 }
 
-void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64,
-    double** ins, long numins, double** outs,
-    long numouts, long sampleframes, long flags,
-    void* userparam)
+void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64, double** ins, long numins,
+                               double** outs, long numouts, long sampleframes, long flags,
+                               void* userparam)
 {
     // Zero out the output if the input signals don't have equal channel counts
-    if (x->channel_muted) {
+    if (x->channel_muted || !x->zc) {
         for (long i = 0; i < numouts; i++) {
             if (outs[i]) {
                 memset(outs[i], 0, sampleframes * sizeof(double));
@@ -244,25 +292,5 @@ void zerr_combinator_perform64(t_zerr_combinator* x, t_object* dsp64,
         return;
     }
 
-    long num_groups = x->input_count;
-
-    // Process each output channel
-    for (long channel = 0; channel < numouts; channel++) {
-        // Process each sample for this channel
-        for (long sample = 0; sample < sampleframes; sample++) {
-            double max_val = 0.0;
-
-            // Find maximum value across all input groups for this channel
-            for (long group = 0; group < num_groups; group++) {
-                long input_idx = group * numouts + channel;
-                if (input_idx < numins && ins[input_idx]) {
-                    double val = ins[input_idx][sample];
-                    max_val = (val > max_val) ? val : max_val;
-                }
-            }
-
-            // Output the maximum value
-            outs[channel][sample] = max_val;
-        }
-    }
+    x->zc->perform(ins, numins, outs, numouts, sampleframes);
 }

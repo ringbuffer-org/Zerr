@@ -9,11 +9,13 @@
  */
 #pragma once
 
+#include <algorithm>
+#include <atomic>
+#include <cstring>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <string_view>
-#include <vector>
+#include <utility>
 
 #include "./envelopecombinator.h"
 #include "types.h"
@@ -21,58 +23,104 @@
 /**
  * @class ZerrCombinator
  * @brief Manages the combination of multiple envelope signals across channel groups
- * 
+ *
  * This class handles the processing of multiple multichannel envelope signals,
- * combining them according to the specified mode. It provides a clean interface 
+ * combining them according to the specified mode. It provides a clean interface
  * between Max/MSP's audio system and the underlying envelope combination algorithms.
+ *
+ * Construction is split in two because Max hands over the object's shape in stages:
+ * the number of envelope sets is known when the object is created, but the number of
+ * envelopes per set (the multichannel channel count), the sample rate and the block
+ * size only arrive in dsp64. The core zerr::EnvelopeCombinator therefore cannot be
+ * built by the constructor -- prepare() builds it.
  */
 class ZerrCombinator {
- public:
+  public:
     /**
      * @brief Creates a new ZerrCombinator instance
-     * @param sys_config System configuration containing sample rate and block size settings
-     * @param inputCount List of audio features to extract from the input signal
-     * @param mode       
+     * @param inputCount Number of envelope sets to combine (one multichannel inlet each)
+     * @param mode       Combination mode: "add", "root" or "max"
+     * @throws std::invalid_argument if inputCount < 1 or mode is not a known mode
      */
-    ZerrCombinator(const zerr::SystemConfigs& sys_config, int inputCount, std::string mode)
-        : systemConfigs { sys_config }
-        , inputBuffer(inputCount, std::vector<double>(sys_config.block_size, 0.0))
-    // , combinator { std::make_unique<zerr::EnvelopeCombinator>(sys_config, spkrCfgFile, selectionMode) }
+    ZerrCombinator(int inputCount, std::string mode)
+        : inputCount{inputCount}, combMode{std::move(mode)}
     {
+        if (inputCount < 1) {
+            throw std::invalid_argument("ZerrCombinator: inputCount must be at least 1");
+        }
+        if (!isValidMode(combMode)) {
+            throw std::invalid_argument("ZerrCombinator: unknown combination mode: " + combMode);
+        }
     }
 
-    // Disable copying but allow moving
-    ZerrCombinator(const ZerrCombinator&) = delete;
+    // Neither copyable nor movable: holds an atomic and is owned by a raw pointer in the
+    // Max object struct, so neither operation is needed.
+    ZerrCombinator(const ZerrCombinator&)            = delete;
     ZerrCombinator& operator=(const ZerrCombinator&) = delete;
-    ZerrCombinator(ZerrCombinator&&) = default;
-    ZerrCombinator& operator=(ZerrCombinator&&) = default;
+    ZerrCombinator(ZerrCombinator&&)                 = delete;
+    ZerrCombinator& operator=(ZerrCombinator&&)      = delete;
 
     /**
-     * @brief Initializes all internal components and prepares the object for processing
-     * @return true if initialization was successful, false otherwise
-     * @throws std::runtime_error if memory allocation fails
+     * @brief Checks a combination mode name without constructing anything
+     * @param mode Mode name to check
+     * @return true if the core supports this mode
+     *
+     * Duplicates the mode names in zerr::EnvelopeCombinator::initialize() so that a typo in
+     * an object argument can be reported at creation time rather than at DSP start. Replace
+     * this with a core-side parser once zerr::EnvelopeCombinator exposes one.
      */
-    bool initialize()
+    [[nodiscard]] static bool isValidMode(const std::string& mode) noexcept
     {
-        // Initialize the Envelope Generator module
-        if (!combinator->initialize()) {
+        return mode == "add" || mode == "root" || mode == "max";
+    }
+
+    /**
+     * @brief Human-readable list of the supported modes, for error messages
+     */
+    [[nodiscard]] static const char* modeNames() noexcept { return "add, root or max"; }
+
+    /**
+     * @brief Builds (or rebuilds) the core module for a given signal shape
+     * @param cfg Sample rate and block size, as reported by dsp64
+     * @param numChannel Number of envelopes per set, i.e. the inlets' channel count
+     * @return true if the combinator is ready to process
+     *
+     * Called from dsp64 on the main thread, where allocation is safe. Idempotent: returns
+     * immediately when the shape has not changed, so toggling DSP does not reallocate.
+     */
+    bool prepare(const zerr::SystemConfigs& cfg, int numChannel)
+    {
+        if (numChannel < 1 || cfg.block_size == 0) {
             return false;
-        };
+        }
 
-        // assgin Max/MSP print method the the logger function
-        // Because we want to see logs in the Max/MSP log window
-        // auto printFunc = [](const std::string& msg) {
-        //     post(msg.c_str());
-        // };
-        // combinator->setPrinter(printFunc);
+        if (ready.load(std::memory_order_acquire) && numChannel == this->numChannel &&
+            cfg.block_size == systemConfigs.block_size &&
+            cfg.sample_rate == systemConfigs.sample_rate) {
+            return true;
+        }
 
-        // outputCount = combinator->getNumSpeakers();
-        // post("ZerrCombinator::initialize outputCount is %d", outputCount);
+        auto next =
+            std::make_unique<zerr::EnvelopeCombinator>(inputCount, numChannel, cfg, combMode);
+        if (!next->initialize()) {
+            return false;
+        }
 
-        inputBuffer.resize(inputCount, zerr::Samples(systemConfigs.block_size, 0.0f));
-        outputBuffer.resize(outputCount, zerr::Samples(systemConfigs.block_size, 0.0f));
+        zerr::Blocks nextIn(next->numInlet, zerr::Samples(cfg.block_size, 0.0));
+        zerr::Blocks nextOut(next->numOutlet, zerr::Samples(cfg.block_size, 0.0));
 
-        return true;
+        // MSP rebuilds the DSP chain around dsp64, so perform() is not running for this
+        // object while we swap. The flag covers the states MSP does not: never prepared,
+        // and prepare() having failed.
+        ready.store(false, std::memory_order_release);
+        combinator.swap(next);
+        inputBuffer.swap(nextIn);
+        outputBuffer.swap(nextOut);
+        systemConfigs    = cfg;
+        this->numChannel = numChannel;
+        ready.store(true, std::memory_order_release);
+
+        return true; // the previous combinator dies with `next` here
     }
 
     /**
@@ -82,54 +130,89 @@ class ZerrCombinator {
      * @param outs Array of pointers to output audio buffers
      * @param numouts Number of output channels
      * @param sampleframes Number of samples to process
+     *
+     * noexcept by contract: this runs on the audio thread, inside Max's C call stack, where
+     * an escaping exception would terminate the host. Anything unexpected zeroes the output.
      */
-    void perform(double** ins, long numins, double** outs, long numouts, long sampleframes)
+    void perform(double** ins, long numins, double** outs, long numouts, long sampleframes) noexcept
     {
-        if (!ins || !outs || numins < inputCount || numouts < outputCount) {
-            throw std::invalid_argument("Invalid buffer pointers or sizes in perform()");
+        const long numIn  = static_cast<long>(inputBuffer.size());
+        const long numOut = static_cast<long>(outputBuffer.size());
+
+        if (!ready.load(std::memory_order_acquire) || !ins || !outs || numins < numIn ||
+            numouts < numOut) {
+            silence(outs, numouts, sampleframes);
+            return;
         }
 
-        for (int i = 0; i < numins; ++i) {
-            std::copy_n(ins[i], sampleframes, inputBuffer[i].begin());
+        // The core sizes its buffers from block_size; never read or write past them.
+        const long count =
+            std::min<long>(sampleframes, static_cast<long>(systemConfigs.block_size));
+
+        for (long i = 0; i < numIn; ++i) {
+            if (!ins[i]) {
+                silence(outs, numouts, sampleframes);
+                return;
+            }
+            std::copy_n(ins[i], count, inputBuffer[i].begin());
         }
 
         outputBuffer = combinator->perform(inputBuffer);
 
-        for (int i = 0; i < numouts; ++i) {
-            std::copy_n(outputBuffer[i].begin(), sampleframes, outs[i]);
+        for (long i = 0; i < numOut; ++i) {
+            if (!outs[i]) {
+                continue;
+            }
+            std::copy_n(outputBuffer[i].begin(), count, outs[i]);
+            if (count < sampleframes) {
+                std::memset(outs[i] + count, 0, (sampleframes - count) * sizeof(double));
+            }
         }
     }
 
     /**
-     * @brief Gets the number of output channels
-     * @return Number of output channels based on enabled feature extractors
+     * @brief Gets the combination mode this object was created with
      */
-    [[nodiscard]] int getOutputCount() const noexcept { return outputCount; }
+    [[nodiscard]] const std::string& getMode() const noexcept { return combMode; }
 
     /**
-     * @brief Gets the number of input channels
-     * @return Number of input channels (currently fixed at 1)
+     * @brief Gets the number of envelope sets being combined
      */
-    [[nodiscard]] constexpr int getInputCount() const noexcept { return inputCount; }
+    [[nodiscard]] int getInputCount() const noexcept { return inputCount; }
 
     /**
-     * @brief Gets the total number of ports (inlets + outlets)
-     * @return Total count of all audio ports
+     * @brief Gets the number of envelopes per set, 0 until prepare() has succeeded
      */
-    [[nodiscard]] int getPortCount() const noexcept { return inputCount + outputCount; }
+    [[nodiscard]] int getChannelCount() const noexcept { return numChannel; }
 
     ~ZerrCombinator() = default;
 
- private:
-    int inputCount = 2; /**< Number of signal inlets for receiving audio input */
-    int outputCount = 1; /**< Number of signal outlets based on enabled feature extractors */
+  private:
+    /**
+     * @brief Zeroes every output buffer; the fallback whenever processing cannot proceed
+     */
+    static void silence(double** outs, long numouts, long sampleframes) noexcept
+    {
+        if (!outs) {
+            return;
+        }
+        for (long i = 0; i < numouts; ++i) {
+            if (outs[i]) {
+                std::memset(outs[i], 0, sampleframes * sizeof(double));
+            }
+        }
+    }
 
-    zerr::SystemConfigs systemConfigs; /**< System configuration settings */
+    int inputCount;       /**< Number of envelope sets, one multichannel inlet each */
+    int numChannel{0};    /**< Envelopes per set; known only once prepare() has run */
+    std::string combMode; /**< Combination mode: "add", "root" or "max" */
 
-    zerr::Blocks inputBuffer; /**< Buffer for storing incoming audio samples */
+    zerr::SystemConfigs systemConfigs{0, 0}; /**< System configuration settings */
+
+    std::atomic<bool> ready{false}; /**< True once the core module is built and buffers sized */
+
+    zerr::Blocks inputBuffer;  /**< Buffer for storing incoming audio samples */
     zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing processed audio samples */
 
-    std::unique_ptr<zerr::EnvelopeCombinator> combinator; /**< Core component that implements the feature extraction algorithms */
-
-    std::string zerr_cfg; /**< Path to configuration file */
+    std::unique_ptr<zerr::EnvelopeCombinator> combinator; /**< Core combination algorithms */
 };

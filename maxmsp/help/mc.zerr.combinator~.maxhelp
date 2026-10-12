@@ -307,8 +307,20 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 40.0, 269.0, 705.0, 22.0 ],
-					"text" : "\"max\": the output is maximum number of envelopes"
+					"patching_rect" : [ 40.0, 272.0, 705.0, 20.0 ],
+					"text" : "\"max\": the largest envelope value across the sets. Used when no mode argument is given"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"fontsize" : 14.0,
+					"id" : "obj-54",
+					"maxclass" : "comment",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 40.0, 292.0, 705.0, 20.0 ],
+					"text" : "\"add\": the sum of the envelopes across the sets"
 				}
 
 			}
@@ -319,8 +331,8 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 40.0, 242.0, 705.0, 22.0 ],
-					"text" : "\"root\": the output is the square root of the multiplied envelopes"
+					"patching_rect" : [ 40.0, 252.0, 705.0, 20.0 ],
+					"text" : "\"root\": the geometric mean - the Nth root of the N envelopes multiplied together. Equals a square root for two sets"
 				}
 
 			}
@@ -397,7 +409,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 40.0, 216.400002181529999, 705.100000768899918, 22.0 ],
+					"patching_rect" : [ 40.0, 232.0, 705.100000768899918, 20.0 ],
 					"text" : "Available combination modes:"
 				}
 
@@ -418,12 +430,12 @@
 				"box" : 				{
 					"fontsize" : 14.0,
 					"id" : "obj-25",
-					"linecount" : 3,
+					"linecount" : 4,
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 40.0, 161.400002181529999, 705.100000768899918, 53.0 ],
-					"text" : "The \\[zerr_combinator~\\] is for combining multiple sets of envelopes in different ways. First argument is the number of sets. The second argument is the number of envelopes per set. The third argument is the combination mode. Available combination modes: - root: - max:"
+					"patching_rect" : [ 40.0, 161.400002181529999, 705.100000768899918, 70.0 ],
+					"text" : "The \\[mc.zerr.combinator~\\] combines multiple sets of envelopes in different ways. First argument: the number of envelope sets - the object gets one multichannel inlet per set. The number of envelopes per set comes from the channel count of the incoming multichannel signals and every inlet must carry the same count. Second argument: the combination mode - optional and defaults to \"max\"."
 				}
 
 			}
