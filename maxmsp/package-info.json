@@ -16,7 +16,7 @@
 	},
 	"package_extra" : {
 		"reverse_domain" : "com.absinthismus",
-		"copyright" : "Copyright (c) 2025 Zeyu Yang"
+		"copyright" : "Copyright (c) 2023-2026 Zeyu Yang"
 	},
 	"tags" : [ "sound spatialization", "multi-channel", "spatiomorphology", "spatial sound synthesis", "panning" ],
 	"version" : "0.1.0",
