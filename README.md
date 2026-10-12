@@ -11,7 +11,7 @@
 | **Puredata**      | ✅     | ✅         | ✅            | ✅       |
 | **JACK**          | 🛠️     | 🛠️         | 🛠️            | 🛠️       |
 | **SuperCollider** | ⏳     | ⏳         | ⏳            | ⏳       |
-| **Max/MSP**       | **➖** | ✅         | ✅            | 🛠️       |
+| **Max/MSP**       | **➖** | ✅         | **➖**        | **➖**   |
 
 ✅: **Fully Supported**
 
@@ -25,7 +25,10 @@
 
 ### Releases
 
-You can download the precompiled version of each environment and system from Releases. Please check the readme of each environment for detail instructions.
+Precompiled builds are attached to [Releases](https://github.com/ringbuffer-org/Zerr/releases).
+For Max, download `Zerr-<version>-macos-arm64.zip` (Apple Silicon, Max 9) and follow
+[`maxmsp/README.md`](maxmsp/README.md) — it covers the quarantine step macOS requires for an
+ad-hoc-signed package. For PureData, see [`puredata/README.md`](puredata/README.md).
 
 ### How to Build
 
@@ -69,6 +72,22 @@ conan install . --output-folder=build --build=missing \
 # build and install puredata package
 ./build.sh -i puredata
 ```
+
+#### For Max/MSP
+
+- Requires macOS on Apple Silicon and the Min-DevKit submodules (`git submodule update --init --recursive`)
+- Build/Install with following commands
+
+```bash
+# build Max externals into maxmsp/externals
+./build.sh maxmsp
+
+# build, then assemble the Max package in maxmsp/dist/Zerr and zip it
+./build.sh -i maxmsp
+```
+
+- To use the build from Max, symlink or copy `maxmsp/dist/Zerr` into `~/Documents/Max 9/Packages/`.
+  The externals are arm64 only; a universal build is not produced
 
 #### On Windows
 
