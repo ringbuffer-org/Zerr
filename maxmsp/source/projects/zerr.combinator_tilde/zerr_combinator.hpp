@@ -1,7 +1,7 @@
 /**
  * @file    zerr.combinator.hpp
  * @author  Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief   Header for the ZerrCombinator class used in mc.zerr.combinator~ Max/MSP External
+ * @brief   Header for the ZerrCombinator class used in zerr.combinator~ Max/MSP External
  * @date    2025-05-03
  *
  * @copyright  Copyright (c) 2023-2025

@@ -1,7 +1,7 @@
 /**
- * @file    mc.zerr.disperser_tilde.cpp
+ * @file    zerr.disperser_tilde.cpp
  * @author  Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief   mc.zerr.disperser~ Max/MSP External
+ * @brief   zerr.disperser~ Max/MSP External
  * @date    2025-04-29
  *
  * @copyright  Copyright (c) 2023-2025
@@ -12,15 +12,15 @@
 
 using namespace c74::min;
 
-class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public mc_operator<> {
+class zerr_disperser_tilde : public object<zerr_disperser_tilde>, public mc_operator<> {
  public:
     // ==========================
     // Basic informations
     // ==========================
-    MIN_DESCRIPTION { "The [zerr_disperser~] is for simply multiply the source signal with the envelopes to achieve multichannel panning." };
+    MIN_DESCRIPTION { "zerr.disperser~ multiplies the source signal with the envelopes to achieve multichannel panning." };
     MIN_TAGS { "zerr" };
     MIN_AUTHOR { "Zeyu Yang" };
-    MIN_RELATED { "zerr.disperser~, zerr.combinator~, mc.zerr.combinator~, mc.disperser~" };
+    MIN_RELATED { "zerr.envelopes~, zerr.combinator~, zerr.features~" };
 
     // ==========================
     // Inlets & Outlets
@@ -32,7 +32,7 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // ==========================
     // Constructor
     // ==========================
-    mc_zerr_disperser_tilde(const atoms& args = {})
+    zerr_disperser_tilde(const atoms& args = {})
         : channelCountEnv { 1 }
         , channelCountSrc { 1 }
     {
@@ -43,7 +43,7 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     // ===================================
     static long _mc_outputs(c74::max::t_object* obj, long outletindex)
     {
-        auto* x = reinterpret_cast<mc_zerr_disperser_tilde*>(obj);
+        auto* x = reinterpret_cast<zerr_disperser_tilde*>(obj);
 
         // The source signal must be 1-channel
         // Force the outlet to 1-channel when invalid source input connected
@@ -58,7 +58,7 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     static long _input_changed(c74::max::t_object* obj, long inletindex, long count)
     {
         // Something unintuitive. If there is any unconnected inlet, all inlet count will be one.
-        auto* x = reinterpret_cast<mc_zerr_disperser_tilde*>(obj);
+        auto* x = reinterpret_cast<zerr_disperser_tilde*>(obj);
 
         // Store the channel count of the source inlet
         // We don't react to the source inlet change
@@ -131,4 +131,4 @@ class mc_zerr_disperser_tilde : public object<mc_zerr_disperser_tilde>, public m
     int channelCountEnv { 1 };
 };
 
-MIN_EXTERNAL(mc_zerr_disperser_tilde);
+MIN_EXTERNAL(zerr_disperser_tilde);

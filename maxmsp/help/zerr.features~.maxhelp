@@ -374,7 +374,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.5, 146.400002181529999, 421.0, 69.0 ],
-					"text" : "The [zerr_features~] calculates the audio features of input signal and output the feature signals in audio rate. The feature to be calculated is defined via arguments. The order of feature outlets is the same as the order of arguments."
+					"text" : "The [zerr.features~] calculates the audio features of input signal and output the feature signals in audio rate. The feature to be calculated is defined via arguments. The order of feature outlets is the same as the order of arguments."
 				}
 
 			}

@@ -1,7 +1,7 @@
 /**
- * @file    mc.zerr.envelopes_tilde.cpp
+ * @file    zerr.envelopes_tilde.cpp
  * @author  Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief   mc.zerr.envelopes~ Max/MSP External - Multichannel envelope generator
+ * @brief   zerr.envelopes~ Max/MSP External - Multichannel envelope generator
  * @date    2025-05-03
  *
  * @copyright  Copyright (c) 2023-2025
@@ -21,7 +21,7 @@
 
 /**
  * @struct t_zerr_envelopes
- * @brief Main data structure for the mc.zerr.envelopes~ object
+ * @brief Main data structure for the zerr.envelopes~ object
  */
 typedef struct _zerr_envelopes {
     t_pxobject x_obj;   ///< DSP object header (must be first)
@@ -62,7 +62,7 @@ C74_EXPORT void ext_main(void* r)
 {
     t_class* c;
 
-    c = class_new("mc.zerr.envelopes~", (method)zerr_envelopes_new, (method)zerr_envelopes_free,
+    c = class_new("zerr.envelopes~", (method)zerr_envelopes_new, (method)zerr_envelopes_free,
                   sizeof(t_zerr_envelopes), 0L, A_GIMME, 0);
 
     // Register methods
@@ -223,7 +223,7 @@ void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
         }
     }
     catch (const std::exception& e) {
-        object_error((t_object*)x, "mc.zerr.envelopes~: %s", e.what());
+        object_error((t_object*)x, "zerr.envelopes~: %s", e.what());
         delete x->ze;
         x->ze = NULL;
         return NULL;
@@ -297,7 +297,7 @@ void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins
 
 void zerr_envelopes_bang(t_zerr_envelopes* x)
 {
-    post("mc.zerr.envelopes~: current channel count = %ld", x->channel_count);
+    post("zerr.envelopes~: current channel count = %ld", x->channel_count);
 }
 
 void zerr_envelopes_active(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* argv)
