@@ -8,6 +8,7 @@ lib/
 # Max/MSP specific
 *.mxo
 maxmsp/dist/
+puredata/dist/
 *.mxe
 *.mxe64
 
@@ -54,3 +55,8 @@ CMakeUserPresets.json
 
 
 
+
+# Local Claude Code state: skills, worktrees, session config.
+# Kept out of the repo because the task-tracker skill holds a private Notion URL
+# and this repository is public.
+.claude/

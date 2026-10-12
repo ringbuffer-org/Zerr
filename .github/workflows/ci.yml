@@ -263,7 +263,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release
           cmake --build maxmsp/build --config Release
 
-      # The same assembly ./build.sh -i maxmsp does locally. The ditto zip is what
+      # The same assembly ./build.sh -p maxmsp does locally. The ditto zip is what
       # a release attaches; it also survives upload-artifact, which does not keep
       # file permissions and would break the bundles if they were uploaded loose.
       - name: Assemble the Max package
