@@ -1300,9 +1300,9 @@
 						40.0,
 						239.0,
 						757.0,
-						53.0
+						69
 					],
-					"text": "First argument chooses the envelope generation strategy: \"trajectory\" or \"trigger\". The second is the name of the speaker layout YAML, looked up on Max's search path (.yaml or .yml, extension optional). This help uses circulation_8.yaml from the package's help folder; more layouts ship in its misc folder."
+					"text": "First argument chooses the envelope generation strategy: \"trajectory\" (default) or \"trigger\". The second is the name of a speaker layout YAML on Max's search path (.yaml or .yml, extension optional); without it the object uses a built-in ring of eight speakers, the same positions as the circulation_8.yaml this help uses. More layouts ship in the package's misc folder."
 				}
 			},
 			{

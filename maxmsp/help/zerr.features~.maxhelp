@@ -518,7 +518,7 @@
 						421.0,
 						69.0
 					],
-					"text": "The [zerr.features~] calculates audio features of the input signal and outputs them as audio-rate signals. The features are chosen by the arguments; the order of the outlets is the order of the arguments."
+					"text": "The [zerr.features~] calculates audio features of the input signal and outputs them as audio-rate signals. The features are chosen by the arguments; the order of the outlets is the order of the arguments. With no argument it extracts rms."
 				}
 			},
 			{

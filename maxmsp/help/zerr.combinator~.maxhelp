@@ -614,7 +614,7 @@
 						709.0,
 						69.0
 					],
-					"text": "The \\[zerr.combinator~\\] combines multiple sets of envelopes in different ways. First argument: the number of envelope sets - the object gets one multichannel inlet per set. The number of envelopes per set comes from the channel count of the incoming multichannel signals and every inlet must carry the same count. Second argument: the combination mode - optional and defaults to \"max\"."
+					"text": "The \\[zerr.combinator~\\] combines multiple sets of envelopes in different ways. First argument: the number of envelope sets (default 2) - the object gets one multichannel inlet per set. The number of envelopes per set comes from the channel count of the incoming multichannel signals and every inlet must carry the same count. Second argument: the combination mode - optional and defaults to \"max\"."
 				}
 			},
 			{
