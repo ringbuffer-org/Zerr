@@ -74,9 +74,9 @@ standard:
 
 ## Object reference
 
-### `zerr.features~ <feature> [<feature> …]`
+### `zerr.features~ [<feature> …]`
 
-Extracts audio features from a mono signal, at audio rate. At least one feature name is required.
+Extracts audio features from a mono signal, at audio rate. With no argument it extracts `rms`.
 
 | name | feature | | name | feature |
 | --- | --- | --- | --- | --- |
@@ -89,10 +89,11 @@ Extracts audio features from a mono signal, at audio rate. At least one feature 
 - Outlets: one signal per feature argument, in argument order.
 - `bang`: posts the outlet count to the Console.
 
-### `zerr.envelopes~ <trigger|trajectory> <layout>`
+### `zerr.envelopes~ [trigger|trajectory] [<layout>]`
 
-Generates one envelope per loudspeaker. Both arguments are required: the mode and the name of a
-layout YAML on the search path (`.yaml` may be omitted).
+Generates one envelope per loudspeaker. The first argument is the mode (default `trajectory`),
+the second the name of a layout YAML on the search path (`.yaml` may be omitted). Without a
+layout the object uses a built-in ring of eight speakers, the same positions as `circulation_8`.
 
 - **trajectory**: the control signal (0 to 1) is a position along a chain of speakers; the envelope
   crossfades between neighbours along that chain.
@@ -122,10 +123,10 @@ Messages (speaker numbers as in the layout file):
 A speaker must be active to appear in `traj`, `topo` or `curr`; deactivate it only after taking it
 out of those lists.
 
-### `zerr.combinator~ <sets> [add|root|max]`
+### `zerr.combinator~ [<sets>] [add|root|max]`
 
-Merges several envelope sets into one. The first argument is the number of sets; the object gets
-one multichannel inlet per set, and every inlet must carry the same channel count (otherwise it
+Merges several envelope sets into one. The first argument is the number of sets (default 2); the
+object gets one multichannel inlet per set, and every inlet must carry the same channel count (otherwise it
 reports an error and outputs silence). The mode defaults to `max`.
 
 - `add`: sum of the sets

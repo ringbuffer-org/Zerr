@@ -120,6 +120,28 @@ void EnvelopeGenerator::setPrinter(Logger::PrintStrategy newPrinter)
     speakerManager->setPrinter(newPrinter);
 }
 
+void EnvelopeGenerator::setLogLevel(LogLevel level)
+{
+    logger.setLogLevel(level);
+    speakerManager->logger.setLogLevel(level);
+}
+
+void EnvelopeGenerator::setSpeakerConfigText(std::string yamlText)
+{
+    speakerManager->setConfigText(std::move(yamlText));
+}
+
+void EnvelopeGenerator::setSystemConfigs(SystemConfigs newCfgs)
+{
+    systemCfgs = newCfgs;
+    for (auto& block : inputBuffers) {
+        block.assign(systemCfgs.block_size, 0.0f);
+    }
+    for (auto& block : outputBuffers) {
+        block.assign(systemCfgs.block_size, 0.0f);
+    }
+}
+
 void EnvelopeGenerator::_processTrigger()
 {
     size_t channel;

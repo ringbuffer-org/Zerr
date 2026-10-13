@@ -60,7 +60,8 @@ bool SpeakerManager::initialize()
     speakers.clear();
     // load speaker configuration file
     try {
-        speakerArrayNode = YAML::LoadFile(speakerArrayPath);
+        speakerArrayNode = speakerArrayText.empty() ? YAML::LoadFile(speakerArrayPath)
+                                                    : YAML::Load(speakerArrayText);
     }
     catch (...) {
         logger.logError("SpeakerManager::initialize: Load speaker configuration " +

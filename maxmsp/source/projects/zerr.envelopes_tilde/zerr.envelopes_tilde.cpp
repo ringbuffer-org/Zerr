@@ -4,7 +4,7 @@
  * @brief   zerr.envelopes~ Max/MSP External - Multichannel envelope generator
  * @date    2025-05-03
  *
- * @copyright  Copyright (c) 2023-2025
+ * @copyright  Copyright (c) 2023-2026
  * @license    MIT license
  */
 
@@ -14,6 +14,10 @@
 #include "z_dsp.h"
 
 #include "./zerr_envelopes.hpp"
+#include "zerr_default_layout.hpp"
+#include "zerr_max_log.hpp"
+
+#include <string>
 
 //------------------------------------------------------------------------------
 // Type Definitions
@@ -25,9 +29,14 @@
  */
 typedef struct _zerr_envelopes {
     t_pxobject x_obj;   ///< DSP object header (must be first)
-    long channel_count; ///< Channel count of multichannel signal
+    long channel_count; ///< Channel count of the multichannel outlet (one per speaker)
+    bool dsp_ready;     ///< dsp_setup() has run, so free must call dsp_free()
     ZerrEnvelopes* ze;  ///< Pointer to the zerr_envelopes implementation
 } t_zerr_envelopes;
+
+#ifndef ZERR_MAX_VERSION
+#define ZERR_MAX_VERSION "dev"
+#endif
 
 //------------------------------------------------------------------------------
 // Function Prototypes
@@ -78,12 +87,6 @@ C74_EXPORT void ext_main(void* r)
     class_addmethod(c, (method)zerr_envelopes_interval, "interval", A_GIMME, 0);
     class_addmethod(c, (method)zerr_envelopes_print, "print", 0);
 
-    // Attributes
-    // CLASS_ATTR_LONG(c, "chans", 0, t_zerr_envelopes, channel_count);
-    // CLASS_ATTR_LABEL(c, "chans", 0, "Output Channels");
-    // CLASS_ATTR_FILTER_CLIP(c, "chans", 1, MC_MAX_CHANS);
-    // CLASS_ATTR_BASIC(c, "chans", 0);
-
     // Initialize DSP and register the class
     class_dspinit(c);
     class_register(CLASS_BOX, c);
@@ -95,146 +98,131 @@ C74_EXPORT void ext_main(void* r)
 // Object Creation/Destruction
 //------------------------------------------------------------------------------
 
+// Every failure path in new() ends here. object_free() runs zerr_envelopes_free(), which
+// tolerates every partial state (no wrapper yet, dsp_setup() not yet run), so neither the
+// Max object nor the wrapper leaks.
+static void* zerr_envelopes_fail(t_zerr_envelopes* x)
+{
+    object_free((t_object*)x);
+    return NULL;
+}
+
+// Resolves a layout name through Max's search path: as given, then with .yaml, then with
+// .yml. Returns the first hit as a Unix path, or an empty string.
+static std::string zerr_envelopes_find_layout(t_zerr_envelopes* x, const char* name)
+{
+    t_fourcc file_types[] = {'TEXT', 'YAML'};
+    const size_t len      = strlen(name);
+    const bool has_ext    = (len > 5 && strcmp(name + len - 5, ".yaml") == 0) ||
+                            (len > 4 && strcmp(name + len - 4, ".yml") == 0);
+
+    const char* suffixes[] = {"", ".yaml", ".yml"};
+    for (const char* suffix : suffixes) {
+        if (suffix[0] == '\0' && !has_ext) {
+            continue; // a bare name is only tried with an extension
+        }
+        char candidate[MAX_PATH_CHARS];
+        snprintf(candidate, MAX_PATH_CHARS, "%s%s", name, suffix);
+
+        t_symbol* absolute = NULL;
+        if (path_absolutepath(&absolute, gensym(candidate), file_types, 2) == MAX_ERR_NONE &&
+            absolute) {
+            // Max paths look like "Macintosh HD:/Users/..."; the core wants "/Users/...".
+            const char* full  = absolute->s_name;
+            const char* colon = strchr(full, ':');
+            std::string unix_path(colon ? colon + 1 : full);
+            object_post((t_object*)x, "speaker layout: %s", unix_path.c_str());
+            return unix_path;
+        }
+    }
+    return std::string();
+}
+
 void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
 {
-    // Initialize t_zerr_envelopes structure -----------------------------------
     t_zerr_envelopes* x = (t_zerr_envelopes*)object_alloc(zerr_envelopes_class);
-
     if (!x)
         return NULL;
 
-    // Initialize default values -----------------------------------------------
     x->ze            = NULL;
-    x->channel_count = 1; // Default 1 channel output for the multichannel outlet
+    x->dsp_ready     = false;
+    x->channel_count = 1;
 
-    // Parsing arguments -------------------------------------------------------
-    if (argc != 2) {
-        return NULL;
-    }
-
-    // Process argument 1: mode
-    t_symbol* arg1   = atom_getsym(argv);
-    const char* mode = arg1->s_name;
-
-    // Process argument 2: relative path of the speaker configuration file
-    t_symbol* file_path = atom_getsym(argv + 1);
-    if (!file_path || !file_path->s_name)
-        return NULL;
-    // const char* path = file_path->s_name;
-
-    // Find the absolute path of configuration file ----------------------------
-    bool yaml_found = false;
-    size_t len      = strlen(file_path->s_name);
-
-    t_symbol* absolute_path = NULL;
-    t_fourcc file_types[]   = {'TEXT', 'YAML'};
-    t_max_err err;
-
-    char* unix_path = NULL;
-    char* full_path = NULL;
-
-    auto extract_unix_path = [](char* full_path) -> char* {
-        if (!full_path)
-            return NULL;
-
-        char* colon_pos = strchr(full_path, ':');
-        return colon_pos ? (colon_pos + 1) : full_path;
-    };
-
-    // Check if path already has .yaml or .yml extension
-    bool has_yaml_ext = (len > 5 && strcmp(file_path->s_name + len - 5, ".yaml") == 0);
-    bool has_yml_ext  = (len > 4 && strcmp(file_path->s_name + len - 4, ".yml") == 0);
-
-    if (has_yaml_ext || has_yml_ext) {
-        err = path_absolutepath(&absolute_path, file_path, file_types, 2);
-
-        if (err == MAX_ERR_NONE && absolute_path) {
-            full_path = absolute_path->s_name;
-            unix_path = full_path;
-
-            // For Linux & MacOS
-            unix_path = extract_unix_path(full_path);
-
-            object_post((t_object*)x, "Found YAML file at: %s", unix_path);
-            yaml_found = true;
-        }
-    }
-
-    // Try with .yaml extension
-    char yaml_name[MAX_PATH_CHARS];
-    snprintf(yaml_name, MAX_PATH_CHARS, "%s.yaml", file_path->s_name);
-    t_symbol* yaml_sym = gensym(yaml_name);
-
-    err = path_absolutepath(&absolute_path, yaml_sym, file_types, 2);
-    if (err == MAX_ERR_NONE && absolute_path) {
-        full_path = absolute_path->s_name;
-        unix_path = full_path;
-
-        // For Linux & MacOS
-        unix_path = extract_unix_path(full_path);
-
-        object_post((t_object*)x, "Found YAML file at: %s", unix_path);
-        yaml_found = true;
-    }
-
-    // Try with .yml extension
-    char yml_name[MAX_PATH_CHARS];
-    snprintf(yml_name, MAX_PATH_CHARS, "%s.yml", file_path->s_name);
-    t_symbol* yml_sym = gensym(yml_name);
-
-    err = path_absolutepath(&absolute_path, yml_sym, file_types, 2);
-    if (err == MAX_ERR_NONE && absolute_path) {
-        full_path = absolute_path->s_name;
-        unix_path = full_path;
-
-        // For Linux & MacOS
-        unix_path = extract_unix_path(full_path);
-
-        object_post((t_object*)x, "Found YAML file at: %s", unix_path);
-        yaml_found = true;
-    }
-
-    if (!yaml_found) {
+    // Positional arguments: [mode] [layout]; they end at the first @attribute.
+    const long offset = attr_args_offset(argc, argv);
+    if (offset > 2) {
         object_error((t_object*)x,
-                     "Cannot find YAML file: %s (tried as-is, with .yaml, and with .yml)",
-                     file_path->s_name);
-        return NULL;
+                     "expects at most 2 arguments: [trigger|trajectory] [speaker layout]");
+        return zerr_envelopes_fail(x);
     }
 
-    // create & initialize ZerrEnvelopes instance ------------------------------
-    // The constructor calls zerr::parseGenMode(), which throws on an unknown mode
-    // argument. An exception must never escape into Max's C call stack: it would
-    // reach std::terminate and abort the host. Report and return NULL instead.
-    //
-    // Return NULL rather than object_free(x): object_free reaches zerr_envelopes_free,
-    // which calls dsp_free() -- but dsp_setup() does not run until further down, and
-    // MSP requires those two to be paired. This path is one typo in the mode argument
-    // away for any user, so it has to be the safe kind of failure. Leaving x for Max
-    // to reclaim is what every other early return in this function already does.
-    // x->ze is NULL until the assignment below, so the delete in the catch is correct
-    // whether the throw came from the constructor or from initialize().
-    try {
-        x->ze = new ZerrEnvelopes(sys_getsr(), sys_getblksize(), mode, unix_path);
-
-        if (!x->ze->initialize()) {
-            delete x->ze;
-            x->ze = NULL;
-            return NULL;
+    // Argument 1: mode. Defaults to trajectory.
+    std::string mode = "trajectory";
+    if (offset >= 1) {
+        if (atom_gettype(argv) != A_SYM) {
+            object_error((t_object*)x, "first argument must be trigger or trajectory");
+            return zerr_envelopes_fail(x);
         }
+        mode = atom_getsym(argv)->s_name;
+        try {
+            zerr::parseGenMode(mode);
+        }
+        catch (const std::exception&) {
+            object_error((t_object*)x, "unknown mode '%s'; expected trigger or trajectory",
+                         mode.c_str());
+            return zerr_envelopes_fail(x);
+        }
+    }
+
+    // Argument 2: speaker layout. Defaults to a built-in 8-speaker ring, so a plain
+    // [zerr.envelopes~] works without any file on the search path.
+    std::string layout_name = zerr_max::kDefaultLayoutName;
+    std::string layout_yaml = zerr_max::kDefaultLayoutYaml;
+    if (offset >= 2) {
+        if (atom_gettype(argv + 1) != A_SYM) {
+            object_error((t_object*)x, "second argument must be a speaker layout name");
+            return zerr_envelopes_fail(x);
+        }
+        const char* requested = atom_getsym(argv + 1)->s_name;
+        layout_name           = zerr_envelopes_find_layout(x, requested);
+        layout_yaml.clear();
+        if (layout_name.empty()) {
+            object_error((t_object*)x,
+                         "cannot find speaker layout '%s' (tried as given, .yaml and .yml on "
+                         "the search path)",
+                         requested);
+            return zerr_envelopes_fail(x);
+        }
+    }
+    else {
+        object_post((t_object*)x, "no speaker layout given, using the %s",
+                    zerr_max::kDefaultLayoutName);
+    }
+
+    // Build the wrapper with Max's global rate and vector size; dsp64 re-sizes it for the
+    // chain it ends up in. The Console printer is installed before initialize() so the
+    // core's own load errors are visible.
+    try {
+        x->ze = new ZerrEnvelopes(sys_getsr(), sys_getblksize(), mode, layout_name, layout_yaml,
+                                  zerr_max::consolePrinter((t_object*)x));
     }
     catch (const std::exception& e) {
-        object_error((t_object*)x, "zerr.envelopes~: %s", e.what());
-        delete x->ze;
-        x->ze = NULL;
-        return NULL;
+        object_error((t_object*)x, "%s", e.what());
+        return zerr_envelopes_fail(x);
     }
 
-    // Further instance setups -------------------------------------------------
+    std::string error;
+    if (!x->ze->initialize(&error)) {
+        object_error((t_object*)x, "%s", error.c_str());
+        return zerr_envelopes_fail(x);
+    }
+
     x->channel_count = x->ze->getOutputCount();
 
     attr_args_process(x, argc, argv);
 
     dsp_setup((t_pxobject*)x, x->ze->getInputCount());
+    x->dsp_ready = true;
 
     outlet_new((t_object*)x, "multichannelsignal");
 
@@ -243,12 +231,12 @@ void* zerr_envelopes_new(t_symbol* s, long argc, t_atom* argv)
 
 void zerr_envelopes_free(t_zerr_envelopes* x)
 {
-    dsp_free((t_pxobject*)x);
-
-    if (x->ze) {
-        delete x->ze;
-        x->ze = NULL;
+    // dsp_free() must pair with dsp_setup(); a creation that failed earlier never ran it.
+    if (x->dsp_ready) {
+        dsp_free((t_pxobject*)x);
     }
+    delete x->ze;
+    x->ze = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -258,10 +246,25 @@ void zerr_envelopes_free(t_zerr_envelopes* x)
 void zerr_envelopes_assist(t_zerr_envelopes* x, void* b, long m, long a, char* s)
 {
     if (m == ASSIST_INLET) {
-        strcpy(s, "(signal) Input source signal");
+        switch (a) {
+        case 0:
+            strcpy(s, "(signal) control: pulses reaching 1 jump (trigger), 0..1 position "
+                      "(trajectory); also messages");
+            break;
+        case 1:
+            strcpy(s, "(signal) spread 0..1, how far a jump spills onto neighbours (trigger "
+                      "mode)");
+            break;
+        case 2:
+            strcpy(s, "(signal) gain applied to every envelope");
+            break;
+        default:
+            strcpy(s, "(signal)");
+        }
     }
     else if (m == ASSIST_OUTLET) {
-        strcpy(s, "(multichannel signal) Output envelopes");
+        snprintf(s, 256, "(multichannel signal) %ld envelopes, one per speaker in layout order",
+                 x->channel_count);
     }
 }
 
@@ -281,6 +284,17 @@ long zerr_envelopes_multichanneloutputs(t_zerr_envelopes* x, long outletindex)
 void zerr_envelopes_dsp64(t_zerr_envelopes* x, t_object* dsp64, short* count, double samplerate,
                           long maxvectorsize, long flags)
 {
+    // The chain's own rate and vector size, which differ from the global ones inside a
+    // resampled poly~ or after a change in Audio Status. prepare() keeps the speaker
+    // state and is idempotent when nothing changed; on failure perform() stays silent.
+    zerr::SystemConfigs cfgs;
+    cfgs.sample_rate = (size_t)samplerate;
+    cfgs.block_size  = (size_t)maxvectorsize;
+    if (!x->ze->prepare(cfgs)) {
+        object_error((t_object*)x, "cannot prepare for %ld samples at %.0f Hz; output muted",
+                     maxvectorsize, samplerate);
+    }
+
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_envelopes_perform64, 0, NULL);
 }
 
@@ -288,7 +302,7 @@ void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins
                               double** outs, long numouts, long sampleframes, long flags,
                               void* userparam)
 {
-    x->ze->perform(ins, numins, outs, numouts, sampleframes);
+    x->ze->perform(ins, numins, outs, numouts, sampleframes); // noexcept
 }
 
 //------------------------------------------------------------------------------
@@ -297,7 +311,11 @@ void zerr_envelopes_perform64(t_zerr_envelopes* x, t_object* dsp64, double** ins
 
 void zerr_envelopes_bang(t_zerr_envelopes* x)
 {
-    post("zerr.envelopes~: current channel count = %ld", x->channel_count);
+    const auto& cfgs = x->ze->getSystemConfigs();
+    object_post((t_object*)x,
+                "zerr.envelopes~ %s: %s mode, %ld speakers from %s, block %ld, sr %ld",
+                ZERR_MAX_VERSION, x->ze->getMode().c_str(), x->channel_count,
+                x->ze->getLayoutName().c_str(), (long)cfgs.block_size, (long)cfgs.sample_rate);
 }
 
 void zerr_envelopes_active(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* argv)
@@ -356,7 +374,7 @@ void zerr_envelopes_curr(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
     long speaker_index;
 
     if (argc < 1) {
-        object_error((t_object*)x, "current_speaker: not enough arguments");
+        object_error((t_object*)x, "curr: not enough arguments");
         return;
     }
 
@@ -367,7 +385,7 @@ void zerr_envelopes_curr(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
         speaker_index = (long)atom_getfloat(argv);
     }
     else {
-        object_error((t_object*)x, "current_speaker: argument must be a number");
+        object_error((t_object*)x, "curr: argument must be a number");
         return;
     }
 
@@ -388,12 +406,12 @@ void zerr_envelopes_topo(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
     int* indices;
 
     if (argc < 3) {
-        object_error((t_object*)x, "topomatrix: not enough arguments");
+        object_error((t_object*)x, "topo: not enough arguments");
         return;
     }
 
     if (atom_gettype(argv) != A_SYM) {
-        object_error((t_object*)x, "topomatrix: first argument must be a symbol");
+        object_error((t_object*)x, "topo: first argument must be a symbol");
         return;
     }
 
@@ -402,7 +420,7 @@ void zerr_envelopes_topo(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
 
     indices = (int*)sysmem_newptr(index_count * sizeof(int));
     if (!indices) {
-        object_error((t_object*)x, "topomatrix: out of memory");
+        object_error((t_object*)x, "topo: out of memory");
         return;
     }
 
@@ -414,7 +432,7 @@ void zerr_envelopes_topo(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
             indices[i] = (int)atom_getfloat(argv + i + 1);
         }
         else {
-            object_error((t_object*)x, "topomatrix: index %ld must be a number", i + 1);
+            object_error((t_object*)x, "topo: index %ld must be a number", i + 1);
             sysmem_freeptr(indices);
             return;
         }
@@ -437,14 +455,14 @@ void zerr_envelopes_traj(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
     long i;
     int* indices;
 
-    if (argc < 2) {
-        object_error((t_object*)x, "trajectory: not enough arguments");
+    if (argc < 1) {
+        object_error((t_object*)x, "traj: expects at least one speaker number");
         return;
     }
 
     indices = (int*)sysmem_newptr(argc * sizeof(int));
     if (!indices) {
-        object_error((t_object*)x, "trajectory: out of memory");
+        object_error((t_object*)x, "traj: out of memory");
         return;
     }
 
@@ -456,7 +474,7 @@ void zerr_envelopes_traj(t_zerr_envelopes* x, t_symbol* msg, long argc, t_atom* 
             indices[i] = (int)atom_getfloat(argv + i);
         }
         else {
-            object_error((t_object*)x, "trajectory: index %ld must be a number", i);
+            object_error((t_object*)x, "traj: index %ld must be a number", i + 1);
             sysmem_freeptr(indices);
             return;
         }
@@ -479,7 +497,7 @@ void zerr_envelopes_interval(t_zerr_envelopes* x, t_symbol* msg, long argc, t_at
     double interval;
 
     if (argc < 1) {
-        object_error((t_object*)x, "trigger_interval: not enough arguments");
+        object_error((t_object*)x, "interval: not enough arguments");
         return;
     }
 
@@ -490,7 +508,7 @@ void zerr_envelopes_interval(t_zerr_envelopes* x, t_symbol* msg, long argc, t_at
         interval = (double)atom_getlong(argv);
     }
     else {
-        object_error((t_object*)x, "trigger_interval: argument must be a number");
+        object_error((t_object*)x, "interval: argument must be a number");
         return;
     }
 
