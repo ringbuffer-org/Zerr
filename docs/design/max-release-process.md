@@ -32,7 +32,7 @@ _Maintainer steps for shipping `maxmsp/` as a Max package. User-facing instructi
 ```
 
 Expected: `maxmsp/dist/Zerr/externals/` holds exactly `zerr.combinator~.mxo`, `zerr.disperser~.mxo`,
-`zerr.envelopes~.mxo`, `zerr.features~.mxo`; `dist/` holds `Zerr-<version>-macos-arm64.zip` with a
+`zerr.envelopes~.mxo`, `zerr.features~.mxo`; `dist/` holds `zerr-max-<version>-macos-arm64.zip` with a
 top-level `Zerr/` folder. CMake warns if hand-copied bundles are left in `maxmsp/help/`.
 
 Checks:
@@ -40,7 +40,7 @@ Checks:
 ```bash
 codesign --verify --deep --strict maxmsp/dist/Zerr/externals/*.mxo
 lipo -archs 'maxmsp/dist/Zerr/externals/zerr.features~.mxo/Contents/MacOS/zerr.features~'   # arm64
-unzip -l maxmsp/dist/Zerr-*.zip | head
+unzip -l maxmsp/dist/zerr-max-*.zip | head
 ```
 
 CI (`maxmsp (macos)` job) performs the same assembly and uploads the zip as `zerr-max-macos-arm64`;
@@ -68,7 +68,7 @@ default-argument chain are the items most likely to regress.
 ```bash
 git tag -a v<version> -m "Zerr* <version>"
 git push origin v<version>
-gh release create v<version> maxmsp/dist/Zerr-<version>-macos-arm64.zip --notes-file <notes>
+gh release create v<version> maxmsp/dist/zerr-max-<version>-macos-arm64.zip --notes-file <notes>
 ```
 
 Attach the PureData zips to the same release if they changed. Send the composer the *Install* and

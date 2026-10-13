@@ -408,9 +408,11 @@ package_maxmsp() {
     case "$archs" in
         *" "*) archs=universal ;;
     esac
-    local zip="Zerr-$(max_version)-macos-${archs}.zip"
+    # zerr-max-<ver>-macos-<arch>.zip, parallel to zerr-pd-...; the folder inside
+    # stays Zerr/, the Max package name.
+    local zip="zerr-max-$(max_version)-macos-${archs}.zip"
 
-    rm -f "$dist"/Zerr-*.zip   # also zips from a previous version or architecture
+    rm -f "$dist"/zerr-max-*.zip   # also zips from a previous version or architecture
     zip_dir "$dist" Zerr "$zip"
     echo "Max package assembled: $dist/Zerr"
     echo "Max package zipped:    $dist/$zip"
