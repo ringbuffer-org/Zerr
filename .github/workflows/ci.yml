@@ -122,13 +122,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # `platform` is the <os>-<arch> suffix of the release zip, the same values
+          # build.sh derives from uname (macos-latest runs on Apple Silicon).
           - id: macos
             runner: macos-latest
             profile: profiles/macos
             cflags: -mmacosx-version-min=10.13
+            platform: macos-arm64
           - id: linux
             runner: ubuntu-latest
             profile: profiles/linux
+            platform: linux-x86_64
           # The only job that can catch core/wrapper API drift at build time.
           # macOS links externals with `-undefined suppress` and Linux permits
           # undefined symbols in a .so, so both happily produce an external that
@@ -138,6 +142,7 @@ jobs:
             profile: profiles/mingw
             mingw: true
             make: mingw32-make
+            platform: windows-x86_64
 
     steps:
       - uses: actions/checkout@v4
@@ -210,11 +215,24 @@ jobs:
           ${{ matrix.make || 'make' }}
           ${{ matrix.make || 'make' }} install PDLIBDIR=build
 
-      - name: Upload PureData externals
+      # The same zip ./build.sh -p puredata produces locally, named after the version
+      # in puredata/zerr-meta.pd (same sed line as build.sh pd_version(); keep them
+      # identical). cmake's tar is on every runner; Pd externals are plain files, so
+      # nothing needs ditto here.
+      - name: Zip the Pd package
+        shell: bash
+        working-directory: puredata/build
+        run: |
+          version=$(sed -n 's|^#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' ../zerr-meta.pd | head -n 1)
+          test -n "$version"
+          cmake -E tar cf "zerr-pd-${version}-${{ matrix.platform }}.zip" --format=zip zerr
+          ls -l zerr-pd-*.zip
+
+      - name: Upload Pd package
         uses: actions/upload-artifact@v4
         with:
           name: zerr-pd-${{ matrix.id }}
-          path: puredata/build/zerr
+          path: puredata/build/zerr-pd-*.zip
           # Nothing consumes this artifact, so without `error` a wrapper that stopped
           # emitting into puredata/build/zerr would leave the job green and publish
           # nothing. The core job is only incidentally protected by its consumers.

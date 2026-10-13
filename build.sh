@@ -319,7 +319,7 @@ build_puredata() {
 }
 
 # Stages the Pd library the way `make install` lays it out (externals, help patches,
-# circulation_8.yaml, LICENSE, README) under puredata/dist/zerr, then zips it.
+# circulation_8.yaml, zerr-meta.pd, LICENSE, README) under puredata/dist/zerr, then zips it.
 package_puredata() {
     local dist="$ROOT/puredata/dist"
     echo "Assembling the Pure Data package..."
@@ -327,7 +327,7 @@ package_puredata() {
     ( cd "$ROOT/puredata" && "$MAKE" install PDLIBDIR="$dist" )
 
     local zip
-    zip="zerr-pd-$(project_version)-$(host_os)-$(host_arch).zip"
+    zip="zerr-pd-$(pd_version)-$(host_os)-$(host_arch).zip"
     rm -f "$dist"/zerr-pd-*.zip
     zip_dir "$dist" zerr "$zip"
     echo "Pure Data package assembled: $dist/zerr"
@@ -408,7 +408,7 @@ package_maxmsp() {
     case "$archs" in
         *" "*) archs=universal ;;
     esac
-    local zip="Zerr-$(project_version)-macos-${archs}.zip"
+    local zip="Zerr-$(max_version)-macos-${archs}.zip"
 
     rm -f "$dist"/Zerr-*.zip   # also zips from a previous version or architecture
     zip_dir "$dist" Zerr "$zip"
@@ -420,10 +420,16 @@ package_maxmsp() {
 # Packaging and install helpers shared by the wrappers
 # -----------------------------------------------------------------------------
 
-# The one version number in the tree. maxmsp/package-info.json is where Max reads
-# it from, CMake reads it for ZERR_MAX_VERSION, and both package zips carry it.
-project_version() {
+# Each host carries its own version. Max: maxmsp/package-info.json (Max reads it,
+# CMake compiles it in as ZERR_MAX_VERSION). Pd: puredata/zerr-meta.pd (the Pd libdir
+# convention; puredata/Makefile compiles it in as ZERR_PD_VERSION). ci.yml reads both
+# with the same two sed lines; keep the three copies identical.
+max_version() {
     sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' "$ROOT/maxmsp/package-info.json" | head -n 1
+}
+
+pd_version() {
+    sed -n 's|^#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' "$ROOT/puredata/zerr-meta.pd" | head -n 1
 }
 
 host_os() {
