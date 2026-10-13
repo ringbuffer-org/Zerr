@@ -318,7 +318,7 @@ class SpeakerManager {
     std::map<Index, Params> distanceMatrix; ///< Matrix storing pre-calculated
                                             ///< distances between all speaker pairs.
 
-    Index currIdx;         ///< Index of the currently selected speaker.
+    Index currIdx{-1};     ///< Index of the currently selected speaker (-1 until initialized).
     Indexes actvSpkIdx;    ///< Vector storing indexes of all currently active speakers.
     Indexes trajVector;    ///< Ordered vector of speaker indexes defining the spatial
                            ///< trajectory for playback.

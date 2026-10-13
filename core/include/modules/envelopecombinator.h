@@ -107,8 +107,8 @@ class EnvelopeCombinator {
      */
     void _process_add();
     /**
-     * @brief Process envelopes using root mean square combination mode
-     * Combines envelopes using RMS calculation across sources
+     * @brief Process envelopes using the root (geometric mean) combination mode
+     * Multiplies the sources per channel and takes the Nth root of the product
      */
     void _process_root();
     /**

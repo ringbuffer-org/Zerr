@@ -144,11 +144,11 @@ class EnvelopeGenerator {
     std::unique_ptr<OnsetDetector>
         onsetDetector; /**< Detector for identifying onset triggers in the input signal */
 
-    using ProcessFunction = void (EnvelopeGenerator::*)();
-    ProcessFunction processFunc;
+    using ProcessFunction       = void (EnvelopeGenerator::*)();
+    ProcessFunction processFunc = nullptr; /**< Bound by initialize(); null means not initialized */
 
-    TriggerMode triggerMode; /**< The strategy for choosing the next speaker to jump to
-                                using trigger with topology */
+    TriggerMode triggerMode = TriggerMode::Random; /**< The strategy for choosing the next speaker
+                                to jump to using trigger with topology */
 
     Blocks inputBuffers;  /**< multi-channel input buffer in the shape of
                              input channel number x block size */
