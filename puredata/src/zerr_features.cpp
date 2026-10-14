@@ -36,7 +36,7 @@ int ZerrFeatures::initialize()
 
     n_outlet = featureNames.size();
 
-    input_buffer.resize(n_inlet, std::vector<double>(systemConfigs.block_size, 0.0f));
+    input_buffer.assign(n_inlet, std::vector<double>(systemConfigs.block_size, 0.0f));
     output_buffer.resize(n_outlet);
 
     in_ptr  = (float**)malloc(n_inlet * sizeof(float**));
@@ -45,22 +45,44 @@ int ZerrFeatures::initialize()
     return 1;
 }
 
+bool ZerrFeatures::prepare(zerr::SystemConfigs cfg)
+{
+    if (!bank->prepare(cfg)) {
+        return false;
+    }
+    systemConfigs = cfg;
+    input_buffer.assign(n_inlet, std::vector<double>(cfg.block_size, 0.0f));
+    return true;
+}
+
 void ZerrFeatures::perform(float** ports, int n_vec)
 {
     in_ptr  = (float**)&ports[0];
     out_ptr = (float**)&ports[n_inlet];
 
+    // never read or write past the prepared block; the remainder of the output is silence
+    const int block = (int)systemConfigs.block_size;
+    const int count = n_vec < block ? n_vec : block;
+
     for (int i = 0; i < n_inlet; i++) {
-        for (int j = 0; j < n_vec; j++) {
+        for (int j = 0; j < count; j++) {
             input_buffer[i][j] = in_ptr[i][j];
+        }
+        for (int j = count; j < block; j++) {
+            input_buffer[i][j] = 0.0;
         }
     }
 
     output_buffer = bank->perform(input_buffer[0]);
 
     for (int i = 0; i < n_outlet; i++) {
-        for (int j = 0; j < n_vec; j++) {
+        const int have =
+            (int)output_buffer[i].size() < count ? (int)output_buffer[i].size() : count;
+        for (int j = 0; j < have; j++) {
             out_ptr[i][j] = output_buffer[i][j];
+        }
+        for (int j = have; j < n_vec; j++) {
+            out_ptr[i][j] = 0.0f;
         }
     }
 }

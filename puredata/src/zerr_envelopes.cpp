@@ -33,12 +33,22 @@ bool ZerrEnvelopes::initialize()
 
     numOutlet = envelopeGenerator->getNumSpeakers();
 
-    inputBuffer.resize(numInlet, zerr::Samples(systemCfgs.block_size, 0.0f));
-    outputBuffer.resize(numOutlet, zerr::Samples(systemCfgs.block_size, 0.0f));
+    inputBuffer.assign(numInlet, zerr::Samples(systemCfgs.block_size, 0.0f));
+    outputBuffer.assign(numOutlet, zerr::Samples(systemCfgs.block_size, 0.0f));
 
     inPtr  = (float**)getbytes(numInlet * sizeof(float**));
     outPtr = (float**)getbytes(numOutlet * sizeof(float**));
 
+    return true;
+}
+
+bool ZerrEnvelopes::prepare(zerr::SystemConfigs cfg)
+{
+    if (!envelopeGenerator->prepare(cfg)) {
+        return false;
+    }
+    systemCfgs = cfg;
+    inputBuffer.assign(numInlet, zerr::Samples(cfg.block_size, 0.0f));
     return true;
 }
 
@@ -47,17 +57,28 @@ void ZerrEnvelopes::perform(float** ports, int blockSize)
     inPtr  = (float**)&ports[0];
     outPtr = (float**)&ports[numInlet];
 
+    // never read or write past the prepared block; the remainder of the output is silence
+    const int block = (int)systemCfgs.block_size;
+    const int count = blockSize < block ? blockSize : block;
+
     for (int i = 0; i < numInlet; i++) {
-        for (int j = 0; j < blockSize; j++) {
+        for (int j = 0; j < count; j++) {
             inputBuffer[i][j] = inPtr[i][j];
+        }
+        for (int j = count; j < block; j++) {
+            inputBuffer[i][j] = 0.0;
         }
     }
 
     outputBuffer = envelopeGenerator->perform(inputBuffer);
 
     for (int i = 0; i < numOutlet; i++) {
-        for (int j = 0; j < blockSize; j++) {
+        const int have = (int)outputBuffer[i].size() < count ? (int)outputBuffer[i].size() : count;
+        for (int j = 0; j < have; j++) {
             outPtr[i][j] = outputBuffer[i][j];
+        }
+        for (int j = have; j < blockSize; j++) {
+            outPtr[i][j] = 0.0f;
         }
     }
 }

@@ -41,6 +41,13 @@ class ZerrDisperser {
      */
     bool initialize();
     /**
+     * @brief Adopt the sample rate and block size Pd reports in the dsp method
+     * @return false, leaving the object untouched, when the core refuses the shape
+     *
+     * Idempotent (the core compares); call it from the dsp method every time.
+     */
+    bool prepare(zerr::SystemConfigs cfg);
+    /**
      * @brief Main DSP callback function that processes audio buffers
      * @param ports Array of pointers to input/output audio buffers (shared memory between in/out)
      * @param n_vec The actual size of audio vectors to process (may be smaller than system block
