@@ -8,46 +8,44 @@
  */
 #include "zerr_disperser.h"
 
-
-ZerrDisperser::ZerrDisperser(int numChannel, zerr::SystemConfigs systemCfgs) {
+ZerrDisperser::ZerrDisperser(int numChannel, zerr::SystemConfigs systemCfgs)
+{
     audioDisperser = new zerr::AudioDisperser(numChannel, systemCfgs);
-
-
 
     logger = new zerr::Logger();
 
-    #ifdef TESTMODE
+#ifdef TESTMODE
     logger->setLogLevel(zerr::LogLevel::INFO);
-    #endif  // TESTMODE
+#endif // TESTMODE
 }
 
-
-bool ZerrDisperser::initialize() {
-    if (!audioDisperser->initialize()) {return false;}
+bool ZerrDisperser::initialize()
+{
+    if (!audioDisperser->initialize()) {
+        return false;
+    }
     numInlet  = audioDisperser->numInlet;
     numOutlet = audioDisperser->numOutlet;
 
-    inputBuffer.resize(numInlet,
-        zerr::Samples(audioDisperser->get_block_size(), 0.0f));
-    outputBuffer.resize(numOutlet,
-        zerr::Samples(audioDisperser->get_block_size(), 0.0f));
+    inputBuffer.resize(numInlet, zerr::Samples(audioDisperser->get_block_size(), 0.0f));
+    outputBuffer.resize(numOutlet, zerr::Samples(audioDisperser->get_block_size(), 0.0f));
 
-    #ifdef TESTMODE
-    logger->logDebug(zerr::formatString(
-        "ZerrDisperser::initialize numInlet:%d numOutlet:%d blockSize %d",
-        numInlet, numOutlet, audioDisperser->get_block_size()));
-    #endif  // TESTMODE
+#ifdef TESTMODE
+    logger->logDebug(
+        zerr::formatString("ZerrDisperser::initialize numInlet:%d numOutlet:%d blockSize %d",
+                           numInlet, numOutlet, audioDisperser->get_block_size()));
+#endif // TESTMODE
 
-    inPtr  = (float **) getbytes(numInlet * sizeof(float **));
-    outPtr = (float **) getbytes(numOutlet * sizeof(float **));
+    inPtr  = (float**)getbytes(numInlet * sizeof(float**));
+    outPtr = (float**)getbytes(numOutlet * sizeof(float**));
 
     return true;
 }
 
-
-void ZerrDisperser::perform(float **ports, int blockSize) {
-    inPtr  = (float **) &ports[0];
-    outPtr = (float **) &ports[numInlet];
+void ZerrDisperser::perform(float** ports, int blockSize)
+{
+    inPtr  = (float**)&ports[0];
+    outPtr = (float**)&ports[numInlet];
 
     for (int i = 0; i < numInlet; i++) {
         for (int j = 0; j < blockSize; j++) {
@@ -70,8 +68,8 @@ void ZerrDisperser::perform(float **ports, int blockSize) {
     }
 }
 
-
-ZerrDisperser::~ZerrDisperser() {
+ZerrDisperser::~ZerrDisperser()
+{
     delete audioDisperser;
     delete logger;
 }

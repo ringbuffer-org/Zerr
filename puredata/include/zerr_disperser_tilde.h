@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include "./m_pd.h"  // PureData APIs
+#include "./m_pd.h" // PureData APIs
 #include "./zerr_disperser.h"
 #include "configs.h"
 
@@ -24,7 +24,7 @@ extern "C" {
  * of outlets that can output signal or control data from the zerr_disperser processing chain.
  */
 typedef struct zerrout {
-    t_outlet *u_outlet;  /**< Pure Data outlet pointer */
+    t_outlet* u_outlet; /**< Pure Data outlet pointer */
 } t_zerrout;
 
 /**
@@ -35,15 +35,15 @@ typedef struct zerrout {
  * of inlets that can receive signal or control data for the zerr_disperser processing chain.
  */
 typedef struct zerrin {
-    t_inlet *u_inlet;  /**< Pure Data inlet pointer */
+    t_inlet* u_inlet; /**< Pure Data inlet pointer */
 } t_zerrin;
 
 /**
  * @struct zerr_disperser_tilde
  * @brief The main Pure Data external interface structure
- * 
+ *
  * This structure represents the complete state of a zerr_disperser~ object instance.
- * It contains all necessary components for audio processing, data routing, and 
+ * It contains all necessary components for audio processing, data routing, and
  * interaction with Pure Data's signal processing system.
  */
 typedef struct {
@@ -51,18 +51,18 @@ typedef struct {
     t_float f;      /**< Fallback field for the main signal inlet when no signal is connected */
 
     t_int n_inlet;      /**< Number of inlets created for this instance */
-    t_zerrin *x_in_vec; /**< Dynamic array of inlet structures */
+    t_zerrin* x_in_vec; /**< Dynamic array of inlet structures */
 
     t_int n_outlet;       /**< Number of outlets created for this instance */
-    t_zerrout *x_out_vec; /**< Dynamic array of outlet structures */
+    t_zerrout* x_out_vec; /**< Dynamic array of outlet structures */
 
-    ZerrDisperser *z; /**< Pointer to the core zerr_disperser processing component */
+    ZerrDisperser* z; /**< Pointer to the core zerr_disperser processing component */
 } zerr_disperser_tilde;
 
 /**
  * @memberof zerr_disperser_tilde
  * @brief Creates a new zerr_disperser_tilde object instance
- * 
+ *
  * This function handles the instantiation of a new zerr_disperser~ object,
  * including memory allocation, initialization of inlets/outlets, and setup of
  * the core processing component.
@@ -72,7 +72,7 @@ typedef struct {
  * @param argv Array of creation arguments
  * @return void* Pointer to the new object or NULL if creation failed
  */
-void *zerr_disperser_tilde_new(t_symbol *s, int argc, t_atom *argv);
+void* zerr_disperser_tilde_new(t_symbol* s, int argc, t_atom* argv);
 
 /**
  * @memberof zerr_disperser_tilde
@@ -83,7 +83,7 @@ void *zerr_disperser_tilde_new(t_symbol *s, int argc, t_atom *argv);
  *
  * @param x Pointer to the zerr_disperser~ object to be freed (must not be NULL)
  */
-void zerr_disperser_tilde_free(zerr_disperser_tilde *x);
+void zerr_disperser_tilde_free(zerr_disperser_tilde* x);
 
 /**
  * @memberof zerr_disperser_tilde
@@ -96,12 +96,12 @@ void zerr_disperser_tilde_free(zerr_disperser_tilde *x);
  * @param x Pointer to the zerr_disperser~ object
  * @param sp Array of signal pointers provided by Pure Data
  */
-void zerr_disperser_tilde_dsp(zerr_disperser_tilde *x, t_signal **sp);
+void zerr_disperser_tilde_dsp(zerr_disperser_tilde* x, t_signal** sp);
 
 /**
  * @related zerr_disperser_tilde
  * @brief Initializes the zerr_disperser~ external in Pure Data
- * 
+ *
  * This setup function is called when the external is loaded into Pure Data.
  * It registers the class, methods, and properties of the zerr_disperser~ object
  * with Pure Data's runtime system.
