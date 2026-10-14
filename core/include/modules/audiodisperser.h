@@ -34,16 +34,27 @@ class AudioDisperser {
      */
     bool initialize();
     /**
+     * @brief Adopt a sample rate and block size (see SystemConfigs for the contract)
+     * @return false, leaving the disperser untouched, when block size or sample rate is 0
+     *
+     * Returns at once when the shape is unchanged; otherwise re-sizes the I/O blocks.
+     */
+    bool prepare(SystemConfigs cfg);
+    /**
      * @brief Process input audio blocks and disperse across channels
      * @param in Input audio blocks to process
      * @return Processed and dispersed output audio blocks
      */
-    Blocks perfrom(Blocks in);
+    const Blocks& perform(const Blocks& in);
     /**
      * @brief Get the block size used by the audio disperser
      * @return The block size from system configuration
      */
     int get_block_size() const noexcept { return systemCfgs.block_size; }
+    /**
+     * @brief The sample rate and block size the disperser is currently prepared for
+     */
+    [[nodiscard]] SystemConfigs getSystemConfigs() const noexcept { return systemCfgs; }
 
   private:
     int numChannel;              /**< Number of audio channels for dispersal */

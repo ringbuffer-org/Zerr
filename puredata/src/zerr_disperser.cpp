@@ -54,7 +54,7 @@ void ZerrDisperser::perform(float** ports, int blockSize)
     }
 
     try {
-        outputBuffer = audioDisperser->perfrom(inputBuffer);
+        outputBuffer = audioDisperser->perform(inputBuffer);
     }
     catch (...) {
         // logger->logError("ZerrDisperser::perform process failed...");
