@@ -121,15 +121,18 @@ class EnvelopeGenerator {
      */
     void setSpeakerConfigText(std::string yamlText);
     /**
-     * @brief Adopt a new sample rate and block size after initialize()
-     * @param newCfgs The new system configuration
+     * @brief Adopt a sample rate and block size (see SystemConfigs for the contract)
+     * @return false, leaving the generator untouched, when block size or sample rate is 0
      *
-     * Resizes the I/O blocks and keeps every speaker setting (active set, trajectory,
-     * topology, current speaker). Call from the host's control thread while the audio
-     * callback is not running, i.e. from the DSP-chain rebuild that reports the change.
-     * The trigger debounce is in samples, so re-apply setTriggerInterval() afterwards.
+     * Returns at once when the shape is unchanged. Otherwise resizes the I/O blocks and keeps
+     * every speaker setting (active set, trajectory, topology, current speaker). The trigger
+     * interval is kept in milliseconds, so its sample debounce follows the new rate.
      */
-    void setSystemConfigs(SystemConfigs newCfgs);
+    bool prepare(SystemConfigs newCfgs);
+    /**
+     * @brief The sample rate and block size the generator is currently prepared for
+     */
+    [[nodiscard]] SystemConfigs getSystemConfigs() const noexcept { return systemCfgs; }
 
   private:
     // NOTE: declaration order matters — config members must precede objects that depend on them
@@ -149,6 +152,8 @@ class EnvelopeGenerator {
 
     TriggerMode triggerMode = TriggerMode::Random; /**< The strategy for choosing the next speaker
                                 to jump to using trigger with topology */
+
+    Param triggerIntervalMs = -1; /**< Last setTriggerInterval() value; negative = never set */
 
     Blocks inputBuffers;  /**< multi-channel input buffer in the shape of
                              input channel number x block size */

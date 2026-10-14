@@ -48,11 +48,18 @@ bool EnvelopeGenerator::initialize()
     // get the number of speakers (the public member, not a shadowing local)
     numOutlet = speakerManager->getNumAllSpeakers();
 
-    // initialize the inputbuffer and outputbuffer size.
-    inputBuffers.resize(numInlet, Samples(systemCfgs.block_size, 0.0f));
-    outputBuffers.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
+    // size the I/O blocks through the one sizing path
+    inputBuffers.assign(numInlet, Samples());
+    outputBuffers.assign(numOutlet, Samples());
+    const SystemConfigs cfg = systemCfgs;
+    systemCfgs              = SystemConfigs{0, 0}; // a fresh layout is never "already prepared"
+    if (!prepare(cfg)) {
+        logger.logError("EnvelopeGenerator::initialize block size and sample rate must be > 0");
+        return false;
+    }
 
-    // setup index to channel reverse lookup table
+    // setup index to channel reverse lookup table (cleared: a reload must not keep stale rows)
+    indexChannelLookup.clear();
     Indexes indexes = speakerManager->getActiveSpeakerIndexes();
     for (size_t i = 0; i < indexes.size(); ++i) {
         indexChannelLookup[indexes[i]] = i;
@@ -70,8 +77,19 @@ bool EnvelopeGenerator::initialize()
 
 Blocks EnvelopeGenerator::perform(Blocks in)
 {
-    // fetch
-    inputBuffers = in;
+    // fetch: copy into the prepared blocks, never past them; missing input is silence
+    if (systemCfgs.block_size == 0 || static_cast<int>(in.size()) < numInlet) {
+        for (auto& block : outputBuffers) {
+            block.assign(block.size(), 0.0f);
+        }
+        return outputBuffers;
+    }
+    for (int i = 0; i < numInlet; ++i) {
+        Samples& dst       = inputBuffers[i];
+        const size_t count = std::min(in[i].size(), dst.size());
+        std::copy_n(in[i].begin(), count, dst.begin());
+        std::fill(dst.begin() + count, dst.end(), 0.0f);
+    }
 
     // process
     if (processFunc) {
@@ -106,8 +124,8 @@ void EnvelopeGenerator::setTopoMatrix(std::string action, Indexes idxs)
 
 void EnvelopeGenerator::setTriggerInterval(Param newInterval)
 {
-    newInterval      = newInterval < 0 ? 0 : newInterval;
-    int newThreshold = static_cast<int>(newInterval / 1000.0 * systemCfgs.sample_rate);
+    triggerIntervalMs = newInterval < 0 ? 0 : newInterval;
+    int newThreshold  = static_cast<int>(triggerIntervalMs / 1000.0 * systemCfgs.sample_rate);
     onsetDetector->setDebounceThreshold(newThreshold);
 }
 
@@ -132,8 +150,15 @@ void EnvelopeGenerator::setSpeakerConfigText(std::string yamlText)
     speakerManager->setConfigText(std::move(yamlText));
 }
 
-void EnvelopeGenerator::setSystemConfigs(SystemConfigs newCfgs)
+bool EnvelopeGenerator::prepare(SystemConfigs newCfgs)
 {
+    if (newCfgs.block_size == 0 || newCfgs.sample_rate == 0) {
+        return false;
+    }
+    if (newCfgs == systemCfgs) {
+        return true;
+    }
+
     systemCfgs = newCfgs;
     for (auto& block : inputBuffers) {
         block.assign(systemCfgs.block_size, 0.0f);
@@ -141,6 +166,11 @@ void EnvelopeGenerator::setSystemConfigs(SystemConfigs newCfgs)
     for (auto& block : outputBuffers) {
         block.assign(systemCfgs.block_size, 0.0f);
     }
+    // the debounce is counted in samples, so it follows the sample rate
+    if (triggerIntervalMs >= 0) {
+        setTriggerInterval(triggerIntervalMs);
+    }
+    return true;
 }
 
 void EnvelopeGenerator::_processTrigger()
