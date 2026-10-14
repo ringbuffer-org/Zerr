@@ -1,7 +1,8 @@
 /**
  * @file zerr_envelopes.h
  * @author Zeyu Yang (zeyuuyang42@gmail.com)
- * @brief EnvelopeGenerator Class Puredata Wrapper - Provides interface between Pure Data and the core envelope generation functionality
+ * @brief EnvelopeGenerator Class Puredata Wrapper - Provides interface between Pure Data and the
+ * core envelope generation functionality
  * @date 2023-08-04
  *
  * @copyright Copyright (c) 2023-2025
@@ -9,30 +10,34 @@
 #pragma once
 #include "m_pd.h"
 
-#include "types.h"
 #include "envelopegenerator.h"
 #include "logger.h"
 #include "ringbuffer.h"
+#include "types.h"
 
 /**
  * @class ZerrEnvelopes
- * @brief Main wrapper class that interfaces between Pure Data and the core envelope generation functionality
+ * @brief Main wrapper class that interfaces between Pure Data and the core envelope generation
+ * functionality
  *
- * This class handles the initialization, audio processing, and cleanup of envelope generation operations.
- * It manages the data flow between Pure Data's audio system and the internal envelope processing chain.
+ * This class handles the initialization, audio processing, and cleanup of envelope generation
+ * operations. It manages the data flow between Pure Data's audio system and the internal envelope
+ * processing chain.
  */
 class ZerrEnvelopes {
- public:
+  public:
     const int numInlet = 3; /**< Number of signal inlets: main(1)/spread(2)/volume(3) */
-    int numOutlet; /**< Number of signal outlets based on speaker configuration */
+    int numOutlet;          /**< Number of signal outlets based on speaker configuration */
     /**
      * @brief Creates a new ZerrEnvelopes instance
-     * @param systemCfgs Pure Data system configuration containing sample rate and block size settings
-     * @param selectionMode The envelope generator mode for control signal handling (trigger & trajectory)
+     * @param systemCfgs Pure Data system configuration containing sample rate and block size
+     * settings
+     * @param selectionMode The envelope generator mode for control signal handling (trigger &
+     * trajectory)
      * @param spkrCfgFile Path to the speaker array configuration file
      */
     ZerrEnvelopes(zerr::SystemConfigs systemCfgs, std::string selectionMode,
-        std::string spkrCfgFile);
+                  std::string spkrCfgFile);
     /**
      * @brief Initializes all internal components and prepares the object for processing
      * @return true if initialization was successful, false otherwise
@@ -41,7 +46,8 @@ class ZerrEnvelopes {
     /**
      * @brief Main DSP callback function that processes audio buffers
      * @param ports Array of pointers to input/output audio buffers (shared memory between in/out)
-     * @param n_vec The actual size of audio vectors to process (may be smaller than system block size)
+     * @param n_vec The actual size of audio vectors to process (may be smaller than system block
+     * size)
      */
     void perform(float** ports, int n_vec);
     /**
@@ -88,16 +94,17 @@ class ZerrEnvelopes {
      */
     ~ZerrEnvelopes();
 
- private:
+  private:
     zerr::SystemConfigs systemCfgs; /**< Pure Data system configuration settings */
 
-    zerr::Blocks inputBuffer; /**< Multi-channel buffer for storing incoming audio samples */
+    zerr::Blocks inputBuffer;  /**< Multi-channel buffer for storing incoming audio samples */
     zerr::Blocks outputBuffer; /**< Multi-channel buffer for storing processed audio samples */
-    float** inPtr; /**< Array of pointers to Pure Data input signal vectors */
-    float** outPtr; /**< Array of pointers to Pure Data output signal vectors */
+    float** inPtr;             /**< Array of pointers to Pure Data input signal vectors */
+    float** outPtr;            /**< Array of pointers to Pure Data output signal vectors */
 
-    std::string spkrCfgFile; /**< Path to speaker configuration file */
+    std::string spkrCfgFile;   /**< Path to speaker configuration file */
     std::string selectionMode; /**< Mode for selecting output speaker routing */
 
-    zerr::EnvelopeGenerator* envelopeGenerator; /**< Core component that implements the envelope generation algorithms */
+    zerr::EnvelopeGenerator*
+        envelopeGenerator; /**< Core component that implements the envelope generation algorithms */
 };

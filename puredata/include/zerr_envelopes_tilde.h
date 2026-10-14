@@ -24,15 +24,15 @@ extern "C" {
  * of outlets that can output signal or control data from the zerr_envelopes processing chain.
  */
 typedef struct zerrout {
-    t_outlet *u_outlet;  /**< Pure Data outlet pointer */
+    t_outlet* u_outlet; /**< Pure Data outlet pointer */
 } t_zerrout;
 
 /**
  * @struct zerr_envelopes_tilde
  * @brief The main Pure Data external interface structure
- * 
+ *
  * This structure represents the complete state of a zerr_envelopes~ object instance.
- * It contains all necessary components for audio processing, data routing, and 
+ * It contains all necessary components for audio processing, data routing, and
  * interaction with Pure Data's signal processing system.
  */
 typedef struct {
@@ -40,19 +40,21 @@ typedef struct {
     t_float f;      /**< Fallback field for the main signal inlet when no signal is connected */
 
     // The main inlet is created by PD automatically
-    t_inlet *spread_inlet; /**< Inlet for receiving spread control signals to adjust envelope spread */
-    t_inlet *volume_inlet; /**< Inlet for receiving volume control signals to adjust envelope amplitude */
+    t_inlet*
+        spread_inlet; /**< Inlet for receiving spread control signals to adjust envelope spread */
+    t_inlet* volume_inlet; /**< Inlet for receiving volume control signals to adjust envelope
+                              amplitude */
 
     t_int n_outlet;   /**< Number of outlets created for this instance */
-    t_zerrout *x_vec; /**< Dynamic array of outlet structures */
+    t_zerrout* x_vec; /**< Dynamic array of outlet structures */
 
-    ZerrEnvelopes *z; /**< Pointer to the core zerr_envelopes processing component */
+    ZerrEnvelopes* z; /**< Pointer to the core zerr_envelopes processing component */
 } zerr_envelopes_tilde;
 
 /**
  * @memberof zerr_envelopes_tilde
  * @brief Creates a new zerr_envelopes_tilde object instance
- * 
+ *
  * This function handles the instantiation of a new zerr_envelopes~ object,
  * including memory allocation, initialization of inlets/outlets, and setup of
  * the core processing component.
@@ -62,7 +64,7 @@ typedef struct {
  * @param argv Array of creation arguments
  * @return void* Pointer to the new object or NULL if creation failed
  */
-void *zerr_envelopes_tilde_new(t_symbol *s, int argc, t_atom *argv);
+void* zerr_envelopes_tilde_new(t_symbol* s, int argc, t_atom* argv);
 
 /**
  * @memberof zerr_envelopes_tilde
@@ -73,7 +75,7 @@ void *zerr_envelopes_tilde_new(t_symbol *s, int argc, t_atom *argv);
  *
  * @param x Pointer to the zerr_envelopes~ object to be freed (must not be NULL)
  */
-void zerr_envelopes_tilde_free(zerr_envelopes_tilde *x);
+void zerr_envelopes_tilde_free(zerr_envelopes_tilde* x);
 
 /**
  * @memberof zerr_envelopes_tilde
@@ -86,12 +88,12 @@ void zerr_envelopes_tilde_free(zerr_envelopes_tilde *x);
  * @param x Pointer to the zerr_envelopes~ object
  * @param sp Array of signal pointers provided by Pure Data
  */
-void zerr_envelopes_tilde_dsp(zerr_envelopes_tilde *x, t_signal **sp);
+void zerr_envelopes_tilde_dsp(zerr_envelopes_tilde* x, t_signal** sp);
 
 /**
  * @related zerr_envelopes_tilde
  * @brief Initializes the zerr_envelopes~ external in Pure Data
- * 
+ *
  * This setup function is called when the external is loaded into Pure Data.
  * It registers the class, methods, and properties of the zerr_envelopes~ object
  * with Pure Data's runtime system.
@@ -101,7 +103,7 @@ void zerr_envelopes_tilde_setup(void);
 /**
  * @memberof zerr_envelopes_tilde
  * @brief Updates the list of active speakers in the envelope system
- * 
+ *
  * This method processes incoming messages to update which speakers are currently
  * active in the envelope generation system.
  *
@@ -110,13 +112,13 @@ void zerr_envelopes_tilde_setup(void);
  * @param argc Number of arguments in the message
  * @param argv Array of arguments specifying active speakers
  */
-void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x, t_symbol *s,
-                                          int argc, t_atom *argv);
+void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde* x, t_symbol* s, int argc,
+                                          t_atom* argv);
 
 /**
  * @memberof zerr_envelopes_tilde
  * @brief Updates the trajectory parameters for envelope movement
- * 
+ *
  * This method processes incoming messages to update the trajectory path
  * that the envelopes will follow during processing.
  *
@@ -125,13 +127,12 @@ void zerr_envelopes_tilde_active_speakers(zerr_envelopes_tilde *x, t_symbol *s,
  * @param argc Number of arguments in the message
  * @param argv Array of arguments specifying trajectory parameters
  */
-void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x, t_symbol *s,
-                                     int argc, t_atom *argv);
+void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde* x, t_symbol* s, int argc, t_atom* argv);
 
 /**
  * @memberof zerr_envelopes_tilde
  * @brief Sets the trigger interval for envelope generation
- * 
+ *
  * This method configures how frequently new envelopes are triggered
  * in the processing chain.
  *
@@ -140,20 +141,20 @@ void zerr_envelopes_tilde_trajectory(zerr_envelopes_tilde *x, t_symbol *s,
  * @param argc Number of arguments in the message
  * @param argv Array of arguments specifying interval parameters
  */
-void zerr_envelopes_tilde_trigger_interval(zerr_envelopes_tilde *x, t_symbol *s,
-                                           int argc, t_atom *argv);
+void zerr_envelopes_tilde_trigger_interval(zerr_envelopes_tilde* x, t_symbol* s, int argc,
+                                           t_atom* argv);
 
 /**
  * @memberof zerr_envelopes_tilde
  * @brief Outputs the current state information to the Pure Data console
- * 
+ *
  * This debug method prints the current configuration and state of the
  * zerr_envelopes~ object to Pure Data's console window.
  *
  * @param x Pointer to the zerr_envelopes~ object
  * @param s Symbol containing the message selector (unused)
  */
-void zerr_envelopes_tilde_print(zerr_envelopes_tilde *x, t_symbol *s);
+void zerr_envelopes_tilde_print(zerr_envelopes_tilde* x, t_symbol* s);
 
 /**
  * @memberof zerr_envelopes_tilde
@@ -164,7 +165,7 @@ void zerr_envelopes_tilde_print(zerr_envelopes_tilde *x, t_symbol *s);
  *
  * @param x Pointer to the zerr_envelopes~ object
  */
-void zerr_envelopes_tilde_param_reset(zerr_envelopes_tilde *x);
+void zerr_envelopes_tilde_param_reset(zerr_envelopes_tilde* x);
 
 #ifdef __cplusplus
 }
