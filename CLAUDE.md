@@ -88,8 +88,10 @@ Platform-independent C++17 static library (`zerr_core`). Three subsystems:
 Signal shape contract (`SystemConfigs` in `types.h`): the shape passed to a module's constructor is
 only its initial guess. Every processing module has an idempotent `bool prepare(SystemConfigs)`;
 a wrapper calls it from the host's DSP-setup callback (Max `dsp64`, Pd `dsp`) every time, and the
-module re-sizes itself in place. The wrapper keeps `perform()` off the module meanwhile.
-`perform()` never reads or writes past the prepared block.
+module re-sizes itself in place. The wrapper keeps `perform()` off the module meanwhile (Max can
+compile a new chain while the old one runs: the Max wrappers hold `zerr_max::BlockLock` from
+`maxmsp/source/shared/zerr_block_lock.hpp`). `perform()` never reads or writes past the prepared
+block.
 
 ### Platform Wrappers
 
