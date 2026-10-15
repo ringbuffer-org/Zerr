@@ -56,10 +56,12 @@ cmake --install core/build   # Installs to core/lib
 
 Per host, never mixed: tag `max-v<ver>` or `pd-v<ver>`. Each host owns its version where its
 ecosystem reads it — Max in `maxmsp/package-info.json`, Pd in `puredata/zerr-meta.pd` — and the
-numbers may differ; `core/CMakeLists.txt`'s version is unused and is not bumped. Pushing a release
-tag makes CI build that host only and open a **draft** GitHub release with the zips attached and
-`docs/releases/<tag>.md` as the body; publishing is manual. Full checklist in
-`docs/design/release-process.md`.
+numbers may differ; `core/CMakeLists.txt`'s version is unused and is not bumped. The core has no
+version of its own: a PR that changes `core/` states what each host's users will notice and adds
+that line to `docs/releases/<host>-next.md`, which becomes `docs/releases/<host>-v<ver>.md` when the
+host's version is bumped. Pushing a release tag makes CI build that host only and open a **draft**
+GitHub release with the zips attached and `docs/releases/<tag>.md` as the body; publishing is
+manual. Full checklist in `docs/design/release-process.md`.
 
 ### Code Formatting
 

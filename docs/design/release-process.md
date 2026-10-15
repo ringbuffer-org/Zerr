@@ -13,7 +13,7 @@ _Maintainer steps. User-facing install instructions live in `maxmsp/README.md` a
    (Max reads it; CMake compiles it in as `ZERR_MAX_VERSION`), Pd in `puredata/zerr-meta.pd` (the
    libdir/deken meta file; the Makefile compiles it in as `ZERR_PD_VERSION`). The numbers may
    diverge; a host with no changes gets no release. `core/CMakeLists.txt` keeps an unused 0.1.0:
-   the core is not released on its own.
+   the core is not released on its own (rule 7).
 3. **Zip names say the host**: `zerr-max-<ver>-macos-arm64.zip`, `zerr-pd-<ver>-<os>-<arch>.zip`
    (`macos-arm64`, `linux-x86_64`, `windows-x86_64`). `./build.sh -p <host>` makes the same files
    CI does. The folder inside the Max zip stays `Zerr`.
@@ -27,6 +27,31 @@ _Maintainer steps. User-facing install instructions live in `maxmsp/README.md` a
    afterwards as the changelog. No H1 (the release title supplies it). `## Breaking` first when
    anything applies; drain the pending items listed under the host below.
 6. **The version file, the notes and the tag name agree**, or the `release` job fails on purpose.
+7. **The core has no version; core changes reach users through host releases, and are written
+   down when they land.** The core is a static library compiled into each host's externals, so a
+   user can only receive it inside a host package, and a host tag already pins the exact core
+   commit. A core number nobody can download would be a third thing to keep in sync by hand.
+   Instead:
+   - A PR that changes `core/` says, in its body, what a user of each host will notice: one line
+     for Max, one for Pd, or "none" (a refactor). The same change can be a fix for one host and a
+     new feature for the other; the prepare contract (#37–#42) fixed a `[block~]` crash in Pd and
+     a DSP-chain race in Max.
+   - Each host's version bump follows that line, ordinary semver per host: patch for a fix, minor
+     for a new feature, message or attribute, major when existing patches would break (object
+     renamed, argument meaning changed, outlet order).
+   - The same PR adds that line to the host's pending notes file, `docs/releases/<host>-next.md`,
+     under `## Breaking`, `## Changed` or `## Fixed`. Once the host's version number is decided
+     (the version file is bumped), the file is renamed to `docs/releases/<host>-v<ver>.md`, which
+     is the file the `release` job reads. A core change therefore cannot be forgotten by a host:
+     it was recorded when it landed, and the Pd file keeps accumulating while only Max ships.
+   - Before tagging, check the notes against git rather than memory. `<last>` is the host's
+     previous tag (`v0.2` for Pd until the first `pd-v` tag exists):
+     ```bash
+     git log <host>-v<last>..HEAD --oneline -- core <maxmsp|puredata>
+     ```
+     Every user-visible commit in that list has a line in the notes, or the notes are not done.
+   - Nothing forces lockstep. A host whose pending file is empty gets no release, however much
+     the core moved for the other host.
 
 ### Ship (either host)
 
@@ -76,6 +101,9 @@ gh release delete <host>-v<ver>-rc1 --yes --cleanup-tag && git tag -d <host>-v<v
 - `maxmsp/README.md` describes the objects as they ship. Re-read the object reference against the
   current `class_new` / message tables after any wrapper change (argument defaults, error wording,
   accepted message forms).
+- `docs/releases/max-v<ver>.md` covers every user-visible commit in
+  `git log max-v<last>..HEAD --oneline -- core maxmsp` (rule 7). For 0.3.0 there is no earlier
+  `max-v` tag: the notes cover everything since the Max package was created.
 
 ### Build and assemble
 
@@ -125,6 +153,8 @@ Then tag `max-v<ver>` as under *Ship* above.
 
 - Pending "Breaking" items for the next Pd release: none recorded. (The `mc.` rename and the
   `root` mode change were Max-only.)
+- Rename `docs/releases/pd-next.md` to `docs/releases/pd-v<ver>.md` and check it against
+  `git log v0.2..HEAD --oneline -- core puredata` (rule 7; `v0.2` is the last Pd tag).
 - Bump `VERSION` in `puredata/zerr-meta.pd`. It is the only place the Pd version lives: the
   Makefile compiles it in as `ZERR_PD_VERSION`, pd-lib-builder reads it as `lib.version`, and the
   zip name carries it.
