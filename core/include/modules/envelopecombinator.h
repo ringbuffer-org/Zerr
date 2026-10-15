@@ -34,14 +34,25 @@ class EnvelopeCombinator {
                        std::string combinationMode);
     /**
      * @brief Initialize the envelope combinator
-     * @return true if initialization successful, false otherwise
+     * @return false when the mode name is unknown or the initial shape is invalid
      */
     bool initialize();
+    /**
+     * @brief Adopt a sample rate and block size (see SystemConfigs for the contract)
+     * @return false, leaving the combinator untouched, when block size or sample rate is 0
+     *
+     * Returns at once when the shape is unchanged; otherwise re-sizes the I/O blocks.
+     */
+    bool prepare(SystemConfigs cfg);
     /**
      * @brief Get the block size used by the envelope combinator
      * @return The block size from system configuration
      */
     int get_block_size() const noexcept { return systemCfgs.block_size; }
+    /**
+     * @brief The sample rate and block size the combinator is currently prepared for
+     */
+    [[nodiscard]] SystemConfigs getSystemConfigs() const noexcept { return systemCfgs; }
     /**
      * @brief Process input envelope blocks and combine using selected mode
      * @param in Input envelope blocks to process
@@ -105,17 +116,17 @@ class EnvelopeCombinator {
      * @brief Process envelopes using addition combination mode
      * Adds envelope values across sources for each channel
      */
-    void _process_add();
+    void _process_add(size_t frames);
     /**
      * @brief Process envelopes using the root (geometric mean) combination mode
      * Multiplies the sources per channel and takes the Nth root of the product
      */
-    void _process_root();
+    void _process_root(size_t frames);
     /**
      * @brief Process envelopes using maximum combination mode
      * Takes maximum envelope value across sources for each channel
      */
-    void _process_max();
+    void _process_max(size_t frames);
 };
 
 } // namespace zerr

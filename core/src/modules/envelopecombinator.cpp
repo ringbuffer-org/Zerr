@@ -7,6 +7,8 @@
  * @copyright Copyright (c) 2023-2024
  */
 #include "envelopecombinator.h"
+
+#include <algorithm>
 using namespace zerr;
 
 EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, SystemConfigs systemCfgs,
@@ -35,15 +37,39 @@ EnvelopeCombinator::EnvelopeCombinator(int numSource, int numChannel, SystemConf
 
 bool EnvelopeCombinator::initialize()
 {
-    inputBuffer.resize(numInlet, Samples(systemCfgs.block_size, 0.0f));
-    outputBuffer.resize(numOutlet, Samples(systemCfgs.block_size, 0.0f));
-
     if (!modeValid) {
         logger.logError("EnvelopeCombinator::initialize Unknown combination mode: " +
                         requestedModeName);
         return false;
     }
 
+    inputBuffer.assign(numInlet, Samples());
+    outputBuffer.assign(numOutlet, Samples());
+    const SystemConfigs cfg = systemCfgs;
+    systemCfgs              = SystemConfigs{0, 0}; // fresh buffers are never "already prepared"
+    if (!prepare(cfg)) {
+        logger.logError("EnvelopeCombinator::initialize block size and sample rate must be > 0");
+        return false;
+    }
+    return true;
+}
+
+bool EnvelopeCombinator::prepare(SystemConfigs cfg)
+{
+    if (cfg.block_size == 0 || cfg.sample_rate == 0) {
+        return false;
+    }
+    if (cfg == systemCfgs) {
+        return true;
+    }
+
+    systemCfgs = cfg;
+    for (auto& block : inputBuffer) {
+        block.assign(systemCfgs.block_size, 0.0f);
+    }
+    for (auto& block : outputBuffer) {
+        block.assign(systemCfgs.block_size, 0.0f);
+    }
     prepared = true;
     return true;
 }
@@ -66,29 +92,41 @@ void EnvelopeCombinator::set_mode(CombMode mode) noexcept
 
 const Blocks& EnvelopeCombinator::perform(const Blocks& in)
 {
-    if (!prepared) {
+    if (!prepared || static_cast<int>(in.size()) < numInlet) {
+        for (auto& block : outputBuffer) {
+            block.assign(block.size(), 0.0f);
+        }
         return outputBuffer;
     }
 
-    inputBuffer = in;
+    // Copy into the prepared blocks, never past them; a short input leaves silence behind.
+    // The frame count is the shortest input, so no loop reads past any of them.
+    size_t frames = systemCfgs.block_size;
+    for (int i = 0; i < numInlet; ++i) {
+        Samples& dst       = inputBuffer[i];
+        const size_t count = std::min(in[i].size(), dst.size());
+        std::copy_n(in[i].begin(), count, dst.begin());
+        std::fill(dst.begin() + count, dst.end(), 0.0f);
+        frames = std::min(frames, count);
+    }
 
     // Load once per block so a block is never processed partly in one mode.
     switch (combMode.load(std::memory_order_relaxed)) {
     case CombMode::Add:
-        _process_add();
+        _process_add(frames);
         break;
     case CombMode::Root:
-        _process_root();
+        _process_root(frames);
         break;
     case CombMode::Max:
-        _process_max();
+        _process_max(frames);
         break;
     }
 
     return outputBuffer;
 }
 
-void EnvelopeCombinator::_process_add()
+void EnvelopeCombinator::_process_add(size_t frames)
 {
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
@@ -97,14 +135,14 @@ void EnvelopeCombinator::_process_add()
 
     for (int i = 0; i < numChannel; ++i) {
         for (int j = 0; j < numSource; ++j) {
-            for (size_t k = 0; k < systemCfgs.block_size; ++k) {
+            for (size_t k = 0; k < frames; ++k) {
                 outputBuffer[i][k] += inputBuffer[i + j * numChannel][k];
             }
         }
     }
 }
 
-void EnvelopeCombinator::_process_root()
+void EnvelopeCombinator::_process_root(size_t frames)
 {
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
@@ -114,8 +152,7 @@ void EnvelopeCombinator::_process_root()
     double exponent = 1.0 / static_cast<double>(numSource);
     Sample multi_tmp;
     for (int i = 0; i < numChannel; ++i) {
-        // TODO: use systemcfg.block_size could cause bug(sometimes smaller)
-        for (size_t k = 0; k < systemCfgs.block_size; ++k) {
+        for (size_t k = 0; k < frames; ++k) {
             multi_tmp = 1;
             for (int j = 0; j < numSource; ++j) {
                 multi_tmp *= inputBuffer[i + j * numChannel][k];
@@ -125,7 +162,7 @@ void EnvelopeCombinator::_process_root()
     }
 }
 
-void EnvelopeCombinator::_process_max()
+void EnvelopeCombinator::_process_max(size_t frames)
 {
     // clean the output buffer
     for (auto& buffer : outputBuffer) {
@@ -135,7 +172,7 @@ void EnvelopeCombinator::_process_max()
     Sample maxVal;
     Sample tmp;
     for (int i = 0; i < numChannel; ++i) {
-        for (size_t k = 0; k < systemCfgs.block_size; ++k) {
+        for (size_t k = 0; k < frames; ++k) {
             maxVal = 0;
             for (int j = 0; j < numSource; ++j) {
                 tmp    = inputBuffer[i + j * numChannel][k];
