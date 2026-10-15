@@ -92,7 +92,18 @@ void zerr_combinator_tilde_dsp(zerr_combinator_tilde* x, t_signal** sp)
 {
     int n_rest = 3; // size of [x, n_vec, n_args]
 
-    int n_vec  = sp[0]->s_n;
+    int n_vec = sp[0]->s_n;
+
+    // Pd reports the real shape here (a [block~] subpatch differs from the global
+    // settings read at creation); the core re-sizes itself in place.
+    zerr::SystemConfigs cfg;
+    cfg.sample_rate = (size_t)sp[0]->s_sr;
+    cfg.block_size  = (size_t)n_vec;
+    if (!x->z->prepare(cfg)) {
+        pd_error(x, "zerr_combinator~: cannot run at block size %d / sample rate %d", n_vec,
+                 (int)sp[0]->s_sr);
+        return;
+    }
     int n_port = x->n_outlet + x->n_inlet;
     int n_args = n_port + n_rest;
 

@@ -27,8 +27,8 @@ bool ZerrDisperser::initialize()
     numInlet  = audioDisperser->numInlet;
     numOutlet = audioDisperser->numOutlet;
 
-    inputBuffer.resize(numInlet, zerr::Samples(audioDisperser->get_block_size(), 0.0f));
-    outputBuffer.resize(numOutlet, zerr::Samples(audioDisperser->get_block_size(), 0.0f));
+    inputBuffer.assign(numInlet, zerr::Samples(audioDisperser->get_block_size(), 0.0f));
+    outputBuffer.assign(numOutlet, zerr::Samples(audioDisperser->get_block_size(), 0.0f));
 
 #ifdef TESTMODE
     logger->logDebug(
@@ -42,28 +42,42 @@ bool ZerrDisperser::initialize()
     return true;
 }
 
+bool ZerrDisperser::prepare(zerr::SystemConfigs cfg)
+{
+    if (!audioDisperser->prepare(cfg)) {
+        return false;
+    }
+    inputBuffer.assign(numInlet, zerr::Samples(cfg.block_size, 0.0f));
+    return true;
+}
+
 void ZerrDisperser::perform(float** ports, int blockSize)
 {
     inPtr  = (float**)&ports[0];
     outPtr = (float**)&ports[numInlet];
 
+    // never read or write past the prepared block; the remainder of the output is silence
+    const int block = audioDisperser->get_block_size();
+    const int count = blockSize < block ? blockSize : block;
+
     for (int i = 0; i < numInlet; i++) {
-        for (int j = 0; j < blockSize; j++) {
+        for (int j = 0; j < count; j++) {
             inputBuffer[i][j] = inPtr[i][j];
+        }
+        for (int j = count; j < block; j++) {
+            inputBuffer[i][j] = 0.0;
         }
     }
 
-    try {
-        outputBuffer = audioDisperser->perform(inputBuffer);
-    }
-    catch (...) {
-        // logger->logError("ZerrDisperser::perform process failed...");
-        return;
-    }
+    const zerr::Blocks& out = audioDisperser->perform(inputBuffer);
 
     for (int i = 0; i < numOutlet; i++) {
-        for (int j = 0; j < blockSize; j++) {
-            outPtr[i][j] = outputBuffer[i][j];
+        const int have = (int)out[i].size() < count ? (int)out[i].size() : count;
+        for (int j = 0; j < have; j++) {
+            outPtr[i][j] = out[i][j];
+        }
+        for (int j = have; j < blockSize; j++) {
+            outPtr[i][j] = 0.0f;
         }
     }
 }

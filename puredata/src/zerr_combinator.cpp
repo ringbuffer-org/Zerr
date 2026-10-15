@@ -41,8 +41,8 @@ bool ZerrCombinator::initialize()
     numInlet  = envelopeCombinator->numInlet;
     numOutlet = envelopeCombinator->numOutlet;
 
-    inputBuffer.resize(numInlet, zerr::Samples(envelopeCombinator->get_block_size(), 0.0f));
-    outputBuffer.resize(numOutlet, zerr::Samples(envelopeCombinator->get_block_size(), 0.0f));
+    inputBuffer.assign(numInlet, zerr::Samples(envelopeCombinator->get_block_size(), 0.0f));
+    outputBuffer.assign(numOutlet, zerr::Samples(envelopeCombinator->get_block_size(), 0.0f));
 
     logger->logDebug(
         zerr::formatString("ZerrCombinator::initialize numInlet:%d numOutlet:%d blockSize %d",
@@ -55,22 +55,42 @@ bool ZerrCombinator::initialize()
     return true;
 }
 
+bool ZerrCombinator::prepare(zerr::SystemConfigs cfg)
+{
+    if (!envelopeCombinator->prepare(cfg)) {
+        return false;
+    }
+    inputBuffer.assign(numInlet, zerr::Samples(cfg.block_size, 0.0f));
+    return true;
+}
+
 void ZerrCombinator::perform(float** ports, int blockSize)
 {
     inPtr  = (float**)&ports[0];
     outPtr = (float**)&ports[numInlet];
 
+    // never read or write past the prepared block; the remainder of the output is silence
+    const int block = envelopeCombinator->get_block_size();
+    const int count = blockSize < block ? blockSize : block;
+
     for (int i = 0; i < numInlet; i++) {
-        for (int j = 0; j < blockSize; j++) {
+        for (int j = 0; j < count; j++) {
             inputBuffer[i][j] = inPtr[i][j];
+        }
+        for (int j = count; j < block; j++) {
+            inputBuffer[i][j] = 0.0;
         }
     }
 
     outputBuffer = envelopeCombinator->perform(inputBuffer);
 
     for (int i = 0; i < numOutlet; i++) {
-        for (int j = 0; j < blockSize; j++) {
+        const int have = (int)outputBuffer[i].size() < count ? (int)outputBuffer[i].size() : count;
+        for (int j = 0; j < have; j++) {
             outPtr[i][j] = outputBuffer[i][j];
+        }
+        for (int j = have; j < blockSize; j++) {
+            outPtr[i][j] = 0.0f;
         }
     }
 }
