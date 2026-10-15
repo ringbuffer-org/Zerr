@@ -17,11 +17,17 @@ on:
   push:
     branches:
       - main
+    # Release tags are per host: max-v<ver> and pd-v<ver>. A tag push runs the
+    # normal build for that host only and ends in the `release` job below.
+    tags:
+      - 'max-v*'
+      - 'pd-v*'
   workflow_dispatch:
 
 # Jobs only ever read the repository: there is no cross-run artifact download left,
 # so nothing here needs a token beyond checkout. State it rather than inherit
 # whatever the repository default happens to be, as deploy-doxygen.yml already does.
+# The one exception, `release`, raises its own job-level permission to write.
 permissions:
   contents: read
 
@@ -32,10 +38,11 @@ permissions:
 #
 # Superseding is right for a branch, wrong for main: two merges in quick succession
 # would cancel the first one's run, and that commit would never get the artifact set
-# the header above promises. Only cancel outside main.
+# the header above promises. Only cancel outside main. A release tag makes the same
+# promise (its run produces the release assets), so it is never cancelled either.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  cancel-in-progress: ${{ !(github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) }}
 
 jobs:
   # Artifacts are keyed by TOOLCHAIN, not by platform. Windows needs two distinct
@@ -115,8 +122,11 @@ jobs:
     # artifact is genuinely missing fails at download, and the others still report.
     # (The wait itself is inherent to matrix-level `needs`; splitting core into
     # per-platform jobs would remove it at the cost of the matrix.)
+    #
+    # On a release tag only the tagged host builds: a pd-v* tag skips maxmsp and a
+    # max-v* tag skips puredata. Branches and main are unaffected.
     needs: core
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && (!startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/tags/pd-v')) }}
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -246,7 +256,7 @@ jobs:
   maxmsp:
     name: maxmsp (${{ matrix.id }})
     needs: core
-    if: ${{ !cancelled() }}   # see the note on puredata above
+    if: ${{ !cancelled() && (!startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/tags/max-v')) }}   # see the notes on puredata above
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -305,3 +315,77 @@ jobs:
           path: maxmsp/dist/zerr-max-*.zip
           if-no-files-found: error
           retention-days: 7
+
+  # Per-host releases. A tag max-v<ver> or pd-v<ver> ends here: the tagged host's
+  # zips (and only those) go onto a DRAFT GitHub release with the notes from
+  # docs/releases/<tag>.md pre-filled. Nothing is published by CI; the owner reads
+  # the draft and clicks publish. A tag with a suffix (max-v0.3.0-rc1) becomes a
+  # prerelease draft, which is the dry-run path.
+  #
+  # `!cancelled()` is required: one of the two `needs` is always skipped on a tag.
+  # The explicit `result == 'success'` checks are what make a Pd tag independent of
+  # the Max job and vice versa. `gh release create` refuses an existing release, so
+  # a re-run after a failure needs the draft deleted first:
+  #   gh release delete <tag> --yes
+  release:
+    name: release (${{ github.ref_name }})
+    needs: [puredata, maxmsp]
+    if: >-
+      ${{ !cancelled() && startsWith(github.ref, 'refs/tags/') &&
+          ((startsWith(github.ref, 'refs/tags/pd-v')  && needs.puredata.result == 'success') ||
+           (startsWith(github.ref, 'refs/tags/max-v') && needs.maxmsp.result   == 'success')) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The tag must say what the host's version file says, suffix aside
+      # (max-v0.3.0-rc1 may be cut from a tree whose file says 0.3.0). The two sed
+      # lines are the ones in build.sh max_version()/pd_version(); keep them identical.
+      - name: Check the tag against the host's version file
+        id: guard
+        shell: bash
+        run: |
+          tag="$GITHUB_REF_NAME"
+          case "$tag" in
+            max-v*) host=max; title="Max";       want="${tag#max-v}"
+                    have=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' maxmsp/package-info.json | head -n 1) ;;
+            pd-v*)  host=pd;  title="Pure Data"; want="${tag#pd-v}"
+                    have=$(sed -n 's|^#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' puredata/zerr-meta.pd | head -n 1) ;;
+            *)      echo "unexpected tag $tag"; exit 1 ;;
+          esac
+          if [ "${want%%-*}" != "$have" ]; then
+            echo "tag $tag says ${want%%-*}, but the version file says $have"
+            exit 1
+          fi
+          { echo "host=$host"; echo "title=$title"; echo "version=$want"; } >> "$GITHUB_OUTPUT"
+
+      # Same run, same commit: see the header. The pattern keeps zerr-core-* out.
+      - name: Download the host's packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: zerr-${{ steps.guard.outputs.host }}-*
+          path: assets
+          merge-multiple: true
+
+      - name: Create the draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Zerr* for ${{ steps.guard.outputs.title }} ${{ steps.guard.outputs.version }}
+        run: |
+          ls -l assets
+          notes="docs/releases/${GITHUB_REF_NAME}.md"
+          if [ -f "$notes" ]; then
+            notes_args=(--notes-file "$notes")
+          else
+            notes_args=(--notes "Draft. Write docs/releases/${GITHUB_REF_NAME}.md and paste it here before publishing.")
+          fi
+          pre=()
+          case "$GITHUB_REF_NAME" in *-*) pre=(--prerelease) ;; esac
+          gh release create "$GITHUB_REF_NAME" --draft --verify-tag --title "$TITLE" \
+            "${notes_args[@]}" "${pre[@]}" assets/*.zip
+          gh release view "$GITHUB_REF_NAME" --json isDraft,isPrerelease,assets \
+            --jq '{draft: .isDraft, prerelease: .isPrerelease, assets: [.assets[].name]}'
