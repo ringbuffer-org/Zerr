@@ -1,7 +1,5 @@
-# Zerr* 0.3.0 — release notes (draft)
-
-_Draft for the GitHub Release that ships the first Max package. Edit freely; the "Breaking" section
-must stay first. Delete this file, or move its text into the release, once the release is out._
+<!-- Body of the GitHub release max-v0.3.0 (CI attaches it to the draft). Kept after
+     publishing as the changelog. Process: docs/design/release-process.md -->
 
 ## Breaking
 

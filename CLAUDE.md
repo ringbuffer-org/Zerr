@@ -45,11 +45,23 @@ cmake --install core/build   # Installs to core/lib
 ./build.sh puredata          # Build PureData externals (auto-builds core if needed)
 ./build.sh maxmsp            # Build Max/MSP externals
 ./build.sh -p <target>       # ...and stage a distributable package in <target>/dist/ plus a zip
+                             #    (zerr-pd-<ver>-<os>-<arch>.zip / zerr-max-<ver>-macos-arm64.zip)
 ./build.sh -i <target>       # ...and install it by copy into the host app's user folder
                              #    (Pd: $PDLIBDIR/zerr, ~/Library/Pd on macOS; Max: ~/Documents/Max 9/Packages/Zerr)
 ./build.sh -l <target>       # ...and install it by symlink to the staged package (development)
 ./build.sh jack              # JACK client — currently broken, see docs/design/repo-audit-2026-07-30.md
 ```
+
+### Releases
+
+Per host, never mixed: tag `max-v<ver>` or `pd-v<ver>`. Each host owns its version where its
+ecosystem reads it — Max in `maxmsp/package-info.json`, Pd in `puredata/zerr-meta.pd` — and the
+numbers may differ; `core/CMakeLists.txt`'s version is unused and is not bumped. The core has no
+version of its own: a PR that changes `core/` states what each host's users will notice and adds
+that line to `docs/releases/<host>-next.md`, which becomes `docs/releases/<host>-v<ver>.md` when the
+host's version is bumped. Pushing a release tag makes CI build that host only and open a **draft**
+GitHub release with the zips attached and `docs/releases/<tag>.md` as the body; publishing is
+manual. Full checklist in `docs/design/release-process.md`.
 
 ### Code Formatting
 
