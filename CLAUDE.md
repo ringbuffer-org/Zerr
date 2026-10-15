@@ -85,6 +85,12 @@ Platform-independent C++17 static library (`zerr_core`). Three subsystems:
 - **Features** (`core/include/features/`): Spectral (Centroid, Rolloff, Flatness, Flux) and temporal (RMS, ZeroCrossingRate, CrestFactor, ZeroCrossings) extractors, all inheriting from `FeatureExtractor` base class
 - **Utils** (`core/include/utils/`): Types (`types.h`), configs (`configs.h`), FrequencyTransformer (FFTW3 wrapper), RingBuffer, OnsetDetector, LinearInterpolator
 
+Signal shape contract (`SystemConfigs` in `types.h`): the shape passed to a module's constructor is
+only its initial guess. Every processing module has an idempotent `bool prepare(SystemConfigs)`;
+a wrapper calls it from the host's DSP-setup callback (Max `dsp64`, Pd `dsp`) every time, and the
+module re-sizes itself in place. The wrapper keeps `perform()` off the module meanwhile.
+`perform()` never reads or writes past the prepared block.
+
 ### Platform Wrappers
 
 - **PureData** (`puredata/`): 4 externals (`zerr_features~`, `zerr_envelopes~`, `zerr_combinator~`, `zerr_disperser~`). Built with pd-lib-builder (git submodule) + Makefile.

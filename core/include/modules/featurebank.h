@@ -46,22 +46,33 @@ class FeatureBank {
      */
     void print_active_features();
     /**
-     * @brief Initialize the feature bank with selected features and system configuration
-     * @param feature_names List of feature names to activate
-     * @param system_configs System configuration parameters
+     * @brief Activate a set of features and prepare them for a signal shape
+     * @param feature_names List of feature names to activate (replaces any previous set)
+     * @param system_configs Initial sample rate and block size; see prepare()
+     * @throws std::runtime_error when a name is not registered or the shape is invalid
+     *
+     * Idempotent: calling it again replaces the active set instead of appending to it.
      */
     void initialize(FeatureNames feature_names, SystemConfigs system_configs);
     /**
+     * @brief Adopt a sample rate and block size (see SystemConfigs for the contract)
+     * @return false, leaving the bank untouched, when the block size is 0 or larger than
+     *         the AUDIO_BUFFER_SIZE analysis window, or the sample rate is 0
+     *
+     * Returns at once when the shape is unchanged. Otherwise every active extractor is
+     * re-initialized for the new shape, which restarts its smoothing state.
+     */
+    bool prepare(SystemConfigs system_configs);
+    /**
      * @brief Process an input audio block and extract all active features
-     * @param in Input audio block to analyze
-     * @return Map of feature names to extracted feature values
+     * @param in Input audio block to analyze; samples beyond the prepared block size are ignored
+     * @return One block of values per active feature, each of the prepared block size
      */
     FeaturesVals perform(Samples in);
     /**
-     * @brief Reset the feature bank parameters and load a new set of features
-     * @param feature_names New list of feature names to activate
+     * @brief The sample rate and block size the bank is currently prepared for
      */
-    void reset(FeatureNames feature_names);
+    [[nodiscard]] SystemConfigs getSystemConfigs() const noexcept { return system_configs; }
     /**
      * @brief The short names every FeatureBank can activate, in registration order
      *
@@ -89,6 +100,8 @@ class FeatureBank {
     FeaturesVals y; /**< Map containing extracted feature names and their values */
 
     int n_features; /**< Number of currently activated features */
+
+    SystemConfigs system_configs{0, 0}; /**< Shape the active extractors are prepared for */
 
     /**
      * @brief Register all available feature extractors to the FeatureBank

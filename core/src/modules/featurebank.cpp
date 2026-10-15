@@ -28,24 +28,56 @@ void FeatureBank::print_active_features()
     }
 }
 
-void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs system_configs)
+void FeatureBank::initialize(FeatureNames feature_names, SystemConfigs cfg)
 {
-    active_feature_names = feature_names;
+    // Build the new set first so a bad name leaves the bank as it was.
+    std::vector<fe_ptr> next;
     for (const auto& name : feature_names) {
-        activated_features.push_back(_create(name));
+        next.push_back(_create(name));
     }
 
-    n_features = activated_features.size();
-    for (auto& feature : activated_features) {
-        feature->initialize(system_configs);
-    }
+    activated_features   = std::move(next);
+    active_feature_names = std::move(feature_names);
+    n_features           = activated_features.size();
     y.resize(activated_features.size());
-
     x.wave.resize(AUDIO_BUFFER_SIZE);
+
+    // A fresh set is never "already prepared"
+    system_configs = SystemConfigs{0, 0};
+    if (!prepare(cfg)) {
+        throw std::runtime_error(
+            "FeatureBank: block size must be 1.." + std::to_string(AUDIO_BUFFER_SIZE) +
+            " and sample rate non-zero (got block " + std::to_string(cfg.block_size) + ", rate " +
+            std::to_string(cfg.sample_rate) + ")");
+    }
+}
+
+bool FeatureBank::prepare(SystemConfigs cfg)
+{
+    if (cfg.block_size == 0 || cfg.block_size > AUDIO_BUFFER_SIZE || cfg.sample_rate == 0) {
+        return false;
+    }
+    if (cfg == system_configs) {
+        return true;
+    }
+
+    for (auto& feature : activated_features) {
+        feature->initialize(cfg);
+    }
+    system_configs = cfg;
+    return true;
 }
 
 FeaturesVals FeatureBank::perform(Samples in)
 {
+    if (system_configs.block_size == 0) {
+        return y; // not prepared
+    }
+    // Never feed the analysis window more than the prepared block
+    if (in.size() > system_configs.block_size) {
+        in.resize(system_configs.block_size);
+    }
+
     // fetch
     Sample* buf_ptr = nullptr;
     size_t buf_len;
