@@ -55,6 +55,17 @@ ldlibs += -lzerr_core -l$(CONAN_LIBS_YAML_CPP)
 # Library directory name: zerr
 lib.name = zerr
 
+# Version: zerr-meta.pd is the single source for the Pd package (the Pd libdir /
+# deken convention). pd-lib-builder reads the same line into lib.version, but only
+# after it has folded cflags into cxx.flags (Makefile.pdlibbuilder:682 vs :699), so
+# it is read here as well. build.sh pd_version() and ci.yml use the same sed line;
+# keep the three copies identical.
+ZERR_PD_VERSION := $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(lib.name)-meta.pd)
+ifeq ($(ZERR_PD_VERSION),)
+  $(error $(lib.name)-meta.pd has no "VERSION x.y.z" line)
+endif
+cflags += -DZERR_PD_VERSION=\"$(ZERR_PD_VERSION)\"
+
 # All class sources files
 class.sources = src/zerr_combinator~.cpp \
                 src/zerr_features~.cpp   \
@@ -75,7 +86,8 @@ zerr_features~.class.ldlibs += -lfftw3
 # yaml-cpp is already in the library-wide ldlibs above; repeating it here made the
 # linker report "ignoring duplicate libraries: '-lyaml-cpp'".
 
-# add library data files
+# add library data files (pd-lib-builder does not install the meta file by itself)
+datafiles += zerr-meta.pd
 datafiles += LICENSE
 datafiles += README.md
 
