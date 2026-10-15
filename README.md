@@ -138,4 +138,7 @@ produces. `./build.sh maxmsp` reports this and exits rather than failing inside 
 ./build.sh jack
 ```
 
-<img src="./zerr_logo.png" alt="zerr_logo" />
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/logo/zerr-logo-white-transparent.png">
+  <img src="./assets/logo/zerr-logo-black-transparent.png" alt="Zerr logo" width="320">
+</picture>
