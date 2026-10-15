@@ -21,7 +21,8 @@ _Maintainer steps. User-facing install instructions live in `maxmsp/README.md` a
    checks the tag against the host's version file, and creates a **draft** release with the zips
    attached and the notes pre-filled (the `release` job in `.github/workflows/ci.yml`). Read the
    draft on GitHub, then publish it. A tag with a suffix (`max-v0.3.0-rc1`) becomes a prerelease
-   draft: that is the dry run. `gh release create` refuses an existing release, so a re-run after a
+   draft, filled from the final release's notes file (`max-v0.3.0.md`) when it has none of its own:
+   that is the dry run. `gh release create` refuses an existing release, so a re-run after a
    failure needs `gh release delete <tag> --yes` first.
 5. **Notes live in the repo and stay**: `docs/releases/<tag>.md`, written before tagging, kept
    afterwards as the changelog. No H1 (the release title supplies it). `## Breaking` first when

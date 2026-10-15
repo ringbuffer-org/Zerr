@@ -375,13 +375,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TITLE: Zerr* for ${{ steps.guard.outputs.title }} ${{ steps.guard.outputs.version }}
+          HOST: ${{ steps.guard.outputs.host }}
+          VERSION: ${{ steps.guard.outputs.version }}
         run: |
           ls -l assets
+          # Notes come from the tag's own file; a suffixed tag (max-v0.3.0-rc1) falls back to
+          # the final release's file (max-v0.3.0.md), so a dry run shows the real notes.
           notes="docs/releases/${GITHUB_REF_NAME}.md"
+          final="docs/releases/${HOST}-v${VERSION%%-*}.md"
           if [ -f "$notes" ]; then
             notes_args=(--notes-file "$notes")
+          elif [ -f "$final" ]; then
+            notes_args=(--notes-file "$final")
           else
-            notes_args=(--notes "Draft. Write docs/releases/${GITHUB_REF_NAME}.md and paste it here before publishing.")
+            notes_args=(--notes "Draft. Write $final and paste it here before publishing.")
           fi
           pre=()
           case "$GITHUB_REF_NAME" in *-*) pre=(--prerelease) ;; esac
