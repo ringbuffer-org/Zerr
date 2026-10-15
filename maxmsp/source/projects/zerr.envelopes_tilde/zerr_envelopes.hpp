@@ -130,7 +130,7 @@ class ZerrEnvelopes {
         // MSP rebuilds the DSP chain around dsp64, so perform() is not running for this
         // object while the blocks are resized.
         ready.store(false, std::memory_order_release);
-        generator->setSystemConfigs(cfg);
+        generator->prepare(cfg);
         inputBuffer.assign(inputCount, zerr::Samples(cfg.block_size, 0.0));
         systemConfigs = cfg;
         if (intervalMs) {
