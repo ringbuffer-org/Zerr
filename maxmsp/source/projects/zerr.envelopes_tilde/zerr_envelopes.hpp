@@ -13,7 +13,6 @@
 #include <atomic>
 #include <cstring>
 #include <memory>
-#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -21,6 +20,7 @@
 #include "envelopegenerator.h"
 #include "logger.h"
 #include "types.h"
+#include "zerr_block_lock.hpp"
 
 /**
  * @class ZerrEnvelopes
@@ -113,29 +113,23 @@ class ZerrEnvelopes {
      * @brief Adopts the sample rate and block size of the signal chain, as dsp64 reports them
      * @return true if the object is ready to process
      *
-     * Main thread only. Idempotent when nothing changed, so toggling DSP costs nothing.
-     * The speaker state survives; only the blocks are resized. The trigger debounce is
-     * kept in samples by the core, so the last interval in milliseconds is re-applied.
+     * Main thread only. The core's prepare() is idempotent, so toggling DSP costs nothing.
+     * The speaker state and the trigger interval survive; only the blocks are resized.
      */
     bool prepare(const zerr::SystemConfigs& cfg)
     {
-        if (!initialized || cfg.block_size == 0 || cfg.sample_rate == 0) {
+        if (!initialized) {
             return false;
         }
-        if (ready.load(std::memory_order_acquire) && cfg.block_size == systemConfigs.block_size &&
-            cfg.sample_rate == systemConfigs.sample_rate) {
-            return true;
-        }
 
-        // MSP rebuilds the DSP chain around dsp64, so perform() is not running for this
-        // object while the blocks are resized.
-        ready.store(false, std::memory_order_release);
-        generator->prepare(cfg);
+        // Max may compile the new DSP chain while the old one still calls perform(); the
+        // lock keeps the resize off a running block (see zerr_block_lock.hpp).
+        zerr_max::BlockGuard guard(lock);
+        if (!generator->prepare(cfg)) {
+            return false;
+        }
         inputBuffer.assign(inputCount, zerr::Samples(cfg.block_size, 0.0));
         systemConfigs = cfg;
-        if (intervalMs) {
-            generator->setTriggerInterval(*intervalMs);
-        }
         ready.store(true, std::memory_order_release);
         return true;
     }
@@ -150,8 +144,9 @@ class ZerrEnvelopes {
     {
         const long numOut = outputCount;
 
-        if (!ready.load(std::memory_order_acquire) || !ins || !outs || numins < inputCount ||
-            numouts < numOut) {
+        zerr_max::TryBlockGuard guard(lock); // silence for the one block prepare() is resizing
+        if (!guard.ok || !ready.load(std::memory_order_acquire) || !ins || !outs ||
+            numins < inputCount || numouts < numOut) {
             silence(outs, numouts, sampleframes);
             return;
         }
@@ -236,11 +231,7 @@ class ZerrEnvelopes {
     }
 
     /** @brief Sets the minimum time between two trigger jumps, in milliseconds */
-    void setTriggerInterval(float interval)
-    {
-        intervalMs = interval;
-        generator->setTriggerInterval(interval);
-    }
+    void setTriggerInterval(float interval) { generator->setTriggerInterval(interval); }
 
     /** @brief Posts the speaker setup to the Console */
     void printParameters() { generator->printParameters(); }
@@ -268,9 +259,9 @@ class ZerrEnvelopes {
     std::string selectionMode;         /**< "trajectory" or "trigger" */
     std::string layoutName;            /**< File path, or the built-in layout's label */
 
-    bool initialized = false;        /**< initialize() succeeded */
-    std::atomic<bool> ready{false};  /**< Blocks are sized for systemConfigs; perform may run */
-    std::optional<float> intervalMs; /**< Last trigger interval, re-applied on a rate change */
+    bool initialized = false;       /**< initialize() succeeded */
+    std::atomic<bool> ready{false}; /**< Blocks are sized for systemConfigs; perform may run */
+    zerr_max::BlockLock lock;       /**< Keeps prepare() off a block perform() is processing */
 
     zerr::Blocks inputBuffer;  /**< One block per inlet, sized to block_size */
     zerr::Blocks outputBuffer; /**< The core's output, one block per speaker */

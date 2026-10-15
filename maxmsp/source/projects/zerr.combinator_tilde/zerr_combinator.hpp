@@ -19,6 +19,7 @@
 
 #include "./envelopecombinator.h"
 #include "types.h"
+#include "zerr_block_lock.hpp"
 
 /**
  * @class ZerrCombinator
@@ -32,7 +33,8 @@
  * the number of envelope sets is known when the object is created, but the number of
  * envelopes per set (the multichannel channel count), the sample rate and the block
  * size only arrive in dsp64. The core zerr::EnvelopeCombinator therefore cannot be
- * built by the constructor -- prepare() builds it.
+ * built by the constructor -- prepare() builds it, and later re-shapes it in place
+ * (see zerr::SystemConfigs).
  */
 class ZerrCombinator {
   public:
@@ -58,45 +60,48 @@ class ZerrCombinator {
     ZerrCombinator& operator=(ZerrCombinator&&)      = delete;
 
     /**
-     * @brief Builds (or rebuilds) the core module for a given signal shape
-     * @param cfg Sample rate and block size, as reported by dsp64
+     * @brief Adopts the signal shape and channel count, as dsp64 reports them
+     * @param cfg Sample rate and block size
      * @param numChannel Number of envelopes per set, i.e. the inlets' channel count
      * @return true if the combinator is ready to process
      *
-     * Called from dsp64 on the main thread, where allocation is safe. Idempotent: returns
-     * immediately when the shape has not changed, so toggling DSP does not reallocate.
+     * Called from dsp64 on the main thread, where allocation is safe. A change of channel
+     * count is a change of topology and rebuilds the core module; a change of sample rate
+     * or block size is handed to EnvelopeCombinator::prepare(), which is idempotent, so
+     * toggling DSP costs nothing.
      */
     bool prepare(const zerr::SystemConfigs& cfg, int numChannel)
     {
-        if (numChannel < 1 || cfg.block_size == 0) {
+        if (numChannel < 1) {
             return false;
         }
 
-        if (ready.load(std::memory_order_acquire) && numChannel == this->numChannel &&
-            cfg.block_size == systemConfigs.block_size &&
-            cfg.sample_rate == systemConfigs.sample_rate) {
-            return true;
+        // A new module is built outside the lock; only the swap and resize are inside it.
+        std::unique_ptr<zerr::EnvelopeCombinator> next;
+        if (!combinator || numChannel != this->numChannel) {
+            next = std::make_unique<zerr::EnvelopeCombinator>(inputCount, numChannel, cfg,
+                                                              zerr::toString(combMode));
+            if (!next->initialize()) {
+                return false;
+            }
         }
 
-        auto next = std::make_unique<zerr::EnvelopeCombinator>(inputCount, numChannel, cfg,
-                                                               zerr::toString(combMode));
-        if (!next->initialize()) {
+        // Max may compile the new DSP chain while the old one still calls perform(); the
+        // lock keeps the swap and resize off a running block (see zerr_block_lock.hpp). The
+        // ready flag covers the states the lock does not: never prepared, prepare() failed.
+        zerr_max::BlockGuard guard(lock);
+        if (next) {
+            combinator.swap(next);
+        }
+        else if (!combinator->prepare(cfg)) {
             return false;
         }
-
-        zerr::Blocks nextIn(next->numInlet, zerr::Samples(cfg.block_size, 0.0));
-
-        // MSP rebuilds the DSP chain around dsp64, so perform() is not running for this
-        // object while we swap. The flag covers the states MSP does not: never prepared,
-        // and prepare() having failed.
-        ready.store(false, std::memory_order_release);
-        combinator.swap(next);
-        inputBuffer.swap(nextIn);
+        inputBuffer.assign(combinator->numInlet, zerr::Samples(cfg.block_size, 0.0));
         systemConfigs    = cfg;
         this->numChannel = numChannel;
         ready.store(true, std::memory_order_release);
 
-        return true; // the previous combinator dies with `next` here
+        return true; // a replaced combinator dies with `next` here
     }
 
     /**
@@ -112,11 +117,12 @@ class ZerrCombinator {
      */
     void perform(double** ins, long numins, double** outs, long numouts, long sampleframes) noexcept
     {
+        zerr_max::TryBlockGuard guard(lock); // silence for the one block prepare() is resizing
         const long numIn  = static_cast<long>(inputBuffer.size());
         const long numOut = numChannel;
 
-        if (!ready.load(std::memory_order_acquire) || !ins || !outs || numins < numIn ||
-            numouts < numOut) {
+        if (!guard.ok || !ready.load(std::memory_order_acquire) || !ins || !outs ||
+            numins < numIn || numouts < numOut) {
             silence(outs, numouts, sampleframes);
             return;
         }
@@ -213,6 +219,7 @@ class ZerrCombinator {
     zerr::SystemConfigs systemConfigs{0, 0}; /**< System configuration settings */
 
     std::atomic<bool> ready{false}; /**< True once the core module is built and buffers sized */
+    zerr_max::BlockLock lock;       /**< Keeps prepare() off a block perform() is processing */
 
     zerr::Blocks inputBuffer; /**< Buffer for storing incoming audio samples */
 
