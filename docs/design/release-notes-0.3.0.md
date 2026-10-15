@@ -18,7 +18,7 @@ must stay first. Delete this file, or move its text into the release, once the r
 
 First release of Zerr* for Max, as a package for Max 9 on Apple Silicon (arm64, macOS 11+).
 
-- `Zerr-0.3.0-macos-arm64.zip`: unzip, move `Zerr` into `~/Documents/Max 9/Packages`, run
+- `zerr-max-0.3.0-macos-arm64.zip`: unzip, move `Zerr` into `~/Documents/Max 9/Packages`, run
   `xattr -dr com.apple.quarantine` on it (the externals are signed ad hoc, not notarized), restart
   Max. Full steps and troubleshooting in the package README. (#22, #23, #27)
 - Four objects with help patches and an overview patcher: `zerr.features~`, `zerr.envelopes~`,

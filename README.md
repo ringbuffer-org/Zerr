@@ -26,7 +26,7 @@
 ### Releases
 
 Precompiled builds are attached to [Releases](https://github.com/ringbuffer-org/Zerr/releases).
-For Max, download `Zerr-<version>-macos-arm64.zip` (Apple Silicon, Max 9) and follow
+For Max, download `zerr-max-<version>-macos-arm64.zip` (Apple Silicon, Max 9) and follow
 [`maxmsp/README.md`](maxmsp/README.md) — it covers the quarantine step macOS requires for an
 ad-hoc-signed package. For PureData, see [`puredata/README.md`](puredata/README.md).
 

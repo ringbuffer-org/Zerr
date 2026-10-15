@@ -29,7 +29,7 @@ all of them.
 
 ## Install
 
-1. Unzip `Zerr-<version>-macos-arm64.zip`. You get a folder named `Zerr`.
+1. Unzip `zerr-max-<version>-macos-arm64.zip`. You get a folder named `Zerr`.
 2. Move the `Zerr` folder into `~/Documents/Max 9/Packages/`.
 3. Clear the quarantine flag macOS puts on downloaded files. The externals are signed ad hoc, not
    notarized, so without this step Max refuses to load them:

@@ -294,7 +294,7 @@ jobs:
             echo "$name: $(lipo -archs "$bundle/Contents/MacOS/$name")"
           done
           version=$(sed -n 's/.*"version" *: *"\([^"]*\)".*/\1/p' maxmsp/package-info.json | head -n 1)
-          ( cd maxmsp/dist && ditto -c -k --sequesterRsrc --keepParent Zerr "Zerr-${version}-macos-arm64.zip" )
+          ( cd maxmsp/dist && ditto -c -k --sequesterRsrc --keepParent Zerr "zerr-max-${version}-macos-arm64.zip" )
           find maxmsp/dist/Zerr -type f | sort
           ls -l maxmsp/dist/*.zip
 
@@ -302,6 +302,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zerr-max-${{ matrix.id }}-arm64
-          path: maxmsp/dist/Zerr-*.zip
+          path: maxmsp/dist/zerr-max-*.zip
           if-no-files-found: error
           retention-days: 7
