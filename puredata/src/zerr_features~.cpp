@@ -7,6 +7,7 @@
  * @copyright Copyright (c) 2023-2025
  */
 #include "./zerr_features_tilde.h"
+#include "configs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,8 +92,10 @@ void zerr_features_tilde_dsp(zerr_features_tilde* x, t_signal** sp)
     cfg.sample_rate = (size_t)sp[0]->s_sr;
     cfg.block_size  = (size_t)n_vec;
     if (!x->z->prepare(cfg)) {
-        pd_error(x, "zerr_features~: cannot run at block size %d / sample rate %d", n_vec,
-                 (int)sp[0]->s_sr);
+        pd_error(x,
+                 "zerr_features~: cannot run at block size %d / sample rate %d: the block must be "
+                 "1..%d samples (the analysis window) and the sample rate non-zero",
+                 n_vec, (int)sp[0]->s_sr, (int)zerr::AUDIO_BUFFER_SIZE);
         return;
     }
     int n_port = x->z->get_port_count();

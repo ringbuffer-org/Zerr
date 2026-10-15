@@ -93,8 +93,10 @@ void zerr_disperser_tilde_dsp(zerr_disperser_tilde* x, t_signal** sp)
     cfg.sample_rate = (size_t)sp[0]->s_sr;
     cfg.block_size  = (size_t)n_vec;
     if (!x->z->prepare(cfg)) {
-        pd_error(x, "zerr_disperser~: cannot run at block size %d / sample rate %d", n_vec,
-                 (int)sp[0]->s_sr);
+        pd_error(
+            x,
+            "zerr_disperser~: cannot run at block size %d / sample rate %d: both must be non-zero",
+            n_vec, (int)sp[0]->s_sr);
         return;
     }
     int n_port = x->n_outlet + x->n_inlet;

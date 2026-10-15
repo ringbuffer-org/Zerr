@@ -74,6 +74,7 @@
 #X text 16 215 "flt" ----> Spectral Flatness, f 69;
 #X text 16 231 "cf" -----> Crest Factor, f 69;
 #X text 16 247 "zc" -----> Zero Crossing Trigger, f 69;
+#X text 16 540 Block size: any size from 1 to 2048 samples works (also inside a [block~] subpatch) and the object adopts it when DSP starts. 2048 is the analysis window the features are computed on - a larger block is refused with an error in the console. Pd itself needs a power of two for [inlet~]/[outlet~] reblocking., f 69;
 #X connect 6 0 4 0;
 #X connect 10 0 12 0;
 #X connect 11 0 25 0;
