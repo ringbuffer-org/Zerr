@@ -172,9 +172,31 @@ using SpeakerPair =
     std::pair<Index, Index>; /**< Pair of speaker indices for representing connections */
 
 // system config
+/**
+ * @brief The signal shape a host runs the core at: sample rate and block size
+ *
+ * The shape handed to a module's constructor is only its initial guess. The host learns the
+ * real shape in its DSP-setup callback (Max `dsp64`, Pd `dsp`, JACK's buffer-size callback)
+ * and may change it later, so every processing module exposes `bool prepare(SystemConfigs)`:
+ * idempotent, callable any number of times from that callback, keeps the module's
+ * configuration and re-sizes its blocks. The wrapper must keep `perform()` off the module
+ * while `prepare()` runs: Pd does so by construction, Max can compile a new chain while the
+ * old one still runs, so the Max wrappers hold a one-block lock. `perform()` never reads or
+ * writes past the prepared block, so a short block is processed partially and the remainder
+ * is silence.
+ */
 struct SystemConfigs {
     size_t sample_rate; /**< Audio sampling rate in Hz */
     size_t block_size;  /**< Size of processing blocks in samples */
+
+    friend bool operator==(const SystemConfigs& a, const SystemConfigs& b) noexcept
+    {
+        return a.sample_rate == b.sample_rate && a.block_size == b.block_size;
+    }
+    friend bool operator!=(const SystemConfigs& a, const SystemConfigs& b) noexcept
+    {
+        return !(a == b);
+    }
 };
 
 } // namespace zerr
