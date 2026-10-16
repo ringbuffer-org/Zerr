@@ -15,5 +15,6 @@ the generated files by hand, rerun the script instead.
 | `sizes/` | 512 to 32 px copies of the two transparent variants |
 | `trimmed/` | cropped to the ink bounding box plus a 24 px margin |
 
-`maxmsp/media/zerr_logo.png` is the 256 px black-on-transparent copy the Max help patches load;
-the script overwrites it too.
+`maxmsp/media/` holds the copies the Max patches load by bare file name (the package's `media/`
+folder is on Max's search path): `zerr-logo-white-transparent.png` at 256 px for the help patches
+and `zerr-logo-grey-transparent.png` at full size for the overview. The script overwrites them too.
