@@ -28,14 +28,16 @@ void CrestFactor::extract()
     for (int i = 0; i < x_size; ++i) {
         square_sum += x[i] * x[i];
 
-        peak_tmp = abs(x[i]);
+        peak_tmp = std::fabs(x[i]);
         peak_max = peak_tmp > peak_max ? peak_tmp : peak_max;
     }
 
     square_sum  = square_sum / x_size;
     square_root = std::sqrt(square_sum);
 
-    crr_y = peak_max / square_root;
+    // Silence: peak and RMS are both 0 and the ratio would be NaN, which then rides into
+    // every object downstream. Report 0, like the spectral features do with no energy.
+    crr_y = square_root > 0.0 ? peak_max / square_root : 0.0;
 }
 
 void CrestFactor::reset() { _reset_param(); }
