@@ -256,7 +256,7 @@ void zerr_envelopes_assist(t_zerr_envelopes* x, void* b, long m, long a, char* s
                       "mode)");
             break;
         case 2:
-            strcpy(s, "(signal) gain applied to every envelope");
+            strcpy(s, "(signal) gain applied to every envelope; 1 when nothing is connected");
             break;
         default:
             strcpy(s, "(signal)");
@@ -294,6 +294,9 @@ void zerr_envelopes_dsp64(t_zerr_envelopes* x, t_object* dsp64, short* count, do
         object_error((t_object*)x, "cannot prepare for %ld samples at %.0f Hz; output muted",
                      maxvectorsize, samplerate);
     }
+
+    // count[] says which signal inlets have a cord; the gain inlet is unity without one
+    x->ze->setGainConnected(count != NULL && count[2] != 0);
 
     dsp_add64(dsp64, (t_object*)x, (t_perfroutine64)zerr_envelopes_perform64, 0, NULL);
 }

@@ -28,6 +28,8 @@ First release of Zerr* for Max, as a package for Max 9 on Apple Silicon (arm64, 
 
 ## Fixes
 
+- `zerr.envelopes~`: the gain inlet reads 1 when nothing is connected to it. It used to read
+  0, so a plain object with only a control signal was silent.
 - `zerr.envelopes~` and `zerr.features~` no longer overflow when the signal vector size grows
   after creation or inside a resampled `poly~`; they adopt the chain's rate and vector size.
   Neither can throw into Max's audio thread any more. (#28, #29)
