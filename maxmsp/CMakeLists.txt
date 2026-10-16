@@ -113,9 +113,14 @@ foreach (extern_name ${ZERR_MAX_EXTERNALS})
             DESTINATION externals USE_SOURCE_PERMISSIONS)
 endforeach ()
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/help/" DESTINATION help
-        FILES_MATCHING PATTERN "*.maxhelp" PATTERN "*.yaml" PATTERN "*.mxo" EXCLUDE)
+        FILES_MATCHING PATTERN "*.maxhelp" PATTERN "*.mxo" EXCLUDE)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/extras/" DESTINATION extras
         FILES_MATCHING PATTERN "*.maxpat")
+# Reference pages, hand-written (Min-API generation is off for zerr.disperser~).
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/docs/" DESTINATION docs
+        FILES_MATCHING PATTERN "*.maxref.xml")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples/" DESTINATION examples
+        FILES_MATCHING PATTERN "*.maxpat" PATTERN "*.yaml" PATTERN "README.md")
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/media/" DESTINATION media)
 # Speaker layouts shipped with the package. Max adds a package's misc/ folder to
 # the search path, so `zerr.envelopes~ trigger ring_8` resolves without a path.
