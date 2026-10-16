@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+
+<!-- Hand-written. Keep in step with the "Object reference" section of maxmsp/README.md. -->
+
+<c74object name="zerr.envelopes~" category="Zerr">
+
+	<digest>
+		Generate one envelope per speaker from a control signal, by trajectory or by trigger
+	</digest>
+	<description>
+		Use the <o>zerr.envelopes~</o> object to turn a control signal and a speaker layout into a multi-channel set of envelopes, one per loudspeaker. In <m>trajectory</m> mode the control signal is a position along a chain of speakers and the envelopes crossfade between neighbours. In <m>trigger</m> mode every pulse makes the sound jump to a speaker connected to the current one. The output feeds <o>zerr.disperser~</o> directly or through <o>zerr.combinator~</o>.
+	</description>
+
+	<!--METADATA-->
+	<metadatalist>
+		<metadata name="author">Zeyu Yang</metadata>
+		<metadata name="tag">Zerr</metadata>
+		<metadata name="tag">spatialization</metadata>
+		<metadata name="tag">multichannel</metadata>
+	</metadatalist>
+
+	<!--INLETS-->
+	<inletlist>
+		<inlet id="0" type="signal">
+			<digest>
+				Control signal (position or pulses); messages
+			</digest>
+			<description>
+				In <m>trajectory</m> mode a position from 0 to 1 along the trajectory chain. In <m>trigger</m> mode a pulse train: every time the signal reaches 1 the sound jumps. The pulse must touch 1.0 exactly (a peak at 0.99 never fires), and a signal held at 1 keeps jumping sample by sample, so send pulses and use <m>interval</m> to cap the rate. All messages go here.
+			</description>
+		</inlet>
+		<inlet id="1" type="signal">
+			<digest>
+				Spread, 0 to 1 (trigger mode)
+			</digest>
+			<description>
+				How far a jump spills onto the neighbouring speakers, from 0 (one speaker) to 1 (widest). Ignored in <m>trajectory</m> mode.
+			</description>
+		</inlet>
+		<inlet id="2" type="signal">
+			<digest>
+				Gain
+			</digest>
+			<description>
+				Multiplies every envelope. Reads 1 when nothing is connected, so a plain object plays at full level.
+			</description>
+		</inlet>
+	</inletlist>
+
+	<!--OUTLETS-->
+	<outletlist>
+		<outlet id="0" type="multi-channel signal">
+			<digest>
+				Envelopes, one channel per speaker
+			</digest>
+			<description>
+				A multi-channel signal with one channel per loudspeaker, in the layout file's numbering. Connect it to the right inlet of <o>zerr.disperser~</o> or to an inlet of <o>zerr.combinator~</o>.
+			</description>
+		</outlet>
+	</outletlist>
+
+	<!--ARGUMENTS-->
+	<objarglist>
+		<objarg name="mode" optional="1" type="symbol">
+			<digest>
+				trigger or trajectory
+			</digest>
+			<description>
+				<m>trajectory</m> (default): the control signal pans along a chain of speakers. <m>trigger</m>: each pulse jumps to a connected speaker.
+			</description>
+		</objarg>
+		<objarg name="layout" optional="1" type="symbol">
+			<digest>
+				Speaker layout YAML on the search path
+			</digest>
+			<description>
+				The name of a layout YAML file, with or without the extension. The package ships <m>quad_4</m>, <m>ring_8</m>, <m>line_16</m> and <m>ambisonic_21</m> in its misc folder; your own file anywhere on the search path works too. Without this argument the object uses a built-in ring of eight speakers, the same positions as <m>ring_8</m>.
+			</description>
+		</objarg>
+	</objarglist>
+
+	<!--MESSAGES-->
+	<methodlist>
+		<method name="signal">
+			<arglist />
+			<digest>
+				Control, spread and gain signals
+			</digest>
+			<description>
+				See the inlet descriptions. All three inlets are signals.
+			</description>
+		</method>
+		<method name="active">
+			<arglist>
+				<arg name="set, add or del" optional="0" type="symbol" />
+				<arg name="speaker numbers" optional="0" type="list" />
+			</arglist>
+			<digest>
+				Which speakers take part
+			</digest>
+			<description>
+				<m>active set</m> replaces the active set, <m>active add</m> and <m>active del</m> change it. Speaker numbers are the ones in the layout file. Only active speakers may appear in <m>traj</m>, <m>topo</m> and <m>curr</m>: a <m>traj</m> or <m>topo set</m> with an inactive number is refused, <m>topo add</m> and <m>topo del</m> skip it. <m>active set</m> replaces the list and resets the trajectory (numeric order) and the topology (fully connected); an unknown speaker number refuses the whole message. <m>active add</m> only activates; the new speaker joins no trajectory or topology until you put it there. <m>active del</m> removes the speakers from the active list, the trajectory and every topology row, and is refused if it would leave no active speaker or an empty trajectory; if the current speaker goes, the sound moves to the first one still active. A speaker with no links left keeps the trigger on itself.
+			</description>
+		</method>
+		<method name="traj">
+			<arglist>
+				<arg name="speaker numbers" optional="0" type="list" />
+			</arglist>
+			<digest>
+				The chain trajectory mode pans along
+			</digest>
+			<description>
+				The ordered list of speakers the control signal travels through in <m>trajectory</m> mode: 0 is the first speaker in the list, 1 the last.
+			</description>
+		</method>
+		<method name="topo">
+			<arglist>
+				<arg name="set, add or del" optional="0" type="symbol" />
+				<arg name="from speaker" optional="0" type="int" />
+				<arg name="speaker numbers" optional="0" type="list" />
+			</arglist>
+			<digest>
+				Which speakers a trigger may jump to
+			</digest>
+			<description>
+				Defines the connections used in <m>trigger</m> mode: the first number is the speaker you jump from, the rest are the speakers a jump may land on. <m>topo set</m> replaces that speaker's list, <m>topo add</m> and <m>topo del</m> change it. One message per source speaker; separate several with commas.
+			</description>
+		</method>
+		<method name="curr">
+			<arglist>
+				<arg name="speaker number" optional="0" type="int" />
+			</arglist>
+			<digest>
+				Set the current speaker (trigger mode)
+			</digest>
+			<description>
+				Moves the sound to that speaker without waiting for a pulse.
+			</description>
+		</method>
+		<method name="interval">
+			<arglist>
+				<arg name="milliseconds" optional="0" type="float" />
+			</arglist>
+			<digest>
+				Minimum time between two jumps (trigger mode)
+			</digest>
+			<description>
+				Pulses arriving sooner than this after a jump are ignored.
+			</description>
+		</method>
+		<method name="print">
+			<arglist />
+			<digest>
+				Post the speaker setup
+			</digest>
+			<description>
+				Posts the active speakers, the trajectory and the topology to the Max Console.
+			</description>
+		</method>
+		<method name="bang">
+			<arglist />
+			<digest>
+				Post the configuration
+			</digest>
+			<description>
+				Posts the package version, the mode, the layout, the channel count, the signal vector size and the sample rate to the Max Console.
+			</description>
+		</method>
+	</methodlist>
+
+	<!--ATTRIBUTES-->
+	<attributelist>
+	</attributelist>
+
+	<!--DISCUSSION-->
+	<discussion>
+		A layout file lists one position per speaker, in Cartesian (x, y, z) or spherical coordinates; the speaker numbering of the file is the channel order of the outlet. By default the trajectory runs through all active speakers in numeric order and every active speaker is connected to all of them, itself included, so a trigger may jump anywhere; reshape both at any time with <m>traj</m> and <m>topo</m>. In <m>trigger</m> mode the envelopes are power-normalised: raising the spread shares the energy over more speakers without raising the total, and the gain multiplies everything afterwards. The console posts the layout path at creation and <m>bang</m> posts the configuration, so you can check which layout loaded. Several <o>zerr.envelopes~</o> objects driven by different features can be merged with <o>zerr.combinator~</o> before <o>zerr.disperser~</o>.
+	</discussion>
+
+	<!--MISC-->
+	<misc name="Output">
+		<entry name="multi-channel signal">
+			<description>
+				One envelope per loudspeaker, in layout order.
+			</description>
+		</entry>
+	</misc>
+
+	<!--RELATED-->
+	<seealsolist>
+		<seealso name="zerr.features~" />
+		<seealso name="zerr.combinator~" />
+		<seealso name="zerr.disperser~" />
+	</seealsolist>
+
+</c74object>

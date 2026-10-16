@@ -102,6 +102,9 @@ gh release delete <host>-v<ver>-rc1 --yes --cleanup-tag && git tag -d <host>-v<v
 - `maxmsp/README.md` describes the objects as they ship. Re-read the object reference against the
   current `class_new` / message tables after any wrapper change (argument defaults, error wording,
   accepted message forms).
+- The four reference pages in `maxmsp/docs/*.maxref.xml` say the same as the README reference.
+  They are hand-written, including `zerr.disperser~`'s (Min-API generation is switched off for it
+  with `MIN_FLAGS`), so a wrapper change means editing the page too.
 - `docs/releases/max-v<ver>.md` covers every user-visible commit in
   `git log max-v<last>..HEAD --oneline -- core maxmsp` (rule 7). For 0.3.0 there is no earlier
   `max-v` tag: the notes cover everything since the Max package was created.

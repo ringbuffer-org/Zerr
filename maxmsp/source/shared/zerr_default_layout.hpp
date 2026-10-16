@@ -10,19 +10,20 @@
 namespace zerr_max {
 
 /// Label shown in messages for the built-in layout (it is not a file on disk).
-constexpr const char* kDefaultLayoutName = "built-in ring_8";
+constexpr const char* kDefaultLayoutName = "built-in ring";
 
-/// Eight loudspeakers in a ring, the same positions as the help patches' circulation_8.yaml,
-/// as YAML text so the object works without any file on Max's search path.
+/// Eight loudspeakers in a regular ring, the same positions as configs/ring_8.yaml (shipped in
+/// the package's misc/ folder), as YAML text so the object works without any file on Max's
+/// search path. Keep the two in step.
 constexpr const char* kDefaultLayoutYaml = R"(standard:
-  1: { position: { cartesian: { x:  3.265, y: -1.065, z: 0.410 } } }
-  2: { position: { cartesian: { x:  0.995, y: -2.268, z: 0.410 } } }
-  3: { position: { cartesian: { x: -1.269, y: -2.318, z: 0.410 } } }
-  4: { position: { cartesian: { x: -3.124, y: -1.250, z: 0.410 } } }
-  5: { position: { cartesian: { x: -3.249, y:  1.433, z: 0.410 } } }
-  6: { position: { cartesian: { x: -1.553, y:  2.814, z: 0.410 } } }
-  7: { position: { cartesian: { x:  1.254, y:  2.946, z: 0.410 } } }
-  8: { position: { cartesian: { x:  3.145, y:  1.474, z: 0.410 } } }
+  1: { position: { spherical: { azimuth:   0.0, elevation: 0.0, distance: 1.0 } } }
+  2: { position: { spherical: { azimuth:  45.0, elevation: 0.0, distance: 1.0 } } }
+  3: { position: { spherical: { azimuth:  90.0, elevation: 0.0, distance: 1.0 } } }
+  4: { position: { spherical: { azimuth: 135.0, elevation: 0.0, distance: 1.0 } } }
+  5: { position: { spherical: { azimuth: 180.0, elevation: 0.0, distance: 1.0 } } }
+  6: { position: { spherical: { azimuth: 225.0, elevation: 0.0, distance: 1.0 } } }
+  7: { position: { spherical: { azimuth: 270.0, elevation: 0.0, distance: 1.0 } } }
+  8: { position: { spherical: { azimuth: 315.0, elevation: 0.0, distance: 1.0 } } }
 )";
 
 } // namespace zerr_max

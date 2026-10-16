@@ -22,7 +22,7 @@ TRIM=${TRIM:-crop=877:873:84:83}
 SIZES=${SIZES:-"512 256 128 64 32"}
 ICO_SIZES="16 32 48 64 128 256"
 AVATAR_PAD=96  # px added on each side before the disc so the outer nodes are not clipped
-MAX_MEDIA=maxmsp/media/zerr_logo.png
+MAX_MEDIA=maxmsp/media  # the Max package folder the patches load pictures from by bare name
 
 for tool in ffmpeg ffprobe; do
     command -v "$tool" >/dev/null || { echo "$tool not found" >&2; exit 1; }
@@ -94,8 +94,13 @@ for name in black-transparent white-transparent; do
     ff -i "$OUT/zerr-logo-$name.png" -vf "${pad},${disc}" "$OUT/zerr-logo-avatar-$name.png"
 done
 
-# The Max package ships a 256 px copy under this fixed name (the .maxhelp files reference it).
-ff -i "$OUT/zerr-logo-black-transparent.png" -vf "scale=256:256:flags=lanczos" "$MAX_MEDIA"
+# The Max package's media/ folder is on Max's search path, so the patches reference these
+# by bare file name: the help patches show the white ink at about 100 px (256 px is plenty
+# on a retina screen), the overview shows the grey ink at about 800 px (full size).
+mkdir -p "$MAX_MEDIA"
+ff -i "$OUT/zerr-logo-white-transparent.png" -vf "scale=256:256:flags=lanczos" \
+    "$MAX_MEDIA/zerr-logo-white-transparent.png"
+cp "$OUT/zerr-logo-grey-transparent.png" "$MAX_MEDIA/zerr-logo-grey-transparent.png"
 
 echo "written:"
 find "$OUT" "$MAX_MEDIA" -type f \( -name '*.png' -o -name '*.ico' \) | sort

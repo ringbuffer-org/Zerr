@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+
+<!-- Hand-written. Keep in step with the "Object reference" section of maxmsp/README.md. -->
+
+<c74object name="zerr.combinator~" category="Zerr">
+
+	<digest>
+		Combine several envelope sets into one: sum, geometric mean or maximum per channel
+	</digest>
+	<description>
+		Use the <o>zerr.combinator~</o> object to merge the multi-channel envelope sets of several <o>zerr.envelopes~</o> objects into one set, channel by channel: the sum, the geometric mean or the maximum of the inputs. The first argument is the number of sets, one multi-channel inlet each; the second is the mode. Every inlet must carry the same channel count, and the output has that many channels. The result feeds <o>zerr.disperser~</o>.
+	</description>
+
+	<!--METADATA-->
+	<metadatalist>
+		<metadata name="author">Zeyu Yang</metadata>
+		<metadata name="tag">Zerr</metadata>
+		<metadata name="tag">spatialization</metadata>
+		<metadata name="tag">multichannel</metadata>
+	</metadatalist>
+
+	<!--INLETS-->
+	<inletlist>
+		<inlet id="0" type="multi-channel signal">
+			<digest>
+				Envelope set 1; messages
+			</digest>
+			<description>
+				One multi-channel inlet per envelope set (the number of inlets is the first argument). All sets must have the same channel count, otherwise the object reports an error and outputs silence. Messages go to the left inlet.
+			</description>
+		</inlet>
+	</inletlist>
+
+	<!--OUTLETS-->
+	<outletlist>
+		<outlet id="0" type="multi-channel signal">
+			<digest>
+				Combined envelopes
+			</digest>
+			<description>
+				A multi-channel signal with the same channel count as the inputs, one combined envelope per loudspeaker.
+			</description>
+		</outlet>
+	</outletlist>
+
+	<!--ARGUMENTS-->
+	<objarglist>
+		<objarg name="sets" optional="1" type="int">
+			<digest>
+				Number of envelope sets (inlets)
+			</digest>
+			<description>
+				How many multi-channel inlets the object has, at least 1. Default: 2.
+			</description>
+		</objarg>
+		<objarg name="mode" optional="1" type="symbol">
+			<digest>
+				add, root or max
+			</digest>
+			<description>
+				The initial combination mode, see the <at>mode</at> attribute. Default: <m>max</m>.
+			</description>
+		</objarg>
+	</objarglist>
+
+	<!--MESSAGES-->
+	<methodlist>
+		<method name="signal">
+			<arglist />
+			<digest>
+				Envelope sets
+			</digest>
+			<description>
+				One multi-channel signal per inlet.
+			</description>
+		</method>
+		<method name="mode">
+			<arglist>
+				<arg name="add, root or max" optional="0" type="symbol" />
+			</arglist>
+			<digest>
+				Change the combination mode
+			</digest>
+			<description>
+				Sets the <at>mode</at> attribute. Safe while audio runs.
+			</description>
+		</method>
+		<method name="bang">
+			<arglist />
+			<digest>
+				Post the configuration
+			</digest>
+			<description>
+				Posts the number of sets, the mode and the channel count to the Max Console.
+			</description>
+		</method>
+	</methodlist>
+
+	<!--ATTRIBUTES-->
+	<attributelist>
+		<attribute name="mode" get="1" set="1" type="symbol" size="1">
+			<digest>
+				Combination mode
+			</digest>
+			<description>
+				How the sets are merged in each channel.
+			</description>
+			<attributelist>
+				<attribute name="enumvals" get="1" set="1" type="atom" size="3">
+					<enumlist>
+						<enum name="add">
+							<digest>
+								Sum
+							</digest>
+							<description>
+								The sum of the sets.
+							</description>
+						</enum>
+						<enum name="root">
+							<digest>
+								Geometric mean
+							</digest>
+							<description>
+								The N-th root of the product of the N sets, a square root for two sets: a speaker sounds only where every set gives it some level.
+							</description>
+						</enum>
+						<enum name="max">
+							<digest>
+								Maximum
+							</digest>
+							<description>
+								The largest envelope in each channel (default).
+							</description>
+						</enum>
+					</enumlist>
+				</attribute>
+				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Combination Mode" />
+				<attribute name="style" get="1" set="1" type="symbol" size="1" value="enum" />
+			</attributelist>
+		</attribute>
+		<attribute name="chans" get="1" set="0" type="long" size="1">
+			<digest>
+				Output channels (read-only)
+			</digest>
+			<description>
+				The channel count of the current inputs and therefore of the output. 0 until signal connections exist.
+			</description>
+			<attributelist>
+				<attribute name="label" get="1" set="1" type="symbol" size="1" value="Output Channels (read-only)" />
+			</attributelist>
+		</attribute>
+	</attributelist>
+
+	<!--DISCUSSION-->
+	<discussion>
+		Combining lets several features shape one distribution: for example one <o>zerr.envelopes~</o> driven by loudness and another by brightness. Think of <m>root</m> as "and" and <m>max</m> as "or": root plays a speaker only where every feature wants it, which keeps the distribution focused, while max lets any feature claim a speaker, which keeps it wide. <m>add</m> is the sum, so it can exceed 1, and <o>zerr.disperser~</o> does not limit; scale it down, for instance with the gain inlet of each <o>zerr.envelopes~</o> or an <o>mc.*~</o> after the combinator. The mode can be changed from the inspector, with the <m>mode</m> message or with the <at>mode</at> attribute, in all cases while audio runs and without a click. The number of sets is fixed at creation. If the inlets carry different channel counts the object reports an error and outputs silence until they match.
+	</discussion>
+
+	<!--MISC-->
+	<misc name="Output">
+		<entry name="multi-channel signal">
+			<description>
+				The combined envelope set.
+			</description>
+		</entry>
+	</misc>
+
+	<!--RELATED-->
+	<seealsolist>
+		<seealso name="zerr.envelopes~" />
+		<seealso name="zerr.disperser~" />
+		<seealso name="zerr.features~" />
+	</seealsolist>
+
+</c74object>

@@ -1,0 +1,40 @@
+# Six loudspeakers around a listening position, for the custom-layout example.
+# Metres from the listener: x to the right, y to the front, z up.
+# The speaker numbers are the channel order of zerr.envelopes~ and mc.dac~.
+standard:
+  1:
+    position:
+      cartesian:
+        x: -2.0
+        y:  3.0
+        z:  1.2
+  2:
+    position:
+      cartesian:
+        x:  2.0
+        y:  3.0
+        z:  1.2
+  3:
+    position:
+      cartesian:
+        x:  3.0
+        y:  0.0
+        z:  1.2
+  4:
+    position:
+      cartesian:
+        x:  3.0
+        y: -3.0
+        z:  1.2
+  5:
+    position:
+      cartesian:
+        x: -3.0
+        y: -3.0
+        z:  1.2
+  6:
+    position:
+      cartesian:
+        x: -3.0
+        y:  0.0
+        z:  1.2

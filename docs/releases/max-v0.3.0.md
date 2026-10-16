@@ -21,10 +21,18 @@ First release of Zerr* for Max, as a package for Max 9 on Apple Silicon (arm64, 
   Max. Full steps and troubleshooting in the package README. (#22, #23, #27)
 - Four objects with help patches and an overview patcher: `zerr.features~`, `zerr.envelopes~`,
   `zerr.combinator~`, `zerr.disperser~`. Speaker layouts ship in `misc/`.
+- Every object has a reference page (right-click → *Open Reference*), and the help patches walk
+  through one worked example each with use tips. `examples/` holds five complete patches: the
+  full chain on four speakers, three ports of the Pure Data examples (spectral centroid,
+  spectral flatness, zero crossings) and a custom-layout walkthrough with its own YAML. The
+  overview opens them from a menu.
 - Every object works from its plain name: `zerr.features~` extracts `rms`; `zerr.envelopes~` runs
   trajectory mode on a built-in 8-speaker ring; `zerr.combinator~` combines two sets;
   `zerr.disperser~` takes no arguments. (#28, #29)
 - `zerr.combinator~` gained a runtime `mode` message and `@mode` attribute. (#20)
+- The built-in layout of `zerr.envelopes~` (no layout argument) is now the regular eight-speaker
+  ring of `ring_8.yaml`, labelled `built-in ring` in the console; it used to be the irregular
+  studio ring from the old `circulation_8.yaml`, which no longer ships with the package.
 
 ## Fixes
 

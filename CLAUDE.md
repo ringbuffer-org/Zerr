@@ -108,7 +108,7 @@ block.
 ### Platform Wrappers
 
 - **PureData** (`puredata/`): 4 externals (`zerr_features~`, `zerr_envelopes~`, `zerr_combinator~`, `zerr_disperser~`). Built with pd-lib-builder (git submodule) + Makefile.
-- **Max/MSP** (`maxmsp/`): 4 externals (`zerr.features~`, `zerr.envelopes~`, `zerr.combinator~`, `zerr.disperser~`; natively multichannel, no `mc.` prefix). Built with Min-DevKit (git submodule) + CMake.
+- **Max/MSP** (`maxmsp/`): 4 externals (`zerr.features~`, `zerr.envelopes~`, `zerr.combinator~`, `zerr.disperser~`; natively multichannel, no `mc.` prefix). Built with Min-DevKit (git submodule) + CMake. Reference pages are hand-written in `maxmsp/docs/` (Min-API generation is disabled for `zerr.disperser~`).
 - **JACK** (`jack/`): Standalone client, in development. Uses Meson.
 
 ### Speaker Configurations (`configs/`)
