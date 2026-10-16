@@ -26,6 +26,10 @@ First release of Zerr* for Max, as a package for Max 9 on Apple Silicon (arm64, 
   `zerr.disperser~` takes no arguments. (#28, #29)
 - `zerr.combinator~` gained a runtime `mode` message and `@mode` attribute. (#20)
 
+- The built-in layout of `zerr.envelopes~` (no layout argument) is now the regular eight-speaker
+  ring of `ring_8.yaml`, labelled `built-in ring` in the console; it used to be the irregular
+  studio ring from the old `circulation_8.yaml`, which no longer ships with the package.
+
 ## Fixes
 
 - `zerr.envelopes~` and `zerr.features~` no longer overflow when the signal vector size grows
