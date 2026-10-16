@@ -156,6 +156,12 @@ class ZerrEnvelopes {
         const long count = std::min<long>(sampleframes, block);
 
         for (int i = 0; i < inputCount; ++i) {
+            if (i == gainInlet && !gainConnected.load(std::memory_order_relaxed)) {
+                // Nothing on the gain inlet: Max hands over zeros, which would mute every
+                // envelope. Unity gain instead, so a plain object plays.
+                std::fill(inputBuffer[i].begin(), inputBuffer[i].end(), 1.0);
+                continue;
+            }
             if (!ins[i]) {
                 silence(outs, numouts, sampleframes);
                 return;
@@ -236,6 +242,17 @@ class ZerrEnvelopes {
     /** @brief Posts the speaker setup to the Console */
     void printParameters() { generator->printParameters(); }
 
+    /**
+     * @brief Whether a patch cord is on the gain inlet, from dsp64's count[]
+     *
+     * Unconnected, the inlet counts as unity gain. Main thread, at DSP setup; the running
+     * perform() picks it up on its next block.
+     */
+    void setGainConnected(bool connected)
+    {
+        gainConnected.store(connected, std::memory_order_relaxed);
+    }
+
   private:
     /**
      * @brief Zeroes every output buffer; the fallback whenever processing cannot proceed
@@ -252,8 +269,10 @@ class ZerrEnvelopes {
         }
     }
 
-    static constexpr int inputCount = 3; /**< Signal inlets: control(0), spread(1), gain(2) */
-    int outputCount                 = 0; /**< One envelope per speaker in the layout */
+    static constexpr int inputCount = 3;    /**< Signal inlets: control(0), spread(1), gain(2) */
+    static constexpr int gainInlet  = 2;    /**< The inlet that reads 1 when nothing is connected */
+    std::atomic<bool> gainConnected{false}; /**< A cord is on the gain inlet (dsp64 count[]) */
+    int outputCount = 0;                    /**< One envelope per speaker in the layout */
 
     zerr::SystemConfigs systemConfigs; /**< Shape the generator is currently sized for */
     std::string selectionMode;         /**< "trajectory" or "trigger" */
