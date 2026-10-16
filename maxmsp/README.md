@@ -117,7 +117,7 @@ Inlets (all signals):
 
 1. control signal: 0 to 1 position (trajectory) or pulses (trigger)
 2. spread, 0 to 1 (trigger mode only)
-3. gain, applied to every envelope
+3. gain, applied to every envelope (1 when nothing is connected)
 
 Outlet: multichannel signal, one channel per speaker, in the layout's numbering.
 

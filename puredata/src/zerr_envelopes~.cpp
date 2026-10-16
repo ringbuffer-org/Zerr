@@ -103,7 +103,8 @@ void* zerr_envelopes_tilde_new(__attribute__((unused)) t_symbol* s, int argc, t_
 
     // create inlets
     x->spread_inlet = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
-    x->volume_inlet = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
+    // gain: 1 when nothing is connected (a float sent here sets a constant, as usual)
+    x->volume_inlet = signalinlet_new(&x->x_obj, 1.0f);
 
     // create outlets
     x->n_outlet = x->z->numOutlet; // get the number of outlets
