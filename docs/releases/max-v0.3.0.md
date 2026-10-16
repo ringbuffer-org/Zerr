@@ -43,6 +43,8 @@ First release of Zerr* for Max, as a package for Max 9 on Apple Silicon (arm64, 
   silently on the audio thread. (#30)
 - `zerr.combinator~` builds the core combinator for real; before #19 the mode argument was parsed
   and discarded. (#19)
+- `zerr.features~ cf` outputs 0 on silence instead of NaN (0/0), which used to poison every
+  object downstream once the input went quiet.
 
 ## Build and tooling
 
