@@ -390,8 +390,10 @@ jobs:
           else
             notes_args=(--notes "Draft. Write $final and paste it here before publishing.")
           fi
+          # Prerelease only for a suffixed version (0.3.0-rc1): test the version, not the
+          # tag, whose host prefix (max-v, pd-v) always carries a hyphen.
           pre=()
-          case "$GITHUB_REF_NAME" in *-*) pre=(--prerelease) ;; esac
+          case "$VERSION" in *-*) pre=(--prerelease) ;; esac
           gh release create "$GITHUB_REF_NAME" --draft --verify-tag --title "$TITLE" \
             "${notes_args[@]}" "${pre[@]}" assets/*.zip
           gh release view "$GITHUB_REF_NAME" --json isDraft,isPrerelease,assets \
