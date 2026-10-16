@@ -16,6 +16,4 @@ show them working together.
 The centroid, flatness and zero-crossing examples are ports of the Pure Data examples in
 `puredata/examples/`; the Pd versions use an 11-speaker line, the Max package ships `line_16`.
 
-Every example starts with the master gain at 0: turn audio on, then raise it. The gain inlet of
-`zerr.envelopes~` is a signal inlet, so each example feeds it `sig~ 1`; left unconnected it reads 0
-and the envelopes are silent.
+Every example starts with the master gain at 0: turn audio on, then raise it.
