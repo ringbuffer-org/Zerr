@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+
+<!-- Hand-written. Keep in step with the "Object reference" section of maxmsp/README.md. -->
+
+<c74object name="zerr.features~" category="Zerr">
+
+	<digest>
+		Extract audio features from a signal as audio-rate control signals
+	</digest>
+	<description>
+		Use the <o>zerr.features~</o> object to extract audio features (loudness, brightness, zero crossings, spectral change and more) from a mono signal. Each argument names one feature and adds one signal outlet; the outlets are the control signals that drive <o>zerr.envelopes~</o>. With no argument the object extracts <m>rms</m>.
+	</description>
+
+	<!--METADATA-->
+	<metadatalist>
+		<metadata name="author">Zeyu Yang</metadata>
+		<metadata name="tag">Zerr</metadata>
+		<metadata name="tag">spatialization</metadata>
+		<metadata name="tag">analysis</metadata>
+	</metadatalist>
+
+	<!--INLETS-->
+	<inletlist>
+		<inlet id="0" type="signal">
+			<digest>
+				Mono source to analyse
+			</digest>
+			<description>
+				The signal whose features are extracted. Also accepts <m>bang</m>.
+			</description>
+		</inlet>
+	</inletlist>
+
+	<!--OUTLETS-->
+	<outletlist>
+		<outlet id="0" type="signal">
+			<digest>
+				Feature signals, one outlet per argument
+			</digest>
+			<description>
+				One signal outlet per feature argument, in argument order. Each carries that feature's value, updated at audio rate.
+			</description>
+		</outlet>
+	</outletlist>
+
+	<!--ARGUMENTS-->
+	<objarglist>
+		<objarg name="feature" optional="1" type="symbol">
+			<digest>
+				Feature names (any number)
+			</digest>
+			<description>
+				Each argument names one feature to extract and adds one outlet. Valid names: <m>rms</m> (root mean square, loudness), <m>zcr</m> (zero-crossing rate), <m>flx</m> (spectral flux, change), <m>cf</m> (crest factor), <m>ctd</m> (spectral centroid, brightness), <m>rlf</m> (spectral rolloff), <m>flt</m> (spectral flatness), <m>zc</m> (zero crossings, a pulse at each crossing). Default: <m>rms</m>.
+			</description>
+		</objarg>
+	</objarglist>
+
+	<!--MESSAGES-->
+	<methodlist>
+		<method name="signal">
+			<arglist />
+			<digest>
+				Source signal
+			</digest>
+			<description>
+				The mono signal to analyse.
+			</description>
+		</method>
+		<method name="bang">
+			<arglist />
+			<digest>
+				Post the configuration
+			</digest>
+			<description>
+				Posts the package version, the extracted features in outlet order, the signal vector size and the sample rate to the Max Console. Useful to confirm which build of the object is loaded.
+			</description>
+		</method>
+	</methodlist>
+
+	<!--ATTRIBUTES-->
+	<attributelist>
+	</attributelist>
+
+	<!--DISCUSSION-->
+	<discussion>
+		Feature ranges differ: <m>rms</m>, <m>flt</m> and <m>zcr</m> stay within 0 to 1, <m>ctd</m> and <m>rlf</m> are in Hz, <m>cf</m> is a ratio at or above 1, and <m>zc</m> is a pulse train. Scale a feature into the 0 to 1 range expected by the control inlet of <o>zerr.envelopes~</o> with ordinary signal arithmetic (<o>*~</o>, <o>-~</o>, <o>clip~</o>); the package's examples folder shows this for four features. The analysis window is 2048 samples; the signal vector size must not exceed it. The features are not normalised: they are control signals, never audio. Do not connect an outlet to <o>dac~</o>; scale it and send it to <o>zerr.envelopes~</o>. All features except <m>zc</m> are measured over the last 2048 samples and updated once per signal vector, ramped linearly across it, so they are smooth and lag by about 46 ms at 44.1 kHz. <m>zc</m> is sample-accurate and touches 1 exactly on every zero crossing, which makes it a ready trigger for a <m>trigger</m>-mode <o>zerr.envelopes~</o>; set <m>interval</m> there, or the sound jumps hundreds of times a second. Level leaks into <m>rms</m> and <m>flx</m> only; the other features are ratios or frequencies.
+	</discussion>
+
+	<!--MISC-->
+	<misc name="Output">
+		<entry name="signal">
+			<description>
+				One feature value per outlet, as a signal.
+			</description>
+		</entry>
+	</misc>
+
+	<!--RELATED-->
+	<seealsolist>
+		<seealso name="zerr.envelopes~" />
+		<seealso name="zerr.combinator~" />
+		<seealso name="zerr.disperser~" />
+	</seealsolist>
+
+</c74object>

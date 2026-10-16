@@ -13,10 +13,10 @@ source ──▶ zerr.features~ ──▶ zerr.envelopes~ ──▶ zerr.combina
 
 | Object | Role |
 | --- | --- |
-| `zerr.features~` | extracts audio features (loudness, brightness, flux…) as audio-rate signals |
-| `zerr.envelopes~` | turns a control signal plus a speaker layout into one envelope per loudspeaker |
-| `zerr.combinator~` | merges several envelope sets into one (add, root, max), switchable live |
-| `zerr.disperser~` | multiplies a mono source by the envelopes: one output channel per speaker |
+| `zerr.features~` | extracts audio features (loudness, brightness, flux…) as audio-rate control signals |
+| `zerr.envelopes~` | generates one envelope per speaker from a control signal, by trajectory or by trigger |
+| `zerr.combinator~` | combines several envelope sets into one: sum, geometric mean or maximum per channel, switchable live |
+| `zerr.disperser~` | disperses a mono source over the speakers, each channel shaped by its envelope |
 
 Every object has a help patch. The package's overview (Package Manager → Zerr → *Launch*) links to
 all of them.
@@ -48,11 +48,11 @@ all of them.
   command above on the whole `Zerr` folder and restart Max.
 - **"zerr.features~: No such object".** The folder must be named exactly `Zerr` and sit directly
   under `Packages`, with `externals/` inside it. Restart Max after moving it.
-- **"Cannot find YAML file: …"** from `zerr.envelopes~`. The layout name is looked up on Max's
-  search path. The package's `misc/` folder (on the search path once the package is installed)
-  holds `quad_4`, `ring_8`, `line_16` and `ambisonic_21`; `circulation_8` sits beside the help
-  patches. For your own layout, put the `.yaml` next to your patch, anywhere in the search path, or
-  give an absolute path.
+- **"cannot find speaker layout '…'"** from `zerr.envelopes~`, and the box stays dashed. The
+  layout name is looked up on Max's search path, as given and with `.yaml` or `.yml` added. The
+  package's `misc/` folder (on the search path once the package is installed) holds `quad_4`,
+  `ring_8`, `line_16` and `ambisonic_21`. For your own layout, put the `.yaml` next to your
+  patch, anywhere in the search path, or give an absolute path; then retype the box.
 - **Everything instantiates but there is no sound from `zerr.disperser~`.** Its first inlet must
   receive a mono signal. A multichannel source silences the output.
 
@@ -74,9 +74,14 @@ standard:
 
 ## Object reference
 
+Each object also has a reference page inside Max: right-click the object and choose *Open
+Reference*, or use the sidebar of its help patch. The pages say the same as this section.
+
 ### `zerr.features~ [<feature> …]`
 
 Extracts audio features from a mono signal, at audio rate. With no argument it extracts `rms`.
+**The features are not normalised**: they are control signals with very different ranges, never
+audio. Do not connect an outlet to `dac~`; scale it and send it to `zerr.envelopes~`.
 
 | name | feature | | name | feature |
 | --- | --- | --- | --- | --- |
@@ -87,18 +92,26 @@ Extracts audio features from a mono signal, at audio rate. With no argument it e
 
 - Inlet: the mono source.
 - Outlets: one signal per feature argument, in argument order.
-- `bang`: posts the outlet count to the Console.
+- `bang`: posts version, the features in outlet order, block size and sample rate.
+
+All features except `zc` are measured over the last 2048 samples and updated once per signal
+vector, ramped across it (about 46 ms lag at 44.1 kHz). `zc` is a sample-accurate pulse that
+touches 1 on every zero crossing: a ready trigger for `zerr.envelopes~ trigger`, with `interval`
+set. `rms`, `zcr`, `flt` are 0 to 1; `ctd`, `rlf` in Hz; `cf` 1 and up; `flx` 0 and up. Level
+only affects `rms` and `flx`.
 
 ### `zerr.envelopes~ [trigger|trajectory] [<layout>]`
 
 Generates one envelope per loudspeaker. The first argument is the mode (default `trajectory`),
 the second the name of a layout YAML on the search path (`.yaml` may be omitted). Without a
-layout the object uses a built-in ring of eight speakers, the same positions as `circulation_8`.
+layout the object uses a built-in ring of eight speakers, the same positions as `ring_8`.
 
 - **trajectory**: the control signal (0 to 1) is a position along a chain of speakers; the envelope
   crossfades between neighbours along that chain.
-- **trigger**: every time the control signal reaches 1, the envelope jumps to another speaker
-  connected to the current one; the spread inlet widens the jump over nearby speakers.
+- **trigger**: every time the control signal reaches 1, the envelope jumps to a speaker
+  connected to the current one (at start: any active speaker, itself included); the spread inlet
+  widens the jump over nearby speakers. The pulse must touch 1.0 exactly, and a signal held at 1
+  keeps jumping, so send pulses and cap the rate with `interval`.
 
 Inlets (all signals):
 
@@ -117,33 +130,46 @@ Messages (speaker numbers as in the layout file):
 | `topo set <from> <n> …` / `topo add …` / `topo del …` | which speakers a trigger may jump to from `<from>` |
 | `curr <n>` | set the current speaker (trigger mode) |
 | `interval <ms>` | minimum time between two jumps (trigger mode) |
-| `print` | post the current speaker setup |
-| `bang` | post the outlet count |
+| `print` | post the active speakers, the trajectory and the topology (from \| to …) |
+| `bang` | post version, mode, speaker count, layout, block size and sample rate |
 
-A speaker must be active to appear in `traj`, `topo` or `curr`; deactivate it only after taking it
-out of those lists.
+Only active speakers may appear in `traj`, `topo` and `curr`: a `traj` or `topo set` with an
+inactive number is refused, `topo add` and `topo del` skip it. `active set` replaces the list and
+resets the trajectory (numeric order) and the topology (fully connected). `active add` only
+activates; the new speaker joins no trajectory or topology until you put it there. `active del`
+also drops the speakers from the trajectory and the topology, is refused if it would leave no
+active speaker or an empty trajectory, and moves the sound to the first speaker still active if
+the current one goes. A speaker with no links left keeps the trigger on itself.
 
 ### `zerr.combinator~ [<sets>] [add|root|max]`
 
-Merges several envelope sets into one. The first argument is the number of sets (default 2); the
-object gets one multichannel inlet per set, and every inlet must carry the same channel count (otherwise it
-reports an error and outputs silence). The mode defaults to `max`.
+Combines several envelope sets into one, channel by channel. The first argument is the number of
+sets (default 2); the object gets one multichannel inlet per set, and every inlet must carry the same
+channel count (otherwise it reports an error and outputs silence). The mode defaults to `max`.
 
 - `add`: sum of the sets
-- `root`: geometric mean, the N-th root of the product of N sets
+- `root`: geometric mean, the N-th root of the product of N sets (a square root for two)
 - `max`: the largest envelope in each channel
 
 The mode can be changed while audio runs: `mode root` as a message, `@mode root` as an attribute,
 or from the inspector. `chans` (read-only attribute) reports the channel count; `bang` posts the
 current settings.
 
+Think of `root` as "and" and `max` as "or": root plays a speaker only where every feature wants
+it, max lets any feature claim one. `add` can exceed 1 and `zerr.disperser~` does not limit, so
+scale it down, for instance with the gain inlet of each `zerr.envelopes~` or an `mc.*~` after the
+combinator.
+
 ### `zerr.disperser~`
 
-Multiplies a mono source by a set of envelopes. No arguments.
+Disperses a mono source over the speakers by multiplying it with a set of envelopes. No arguments.
 
-- Inlet 1: the mono source.
+- Inlet 1: the mono source. A multichannel signal here silences the output: sum or pick a channel first.
 - Inlet 2: multichannel envelopes from `zerr.envelopes~` or `zerr.combinator~`.
 - Outlet: multichannel signal, one channel per envelope. Connect it to `mc.dac~` or route it on.
+
+The channel count follows the envelopes, not a layout file. The envelopes are plain gains: values
+above 1 boost, negative values flip the phase.
 
 ## Building from source
 

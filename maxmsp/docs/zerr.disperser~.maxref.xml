@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+
+<!-- Hand-written. Keep in step with the "Object reference" section of maxmsp/README.md.
+     Min-API's automatic page generation is switched off for this object (MIN_FLAGS in
+     source/projects/zerr.disperser_tilde/zerr.disperser_tilde.cpp), so Max never overwrites it. -->
+
+<c74object name="zerr.disperser~" category="Zerr">
+
+	<digest>
+		Disperse a mono source over the speakers, each channel shaped by its envelope
+	</digest>
+	<description>
+		Use the <o>zerr.disperser~</o> object as the last stage of the Zerr* chain: it disperses a mono source over the loudspeakers by multiplying it with a multi-channel envelope set, one output channel per envelope. The envelopes come from <o>zerr.envelopes~</o> or <o>zerr.combinator~</o>; the output goes to <o>mc.dac~</o> or on to further multi-channel processing.
+	</description>
+
+	<!--METADATA-->
+	<metadatalist>
+		<metadata name="author">Zeyu Yang</metadata>
+		<metadata name="tag">Zerr</metadata>
+		<metadata name="tag">spatialization</metadata>
+		<metadata name="tag">multichannel</metadata>
+	</metadatalist>
+
+	<!--INLETS-->
+	<inletlist>
+		<inlet id="0" type="signal">
+			<digest>
+				Mono source
+			</digest>
+			<description>
+				The signal to disperse over the loudspeakers. It must be mono: a multi-channel source silences the output, so sum or pick a channel first.
+			</description>
+		</inlet>
+		<inlet id="1" type="multi-channel signal">
+			<digest>
+				Envelopes
+			</digest>
+			<description>
+				One envelope per loudspeaker, from <o>zerr.envelopes~</o> or <o>zerr.combinator~</o>.
+			</description>
+		</inlet>
+	</inletlist>
+
+	<!--OUTLETS-->
+	<outletlist>
+		<outlet id="0" type="multi-channel signal">
+			<digest>
+				The source on every speaker channel, scaled by its envelope
+			</digest>
+			<description>
+				A multi-channel signal with one channel per envelope: the source scaled by that loudspeaker's envelope. Connect it to <o>mc.dac~</o>.
+			</description>
+		</outlet>
+	</outletlist>
+
+	<!--ARGUMENTS-->
+	<objarglist>
+	</objarglist>
+
+	<!--MESSAGES-->
+	<methodlist>
+		<method name="signal">
+			<arglist />
+			<digest>
+				Source and envelopes
+			</digest>
+			<description>
+				The mono source in the left inlet, the multi-channel envelopes in the right inlet.
+			</description>
+		</method>
+	</methodlist>
+
+	<!--ATTRIBUTES-->
+	<attributelist>
+	</attributelist>
+
+	<!--DISCUSSION-->
+	<discussion>
+		The channel count follows the envelopes, not a layout file: change the layout argument of <o>zerr.envelopes~</o> and <o>zerr.disperser~</o> adapts on its own; nothing is set here. The envelopes are gains and are not limited: <o>zerr.envelopes~</o> stays within 0 and 1, but if you build envelopes yourself, values above 1 boost and negative values flip the phase. The object takes no arguments and has no messages beyond the signals.
+	</discussion>
+
+	<!--MISC-->
+	<misc name="Output">
+		<entry name="multi-channel signal">
+			<description>
+				The source on every loudspeaker channel, each scaled by its envelope.
+			</description>
+		</entry>
+	</misc>
+
+	<!--RELATED-->
+	<seealsolist>
+		<seealso name="zerr.envelopes~" />
+		<seealso name="zerr.combinator~" />
+		<seealso name="zerr.features~" />
+	</seealsolist>
+
+</c74object>

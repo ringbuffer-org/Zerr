@@ -22,6 +22,8 @@ class zerr_disperser_tilde : public object<zerr_disperser_tilde>, public mc_oper
     MIN_TAGS{"zerr"};
     MIN_AUTHOR{"Zeyu Yang"};
     MIN_RELATED{"zerr.envelopes~, zerr.combinator~, zerr.features~"};
+    // The reference page is hand-written in maxmsp/docs/; keep Min from regenerating it.
+    MIN_FLAGS{documentation_flags::do_not_generate};
 
     // ==========================
     // Inlets & Outlets
