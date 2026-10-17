@@ -85,9 +85,9 @@ gh release delete <host>-v<ver>-rc1 --yes --cleanup-tag && git tag -d <host>-v<v
 
 ### Before building
 
-- The release notes must open with a **Breaking** section when anything below applies. Pending as
-  of 2026-10-12: the Max objects lost their `mc.` prefix (PR #21), and `root` combination mode now
-  computes the geometric mean instead of behaving like `max` (PR #19).
+- The release notes must open with a **Breaking** section when anything below applies. Pending
+  for the next Max release: none recorded. (The `mc.` rename of PR #21 and the `root` mode change
+  of PR #19 shipped in `max-v0.3.0`.)
 - Keep `"x64"` in `os.macintosh.platform` of `package-info.json`, whatever the docs say about it
   meaning Intel. Max 9 looks up the block for the running OS and requires `x64` there, otherwise it
   refuses the whole package with "Could not load package 'Zerr', 64-bit architecture unsupported"
