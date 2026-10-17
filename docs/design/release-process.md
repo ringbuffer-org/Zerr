@@ -46,7 +46,8 @@ _Maintainer steps. User-facing install instructions live in `maxmsp/README.md` a
      is the file the `release` job reads. A core change therefore cannot be forgotten by a host:
      it was recorded when it landed, and the Pd file keeps accumulating while only Max ships.
    - Before tagging, check the notes against git rather than memory. `<last>` is the host's
-     previous tag (`v0.2` for Pd until the first `pd-v` tag exists):
+     previous tag (`v0.1` for Pd until the first `pd-v` tag exists; it is the Pd 0.1 release and
+     the only pre-split tag left):
      ```bash
      git log <host>-v<last>..HEAD --oneline -- core <maxmsp|puredata>
      ```
@@ -159,7 +160,8 @@ Then tag `max-v<ver>` as under *Ship* above.
 - Pending "Breaking" items for the next Pd release: none recorded. (The `mc.` rename and the
   `root` mode change were Max-only.)
 - Rename `docs/releases/pd-next.md` to `docs/releases/pd-v<ver>.md` and check it against
-  `git log v0.2..HEAD --oneline -- core puredata` (rule 7; `v0.2` is the last Pd tag).
+  `git log v0.1..HEAD --oneline -- core puredata` (rule 7; `v0.1`, the Pd 0.1 release, is the
+  last Pd tag). Pd versioning starts properly with `pd-v0.3.0`.
 - Bump `VERSION` in `puredata/zerr-meta.pd`. It is the only place the Pd version lives: the
   Makefile compiles it in as `ZERR_PD_VERSION`, pd-lib-builder reads it as `lib.version`, and the
   zip name carries it.
