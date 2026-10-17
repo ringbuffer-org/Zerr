@@ -110,7 +110,7 @@ endif()
 # the ad-hoc signature max-posttarget.cmake applied; CI verifies it after install.
 foreach (extern_name ${ZERR_MAX_EXTERNALS})
     install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/externals/${extern_name}.mxo"
-            DESTINATION externals USE_SOURCE_PERMISSIONS)
+            DESTINATION externals USE_SOURCE_PERMISSIONS PATTERN ".DS_Store" EXCLUDE)
 endforeach ()
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/help/" DESTINATION help
         FILES_MATCHING PATTERN "*.maxhelp" PATTERN "*.mxo" EXCLUDE)
@@ -121,7 +121,8 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/docs/" DESTINATION docs
         FILES_MATCHING PATTERN "*.maxref.xml")
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples/" DESTINATION examples
         FILES_MATCHING PATTERN "*.maxpat" PATTERN "*.yaml" PATTERN "README.md")
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/media/" DESTINATION media)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/media/" DESTINATION media
+        PATTERN ".DS_Store" EXCLUDE)
 # Speaker layouts shipped with the package. Max adds a package's misc/ folder to
 # the search path, so `zerr.envelopes~ trigger ring_8` resolves without a path.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../configs/" DESTINATION misc

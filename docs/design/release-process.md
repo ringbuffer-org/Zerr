@@ -127,6 +127,7 @@ Checks:
 codesign --verify --deep --strict maxmsp/dist/Zerr/externals/*.mxo
 lipo -archs 'maxmsp/dist/Zerr/externals/zerr.features~.mxo/Contents/MacOS/zerr.features~'   # arm64
 unzip -l maxmsp/dist/zerr-max-*.zip | head
+unzip -l maxmsp/dist/zerr-max-*.zip | grep -c -e __MACOSX -e .DS_Store    # 0: ditto --norsrc, no Finder files
 ```
 
 CI (`maxmsp (macos)` job) performs the same assembly and uploads the zip as `zerr-max-macos-arm64`;
