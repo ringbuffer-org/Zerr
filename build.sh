@@ -328,7 +328,7 @@ package_puredata() {
 
     local zip
     zip="zerr-pd-$(pd_version)-$(host_os)-$(host_arch).zip"
-    rm -f "$dist"/zerr-pd-*.zip
+    rm -f "$dist"/*.zip   # also zips from a previous version, architecture or naming
     zip_dir "$dist" zerr "$zip"
     echo "Pure Data package assembled: $dist/zerr"
     echo "Pure Data package zipped:    $dist/$zip"
@@ -412,7 +412,7 @@ package_maxmsp() {
     # stays Zerr/, the Max package name.
     local zip="zerr-max-$(max_version)-macos-${archs}.zip"
 
-    rm -f "$dist"/zerr-max-*.zip   # also zips from a previous version or architecture
+    rm -f "$dist"/*.zip   # also zips from a previous version, architecture or naming
     zip_dir "$dist" Zerr "$zip"
     echo "Max package assembled: $dist/Zerr"
     echo "Max package zipped:    $dist/$zip"
@@ -448,12 +448,16 @@ host_arch() {
 }
 
 # zip_dir <parent> <folder> <zip>: zips <parent>/<folder> as <parent>/<zip> with the
-# folder as the top-level entry. ditto keeps the bundle metadata and permissions a
-# plain zip of a .mxo can lose; elsewhere CMake's tar does the job.
+# folder as the top-level entry. ditto keeps the bundle permissions a plain zip of a
+# .mxo can lose; --norsrc leaves out resource forks and extended attributes, which
+# --sequesterRsrc would write as a __MACOSX/._* tree that Windows and Linux users see
+# as junk (a code signature lives in _CodeSignature/, not in an attribute). Finder's
+# .DS_Store files are dropped first. Elsewhere CMake's tar does the job.
 zip_dir() {
     local parent="$1" folder="$2" zip="$3"
+    find "$parent/$folder" -name .DS_Store -delete
     if command -v ditto &> /dev/null; then
-        ( cd "$parent" && ditto -c -k --sequesterRsrc --keepParent "$folder" "$zip" )
+        ( cd "$parent" && ditto -c -k --norsrc --keepParent "$folder" "$zip" )
     else
         ( cd "$parent" && cmake -E tar cf "$zip" --format=zip "$folder" )
     fi
