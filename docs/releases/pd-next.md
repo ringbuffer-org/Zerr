@@ -1,7 +1,8 @@
 _Pending notes for the next Pure Data release (rule 7 in `docs/design/release-process.md`).
 Renamed to `pd-v<ver>.md` when the version in `puredata/zerr-meta.pd` is decided. Lines added
-since 2026-10-15 only; everything earlier since `v0.2` still has to be enumerated with
-`git log v0.2..HEAD --oneline -- core puredata` before the first `pd-v` tag._
+since 2026-10-15 only; everything earlier since `v0.1` (the Pd 0.1 release, the last Pd tag)
+still has to be enumerated with `git log v0.1..HEAD --oneline -- core puredata` before the first
+`pd-v` tag._
 
 ## Changed
 
