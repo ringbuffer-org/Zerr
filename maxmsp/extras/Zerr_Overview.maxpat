@@ -9,7 +9,7 @@
             "modernui": 1
         },
         "classnamespace": "box",
-        "rect": [ 1658.0, -371.0, 1237.0, 1234.0 ],
+        "rect": [ 1925.0, -221.0, 1092.0, 1141.0 ],
         "openinpresentation": 1,
         "boxes": [
             {
@@ -438,9 +438,9 @@
                     "numoutlets": 0,
                     "patching_rect": [ 22.0, 99.0, 823.0, 87.0 ],
                     "presentation": 1,
-                    "presentation_linecount": 3,
-                    "presentation_rect": [ 22.0, 99.0, 884.0, 87.0 ],
-                    "text": "Channel-based spatialization for any loudspeaker layout. Audio features extracted from the signal drive its distribution over the speakers: no manual positioning. Four objects form the chain; each has a help patch."
+                    "presentation_linecount": 2,
+                    "presentation_rect": [ 22.0, 99.0, 884.0, 60.0 ],
+                    "text": "Channel-based spatialization for any loudspeaker layout. Audio features extracted from the signal drive its distribution over the speakers: no manual positioning."
                 }
             },
             {
@@ -472,15 +472,15 @@
                 "box": {
                     "fontsize": 12.0,
                     "id": "obj-7",
-                    "linecount": 5,
+                    "linecount": 4,
                     "maxclass": "comment",
                     "numinlets": 1,
                     "numoutlets": 0,
-                    "patching_rect": [ 400.0, 253.8888888888888, 292.0, 74.0 ],
+                    "patching_rect": [ 400.0, 253.8888888888888, 295.0, 60.0 ],
                     "presentation": 1,
-                    "presentation_linecount": 5,
-                    "presentation_rect": [ 400.0, 253.8888888888888, 292.0, 74.0 ],
-                    "text": "Extracts audio features from a mono signal, at audio rate. Arguments pick the features (rms zcr flx ctd rlf cf flt zc); one signal outlet per argument, in argument order. These are the control signals that drive the spatialization."
+                    "presentation_linecount": 4,
+                    "presentation_rect": [ 400.0, 253.8888888888888, 295.0, 60.0 ],
+                    "text": "Extracts audio features from a mono signal, at audio rate. Arguments pick the features; one signal outlet per argument, in argument order. These are the control signals that drive the spatialization."
                 }
             },
             {
@@ -552,15 +552,15 @@
                 "box": {
                     "fontsize": 12.0,
                     "id": "obj-13",
-                    "linecount": 6,
+                    "linecount": 3,
                     "maxclass": "comment",
                     "numinlets": 1,
                     "numoutlets": 0,
-                    "patching_rect": [ 48.888888888888886, 703.7346938775511, 252.5, 87.0 ],
+                    "patching_rect": [ 48.888888888888886, 703.7346938775511, 252.5, 47.0 ],
                     "presentation": 1,
-                    "presentation_linecount": 6,
-                    "presentation_rect": [ 48.888888888888886, 703.7346938775511, 252.5, 87.0 ],
-                    "text": "Merges several envelope sets (one multichannel inlet per set, equal channel counts) into one set by add, root (geometric mean) or max. The mode is an argument, an attribute, and a message, so it can change while audio runs."
+                    "presentation_linecount": 3,
+                    "presentation_rect": [ 48.888888888888886, 703.7346938775511, 252.5, 47.0 ],
+                    "text": "Merges several envelope sets (one multichannel inlet per set, equal channel counts) into one set."
                 }
             },
             {
@@ -598,9 +598,9 @@
                     "numoutlets": 0,
                     "patching_rect": [ 292.22222222222223, 870.0, 275.0, 47.0 ],
                     "presentation": 1,
-                    "presentation_linecount": 3,
-                    "presentation_rect": [ 292.22222222222223, 870.0, 275.0, 47.0 ],
-                    "text": "Multiplies a mono source by a multichannel envelope set: one output channel per loudspeaker, ready for mc.dac~ or further routing."
+                    "presentation_linecount": 2,
+                    "presentation_rect": [ 292.22222222222223, 870.0, 287.7777777777778, 33.0 ],
+                    "text": "Multiplies a mono source by a multichannel envelope set: one output channel per loudspeaker."
                 }
             },
             {
@@ -661,15 +661,15 @@
                 "box": {
                     "fontsize": 12.0,
                     "id": "obj-30",
-                    "linecount": 3,
+                    "linecount": 2,
                     "maxclass": "comment",
                     "numinlets": 1,
                     "numoutlets": 0,
-                    "patching_rect": [ 765.0, 636.0, 240.0, 47.0 ],
+                    "patching_rect": [ 765.0, 636.0, 240.0, 33.0 ],
                     "presentation": 1,
-                    "presentation_linecount": 3,
-                    "presentation_rect": [ 765.0, 636.0, 240.0, 47.0 ],
-                    "text": "Complete patches, one scenario each, in the package's examples/ folder (also listed under Examples in the Package Manager). "
+                    "presentation_linecount": 2,
+                    "presentation_rect": [ 765.0, 636.0, 240.0, 33.0 ],
+                    "text": "Complete patches, one scenario each, in the package's examples/ folder. "
                 }
             },
             {

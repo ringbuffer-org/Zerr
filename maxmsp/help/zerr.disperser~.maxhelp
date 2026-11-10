@@ -9,7 +9,7 @@
             "modernui": 1
         },
         "classnamespace": "box",
-        "rect": [ 2417.0, -238.0, 1087.0, 822.0 ],
+        "rect": [ 2031.0, -249.0, 1848.0, 1165.0 ],
         "boxes": [
             {
                 "box": {
@@ -47,12 +47,12 @@
                 "box": {
                     "bubble": 1,
                     "id": "obj-31",
-                    "linecount": 4,
+                    "linecount": 3,
                     "maxclass": "comment",
                     "numinlets": 1,
                     "numoutlets": 0,
-                    "patching_rect": [ 57.000000000000014, 794.0, 320.0, 64.0 ],
-                    "text": "Channel count follows the envelopes, not the layout file. Swap the layout argument of [zerr.envelopes~] and [zerr.disperser~] adapts on its own; nothing needs to be set here."
+                    "patching_rect": [ 57.000000000000014, 794.0, 322.0, 51.0 ],
+                    "text": "Channel count follows the envelopes. Swap the layout argument of [zerr.envelopes~] and [zerr.disperser~] adapts on its own; nothing needs to be set here."
                 }
             },
             {
@@ -365,7 +365,7 @@
                     "maxclass": "comment",
                     "numinlets": 1,
                     "numoutlets": 0,
-                    "patching_rect": [ 40.0, 216.40000218153, 676.0, 69.0 ],
+                    "patching_rect": [ 40.0, 216.40000218153, 678.0, 69.0 ],
                     "text": "In the help patch, the source is a 100 Hz sine from [cycle~]. Four envelopes are packed with [mc.pack~ 4]: a slow triangle wave, a square pulse, white noise and a [number~] you set by hand. Every output channel is the same sine, scaled by its own envelope, so the four channels behave differently from one tone. You can check the waveforms of the envelopes and the waveforms of the outputs for an intuitive feeling"
                 }
             },
